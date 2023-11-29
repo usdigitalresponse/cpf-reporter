@@ -1,6 +1,6 @@
 // Lambda defaults
 locals {
-  lambda_artifacts_base_path = trimsuffix(coalesce(var.lambda_artifacts_base_path, "${path.module}/../api/dist/zipball"), "/")
+  lambda_artifacts_base_path = trimsuffix(coalesce(var.lambda_artifacts_base_path, "${path.module}/../api/dist/zipballs"), "/")
   datadog_lambda_custom_tags = {
     "git.repository_url" = var.git_repository_url
     "git.commit.sha"     = var.git_commit_sha

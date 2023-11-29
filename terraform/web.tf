@@ -134,6 +134,10 @@ locals {
   website_config_object_contents = templatefile("${path.module}/tpl/deploy-config.js.tftpl", {
     feature_flags = jsonencode(var.website_feature_flags),
   })
+  website_origin_artifacts_dist_path = coalesce(
+    var.website_origin_artifacts_dist_path,
+    "${path.module}/../web/dist"
+  )
 }
 
 resource "aws_s3_object" "website_deploy_config" {
@@ -143,6 +147,21 @@ resource "aws_s3_object" "website_deploy_config" {
   etag                   = md5(local.website_config_object_contents)
   source_hash            = md5(local.website_config_object_contents)
   server_side_encryption = "AES256"
+
+  depends_on = [module.origin_bucket]
+}
+
+resource "aws_s3_object" "origin_dist_artifact" {
+  for_each = fileset(local.website_origin_artifacts_dist_path, "**")
+
+  bucket                 = module.origin_bucket.bucket_id
+  key                    = "${local.website_origin_artifacts_dist_path}/${each.value}"
+  source                 = "${local.website_origin_artifacts_dist_path}/${each.value}"
+  source_hash            = filemd5("${local.website_origin_artifacts_dist_path}/${each.value}")
+  etag                   = filemd5("${local.website_origin_artifacts_dist_path}/${each.value}")
+  server_side_encryption = "AES256"
+
+  depends_on = [module.origin_bucket]
 }
 
 module "cdn" {

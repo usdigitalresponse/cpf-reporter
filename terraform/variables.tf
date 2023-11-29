@@ -221,6 +221,12 @@ variable "lambda_log_level" {
 }
 
 // Web (static client site served from CDN)
+variable "website_origin_artifacts_dist_path" {
+  description = "Path to the local directory from which website build artifacts are sourced and uploaded to the S3 origin bucket."
+  type        = string
+  default     = ""
+}
+
 variable "website_feature_flags" {
   description = "Feature flags for configuring the website independently of builds."
   type        = any
