@@ -33,6 +33,8 @@ provider "datadog" {
 }
 
 data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+data "aws_partition" "current" {}
 
 data "aws_ssm_parameter" "vpc_id" {
   name = "${var.ssm_deployment_parameters_path_prefix}/network/vpc_id"
@@ -40,6 +42,10 @@ data "aws_ssm_parameter" "vpc_id" {
 
 data "aws_ssm_parameter" "private_subnet_ids" {
   name = "${var.ssm_deployment_parameters_path_prefix}/network/private_subnet_ids"
+}
+
+data "aws_kms_key" "ssm" {
+  key_id = "alias/aws/ssm"
 }
 
 locals {
@@ -56,6 +62,13 @@ data "aws_ssm_parameter" "datadog_api_key_secret_arn" {
   count = var.datadog_enabled ? 1 : 0
 
   name = "${var.ssm_deployment_parameters_path_prefix}/datadog/api_key_secret_arn"
+}
+
+module "this" {
+  source  = "cloudposse/label/null"
+  version = "0.25.0"
+
+  namespace = var.namespace
 }
 
 module "s3_label" {

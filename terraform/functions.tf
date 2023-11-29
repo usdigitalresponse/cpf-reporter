@@ -1,6 +1,6 @@
 // Lambda defaults
 locals {
-  lambda_artifacts_base_path = trimsuffix(coalesce(var.lambda_artifacts_base_path, "${path.module}/../api/dist/zipballs"), "/")
+  lambda_artifacts_base_path = trimsuffix(coalesce(var.lambda_artifacts_base_path, "${path.module}/../api/dist/zipball"), "/")
   datadog_lambda_custom_tags = {
     "git.repository_url" = var.git_repository_url
     "git.commit.sha"     = var.git_commit_sha
@@ -101,9 +101,12 @@ module "lambda_artifacts_bucket" {
 }
 
 resource "aws_s3_object" "lambda_artifact-graphql" {
-  bucket = module.lambda_artifacts_bucket.bucket_id
-  key    = "graphql.${filemd5(each.value)}.zip"
-  source = "${local.lambda_artifacts_base_path}/graphql.zip"
+  bucket                 = module.lambda_artifacts_bucket.bucket_id
+  key                    = "graphql.${filemd5("${local.lambda_artifacts_base_path}/graphql.zip")}.zip"
+  source                 = "${local.lambda_artifacts_base_path}/graphql.zip"
+  source_hash            = filemd5("${local.lambda_artifacts_base_path}/graphql.zip")
+  etag                   = filemd5("${local.lambda_artifacts_base_path}/graphql.zip")
+  server_side_encryption = "AES256"
 }
 
 module "lambda_function-graphql" {
@@ -124,10 +127,20 @@ module "lambda_function-graphql" {
   policy_jsons                      = local.lambda_default_execution_policies
   attach_policy_statements          = true
   policy_statements = {
-    ConnectToPostgres = {
+    PostgresIAMAuth = {
       effect    = "Allow"
       actions   = ["rds-db:connect"]
-      resources = "${local.postgres_rds_connect_resource_base_arn}/data-user"
+      resources = "${local.postgres_rds_connect_resource_base_arn}/${module.postgres.cluster_master_username}"
+    }
+    GetPostgresSecret = {
+      effect    = "Allow"
+      actions   = ["ssm:GetParameters", "ssm:GetParameter"]
+      resources = [aws_ssm_parameter.postgres_master_password.arn]
+    }
+    DecryptPostgresSecret = {
+      effect    = "Allow"
+      actions   = ["kms:Decrypt"]
+      resources = [data.aws_kms_key.ssm.arn]
     }
   }
 
@@ -147,6 +160,16 @@ module "lambda_function-graphql" {
   memory_size = 512 # MB
   environment_variables = merge(local.lambda_default_environment_variables, {
     // Function-specific environment variables go here:
+    DATABASE_URL = format(
+      "postgres://%s@%s:%s/%s?%s",
+      module.postgres.cluster_master_username,
+      module.postgres.cluster_endpoint,
+      module.postgres.cluster_port,
+      module.postgres.cluster_database_name,
+      join("&", ["sslmode=verify", "sslcert=rds-combined-ca-bundle.pem"])
+    )
+    DATABASE_SECRET_SOURCE             = "ssm"
+    DATABASE_SECRET_SSM_PARAMETER_PATH = aws_ssm_parameter.postgres_master_password.name
   })
 
   allowed_triggers = {

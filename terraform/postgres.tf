@@ -30,6 +30,14 @@ resource "random_password" "postgres_user" {
   special = false
 }
 
+resource "aws_ssm_parameter" "postgres_master_password" {
+  name        = "${var.ssm_service_parameters_path_prefix}/postgres/master_password"
+  description = "Master password generated when creating the Postgres cluster"
+  type        = "SecureString"
+  key_id      = data.aws_kms_key.ssm.arn
+  value       = random_password.postgres_user.result
+}
+
 module "postgres" {
   create  = true
   source  = "terraform-aws-modules/rds-aurora/aws"
@@ -43,7 +51,7 @@ module "postgres" {
   engine_mode                = "provisioned"
   storage_encrypted          = true
 
-  vpc_id                         = data.aws_ssm_parameter.vpc_id
+  vpc_id                         = data.aws_ssm_parameter.vpc_id.value
   subnets                        = local.private_subnet_ids
   create_security_group          = true
   create_db_subnet_group         = true

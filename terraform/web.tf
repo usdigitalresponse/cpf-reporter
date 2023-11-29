@@ -3,6 +3,7 @@ module "cloudfront_to_origin_bucket_access_policy" {
   source  = "cloudposse/iam-policy/aws"
   version = "2.0.1"
   context = module.s3_label.context
+  enabled = true
 
   iam_policy_statements = {
     S3GetObjectForCloudFront = {
@@ -151,7 +152,7 @@ module "cdn" {
 
   depends_on = [
     module.cdn_origin_bucket,
-    module.logs_bucket,
+    module.cdn_logs_bucket,
     module.cloudfront_ssl_certificate,
   ]
 
@@ -214,7 +215,7 @@ module "cdn" {
 
   ordered_cache_behavior = [
     {
-      path_pattern           = "/${aws_s3_object.deploy_config.key}"
+      path_pattern           = "/${aws_s3_object.website_deploy_config.key}"
       target_origin_id       = local.website_config_origin_path
       viewer_protocol_policy = "redirect-to-https"
 

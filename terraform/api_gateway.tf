@@ -49,7 +49,7 @@ module "api_gateway" {
   protocol_type = "HTTP"
 
   domain_name                 = local.api_domain_name
-  domain_name_certificate_arn = module.ssl_certificate.arn
+  domain_name_certificate_arn = module.api_ssl_certificate.arn
 
   cors_configuration = {
     allow_methods = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -69,7 +69,7 @@ module "api_gateway" {
     max_age = 86400 // 24 hours, in seconds
   }
 
-  default_stage_access_log_destination_arn = aws_cloudwatch_log_group.default.arn
+  default_stage_access_log_destination_arn = aws_cloudwatch_log_group.api_gateway.arn
   default_stage_access_log_format = jsonencode({
     requestId      = "$context.requestId"
     ip             = "$context.identity.sourceIp"
@@ -93,22 +93,14 @@ module "api_gateway" {
 
   integrations = {
     "POST /graphql" = {
-      lambda_arn      = aws_lambda_function.graphql.arn
+      lambda_arn      = module.lambda_function-graphql.lambda_function_arn
       connection_type = "VPC_LINK"
       vpc_link        = "api-service"
     }
     "GET /graphql" = {
-      lambda_arn      = aws_lambda_function.graphql.arn
+      lambda_arn      = module.lambda_function-graphql.lambda_function_arn
       connection_type = "VPC_LINK"
       vpc_link        = "api-service"
-    }
-  }
-
-  vpc_links = {
-    api-service = {
-      name               = "${var.namespace}-api"
-      security_group_ids = [module.http_security_group.id]
-      subnet_ids         = local.private_subnet_ids
     }
   }
 }
