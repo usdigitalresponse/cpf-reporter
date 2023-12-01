@@ -134,5 +134,8 @@ dist
 # Mac defaults
 .DS_Store
 
+# Redwood state
+.redwood
+
 # Terraform cache
 terraform/.terraform
