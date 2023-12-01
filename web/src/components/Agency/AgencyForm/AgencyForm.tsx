@@ -26,6 +26,7 @@ const AgencyForm = (props: AgencyFormProps) => {
 
   return (
     <div className="rw-form-wrapper">
+      ID: {props.agency?.id}
       <Form<FormAgency> onSubmit={onSubmit} error={props.error}>
         <FormError
           error={props.error}

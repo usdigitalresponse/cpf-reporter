@@ -11,10 +11,9 @@ const AgenciesPage = () => {
   return (
     <div>
       <h2>Agencies</h2>
-      <Button variant="primary" className="mb-3">Create New Agency</Button>
-      {/* <Link to={routes['newAgency']()}>
+      <Link to={routes['newAgency']()}>
         <Button variant="primary" className="mb-3">Create New Agency</Button>
-      </Link> */}
+      </Link>
       <AgenciesCell tenantId={tenantIdOfUser} />
     </div>
   )

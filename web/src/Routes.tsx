@@ -19,10 +19,9 @@ const Routes = () => {
       {/* </Set> */}
 
       <Set wrap={ScaffoldLayout} title="Agencies" titleTo="agencies">
-        {/* Part of other tickets */}
-        {/* <Route path="/agencies/{id:Int}/edit" page={AgencyEditAgencyPage} name="editAgency" />
+        <Route path="/agencies/{id:Int}/edit" page={AgencyEditAgencyPage} name="editAgency" />
         <Route path="/agencies/{id:Int}" page={AgencyAgencyPage} name="agency" />
-        <Route path="/agencies/new" page={AgencyNewAgencyPage} name="newAgency" /> */}
+        <Route path="/agencies/new" page={AgencyNewAgencyPage} name="newAgency" />
         <Route path="/agencies" page={AgencyAgenciesPage} name="agencies" />
       </Set>
       <Route notfound page={NotFoundPage} />

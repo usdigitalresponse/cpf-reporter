@@ -27,14 +27,12 @@ const AgenciesList = ({ agencies }: FindAgencies) => {
             </td>
             <td className="border border-slate-700">
               <nav className="rw-table-actions">
-              <Button size="sm" variant="secondary">Edit</Button>
-              {/* Will be used in Edit Agencies ticket */}
-              {/* <Link
-                to={routes.editAgency({ id: agency.id })}
-                title={'Edit agency ' + agency.id}
-              >
-                <Button size="sm" variant="secondary">Edit</Button>
-              </Link> */}
+                <Link
+                  to={routes.editAgency({ id: agency.id })}
+                  title={'Edit agency ' + agency.id}
+                >
+                  <Button size="sm" variant="secondary">Edit</Button>
+                </Link>
               </nav>
             </td>
           </tr>
