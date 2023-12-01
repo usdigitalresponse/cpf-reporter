@@ -1,4 +1,4 @@
-# README
+# Getting Started with RedwoodJS
 
 Welcome to [RedwoodJS](https://redwoodjs.com)!
 
