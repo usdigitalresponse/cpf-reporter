@@ -9,18 +9,18 @@ datasource db {
 }
 
 model Agency {
-  id                 Int                 @id @default(autoincrement())
-  name               String
-  abbreviation       String?
-  code               String
-  tenant             Tenant? @relation(fields: [tenantId], references: [id])
-  tenantId           Int?  
+  id             Int           @id @default(autoincrement())
+  name           String
+  abbreviation   String?
+  code           String
+  tenant         Organization? @relation(fields: [organizationId], references: [id])
+  organizationId Int?
 }
 
-model Tenant {
-    id                Int                 @id @default(autoincrement())
-    agencies          Agency[]
-    name              String
+model Organization {
+  id       Int      @id @default(autoincrement())
+  agencies Agency[]
+  name     String
 }
 
 // model access_tokens {

@@ -34,12 +34,12 @@ export const deleteAgency: MutationResolvers['deleteAgency'] = ({ id }) => {
   })
 }
 
-export const agenciesByTenant: QueryResolvers['agenciesByTenant'] = async ({
-  tenantId,
+export const agenciesByOrganization: QueryResolvers['agenciesByOrganization'] = async ({
+  organizationId,
 }) => {
   try {
     const agencies = await db.agency.findMany({
-      where: { tenantId },
+      where: { organizationId },
     })
     return agencies || [] // Return an empty array if null is received
   } catch (error) {
