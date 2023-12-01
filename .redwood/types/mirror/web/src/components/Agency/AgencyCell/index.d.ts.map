@@ -1,9 +1,0 @@
-{
-  "version": 3,
-  "sources": [
-    "../../../../../../../../web/src/components/Agency/AgencyCell/AgencyCell.tsx"
-  ],
-  "names": [],
-  "mappings": ";;;;;;;;;;;AAyBa",
-  "file": "index.d.ts"
-}

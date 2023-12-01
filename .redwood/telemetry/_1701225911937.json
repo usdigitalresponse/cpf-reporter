@@ -15,27 +15,27 @@
       "code": 1
     },
     "endTime": [
-      1701403480,
-      845915500
+      1701225912,
+      175054084
     ],
     "_ended": true,
     "_duration": [
       0,
-      172915500
+      236054084
     ],
     "name": "cli",
     "_spanContext": {
-      "traceId": "38757f800c64d6b8d58f8fc376b1bd5e",
-      "spanId": "907228736819ea18",
+      "traceId": "55131388ab8ceae4abcfa4aae76b29ce",
+      "spanId": "1d97f32a8cdd757f",
       "traceFlags": 1
     },
     "kind": 0,
-    "_performanceStartTime": 291.629417181015,
-    "_performanceOffset": -0.853515625,
+    "_performanceStartTime": 529.7127499580383,
+    "_performanceOffset": -0.03466796875,
     "_startTimeProvided": false,
     "startTime": [
-      1701403480,
-      673000000
+      1701225911,
+      939000000
     ],
     "resource": {
       "_attributes": {
@@ -43,23 +43,23 @@
         "telemetry.sdk.language": "nodejs",
         "telemetry.sdk.name": "opentelemetry",
         "telemetry.sdk.version": "1.15.2",
-        "service.version": "6.4.1",
+        "service.version": "6.3.2",
         "os.type": "macOS",
         "os.version": "14.1",
         "shell.name": "zsh",
         "node.version": "18.18.2",
-        "yarn.version": "4.0.2",
-        "npm.version": "10.2.4",
+        "yarn.version": "1.22.19",
+        "npm.version": "9.8.1",
         "cpu.count": 8,
         "memory.gb": 16,
         "env.node_env": null,
         "ci.redwood": false,
         "ci.isci": false,
-        "complexity": "6.0.1.3.7",
+        "complexity": "5.0.1.3.6",
         "sides": "web,api",
         "experiments": "[]",
         "webBundler": "webpack",
-        "uid": "4c73e4e9-bca5-41e5-9fe5-0b4ce89c72c4"
+        "uid": "af0f8f96-a51f-4d10-a335-c779432bd24e"
       },
       "asyncAttributesPending": false,
       "_syncAttributes": {
@@ -67,23 +67,23 @@
         "telemetry.sdk.language": "nodejs",
         "telemetry.sdk.name": "opentelemetry",
         "telemetry.sdk.version": "1.15.2",
-        "service.version": "6.4.1",
+        "service.version": "6.3.2",
         "os.type": "macOS",
         "os.version": "14.1",
         "shell.name": "zsh",
         "node.version": "18.18.2",
-        "yarn.version": "4.0.2",
-        "npm.version": "10.2.4",
+        "yarn.version": "1.22.19",
+        "npm.version": "9.8.1",
         "cpu.count": 8,
         "memory.gb": 16,
         "env.node_env": null,
         "ci.redwood": false,
         "ci.isci": false,
-        "complexity": "6.0.1.3.7",
+        "complexity": "5.0.1.3.6",
         "sides": "web,api",
         "experiments": "[]",
         "webBundler": "webpack",
-        "uid": "4c73e4e9-bca5-41e5-9fe5-0b4ce89c72c4"
+        "uid": "af0f8f96-a51f-4d10-a335-c779432bd24e"
       }
     },
     "instrumentationLibrary": {

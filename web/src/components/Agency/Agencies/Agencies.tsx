@@ -8,38 +8,44 @@ import { truncate } from 'src/lib/formatters'
 
 const AgenciesList = ({ agencies }: FindAgencies) => {
   return (
-    <div>
-      <h2>Agencies</h2>
-      <Table striped bordered>
-        <thead>
-          <tr>
-            <th>Agency Code</th>
-            <th>Name</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {agencies.map((agency) => (
-            <tr key={agency.id}>
-              <td>
-                {truncate(agency.code)}
-              </td>
-              <td>
-                {truncate(agency.name)}
-              </td>
-              <td>
+    <Table striped borderless>
+      <thead>
+        <tr>
+          <th className="border">Agency Code</th>
+          <th className="border">Name</th>
+          <th className="border">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {agencies.map((agency) => (
+          <tr key={agency.id}>
+            <td className="border border-slate-700">
+              {truncate(agency.code)}
+            </td>
+            <td className="border border-slate-700">
+              {truncate(agency.name)}
+            </td>
+            <td className="border border-slate-700">
+              <nav className="rw-table-actions">
+                {/* <Link
+                  to={routes.agency({ id: agency.id })}
+                  title={'Show agency ' + agency.id + ' detail'}
+                  className="rw-button rw-button-small"
+                >
+                  Show
+                </Link> */}
                 <Link
                   to={routes.editAgency({ id: agency.id })}
                   title={'Edit agency ' + agency.id}
                 >
-                  <Button size="sm" variant="secondary">Edit</Button>
+                  <Button size="sm">Edit</Button>
                 </Link>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-    </div>
+              </nav>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
   )
 }
 

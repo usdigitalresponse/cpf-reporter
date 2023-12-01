@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client"
 import { MergePrismaWithSdlTypes, MakeRelationsOptional } from '@redwoodjs/api'
-import { Agency as PrismaAgency, Tenant as PrismaTenant, User as PrismaUser } from '@prisma/client'
+import { agency as Prismaagency } from '@prisma/client'
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { RedwoodGraphQLContext } from '@redwoodjs/graphql-server/dist/types';
 export type Maybe<T> = T | null;
@@ -111,7 +111,7 @@ export type UpdateAgencyInput = {
 };
 
 type MaybeOrArrayOfMaybe<T> = T | Maybe<T> | Maybe<T>[];
-type AllMappedModels = MaybeOrArrayOfMaybe<Agency>
+type AllMappedModels = MaybeOrArrayOfMaybe<>
 
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -172,7 +172,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
-  Agency: ResolverTypeWrapper<MergePrismaWithSdlTypes<PrismaAgency, MakeRelationsOptional<Agency, AllMappedModels>, AllMappedModels>>;
+  Agency: ResolverTypeWrapper<Agency>;
   BigInt: ResolverTypeWrapper<Scalars['BigInt']>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   CreateAgencyInput: CreateAgencyInput;
@@ -191,7 +191,7 @@ export type ResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
-  Agency: MergePrismaWithSdlTypes<PrismaAgency, MakeRelationsOptional<Agency, AllMappedModels>, AllMappedModels>;
+  Agency: Agency;
   BigInt: Scalars['BigInt'];
   Boolean: Scalars['Boolean'];
   CreateAgencyInput: CreateAgencyInput;

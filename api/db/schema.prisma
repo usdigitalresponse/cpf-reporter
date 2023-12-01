@@ -8,33 +8,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Agency {
-  id                 Int                 @id @default(autoincrement())
-  name               String
-  abbreviation       String?
-  code               String
-  tenant             Tenant? @relation(fields: [tenantId], references: [id])
-  tenantId           Int?  
-}
-
-model Tenant {
-    id                Int                 @id @default(autoincrement())
-    agencies          Agency[]
-    users             User[]
-}
-
-enum UserRole {
-  admin
-  staff
-}
-
-model User {
-  id       Int       @id @default(autoincrement())
-  email    String    @unique
-  name     String?
-  tenant   Tenant    @relation(fields: [tenantId], references: [id])
-  tenantId Int
-  role     UserRole
+model agency {
+  id                                               Int                        @id @default(autoincrement())
+  name                                             String
+  abbreviation                                     String?
+  code                                             String
 }
 
 // model access_tokens {

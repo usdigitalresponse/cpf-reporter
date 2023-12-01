@@ -1,9 +1,0 @@
-{
-  "version": 3,
-  "sources": [
-    "../../../web/src/Routes.tsx"
-  ],
-  "names": [],
-  "mappings": ";;;;;;;;IAkBM;IAGE;IACA;IACA;IACA",
-  "file": "web-routerRoutes.d.ts"
-}

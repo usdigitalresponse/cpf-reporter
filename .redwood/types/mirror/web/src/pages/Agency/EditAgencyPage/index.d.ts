@@ -2,5 +2,3 @@
 import { default as DEFAULT } from './EditAgencyPage'
 export default DEFAULT
 export * from './EditAgencyPage'
-
-//# sourceMappingURL=index.d.ts.map
