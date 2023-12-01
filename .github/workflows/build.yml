@@ -74,6 +74,10 @@ on:
         description: Number of days to retain website build artifacts.
         type: number
         default: 90
+      web-dotenv:
+        description: Contents to write to .env before building website artifacts.
+        type: string
+        default: ""
     outputs:
       build-api-image-result:
         value: ${{ jobs.api-docker-image.result }}
@@ -335,6 +339,10 @@ jobs:
           cache-dependency-path: yarn.lock
       - name: Install dependencies
         run: yarn install
+      - name: Write env vars for build
+        run: cat <<< "$DOTENV_FOR_BUILD" >> .env
+        env:
+          DOTENV_FOR_BUILD: ${{ inputs.web-dotenv }}
       - name: Build the website
         run: yarn rw build web
         env:

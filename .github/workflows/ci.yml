@@ -54,6 +54,8 @@ jobs:
       api-function-artifact-retention-days: 14
       build-web: true
       web-artifact-retention-days: 14
+      web-dotenv: |
+        API_URL=staging.cpf.usdr.dev
 
   aws-auth:
     name: Configure AWS Credentials
