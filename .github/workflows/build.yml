@@ -248,7 +248,7 @@ jobs:
     env:
       ARTIFACTS_KEY: api-${{ inputs.ref }}
       BUILD_OUTPUT_PATH: ${{ github.workspace }}/api/dist
-      ARTIFACTS_PATH: ${{ github.workspace }}/api/dist/zipball
+      ARTIFACTS_PATH: ${{ github.workspace }}/api/dist/zipballs
     outputs:
       artifacts-key: ${{ env.ARTIFACTS_KEY }}
       artifacts-path: ${{ env.ARTIFACTS_PATH }}
@@ -275,7 +275,7 @@ jobs:
         env:
           CI: 1
       - name: Zip the built functions
-        run: yarn zip-it-and-ship-it $BUILD_OUTPUT_PATH/functions $BUILD_OUTPUT_PATH/zipballs
+        run: yarn zip-it-and-ship-it $BUILD_OUTPUT_PATH/functions $ARTIFACTS_PATH
       - name: Compute build artifact checksums
         id: checksums
         run: |
