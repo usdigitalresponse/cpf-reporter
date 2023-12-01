@@ -1,4 +1,4 @@
-import type { FindAgencies } from 'types/graphql'
+import type { FindAgenciesByTenantId } from 'types/graphql'
 
 import { Link, routes } from '@redwoodjs/router'
 import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
@@ -6,7 +6,7 @@ import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 import Agencies from 'src/components/Agency/Agencies'
 
 export const QUERY = gql`
-  query ($tenantId: Int!) {
+  query FindAgenciesByTenantId($tenantId: Int!) {
     agenciesByTenant(tenantId: $tenantId) {
       id
       name
@@ -33,6 +33,8 @@ export const Failure = ({ error }: CellFailureProps) => (
   <div className="rw-cell-error">{error?.message}</div>
 )
 
-export const Success = ({ agenciesByTenant }: CellSuccessProps<FindAgencies>) => {
+export const Success = ({
+  agenciesByTenant,
+}: CellSuccessProps<FindAgenciesByTenantId>) => {
   return <Agencies agencies={agenciesByTenant} />
 }

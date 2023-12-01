@@ -6,7 +6,7 @@ import AgenciesCell from 'src/components/Agency/AgenciesCell'
 
 const AgenciesPage = () => {
   // temporarily hardcode tenantId to 2
-  const tenantIdOfUser = 2;
+  const tenantIdOfUser = 2
 
   return (
     <div>

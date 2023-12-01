@@ -25,6 +25,7 @@ export type Agency = {
   code: Scalars['String'];
   id: Scalars['Int'];
   name: Scalars['String'];
+  tenantId: Scalars['Int'];
 };
 
 export type CreateAgencyInput = {
@@ -60,9 +61,16 @@ export type MutationupdateAgencyArgs = {
 export type Query = {
   __typename?: 'Query';
   agencies: Array<Agency>;
+  agenciesByTenant: Array<Agency>;
   agency?: Maybe<Agency>;
   /** Fetches the Redwood root schema. */
   redwood?: Maybe<Redwood>;
+};
+
+
+/** About the Redwood queries. */
+export type QueryagenciesByTenantArgs = {
+  tenantId: Scalars['Int'];
 };
 
 
@@ -92,10 +100,12 @@ export type UpdateAgencyInput = {
   name?: InputMaybe<Scalars['String']>;
 };
 
-export type FindAgenciesVariables = Exact<{ [key: string]: never; }>;
+export type FindAgenciesByTenantIdVariables = Exact<{
+  tenantId: Scalars['Int'];
+}>;
 
 
-export type FindAgencies = { __typename?: 'Query', agencies: Array<{ __typename?: 'Agency', id: number, name: string, abbreviation?: string | null, code: string }> };
+export type FindAgenciesByTenantId = { __typename?: 'Query', agenciesByTenant: Array<{ __typename?: 'Agency', id: number, name: string, abbreviation?: string | null, code: string }> };
 
 export type DeleteAgencyMutationVariables = Exact<{
   id: Scalars['Int'];
