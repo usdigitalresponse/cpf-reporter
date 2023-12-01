@@ -14,6 +14,12 @@ import ScaffoldLayout from 'src/layouts/ScaffoldLayout'
 const Routes = () => {
   return (
     <Router>
+      <Set wrap={ScaffoldLayout} title="Organizations" titleTo="organizations" buttonLabel="New Organization" buttonTo="newOrganization">
+        <Route path="/organizations/new" page={OrganizationNewOrganizationPage} name="newOrganization" />
+        <Route path="/organizations/{id:Int}/edit" page={OrganizationEditOrganizationPage} name="editOrganization" />
+        <Route path="/organizations/{id:Int}" page={OrganizationOrganizationPage} name="organization" />
+        <Route path="/organizations" page={OrganizationOrganizationsPage} name="organizations" />
+      </Set>
       {/* TODO: change to this Set after implementing user authentication */}
       {/* <Set private unauthenticated="forbidden" hasRole="admin"> */}
       {/* </Set> */}
