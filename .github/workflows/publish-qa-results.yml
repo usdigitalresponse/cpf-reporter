@@ -69,7 +69,7 @@ jobs:
           ${{ env.API_COVERAGE_REPORT }}
 
           </details>
-
+          <details>
           <summary>Coverage report for `web` suite</summary>
 
           ${{ env.WEB_COVERAGE_REPORT }}

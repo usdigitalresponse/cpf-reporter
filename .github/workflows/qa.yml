@@ -103,7 +103,7 @@ jobs:
         uses: fingerprintjs/action-coverage-report-md@b7fcda0d2891d215c6808d32ca249e43f55abe3f # v1.0.6
         with:
           textReportPath: 'coverage/coverage.txt'
-          srcBasePath: 'api/'
+          srcBasePath: 'api/src'
 
   test-client:
     name: Test client-side code
@@ -140,7 +140,7 @@ jobs:
         uses: fingerprintjs/action-coverage-report-md@b7fcda0d2891d215c6808d32ca249e43f55abe3f # v1.0.6
         with:
           textReportPath: 'coverage/coverage.txt'
-          srcBasePath: 'web/'
+          srcBasePath: 'web/src'
 
   eslint:
     name: Lint JavaScript
