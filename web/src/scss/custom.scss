@@ -46,10 +46,7 @@ $theme-colors: map-merge(
   $theme-colors
 );
 
-// @import 'bootstrap/scss/bootstrap.scss';
-// @import 'bootstrap-react/src/index.scss';
 @import '~bootstrap/scss/bootstrap';
-
 
 // SET USDR FONTS
 @import './fonts.scss';
