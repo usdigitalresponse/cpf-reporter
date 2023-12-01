@@ -1,37 +1,40 @@
-
 module "cloudfront_to_origin_bucket_access_policy" {
   source  = "cloudposse/iam-policy/aws"
   version = "2.0.1"
   context = module.s3_label.context
   enabled = true
 
-  iam_policy_statements = {
-    S3GetObjectForCloudFront = {
-      effect  = "Allow"
-      actions = ["s3:GetObject"]
-      resources = [
-        "${module.cdn_origin_bucket.bucket_arn}/${local.website_content_origin_path}/*",
-        "${module.cdn_origin_bucket.bucket_arn}/${local.website_config_object_key}",
-      ]
-      principals = [
-        {
-          type        = "AWS"
-          identifiers = [aws_cloudfront_origin_access_identity.default.iam_arn]
-        },
-      ]
-    }
-    S3ListBucketForCloudFront = {
-      effect    = "Allow"
-      actions   = ["s3:ListBucket"]
-      resources = [module.cdn_origin_bucket.bucket_arn]
-      principals = [
-        {
-          type        = "AWS"
-          identifiers = [aws_cloudfront_origin_access_identity.default.iam_arn]
-        },
-      ]
-    }
-  }
+  iam_policy = [{
+    statements = [
+      {
+        sid     = "S3GetObjectForCloudFront"
+        effect  = "Allow"
+        actions = ["s3:GetObject"]
+        resources = [
+          "${module.cdn_origin_bucket.bucket_arn}/${local.website_content_origin_path}/*",
+          "${module.cdn_origin_bucket.bucket_arn}/${local.website_config_object_key}",
+        ]
+        principles = [
+          {
+            type        = "AWS"
+            identifiers = [aws_cloudfront_origin_access_identity.default.iam_arn]
+          },
+        ]
+      },
+      {
+        sid       = "S3ListBucketForCloudFront"
+        effect    = "Allow"
+        actions   = ["s3:ListBucket"]
+        resources = [module.cdn_origin_bucket.bucket_arn]
+        principals = [
+          {
+            type        = "AWS"
+            identifiers = [aws_cloudfront_origin_access_identity.default.iam_arn]
+          },
+        ]
+      }
+    ]
+  }]
 }
 
 module "cdn_origin_bucket" {

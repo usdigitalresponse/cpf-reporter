@@ -24,20 +24,23 @@ module "write_api_logs_policy" {
 
   name = "write-logs"
 
-  iam_policy_statements = {
-    WriteLogs = {
-      effect = "Allow"
-      actions = [
-        "logs:CreateLogStream",
-        "logs:DescribeLogStreams",
-        "logs:PutLogEvents",
-      ]
-      resources = [
-        aws_cloudwatch_log_group.api_gateway.arn,
-        "${aws_cloudwatch_log_group.api_gateway.arn}:log-stream:*",
-      ]
-    }
-  }
+  iam_policy = [{
+    statements = [
+      {
+        sid    = "WriteLogs"
+        effect = "Allow"
+        actions = [
+          "logs:CreateLogStream",
+          "logs:DescribeLogStreams",
+          "logs:PutLogEvents",
+        ]
+        resources = [
+          aws_cloudwatch_log_group.api_gateway.arn,
+          "${aws_cloudwatch_log_group.api_gateway.arn}:log-stream:*",
+        ]
+      }
+    ]
+  }]
 }
 
 module "api_gateway" {
