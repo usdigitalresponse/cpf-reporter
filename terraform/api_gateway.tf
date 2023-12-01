@@ -45,7 +45,7 @@ module "api_gateway" {
   version = "2.2.2"
 
   name          = var.namespace
-  description   = "API Gateway proxy to ECS web services for GOST"
+  description   = "API Gateway to CPF Reporter web services"
   protocol_type = "HTTP"
 
   domain_name                 = local.api_domain_name
