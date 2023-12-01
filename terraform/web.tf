@@ -148,20 +148,20 @@ resource "aws_s3_object" "website_deploy_config" {
   source_hash            = md5(local.website_config_object_contents)
   server_side_encryption = "AES256"
 
-  depends_on = [module.origin_bucket]
+  depends_on = [module.cdn_origin_bucket]
 }
 
 resource "aws_s3_object" "origin_dist_artifact" {
   for_each = fileset(local.website_origin_artifacts_dist_path, "**")
 
-  bucket                 = module.origin_bucket.bucket_id
+  bucket                 = module.cdn_origin_bucket.bucket_id
   key                    = "${local.website_origin_artifacts_dist_path}/${each.value}"
   source                 = "${local.website_origin_artifacts_dist_path}/${each.value}"
   source_hash            = filemd5("${local.website_origin_artifacts_dist_path}/${each.value}")
   etag                   = filemd5("${local.website_origin_artifacts_dist_path}/${each.value}")
   server_side_encryption = "AES256"
 
-  depends_on = [module.origin_bucket]
+  depends_on = [module.cdn_origin_bucket]
 }
 
 module "cdn" {
