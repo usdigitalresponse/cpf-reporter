@@ -1,8 +1,8 @@
 // Common
-namespace                             = "cpf_reporter"
+namespace                             = "cpfreporter"
 environment                           = "staging"
-ssm_service_parameters_path_prefix    = "/cpf_reporter"
-ssm_deployment_parameters_path_prefix = "/cpf_reporter/deploy-config"
+ssm_service_parameters_path_prefix    = "/cpfreporter"
+ssm_deployment_parameters_path_prefix = "/cpfreporter/deploy-config"
 log_bucket_versioning                 = false
 log_retention_in_days                 = 14
 
