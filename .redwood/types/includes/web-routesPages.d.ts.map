@@ -1,0 +1,15 @@
+{
+  "version": 3,
+  "sources": [
+    "../../../web/src/pages/FatalErrorPage/FatalErrorPage.tsx",
+    "../../../web/src/pages/HomePage/HomePage.tsx",
+    "../../../web/src/pages/NotFoundPage/NotFoundPage.tsx",
+    "../../../web/src/pages/Agency/AgenciesPage/AgenciesPage.tsx",
+    "../../../web/src/pages/Agency/AgencyPage/AgencyPage.tsx",
+    "../../../web/src/pages/Agency/EditAgencyPage/EditAgencyPage.tsx",
+    "../../../web/src/pages/Agency/NewAgencyPage/NewAgencyPage.tsx"
+  ],
+  "names": [],
+  "mappings": ";;;;;;;;;;;AAYA;ACTA;ACHA;ACKA;ACCA;ACAA;ACJA",
+  "file": "web-routesPages.d.ts"
+}

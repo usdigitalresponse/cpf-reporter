@@ -2,3 +2,5 @@
 import { default as DEFAULT } from './ScaffoldLayout'
 export default DEFAULT
 export * from './ScaffoldLayout'
+
+//# sourceMappingURL=index.d.ts.map

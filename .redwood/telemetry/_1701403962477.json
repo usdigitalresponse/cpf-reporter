@@ -15,27 +15,27 @@
       "code": 1
     },
     "endTime": [
-      1701370138,
-      794925417
+      1701403962,
+      701334250
     ],
     "_ended": true,
     "_duration": [
       0,
-      189925417
+      222334250
     ],
     "name": "cli",
     "_spanContext": {
-      "traceId": "58413aa67a8875f7e6778789c33c8cbf",
-      "spanId": "d2176d2cd96f9818",
+      "traceId": "0ea65cfdf3e0e6b3251887b024c73be4",
+      "spanId": "d4e0206ba48ad0c7",
       "traceFlags": 1
     },
     "kind": 0,
-    "_performanceStartTime": 345.01150012016296,
-    "_performanceOffset": -0.8525390625,
+    "_performanceStartTime": 480.3496251106262,
+    "_performanceOffset": -0.279541015625,
     "_startTimeProvided": false,
     "startTime": [
-      1701370138,
-      605000000
+      1701403962,
+      479000000
     ],
     "resource": {
       "_attributes": {
@@ -43,19 +43,19 @@
         "telemetry.sdk.language": "nodejs",
         "telemetry.sdk.name": "opentelemetry",
         "telemetry.sdk.version": "1.15.2",
-        "service.version": "6.3.2",
+        "service.version": "6.4.1",
         "os.type": "macOS",
         "os.version": "14.1",
         "shell.name": "zsh",
         "node.version": "18.18.2",
-        "yarn.version": "1.22.19",
-        "npm.version": "9.8.1",
+        "yarn.version": "4.0.2",
+        "npm.version": "10.2.4",
         "cpu.count": 8,
         "memory.gb": 16,
         "env.node_env": null,
         "ci.redwood": false,
         "ci.isci": false,
-        "complexity": "5.0.1.3.6",
+        "complexity": "6.0.1.3.7",
         "sides": "web,api",
         "experiments": "[]",
         "webBundler": "webpack",
@@ -67,19 +67,19 @@
         "telemetry.sdk.language": "nodejs",
         "telemetry.sdk.name": "opentelemetry",
         "telemetry.sdk.version": "1.15.2",
-        "service.version": "6.3.2",
+        "service.version": "6.4.1",
         "os.type": "macOS",
         "os.version": "14.1",
         "shell.name": "zsh",
         "node.version": "18.18.2",
-        "yarn.version": "1.22.19",
-        "npm.version": "9.8.1",
+        "yarn.version": "4.0.2",
+        "npm.version": "10.2.4",
         "cpu.count": 8,
         "memory.gb": 16,
         "env.node_env": null,
         "ci.redwood": false,
         "ci.isci": false,
-        "complexity": "5.0.1.3.6",
+        "complexity": "6.0.1.3.7",
         "sides": "web,api",
         "experiments": "[]",
         "webBundler": "webpack",

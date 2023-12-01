@@ -8,44 +8,38 @@ import { truncate } from 'src/lib/formatters'
 
 const AgenciesList = ({ agencies }: FindAgencies) => {
   return (
-    <Table striped borderless>
-      <thead>
-        <tr>
-          <th className="border">Agency Code</th>
-          <th className="border">Name</th>
-          <th className="border">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {agencies.map((agency) => (
-          <tr key={agency.id}>
-            <td className="border border-slate-700">
-              {truncate(agency.code)}
-            </td>
-            <td className="border border-slate-700">
-              {truncate(agency.name)}
-            </td>
-            <td className="border border-slate-700">
-              <nav className="rw-table-actions">
-                {/* <Link
-                  to={routes.agency({ id: agency.id })}
-                  title={'Show agency ' + agency.id + ' detail'}
-                  className="rw-button rw-button-small"
-                >
-                  Show
-                </Link> */}
+    <div>
+      <h2>Agencies</h2>
+      <Table striped bordered>
+        <thead>
+          <tr>
+            <th>Agency Code</th>
+            <th>Name</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {agencies.map((agency) => (
+            <tr key={agency.id}>
+              <td>
+                {truncate(agency.code)}
+              </td>
+              <td>
+                {truncate(agency.name)}
+              </td>
+              <td>
                 <Link
                   to={routes.editAgency({ id: agency.id })}
                   title={'Edit agency ' + agency.id}
                 >
-                  <Button size="sm">Edit</Button>
+                  <Button size="sm" variant="secondary">Edit</Button>
                 </Link>
-              </nav>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </Table>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </div>
   )
 }
 

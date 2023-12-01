@@ -10,3 +10,5 @@ export * from './AgenciesCell'
 type CellInputs = CellProps<SuccessType, FindAgencies, typeof Cell, FindAgenciesVariables>
 
 export default function (props: CellInputs): ReturnType<SuccessType>
+
+//# sourceMappingURL=index.d.ts.map
