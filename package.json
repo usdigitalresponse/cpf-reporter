@@ -25,8 +25,5 @@
     "seed": "yarn rw exec seed"
   },
   "packageManager": "yarn@3.7.0",
-  "dependencies": {
-    "fsevents": "^2.3.3"
-  },
   "version": "3.7.0"
 }
