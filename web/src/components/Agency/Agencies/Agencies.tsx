@@ -27,19 +27,13 @@ const AgenciesList = ({ agencies }: FindAgencies) => {
             </td>
             <td className="border border-slate-700">
               <nav className="rw-table-actions">
+              <Button size="sm" variant="secondary">Edit</Button>
                 {/* <Link
-                  to={routes.agency({ id: agency.id })}
-                  title={'Show agency ' + agency.id + ' detail'}
-                  className="rw-button rw-button-small"
-                >
-                  Show
-                </Link> */}
-                <Link
                   to={routes.editAgency({ id: agency.id })}
                   title={'Edit agency ' + agency.id}
                 >
-                  <Button size="sm">Edit</Button>
-                </Link>
+                  <Button size="sm" variant="secondary">Edit</Button>
+                </Link> */}
               </nav>
             </td>
           </tr>

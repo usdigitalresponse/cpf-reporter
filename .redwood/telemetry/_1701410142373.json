@@ -15,27 +15,27 @@
       "code": 1
     },
     "endTime": [
-      1701225912,
-      175054084
+      1701410142,
+      596523792
     ],
     "_ended": true,
     "_duration": [
       0,
-      236054084
+      221523792
     ],
     "name": "cli",
     "_spanContext": {
-      "traceId": "55131388ab8ceae4abcfa4aae76b29ce",
-      "spanId": "1d97f32a8cdd757f",
+      "traceId": "6ee5ba8ad2483621d0a738d86a26c6d1",
+      "spanId": "87d05c0cac01471b",
       "traceFlags": 1
     },
     "kind": 0,
-    "_performanceStartTime": 529.7127499580383,
-    "_performanceOffset": -0.03466796875,
+    "_performanceStartTime": 449.666916847229,
+    "_performanceOffset": -0.551025390625,
     "_startTimeProvided": false,
     "startTime": [
-      1701225911,
-      939000000
+      1701410142,
+      375000000
     ],
     "resource": {
       "_attributes": {
@@ -49,7 +49,7 @@
         "shell.name": "zsh",
         "node.version": "18.18.2",
         "yarn.version": "1.22.19",
-        "npm.version": "9.8.1",
+        "npm.version": "10.2.4",
         "cpu.count": 8,
         "memory.gb": 16,
         "env.node_env": null,
@@ -59,7 +59,7 @@
         "sides": "web,api",
         "experiments": "[]",
         "webBundler": "webpack",
-        "uid": "af0f8f96-a51f-4d10-a335-c779432bd24e"
+        "uid": "4c73e4e9-bca5-41e5-9fe5-0b4ce89c72c4"
       },
       "asyncAttributesPending": false,
       "_syncAttributes": {
@@ -73,7 +73,7 @@
         "shell.name": "zsh",
         "node.version": "18.18.2",
         "yarn.version": "1.22.19",
-        "npm.version": "9.8.1",
+        "npm.version": "10.2.4",
         "cpu.count": 8,
         "memory.gb": 16,
         "env.node_env": null,
@@ -83,7 +83,7 @@
         "sides": "web,api",
         "experiments": "[]",
         "webBundler": "webpack",
-        "uid": "af0f8f96-a51f-4d10-a335-c779432bd24e"
+        "uid": "4c73e4e9-bca5-41e5-9fe5-0b4ce89c72c4"
       }
     },
     "instrumentationLibrary": {
