@@ -131,3 +131,6 @@ dist
 
 # Mac defaults
 .DS_Store
+
+# Terraform cache
+terraform/.terraform
