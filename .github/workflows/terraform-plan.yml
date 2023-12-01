@@ -38,6 +38,12 @@ on:
       api-image-digest:
         type: string
         required: true
+      api-functions-artifacts-key:
+        type: string
+        required: true
+      api-functions-artifacts-path:
+        type: string
+        required: true
       web-artifacts-key:
         type: string
         required: true
@@ -120,6 +126,11 @@ jobs:
           exit 1
         env:
           GPG_PASSPHRASE: ${{ secrets.gpg-passphrase }}
+      - name: Download api functions artifacts
+        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
+        with:
+          name: ${{ inputs.api-functions-artifacts-key }}
+          path: ${{ inputs.api-functions-artifacts-path }}
       - name: Download website artifacts
         uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
         with:
@@ -187,6 +198,7 @@ jobs:
           TF_VAR_datadog_api_key: ${{ secrets.datadog-api-key }}
           TF_VAR_datadog_app_key: ${{ secrets.datadog-app-key }}
           TF_VAR_api_container_image_tag: "${{ inputs.api-image-tag }}@sha256:${{ inputs.api-image-digest }}"
+          TF_VAR_lambda_artifacts_base_path: ${{ inputs.api-functions-artifacts-path }}
           TF_VAR_website_origin_artifacts_dist_path: "${{ inputs.web-artifacts-path }}"
       - name: Generate plaintext plan
         id: show_plan

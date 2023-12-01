@@ -190,6 +190,13 @@ variable "postgres_snapshot_before_destroy" {
   default     = true
 }
 
+// ECS (currently unused)
+variable "api_container_image_tag" {
+  description = "Complete Docker image tag to pull for API tasks."
+  type        = string
+  default     = ""
+}
+
 // Lambda
 variable "lambda_runtime" {
   description = "Lambda runtime for the target Node.js version."
