@@ -64,13 +64,13 @@ jobs:
           ### Test Coverage
 
           <details>
-          <summary>Coverage report for `api` suite</summary>
+          <summary>Coverage report for <code>api</code> suite</summary>
 
           ${{ env.API_COVERAGE_REPORT }}
 
           </details>
           <details>
-          <summary>Coverage report for `web` suite</summary>
+          <summary>Coverage report for <code>web</code> suite</summary>
 
           ${{ env.WEB_COVERAGE_REPORT }}
 
