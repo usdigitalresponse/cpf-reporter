@@ -33,3 +33,18 @@ export const deleteAgency: MutationResolvers['deleteAgency'] = ({ id }) => {
     where: { id },
   })
 }
+
+export const agenciesByTenant: QueryResolvers['agenciesByTenant'] = async ({
+  tenantId,
+}) => {
+  try {
+    const agencies = await db.agency.findMany({
+      where: { tenantId },
+    })
+    return agencies || [] // Return an empty array if null is received
+  } catch (error) {
+    console.error(error)
+    // Handle the error appropriately; maybe log it and return an empty array
+    return []
+  }
+}

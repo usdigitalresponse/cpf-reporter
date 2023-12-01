@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client"
 import { MergePrismaWithSdlTypes, MakeRelationsOptional } from '@redwoodjs/api'
-import { Agency as PrismaAgency, Tenant as PrismaTenant, User as PrismaUser } from '@prisma/client'
+import { Agency as PrismaAgency, Tenant as PrismaTenant } from '@prisma/client'
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { RedwoodGraphQLContext } from '@redwoodjs/graphql-server/dist/types';
 export type Maybe<T> = T | null;
@@ -43,6 +43,7 @@ export type Agency = {
   code: Scalars['String'];
   id: Scalars['Int'];
   name: Scalars['String'];
+  tenantId: Scalars['Int'];
 };
 
 export type CreateAgencyInput = {
@@ -78,9 +79,16 @@ export type MutationupdateAgencyArgs = {
 export type Query = {
   __typename?: 'Query';
   agencies: Array<Agency>;
+  agenciesByTenant: Array<Agency>;
   agency?: Maybe<Agency>;
   /** Fetches the Redwood root schema. */
   redwood?: Maybe<Redwood>;
+};
+
+
+/** About the Redwood queries. */
+export type QueryagenciesByTenantArgs = {
+  tenantId: Scalars['Int'];
 };
 
 
@@ -223,6 +231,7 @@ export type AgencyResolvers<ContextType = RedwoodGraphQLContext, ParentType exte
   code: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   name: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  tenantId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -231,6 +240,7 @@ export type AgencyRelationResolvers<ContextType = RedwoodGraphQLContext, ParentT
   code?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   name?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  tenantId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -268,12 +278,14 @@ export type MutationRelationResolvers<ContextType = RedwoodGraphQLContext, Paren
 
 export type QueryResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   agencies: OptArgsResolverFn<Array<ResolversTypes['Agency']>, ParentType, ContextType>;
+  agenciesByTenant: Resolver<Array<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagenciesByTenantArgs, 'tenantId'>>;
   agency: Resolver<Maybe<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagencyArgs, 'id'>>;
   redwood: OptArgsResolverFn<Maybe<ResolversTypes['Redwood']>, ParentType, ContextType>;
 };
 
 export type QueryRelationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   agencies?: RequiredResolverFn<Array<ResolversTypes['Agency']>, ParentType, ContextType>;
+  agenciesByTenant?: RequiredResolverFn<Array<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagenciesByTenantArgs, 'tenantId'>>;
   agency?: RequiredResolverFn<Maybe<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagencyArgs, 'id'>>;
   redwood?: RequiredResolverFn<Maybe<ResolversTypes['Redwood']>, ParentType, ContextType>;
 };

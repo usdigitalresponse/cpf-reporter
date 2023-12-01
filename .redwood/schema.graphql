@@ -12,6 +12,7 @@ type Agency {
   code: String!
   id: Int!
   name: String!
+  tenantId: Int!
 }
 
 scalar BigInt
@@ -39,6 +40,7 @@ type Mutation {
 """About the Redwood queries."""
 type Query {
   agencies: [Agency!]!
+  agenciesByTenant(tenantId: Int!): [Agency!]!
   agency(id: Int!): Agency
 
   """Fetches the Redwood root schema."""

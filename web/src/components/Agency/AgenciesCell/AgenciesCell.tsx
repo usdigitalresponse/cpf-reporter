@@ -6,8 +6,8 @@ import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 import Agencies from 'src/components/Agency/Agencies'
 
 export const QUERY = gql`
-  query FindAgencies {
-    agencies {
+  query ($tenantId: Int!) {
+    agenciesByTenant(tenantId: $tenantId) {
       id
       name
       abbreviation
@@ -33,6 +33,6 @@ export const Failure = ({ error }: CellFailureProps) => (
   <div className="rw-cell-error">{error?.message}</div>
 )
 
-export const Success = ({ agencies }: CellSuccessProps<FindAgencies>) => {
-  return <Agencies agencies={agencies} />
+export const Success = ({ agenciesByTenant }: CellSuccessProps<FindAgencies>) => {
+  return <Agencies agencies={agenciesByTenant} />
 }

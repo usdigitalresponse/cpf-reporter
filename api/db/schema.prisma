@@ -8,11 +8,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model agency {
-  id                                               Int                        @id @default(autoincrement())
-  name                                             String
-  abbreviation                                     String?
-  code                                             String
+model Agency {
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  abbreviation       String?
+  code               String
+  tenant             Tenant? @relation(fields: [tenantId], references: [id])
+  tenantId           Int?  
+}
+
+model Tenant {
+    id                Int                 @id @default(autoincrement())
+    agencies          Agency[]
+    name              String
 }
 
 // model access_tokens {

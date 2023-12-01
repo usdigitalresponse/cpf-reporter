@@ -4,11 +4,13 @@ export const schema = gql`
     name: String!
     abbreviation: String
     code: String!
+    tenantId: Int!
   }
 
   type Query {
     agencies: [Agency!]! @requireAuth
     agency(id: Int!): Agency @requireAuth
+    agenciesByTenant(tenantId: Int!): [Agency!]! @requireAuth
   }
 
   input CreateAgencyInput {
