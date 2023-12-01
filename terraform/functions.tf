@@ -156,7 +156,7 @@ module "lambda_function-graphql" {
     key    = aws_s3_object.lambda_artifact-graphql.key
   }
 
-  timeout     = 30  # seconds
+  timeout     = 25  # seconds (API Gateway limit is 30 seconds)
   memory_size = 512 # MB
   environment_variables = merge(local.lambda_default_environment_variables, {
     // Function-specific environment variables go here:
