@@ -163,7 +163,7 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
       - name: Install dependencies
-        run: yarn install -D --frozen-lockfile
+        run: yarn install
         env:
           CI: 1
       - name: Run linter for api side
