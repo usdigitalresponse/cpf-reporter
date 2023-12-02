@@ -46,6 +46,25 @@ $theme-colors: map-merge(
   $theme-colors
 );
 
+$form-feedback-invalid-color:       theme-color("danger") !default;
+
+// OVERRIDE BOOTSTRAP FORM VALIDATION STATES
+$form-validation-states: () !default;
+$form-validation-states: map-merge(
+  (
+    "invalid": (
+      "color": $negative-default,
+      "icon": 'none'
+    ),
+  ),
+  $form-validation-states
+);
+
+// OVERRIDE BOOTSTRAP FORM ERROR STYLING
+span.invalid-feedback {
+  display: block;
+}
+
 @import '~bootstrap/scss/bootstrap';
 
 // SET USDR FONTS

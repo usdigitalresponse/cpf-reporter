@@ -1,4 +1,4 @@
-import Container from 'react-bootstrap/Container';
+import Container from 'react-bootstrap/Container'
 
 type LayoutProps = {
   title: string
@@ -6,15 +6,11 @@ type LayoutProps = {
   children: React.ReactNode
 }
 
-const ScaffoldLayout = ({
-  children,
-}: LayoutProps) => {
+const ScaffoldLayout = ({ children }: LayoutProps) => {
   return (
-    <div className="col-12">
-      <Container fluid>
-        <main>{children}</main>
-      </Container>
-    </div>
+    <Container fluid>
+      <main>{children}</main>
+    </Container>
   )
 }
 

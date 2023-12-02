@@ -12,7 +12,9 @@ const AgenciesPage = () => {
     <div>
       <h2>Agencies</h2>
       <Link to={routes['newAgency']()}>
-        <Button variant="primary" className="mb-3">Create New Agency</Button>
+        <Button variant="primary" className="mb-3">
+          Create New Agency
+        </Button>
       </Link>
       <AgenciesCell tenantId={tenantIdOfUser} />
     </div>

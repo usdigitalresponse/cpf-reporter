@@ -1,3 +1,5 @@
+import { Button } from 'react-bootstrap'
+import { useForm, UseFormReturn } from 'react-hook-form'
 import type { EditAgencyById, UpdateAgencyInput } from 'types/graphql'
 
 import {
@@ -20,81 +22,99 @@ interface AgencyFormProps {
 }
 
 const AgencyForm = (props: AgencyFormProps) => {
+  const { agency, onSave, error, loading } = props
+  const formMethods: UseFormReturn<FormAgency> = useForm<FormAgency>()
+
+  // Resets the form to the previous values when editing the existing agency
+  // Clears out the form when creating a new agency
+  const onReset = () => {
+    formMethods.reset()
+  }
+
   const onSubmit = (data: FormAgency) => {
-    props.onSave(data, props?.agency?.id)
+    onSave(data, props?.agency?.id)
   }
 
   return (
-    <div className="rw-form-wrapper">
-      ID: {props.agency?.id}
-      <Form<FormAgency> onSubmit={onSubmit} error={props.error}>
-        <FormError
-          error={props.error}
-          wrapperClassName="rw-form-error-wrapper"
-          titleClassName="rw-form-error-title"
-          listClassName="rw-form-error-list"
-        />
+    <Form<FormAgency>
+      onSubmit={onSubmit}
+      formMethods={formMethods}
+      error={error}
+      className="needs-validation"
+    >
+      {agency && (
+        <div className="row">
+          <Label name="id" className="form-label col-sm-2 col-form-label">
+            Agency Code
+          </Label>
+          <div className="col-sm-2">
+            <TextField
+              name="id"
+              defaultValue={agency?.id}
+              className="form-control mb-3 col-auto"
+              disabled
+            />
+          </div>
+        </div>
+      )}
 
-        <Label
-          name="name"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Name
+      <FormError
+        error={error}
+        wrapperClassName="rw-form-error-wrapper"
+        titleClassName="rw-form-error-title"
+        listClassName="rw-form-error-list"
+      />
+
+      <div className="row mb-3">
+        <Label name="code" className="form-label col-sm-2 col-form-label">
+          Agency Code
         </Label>
 
-        <TextField
-          name="name"
-          defaultValue={props.agency?.name}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
-        />
+        <div className="col-sm-6">
+          <TextField
+            name="code"
+            defaultValue={agency?.code}
+            className="form-control"
+            validation={{ required: 'This field is required' }}
+          />
+        </div>
 
-        <FieldError name="name" className="rw-field-error" />
-
-        <Label
-          name="abbreviation"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Abbreviation
-        </Label>
-
-        <TextField
-          name="abbreviation"
-          defaultValue={props.agency?.abbreviation}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-        />
-
-        <FieldError name="abbreviation" className="rw-field-error" />
-
-        <Label
+        <FieldError
           name="code"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Code
+          className="error-message offset-2 invalid-feedback"
+        />
+      </div>
+
+      <div className="row mb-3">
+        <Label name="name" className="form-label col-sm-2 col-form-label">
+          Agency Name
         </Label>
 
-        <TextField
-          name="code"
-          defaultValue={props.agency?.code}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
+        <div className="col-sm-6">
+          <TextField
+            name="name"
+            defaultValue={agency?.name}
+            className="form-control"
+            validation={{ required: 'This field is required' }}
+          />
+        </div>
+        <FieldError
+          name="name"
+          className="error-message offset-2 invalid-feedback"
         />
+      </div>
 
-        <FieldError name="code" className="rw-field-error" />
-
-        <div className="rw-button-group">
-          <Submit disabled={props.loading} className="rw-button rw-button-blue">
+      <div className="row">
+        <div className="offset-2 col-sm-6">
+          <Submit disabled={loading} className="btn btn-primary me-2">
             Save
           </Submit>
+          <Button onClick={onReset} className="btn btn-secondary">
+            Reset
+          </Button>
         </div>
-      </Form>
-    </div>
+      </div>
+    </Form>
   )
 }
 
