@@ -6,7 +6,7 @@ import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 import Agencies from 'src/components/Agency/Agencies'
 
 export const QUERY = gql`
-  query ($organizationId: Int!) {
+  query FindAgenciesByOrganizationId($organizationId: Int!) {
     agenciesByOrganization(organizationId: $organizationId) {
       id
       name
