@@ -24,6 +24,7 @@ interface AgencyFormProps {
 const AgencyForm = (props: AgencyFormProps) => {
   const { agency, onSave, error, loading } = props
   const formMethods: UseFormReturn<FormAgency> = useForm<FormAgency>()
+  const hasErrors = Object.keys(formMethods.formState.errors).length > 0
 
   // Resets the form to the previous values when editing the existing agency
   // Clears out the form when creating a new agency
@@ -40,7 +41,7 @@ const AgencyForm = (props: AgencyFormProps) => {
       onSubmit={onSubmit}
       formMethods={formMethods}
       error={error}
-      className="needs-validation"
+      className={hasErrors ? 'was-validated' : ''}
     >
       {agency && (
         <div className="row">
@@ -75,6 +76,7 @@ const AgencyForm = (props: AgencyFormProps) => {
             name="code"
             defaultValue={agency?.code}
             className="form-control"
+            errorClassName="form-control is-invalid"
             validation={{ required: 'This field is required' }}
           />
         </div>
@@ -95,6 +97,7 @@ const AgencyForm = (props: AgencyFormProps) => {
             name="name"
             defaultValue={agency?.name}
             className="form-control"
+            errorClassName="form-control is-invalid"
             validation={{ required: 'This field is required' }}
           />
         </div>

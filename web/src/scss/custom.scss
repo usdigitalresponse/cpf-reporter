@@ -54,7 +54,7 @@ $form-validation-states: map-merge(
   (
     "invalid": (
       "color": $negative-default,
-      "icon": 'none'
+      "icon": inherit
     ),
   ),
   $form-validation-states
