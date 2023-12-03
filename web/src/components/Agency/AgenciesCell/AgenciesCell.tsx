@@ -33,8 +33,6 @@ export const Failure = ({ error }: CellFailureProps) => (
   <div className="rw-cell-error">{error?.message}</div>
 )
 
-export const Success = ({
-                          agenciesByOrganization,
-}: CellSuccessProps<FindAgenciesByOrganizationId>) => {
+export const Success = ({ agenciesByOrganization }: CellSuccessProps<FindAgenciesByOrganizationId>) => {
   return <Agencies agencies={agenciesByOrganization} />
 }
