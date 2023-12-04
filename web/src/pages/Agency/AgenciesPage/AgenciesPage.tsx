@@ -5,8 +5,8 @@ import { Link, routes } from '@redwoodjs/router'
 import AgenciesCell from 'src/components/Agency/AgenciesCell'
 
 const AgenciesPage = () => {
-  // temporarily hardcode tenantId to 2
-  const tenantIdOfUser = 2
+  // temporarily hardcode organizationId to 2
+  const organizationIdOfUser = 2
 
   return (
     <div>
@@ -16,7 +16,7 @@ const AgenciesPage = () => {
           Create New Agency
         </Button>
       </Link>
-      <AgenciesCell tenantId={tenantIdOfUser} />
+      <AgenciesCell organizationId={organizationIdOfUser} />
     </div>
   )
 }
