@@ -1,4 +1,4 @@
-import type { agency } from '@prisma/client'
+import type { Agency } from '@prisma/client'
 
 import {
   agencies,
@@ -38,7 +38,7 @@ describe('agencies', () => {
   })
 
   scenario('updates a agency', async (scenario: StandardScenario) => {
-    const original = (await agency({ id: scenario.agency.one.id })) as agency
+    const original = (await agency({ id: scenario.agency.one.id })) as Agency
     const result = await updateAgency({
       id: original.id,
       input: { name: 'String2' },
@@ -50,7 +50,7 @@ describe('agencies', () => {
   scenario('deletes a agency', async (scenario: StandardScenario) => {
     const original = (await deleteAgency({
       id: scenario.agency.one.id,
-    })) as agency
+    })) as Agency
     const result = await agency({ id: original.id })
 
     expect(result).toEqual(null)
