@@ -134,3 +134,4 @@ dist
 
 # Mac defaults
 .DS_Store
+.idea
