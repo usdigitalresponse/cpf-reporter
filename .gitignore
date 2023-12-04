@@ -131,3 +131,5 @@ dist
 
 # Mac defaults
 .DS_Store
+.redwood
+.tool-versions
