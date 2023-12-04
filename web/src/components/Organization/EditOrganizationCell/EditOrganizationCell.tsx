@@ -63,7 +63,7 @@ export const Success = ({
     <div className="rw-segment">
       <header className="rw-segment-header">
         <h2 className="rw-heading rw-heading-secondary">
-          Edit Organization {organization?.id}
+          {organization?.name}
         </h2>
       </header>
       <div className="rw-segment-main">
