@@ -8,7 +8,6 @@ export const QUERY = gql`
       id
       startDate
       endDate
-      templateFilename
       certifiedAt
     }
   }
@@ -26,7 +25,7 @@ export const Success = ({
   reportingPeriods,
 }: CellSuccessProps<ReportingPeriodsQuery>) => {
   return (
-    <table>
+    <table border="1">
       <thead>
         <tr>
           <th>Start Date</th>
@@ -35,17 +34,15 @@ export const Success = ({
           <th>Certified At</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody></tbody>
       {reportingPeriods.map((item) => {
-        return
-        <tr>
+        return <tr>
           <td>{item.startDate}</td>
           <td>{item.endDate}</td>
-          <td>{item.templateFilename}</td>
+          <td>TODO</td>
           <td>{item.certifiedAt}</td>
         </tr>
       })}
-      </tbody>
     </table>
   )
 }
