@@ -1,9 +1,10 @@
 # Configuration for https://github.com/actions/dependency-review-action
 # Used in .github/workflows/code-scanning.yml
-#
-# All allowances should provide details, including rationale.
 
-fail_on_scopes: runtime
+fail_on_scopes:
+  - runtime
+
+# All allowances should provide details, including rationale.
 allow_ghsas:
   # Only used during build / development:
   - GHSA-pfrx-2q88-qq97  # Got allows a redirect to a UNIX socket (moderate severity)
