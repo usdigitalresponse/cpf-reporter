@@ -9,6 +9,11 @@ on:
       - opened
       - synchronize
       - reopened
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
   workflow_dispatch:
 
 permissions:
