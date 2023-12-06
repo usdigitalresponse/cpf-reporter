@@ -53,6 +53,7 @@ export type CreateOutputTemplateInput = {
 
 export type CreateReportingPeriodInput = {
   certifiedAt?: InputMaybe<Scalars['DateTime']>;
+  certifiedBy?: InputMaybe<Scalars['String']>;
   endDate: Scalars['DateTime'];
   inputTemplateId: Scalars['Int'];
   isCurrentPeriod: Scalars['Boolean'];
@@ -195,6 +196,7 @@ export type Redwood = {
 export type ReportingPeriod = {
   __typename?: 'ReportingPeriod';
   certifiedAt?: Maybe<Scalars['DateTime']>;
+  certifiedBy?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
   endDate: Scalars['DateTime'];
   id: Scalars['Int'];
@@ -224,6 +226,7 @@ export type UpdateOutputTemplateInput = {
 
 export type UpdateReportingPeriodInput = {
   certifiedAt?: InputMaybe<Scalars['DateTime']>;
+  certifiedBy?: InputMaybe<Scalars['String']>;
   endDate?: InputMaybe<Scalars['DateTime']>;
   inputTemplateId?: InputMaybe<Scalars['Int']>;
   isCurrentPeriod?: InputMaybe<Scalars['Boolean']>;
@@ -480,6 +483,7 @@ export type RedwoodRelationResolvers<ContextType = RedwoodGraphQLContext, Parent
 
 export type ReportingPeriodResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['ReportingPeriod'] = ResolversParentTypes['ReportingPeriod']> = {
   certifiedAt: OptArgsResolverFn<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  certifiedBy: OptArgsResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   endDate: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
@@ -496,6 +500,7 @@ export type ReportingPeriodResolvers<ContextType = RedwoodGraphQLContext, Parent
 
 export type ReportingPeriodRelationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['ReportingPeriod'] = ResolversParentTypes['ReportingPeriod']> = {
   certifiedAt?: RequiredResolverFn<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  certifiedBy?: RequiredResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   endDate?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;

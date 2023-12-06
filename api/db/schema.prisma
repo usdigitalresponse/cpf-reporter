@@ -36,6 +36,7 @@ model ReportingPeriod {
   startDate        DateTime       @db.Date
   endDate          DateTime       @db.Date
   certifiedAt      DateTime?      @db.Timestamptz(6)
+  certifiedBy      String?
   inputTemplateId  Int
   inputTemplate    InputTemplate  @relation(fields: [inputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   outputTemplateId Int

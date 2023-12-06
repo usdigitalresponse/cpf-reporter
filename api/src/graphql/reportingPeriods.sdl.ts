@@ -5,6 +5,7 @@ export const schema = gql`
     startDate: DateTime!
     endDate: DateTime!
     certifiedAt: DateTime
+    certifiedBy: String
     inputTemplateId: Int!
     inputTemplate: InputTemplate!
     outputTemplateId: Int!
@@ -24,6 +25,7 @@ export const schema = gql`
     startDate: DateTime!
     endDate: DateTime!
     certifiedAt: DateTime
+    certifiedBy: String
     inputTemplateId: Int!
     outputTemplateId: Int!
     isCurrentPeriod: Boolean!
@@ -34,6 +36,7 @@ export const schema = gql`
     startDate: DateTime
     endDate: DateTime
     certifiedAt: DateTime
+    certifiedBy: String
     inputTemplateId: Int
     outputTemplateId: Int
     isCurrentPeriod: Boolean

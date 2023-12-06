@@ -35,6 +35,7 @@ export type CreateOutputTemplateInput = {
 
 export type CreateReportingPeriodInput = {
   certifiedAt?: InputMaybe<Scalars['DateTime']>;
+  certifiedBy?: InputMaybe<Scalars['String']>;
   endDate: Scalars['DateTime'];
   inputTemplateId: Scalars['Int'];
   isCurrentPeriod: Scalars['Boolean'];
@@ -177,6 +178,7 @@ export type Redwood = {
 export type ReportingPeriod = {
   __typename?: 'ReportingPeriod';
   certifiedAt?: Maybe<Scalars['DateTime']>;
+  certifiedBy?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
   endDate: Scalars['DateTime'];
   id: Scalars['Int'];
@@ -206,6 +208,7 @@ export type UpdateOutputTemplateInput = {
 
 export type UpdateReportingPeriodInput = {
   certifiedAt?: InputMaybe<Scalars['DateTime']>;
+  certifiedBy?: InputMaybe<Scalars['String']>;
   endDate?: InputMaybe<Scalars['DateTime']>;
   inputTemplateId?: InputMaybe<Scalars['Int']>;
   isCurrentPeriod?: InputMaybe<Scalars['Boolean']>;
@@ -217,4 +220,4 @@ export type UpdateReportingPeriodInput = {
 export type ReportingPeriodsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ReportingPeriodsQuery = { __typename?: 'Query', reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, startDate: string, endDate: string, certifiedAt?: string | null }> };
+export type ReportingPeriodsQuery = { __typename?: 'Query', reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, startDate: string, endDate: string, isCurrentPeriod: boolean, certifiedAt?: string | null, certifiedBy?: string | null, inputTemplate: { __typename?: 'InputTemplate', name: string } }> };
