@@ -45,7 +45,7 @@ jobs:
       - name: Count commits in candidate ref that are not in protected ref
         id: all-cherries
         run: |
-          $CHERRY_FILE=$(mktemp -t cherries.XXXXX)
+          CHERRY_FILE=$(mktemp -t cherries.XXXXX)
           git cherry -v "$PROTECTED_REF" "$DEPLOYMENT_REF" > $CHERRY_FILE
           echo "count=$(cat $CHERRY_FILE | wc -l)" >> $GITHUB_OUTPUT
           echo "file=$CHERRY_FILE" >> $GITHUB_OUTPUT
