@@ -1,6 +1,6 @@
 import type { ReportingPeriodsQuery } from 'types/graphql'
 
-import { Link } from '@redwoodjs/router'
+import { Link, routes } from '@redwoodjs/router'
 import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 
 export const QUERY = gql`
@@ -45,7 +45,7 @@ export const Success = ({
         return <tr>
           <td>{item.startDate}</td>
           <td>{item.endDate}</td>
-          <td>{item.inputTemplate.name}{!item.certifiedAt && <span> <Link to="/">Upload Template</Link></span>}</td>
+          <td>{item.inputTemplate.name}{!item.certifiedAt && <span> <Link to={routes.uploadTemplate({id: item.id})}>Upload Template</Link></span>}</td>
           <td>{item.isCurrentPeriod ? (<button>Certify Reporting Period</button>) : (item.certifiedAt && (<span>{item.certifiedAt} by {item.certifiedBy}</span>))}</td>
         </tr>
       })}

@@ -217,6 +217,13 @@ export type UpdateReportingPeriodInput = {
   startDate?: InputMaybe<Scalars['DateTime']>;
 };
 
+export type FindReportingPeriodQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type FindReportingPeriodQuery = { __typename?: 'Query', reportingPeriod?: { __typename?: 'ReportingPeriod', id: number } | null };
+
 export type ReportingPeriodsQueryVariables = Exact<{ [key: string]: never; }>;
 
 

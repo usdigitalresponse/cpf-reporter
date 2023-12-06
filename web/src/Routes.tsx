@@ -18,6 +18,7 @@ const Routes = () => {
       <Set wrap={MainLayout}>
         <Route path="/dashboard" page={DashboardPage} name="dashboard" />
         <Route path="/reporting-periods" page={ReportingPeriodsPage} name="reportingPeriods" />
+        <Route path="/upload-template/{id:Int}" page={UploadTemplatePage} name="uploadTemplate" />
       </Set>
       <Route notfound page={NotFoundPage} />
     </Router>
