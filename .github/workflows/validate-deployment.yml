@@ -67,6 +67,7 @@ jobs:
           VALIDATION_RESULT: ${{ fromJson(steps.missing-cherries.outputs.count) == 0 && 'SUCCESS' || 'FAIL' }}
           TOTAL_CHERRY_COUNT: ${{ steps.all-cherries.outputs.count }}
           INVALID_CHERRY_COUNT: ${{ steps.missing-cherries.outputs.count }}
+          CHERRY_FILE: ${{ steps.all-cherries.outputs.file }}
       - name: Fail validation
         if: fromJson(steps.missing-cherries.outputs.count) > 0
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
