@@ -2,7 +2,6 @@ name: Continuous Integration
 
 on:
   pull_request_target: {}
-  pull_request: {} # TESTING ONLY!!!
 
 permissions:
   contents: read
