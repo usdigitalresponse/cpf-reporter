@@ -122,7 +122,7 @@ jobs:
     uses: ./.github/workflows/terraform-apply.yml
     with:
       api-functions-artifacts-key: ${{ needs.build.outputs.api-functions-artifacts-key }}
-      api-functions-artifacts-path: ${{ needs.build.outputs.api-attestation-artifacts-path }}
+      api-functions-artifacts-path: ${{ needs.build.outputs.api-functions-artifacts-path }}
       web-artifacts-key: ${{ needs.build.outputs.web-artifacts-key }}
       web-artifacts-path: ${{ needs.build.outputs.web-artifacts-path }}
       tf-plan-artifacts-key: ${{ needs.tf-plan.outputs.artifacts-key }}
