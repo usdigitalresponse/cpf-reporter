@@ -1,3 +1,6 @@
+# Redwood
+.redwood/*
+
 # Logs
 logs
 *.log
@@ -124,6 +127,7 @@ dist
 
 # yarn (see https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored)
 .pnp.*
+.idea
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
