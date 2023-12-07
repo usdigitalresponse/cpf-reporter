@@ -96,14 +96,10 @@ module "api_gateway" {
 
   integrations = {
     "POST /graphql" = {
-      lambda_arn      = module.lambda_function-graphql.lambda_function_arn
-      connection_type = "VPC_LINK"
-      vpc_link        = "api-service"
+      lambda_arn = module.lambda_function-graphql.lambda_function_arn
     }
     "GET /graphql" = {
-      lambda_arn      = module.lambda_function-graphql.lambda_function_arn
-      connection_type = "VPC_LINK"
-      vpc_link        = "api-service"
+      lambda_arn = module.lambda_function-graphql.lambda_function_arn
     }
   }
 }

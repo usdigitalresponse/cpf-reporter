@@ -19,4 +19,6 @@ terraform {
       version = "3.5.1"
     }
   }
+
+  backend "s3" {}
 }
