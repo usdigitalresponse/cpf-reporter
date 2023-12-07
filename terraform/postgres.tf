@@ -58,7 +58,7 @@ module "postgres" {
   security_group_use_name_prefix = true
   security_group_rules = {
     from_lambda = {
-      type = "ingress"
+      type                     = "ingress"
       source_security_group_id = module.lambda_security_group.id
     }
   }
