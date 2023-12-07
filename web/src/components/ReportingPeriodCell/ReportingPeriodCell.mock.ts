@@ -2,5 +2,6 @@
 export const standard = (/* vars, { ctx, req } */) => ({
   reportingPeriod: {
     id: 42,
+    name: 'Q423',
   },
 })

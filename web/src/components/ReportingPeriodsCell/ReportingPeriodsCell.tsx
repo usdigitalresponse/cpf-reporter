@@ -49,7 +49,7 @@ export const Success = ({
               <td>{item.startDate}</td>
               <td>{item.endDate}</td>
               <td>
-                {item.inputTemplate && item.inputTemplate.name}
+                {item.inputTemplate?.name}
                 {!item.certifiedAt && (
                   <span>
                     {' '}
@@ -65,7 +65,7 @@ export const Success = ({
                 ) : (
                   item.certifiedAt && (
                     <span>
-                      {item.certifiedAt} by {item.certifiedBy.email}
+                      {item.certifiedAt} by {item.certifiedBy?.email}
                     </span>
                   )
                 )}

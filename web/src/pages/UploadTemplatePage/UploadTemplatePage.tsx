@@ -16,7 +16,7 @@ const UploadTemplatePage = ({ id }) => {
       <h1>Upload Period Template</h1>
       <p>
         This upload will be used as the template for period{' '}
-        <ReportingPeriodCell id={id} />
+        {/* <ReportingPeriodCell id={id} /> */}
       </p>
       <Form onSubmit={onSubmit}>
         <FileField name="file" />
