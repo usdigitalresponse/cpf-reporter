@@ -8,7 +8,6 @@ import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 export const QUERY = gql`
   query FindReportingPeriodQuery($id: Int!) {
     reportingPeriod: reportingPeriod(id: $id) {
-      id
       name
     }
   }

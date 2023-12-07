@@ -507,9 +507,9 @@ export type FindReportingPeriodQueryVariables = Exact<{
 }>;
 
 
-export type FindReportingPeriodQuery = { __typename?: 'Query', reportingPeriod?: { __typename?: 'ReportingPeriod', id: number } | null };
+export type FindReportingPeriodQuery = { __typename?: 'Query', reportingPeriod?: { __typename?: 'ReportingPeriod', id: number, name: string } | null };
 
 export type ReportingPeriodsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ReportingPeriodsQuery = { __typename?: 'Query', reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, startDate: string, endDate: string, isCurrentPeriod: boolean, certifiedAt?: string | null, certifiedBy?: { __typename?: 'User', email: string } | null, inputTemplate: { __typename?: 'InputTemplate', name: string } }> };
+export type ReportingPeriodsQuery = { __typename?: 'Query', reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, startDate: string, endDate: string, isCurrentPeriod: boolean, certifiedAt?: string | null, inputTemplate: { __typename?: 'InputTemplate', name: string }, certifiedBy?: { __typename?: 'User', email: string } | null }> };

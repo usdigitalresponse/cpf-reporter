@@ -42,37 +42,38 @@ export const Success = ({
           <th>Certified At</th>
         </tr>
       </thead>
-      <tbody></tbody>
-      {reportingPeriods.map((item) => {
-        return (
-          <tr>
-            <td>{item.startDate}</td>
-            <td>{item.endDate}</td>
-            <td>
-              {item.inputTemplate.name}
-              {!item.certifiedAt && (
-                <span>
-                  {' '}
-                  <Link to={routes.uploadTemplate({ id: item.id })}>
-                    Upload Template
-                  </Link>
-                </span>
-              )}
-            </td>
-            <td>
-              {item.isCurrentPeriod ? (
-                <button>Certify Reporting Period</button>
-              ) : (
-                item.certifiedAt && (
+      <tbody>
+        {reportingPeriods.map((item) => {
+          return (
+            <tr key={item.id}>
+              <td>{item.startDate}</td>
+              <td>{item.endDate}</td>
+              <td>
+                {item.inputTemplate && item.inputTemplate.name}
+                {!item.certifiedAt && (
                   <span>
-                    {item.certifiedAt} by {item.certifiedBy}
+                    {' '}
+                    <Link to={routes.uploadTemplate({ id: item.id })}>
+                      Upload Template
+                    </Link>
                   </span>
-                )
-              )}
-            </td>
-          </tr>
-        )
-      })}
+                )}
+              </td>
+              <td>
+                {item.isCurrentPeriod ? (
+                  <button>Certify Reporting Period</button>
+                ) : (
+                  item.certifiedAt && (
+                    <span>
+                      {item.certifiedAt} by {item.certifiedBy.email}
+                    </span>
+                  )
+                )}
+              </td>
+            </tr>
+          )
+        })}
+      </tbody>
     </table>
   )
 }

@@ -8,7 +8,7 @@ import UploadTemplatePage from './UploadTemplatePage'
 describe('UploadTemplatePage', () => {
   it('renders successfully', () => {
     expect(() => {
-      render(<UploadTemplatePage />)
+      render(<UploadTemplatePage id="1" />)
     }).not.toThrow()
   })
 })
