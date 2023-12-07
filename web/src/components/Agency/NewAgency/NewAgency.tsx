@@ -6,7 +6,6 @@ import { toast } from '@redwoodjs/web/toast'
 
 import AgencyForm from 'src/components/Agency/AgencyForm'
 
-
 const CREATE_AGENCY_MUTATION = gql`
   mutation CreateAgencyMutation($input: CreateAgencyInput!) {
     createAgency(input: $input) {

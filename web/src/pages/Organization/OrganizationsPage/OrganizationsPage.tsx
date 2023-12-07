@@ -1,9 +1,10 @@
+import Button from 'react-bootstrap/Button'
+
+import { Link, routes } from '@redwoodjs/router'
+
 import OrganizationsCell from 'src/components/Organization/OrganizationsCell'
-import {Link, routes} from "@redwoodjs/router";
-import Button from "react-bootstrap/Button";
 
 const OrganizationsPage = () => {
-
   return (
     <div>
       <h2>Organizations</h2>

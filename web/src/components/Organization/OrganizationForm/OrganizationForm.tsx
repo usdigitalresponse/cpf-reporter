@@ -1,3 +1,10 @@
+import { Button } from 'react-bootstrap'
+import { useForm, UseFormReturn } from 'react-hook-form'
+import type {
+  EditOrganizationById,
+  UpdateOrganizationInput,
+} from 'types/graphql'
+
 import {
   Form,
   FormError,
@@ -6,14 +13,7 @@ import {
   TextField,
   Submit,
 } from '@redwoodjs/forms'
-
-import type {
-  EditOrganizationById,
-  UpdateOrganizationInput,
-} from 'types/graphql'
 import type { RWGqlError } from '@redwoodjs/forms'
-import {useForm, UseFormReturn} from "react-hook-form";
-import {Button} from "react-bootstrap";
 
 type FormOrganization = NonNullable<EditOrganizationById['organization']>
 
@@ -25,8 +25,9 @@ interface OrganizationFormProps {
 }
 
 const OrganizationForm = (props: OrganizationFormProps) => {
-  const { organization, onSave, error, loading } = props
-  const formMethods: UseFormReturn<FormOrganization> = useForm<FormOrganization>()
+  const { organization, error, loading } = props
+  const formMethods: UseFormReturn<FormOrganization> =
+    useForm<FormOrganization>()
   const hasErrors = Object.keys(formMethods.formState.errors).length > 0
 
   const onReset = () => {
@@ -66,10 +67,7 @@ const OrganizationForm = (props: OrganizationFormProps) => {
         listClassName="rw-form-error-list"
       />
       <div className={'row mb-3'}>
-        <Label
-          name="name"
-          className="form-label col-sm-2 col-form-label"
-        >
+        <Label name="name" className="form-label col-sm-2 col-form-label">
           Organization Name
         </Label>
         <div className={'col-sm-6'}>
@@ -81,7 +79,10 @@ const OrganizationForm = (props: OrganizationFormProps) => {
             validation={{ required: 'This field is required' }}
           />
         </div>
-        <FieldError name="name" className="error-message offset-2 invalid-feedback" />
+        <FieldError
+          name="name"
+          className="error-message offset-2 invalid-feedback"
+        />
       </div>
       <div className={'row'}>
         <div className="offset-2 col-sm-6">

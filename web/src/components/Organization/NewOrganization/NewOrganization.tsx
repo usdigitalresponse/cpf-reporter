@@ -1,10 +1,10 @@
+import type { CreateOrganizationInput } from 'types/graphql'
+
 import { navigate, routes } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
 import OrganizationForm from 'src/components/Organization/OrganizationForm'
-
-import type { CreateOrganizationInput } from 'types/graphql'
 
 const CREATE_ORGANIZATION_MUTATION = gql`
   mutation CreateOrganizationMutation($input: CreateOrganizationInput!) {

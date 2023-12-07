@@ -1,13 +1,11 @@
-import { Link, routes, navigate } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
-
-import {} from 'src/lib/formatters'
-
 import type {
   DeleteOrganizationMutationVariables,
   FindOrganizationById,
 } from 'types/graphql'
+
+import { Link, routes, navigate } from '@redwoodjs/router'
+import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
 
 const DELETE_ORGANIZATION_MUTATION = gql`
   mutation DeleteOrganizationMutation($id: Int!) {
