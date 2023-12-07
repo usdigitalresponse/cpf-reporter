@@ -14,7 +14,7 @@ module "cloudfront_to_origin_bucket_access_policy" {
           "${module.cdn_origin_bucket.bucket_arn}/${local.website_content_origin_path}/*",
           "${module.cdn_origin_bucket.bucket_arn}/${local.website_config_object_key}",
         ]
-        principles = [
+        principals = [
           {
             type        = "AWS"
             identifiers = [aws_cloudfront_origin_access_identity.default.iam_arn]
@@ -107,7 +107,7 @@ module "cdn_logs_bucket" {
         },
       ]
       expiration = {
-        days = var.log_retention_in_days
+        days = 90
       }
       noncurrent_version_transition = [
         {
@@ -116,7 +116,7 @@ module "cdn_logs_bucket" {
         },
       ]
       noncurrent_version_expiration = {
-        noncurrent_days = var.log_retention_in_days
+        noncurrent_days = 90
       }
     }
   ]
