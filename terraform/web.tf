@@ -141,6 +141,35 @@ locals {
     var.website_origin_artifacts_dist_path,
     "${path.module}/../web/dist"
   )
+
+  extension_mime_types = {
+    bmp    = "image/bmp"
+    css    = "text/css"
+    csv    = "text/csv"
+    gif    = "image/gif"
+    htm    = "text/html"
+    html   = "text/html"
+    ico    = "image/vnd.microsoft.icon"
+    jpeg   = "image/jpeg"
+    jpg    = "image/jpeg"
+    js     = "text/javascript"
+    json   = "application/json"
+    jsonld = "application/ld+json"
+    otf    = "font/otf"
+    pdf    = "application/pdf"
+    png    = "image/png"
+    svg    = "image/svg+xml"
+    tif    = "image/tiff"
+    tiff   = "image/tiff"
+    ttf    = "font/ttf"
+    txt    = "text/plain"
+    woff   = "font/woff"
+    woff2  = "font/woff2"
+    xls    = "application/vnd.ms-excel"
+    xlsx   = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    xml    = "application/xml"
+    webp   = "image/webp"
+  }
 }
 
 resource "aws_s3_object" "website_deploy_config" {
@@ -150,6 +179,7 @@ resource "aws_s3_object" "website_deploy_config" {
   etag                   = md5(local.website_config_object_contents)
   source_hash            = md5(local.website_config_object_contents)
   server_side_encryption = "AES256"
+  content_type           = "text/javascript"
 
   depends_on = [module.cdn_origin_bucket]
 }
@@ -158,11 +188,12 @@ resource "aws_s3_object" "origin_dist_artifact" {
   for_each = fileset(local.website_origin_artifacts_dist_path, "**")
 
   bucket                 = module.cdn_origin_bucket.bucket_id
-  key                    = "${local.website_origin_artifacts_dist_path}/${each.value}"
+  key                    = "${local.website_content_origin_path}/${each.value}"
   source                 = "${local.website_origin_artifacts_dist_path}/${each.value}"
   source_hash            = filemd5("${local.website_origin_artifacts_dist_path}/${each.value}")
   etag                   = filemd5("${local.website_origin_artifacts_dist_path}/${each.value}")
   server_side_encryption = "AES256"
+  content_type           = local.extension_mime_types[reverse(split(".", each.value))[0]]
 
   depends_on = [module.cdn_origin_bucket]
 }
