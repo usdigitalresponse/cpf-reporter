@@ -1,6 +1,6 @@
 import { MetaTags } from '@redwoodjs/web'
 
-import ReportingPeriodsCell from 'src/components/ReportingPeriodsCell'
+// import ReportingPeriodsCell from 'src/components/ReportingPeriodsCell'
 
 const ReportingPeriodsPage = () => {
   return (

@@ -2,7 +2,7 @@ import { Form, FileField, HiddenField, Submit } from '@redwoodjs/forms'
 import { Link, routes } from '@redwoodjs/router'
 import { MetaTags } from '@redwoodjs/web'
 
-import ReportingPeriodCell from 'src/components/ReportingPeriodCell'
+// import ReportingPeriodCell from 'src/components/ReportingPeriodCell'
 
 const UploadTemplatePage = ({ id }) => {
   const onSubmit = (data) => {
