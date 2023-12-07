@@ -26,17 +26,18 @@ model Organization {
 }
 
 model User {
-  id             Int          @id @default(autoincrement())
+  id             Int               @id @default(autoincrement())
   email          String
   name           String?
   agencyId       Int?
   organizationId Int
   roleId         Int?
-  createdAt      DateTime     @default(now())
+  createdAt      DateTime          @default(now())
   updatedAt      DateTime
-  agency         Agency?      @relation(fields: [agencyId], references: [id])
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  role           Role?        @relation(fields: [roleId], references: [id])
+  agency         Agency?           @relation(fields: [agencyId], references: [id])
+  organization   Organization      @relation(fields: [organizationId], references: [id])
+  role           Role?             @relation(fields: [roleId], references: [id])
+  certified      ReportingPeriod[]
 }
 
 model Role {
@@ -45,4 +46,43 @@ model Role {
   createdAt DateTime @default(now())
   updatedAt DateTime
   users     User[]
+}
+
+model InputTemplate {
+  id                 Int               @id @default(autoincrement())
+  name               String
+  version            String
+  effectiveDate      DateTime          @db.Date
+  rulesGeneratedAt   DateTime?         @db.Timestamptz(6)
+  createdAt          DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime          @db.Timestamptz(6)
+  reportingPeriods   ReportingPeriod[]
+}
+
+model OutputTemplate {
+  id                 Int               @id @default(autoincrement())
+  name               String
+  version            String
+  effectiveDate      DateTime          @db.Date
+  rulesGeneratedAt   DateTime?         @db.Timestamptz(6)
+  createdAt          DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime          @db.Timestamptz(6)
+  reportingPeriods   ReportingPeriod[]
+}
+
+model ReportingPeriod {
+  id               Int            @id @default(autoincrement())
+  name             String
+  startDate        DateTime       @db.Date
+  endDate          DateTime       @db.Date
+  certifiedAt      DateTime?      @db.Timestamptz(6)
+  certifiedById    Int?
+  certifiedBy      User?          @relation(fields: [certifiedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  inputTemplateId  Int
+  inputTemplate    InputTemplate  @relation(fields: [inputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  outputTemplateId Int
+  outputTemplate   OutputTemplate @relation(fields: [outputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  isCurrentPeriod  Boolean        @default(false)
+  createdAt        DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime       @db.Timestamptz(6)
 }
