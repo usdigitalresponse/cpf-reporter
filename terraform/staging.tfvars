@@ -7,13 +7,14 @@ log_bucket_versioning                 = false
 log_retention_in_days                 = 14
 
 // Datadog
-datadog_enabled                      = true
-datadog_draft                        = true
-datadog_dashboards_enabled           = true
-datadog_monitors_enabled             = true
-datadog_monitor_notification_handles = []
-datadog_lambda_extension_version     = "51"
-datadog_lambda_tracer_version        = "101"
+datadog_enabled                       = true
+datadog_draft                         = true
+datadog_dashboards_enabled            = true
+datadog_monitors_enabled              = true
+datadog_monitor_notification_handles  = []
+datadog_lambda_extension_version      = "51"
+datadog_lambda_tracer_version         = "101"
+datadog_default_environment_variables = { DD_CAPTURE_LAMBDA_PAYLOAD = "true" }
 // Only defined in staging:
 datadog_metrics_metadata = {}
 
