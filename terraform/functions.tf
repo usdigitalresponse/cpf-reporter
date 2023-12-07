@@ -66,6 +66,18 @@ data "aws_iam_policy_document" "read_datadog_api_key_secret" {
   }
 }
 
+module "lambda_security_group" {
+  source  = "cloudposse/security-group/aws"
+  version = "2.2.0"
+  context = module.this.context
+
+  vpc_id           = data.aws_ssm_parameter.vpc_id.value
+  attributes       = ["lambda"]
+  allow_all_egress = true
+
+  create_before_destroy = true
+}
+
 module "lambda_artifacts_bucket" {
   source  = "cloudposse/s3-bucket/aws"
   version = "4.0.1"
@@ -116,8 +128,11 @@ module "lambda_function-graphql" {
   function_name = "${var.namespace}-graphql"
   description   = "GraphQL API server for the CPF Reporter service."
 
-  vpc_subnet_ids                    = local.private_subnet_ids
-  vpc_security_group_ids            = [module.postgres.security_group_id]
+  vpc_subnet_ids = local.private_subnet_ids
+  vpc_security_group_ids = [
+    module.lambda_security_group.id,
+    module.postgres.security_group_id,
+  ]
   attach_network_policy             = true
   role_permissions_boundary         = local.permissions_boundary_arn
   attach_cloudwatch_logs_policy     = true
@@ -130,7 +145,7 @@ module "lambda_function-graphql" {
     PostgresIAMAuth = {
       effect    = "Allow"
       actions   = ["rds-db:connect"]
-      resources = "${local.postgres_rds_connect_resource_base_arn}/${module.postgres.cluster_master_username}"
+      resources = ["${local.postgres_rds_connect_resource_base_arn}/${module.postgres.cluster_master_username}"]
     }
     GetPostgresSecret = {
       effect    = "Allow"
@@ -166,7 +181,9 @@ module "lambda_function-graphql" {
       module.postgres.cluster_endpoint,
       module.postgres.cluster_port,
       module.postgres.cluster_database_name,
-      join("&", ["sslmode=verify", "sslcert=rds-combined-ca-bundle.pem"])
+      join("&", [
+        "sslmode=verify",
+      ])
     )
     DATABASE_SECRET_SOURCE             = "ssm"
     DATABASE_SECRET_SSM_PARAMETER_PATH = aws_ssm_parameter.postgres_master_password.name
