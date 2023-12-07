@@ -15,10 +15,34 @@ model Agency {
   code           String
   tenant         Organization? @relation(fields: [organizationId], references: [id])
   organizationId Int?
+  users          User[]
 }
 
 model Organization {
   id       Int      @id @default(autoincrement())
   agencies Agency[]
+  users    User[]
   name     String
+}
+
+model User {
+  id             Int          @id @default(autoincrement())
+  email          String
+  name           String?
+  agencyId       Int?
+  organizationId Int
+  roleId         Int?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime
+  agency         Agency?      @relation(fields: [agencyId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  role           Role?        @relation(fields: [roleId], references: [id])
+}
+
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  users     User[]
 }
