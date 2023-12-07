@@ -166,7 +166,10 @@ module "lambda_function-graphql" {
       module.postgres.cluster_endpoint,
       module.postgres.cluster_port,
       module.postgres.cluster_database_name,
-      join("&", ["sslmode=verify", "sslcert=rds-combined-ca-bundle.pem"])
+      join("&", [
+        "sslmode=verify",
+        # "sslcert=rds-combined-ca-bundle.pem",
+      ])
     )
     DATABASE_SECRET_SOURCE             = "ssm"
     DATABASE_SECRET_SSM_PARAMETER_PATH = aws_ssm_parameter.postgres_master_password.name
