@@ -130,7 +130,7 @@ module "lambda_function-graphql" {
     PostgresIAMAuth = {
       effect    = "Allow"
       actions   = ["rds-db:connect"]
-      resources = "${local.postgres_rds_connect_resource_base_arn}/${module.postgres.cluster_master_username}"
+      resources = ["${local.postgres_rds_connect_resource_base_arn}/${module.postgres.cluster_master_username}"]
     }
     GetPostgresSecret = {
       effect    = "Allow"
