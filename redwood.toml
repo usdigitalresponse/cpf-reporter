@@ -14,9 +14,15 @@
     # Add any ENV vars that should be available to the web side to this array
     # See https://redwoodjs.com/docs/environment-variables#web
   ]
+
 [api]
   port = 8911
+
 [browser]
-  open = true
+  open = false
+
 [notifications]
   versionUpdates = ["latest"]
+
+[experimental.dockerfile]
+	enabled = true
