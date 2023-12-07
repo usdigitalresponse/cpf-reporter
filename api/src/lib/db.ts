@@ -50,10 +50,11 @@ async function createPrismaClient() {
     datasourceUrl: datasourceUrl,
   })
 }
-createPrismaClient()
 
-handlePrismaLogging({
-  db,
-  logger,
-  logLevels: ['info', 'warn', 'error'],
+createPrismaClient().then(() => {
+  handlePrismaLogging({
+    db,
+    logger,
+    logLevels: ['info', 'warn', 'error'],
+  })
 })
