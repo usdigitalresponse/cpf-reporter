@@ -1,6 +1,6 @@
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native"]
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
 datasource db {
@@ -8,187 +8,41 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model access_tokens {
-  id         Int      @id @default(autoincrement())
-  user_id    Int?
-  passcode   String   @unique(map: "access_tokens_passcode_unique") @db.VarChar(200)
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  expires    DateTime @db.Timestamptz(6)
-  used       Boolean
-  uses       Int      @default(0)
-  users      users?   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "access_tokens_user_id_foreign")
+model Agency {
+  id             Int           @id @default(autoincrement())
+  name           String
+  abbreviation   String?
+  code           String
+  tenant         Organization? @relation(fields: [organizationId], references: [id])
+  organizationId Int?
+  users          User[]
 }
 
-model agencies {
-  id                                               Int                        @id @default(autoincrement())
-  name                                             String
-  abbreviation                                     String?                    @db.VarChar(255)
-  parent                                           Int?
-  warning_threshold                                Int?                       @default(30)
-  danger_threshold                                 Int?                       @default(15)
-  main_agency_id                                   Int
-  tenant_id                                        Int
-  code                                             String
-  agencies_agencies_main_agency_idToagencies       agencies                   @relation("agencies_main_agency_idToagencies", fields: [main_agency_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "agencies_main_agency_id_foreign")
-  other_agencies_agencies_main_agency_idToagencies agencies[]                 @relation("agencies_main_agency_idToagencies")
-  agencies_agencies_parentToagencies               agencies?                  @relation("agencies_parentToagencies", fields: [parent], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "agencies_parent_foreign")
-  other_agencies_agencies_parentToagencies         agencies[]                 @relation("agencies_parentToagencies")
-  tenants_agencies_tenant_idTotenants              tenants                    @relation("agencies_tenant_idTotenants", fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "agencies_tenant_id_foreign")
-  projects                                         projects[]
-  tenants_tenants_main_agency_idToagencies         tenants[]                  @relation("tenants_main_agency_idToagencies")
-  uploads                                          uploads[]
-  users                                            users[]
-
-  @@unique([tenant_id, code], map: "agencies_tenant_id_code_unique")
-  @@unique([tenant_id, name], map: "agencies_tenant_id_name_unique")
+model Organization {
+  id       Int      @id @default(autoincrement())
+  agencies Agency[]
+  users    User[]
+  name     String
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model application_settings {
-  id                          Int                @id @default(autoincrement())
-  title                       String?
-  current_reporting_period_id Int?
-  duns_number                 String?
-  validation_rule_tags        String[]
-  tenant_id                   Int
-  reporting_periods           reporting_periods? @relation(fields: [current_reporting_period_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "application_settings_current_reporting_period_id_foreign")
-  tenants                     tenants            @relation(fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "application_settings_tenant_id_foreign")
-
-  @@ignore
+model User {
+  id             Int          @id @default(autoincrement())
+  email          String
+  name           String?
+  agencyId       Int?
+  organizationId Int
+  roleId         Int?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime
+  agency         Agency?      @relation(fields: [agencyId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  role           Role?        @relation(fields: [roleId], references: [id])
 }
 
-model arpa_subrecipients {
-  id         Int       @id @default(autoincrement())
-  tenant_id  Int
-  created_at DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at DateTime? @db.Timestamptz(6)
-  updated_by Int?
-  uei        String?   @db.VarChar(255)
-  tin        String?   @db.VarChar(255)
-  record     String?
-  upload_id  String?   @db.Uuid
-  tenants    tenants   @relation(fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "arpa_subrecipients_tenant_id_foreign")
-  users      users?    @relation(fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "arpa_subrecipients_updated_by_foreign")
-  uploads    uploads?  @relation(fields: [upload_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "arpa_subrecipients_upload_id_foreign")
-
-  @@unique([tenant_id, tin], map: "arpa_subrecipients_tenant_id_tin_unique")
-  @@unique([tenant_id, uei], map: "arpa_subrecipients_tenant_id_uei_unique")
-}
-
-model period_summaries {
-  id                  Int               @id @default(autoincrement())
-  reporting_period_id Int
-  project_code        String
-  award_type          String
-  award_number        String
-  current_obligation  Decimal           @db.Decimal(19, 2)
-  current_expenditure Decimal           @db.Decimal(19, 2)
-  award_amount        Decimal?          @db.Decimal(19, 2)
-  tenant_id           Int
-  reporting_periods   reporting_periods @relation(fields: [reporting_period_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "period_summaries_reporting_period_id_foreign")
-  tenants             tenants           @relation(fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "period_summaries_tenant_id_foreign")
-  projects            projects          @relation(fields: [tenant_id, project_code], references: [tenant_id, code], onDelete: NoAction, onUpdate: NoAction, map: "period_summaries_tenant_id_project_code_foreign")
-}
-
-model projects {
-  id                Int                @id @default(autoincrement())
-  code              String
-  name              String
-  agency_id         Int?
-  status            String?
-  description       String?
-  created_at        DateTime           @default(now()) @db.Timestamptz(6)
-  created_by        String?
-  updated_at        DateTime?          @db.Timestamptz(6)
-  updated_by        String?
-  created_in_period Int?
-  tenant_id         Int
-  period_summaries  period_summaries[]
-  agencies          agencies?          @relation(fields: [agency_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "projects_agency_id_foreign")
-  reporting_periods reporting_periods? @relation(fields: [created_in_period], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "projects_created_in_period_foreign")
-  tenants           tenants            @relation(fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "projects_tenant_id_foreign")
-
-  @@unique([tenant_id, code], map: "projects_tenant_id_code_unique")
-  @@unique([tenant_id, name], map: "projects_tenant_id_name_unique")
-}
-
-model reporting_periods {
-  id                   Int                    @id @default(autoincrement())
-  name                 String
-  start_date           DateTime               @db.Date
-  end_date             DateTime               @db.Date
-  certified_at         DateTime?              @db.Timestamptz(6)
-  certified_by         Int?
-  tenant_id            Int
-  template_filename    String?                @db.VarChar(255)
-  application_settings application_settings[] @ignore
-  period_summaries     period_summaries[]
-  projects             projects[]
-  users                users?                 @relation(fields: [certified_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reporting_periods_certified_by_foreign")
-  tenants              tenants                @relation(fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reporting_periods_tenant_id_foreign")
-  uploads              uploads[]
-
-  @@unique([tenant_id, name], map: "reporting_periods_tenant_id_name_unique")
-}
-
-model roles {
-  id         Int      @id @default(autoincrement())
-  name       String   @unique(map: "roles_name_unique") @db.VarChar(255)
-  rules      Json     @db.Json
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  users      users[]
-}
-
-model tenants {
-  id                                        Int                    @id @default(autoincrement())
-  display_name                              String?                @db.VarChar(255)
-  main_agency_id                            Int?
-  created_at                                DateTime               @default(now()) @db.Timestamptz(6)
-  updated_at                                DateTime?              @db.Timestamptz(6)
-  agencies_agencies_tenant_idTotenants      agencies[]             @relation("agencies_tenant_idTotenants")
-  application_settings                      application_settings[] @ignore
-  arpa_subrecipients                        arpa_subrecipients[]
-  period_summaries                          period_summaries[]
-  projects                                  projects[]
-  reporting_periods                         reporting_periods[]
-  agencies_tenants_main_agency_idToagencies agencies?              @relation("tenants_main_agency_idToagencies", fields: [main_agency_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "tenants_main_agency_id_foreign")
-  uploads                                   uploads[]
-  users                                     users[]
-}
-
-model uploads {
-  filename                          String
-  created_at                        DateTime             @default(now()) @db.Timestamptz(6)
-  reporting_period_id               Int?
-  user_id                           Int?
-  agency_id                         Int?
-  validated_at                      DateTime?            @db.Timestamptz(6)
-  validated_by                      Int?
-  ec_code                           String?              @db.VarChar(255)
-  tenant_id                         Int
-  id                                String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  arpa_subrecipients                arpa_subrecipients[]
-  agencies                          agencies?            @relation(fields: [agency_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "uploads_agency_id_foreign")
-  reporting_periods                 reporting_periods?   @relation(fields: [reporting_period_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "uploads_reporting_period_id_foreign")
-  tenants                           tenants              @relation(fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "uploads_tenant_id_foreign")
-  users_uploads_user_idTousers      users?               @relation("uploads_user_idTousers", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "uploads_user_id_foreign")
-  users_uploads_validated_byTousers users?               @relation("uploads_validated_byTousers", fields: [validated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "uploads_validated_by_foreign")
-}
-
-model users {
-  id                                  Int                      @id @default(autoincrement())
-  email                               String                   @unique(map: "users_email_unique") @db.VarChar(255)
-  name                                String?                  @db.VarChar(255)
-  role_id                             Int?
-  created_at                          DateTime                 @default(now()) @db.Timestamptz(6)
-  agency_id                           Int?
-  tenant_id                           Int
-  access_tokens                       access_tokens[]
-  arpa_subrecipients                  arpa_subrecipients[]
-  reporting_periods                   reporting_periods[]
-  uploads_uploads_user_idTousers      uploads[]                @relation("uploads_user_idTousers")
-  uploads_uploads_validated_byTousers uploads[]                @relation("uploads_validated_byTousers")
-  agencies                            agencies?                @relation(fields: [agency_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_agency_id_foreign")
-  roles                               roles?                   @relation(fields: [role_id], references: [id], onUpdate: NoAction, map: "users_role_id_foreign")
-  tenants                             tenants                  @relation(fields: [tenant_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "users_tenant_id_foreign")
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  users     User[]
 }
