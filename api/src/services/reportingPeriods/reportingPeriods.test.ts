@@ -51,8 +51,8 @@ describe('reportingPeriods', () => {
     })
 
     expect(result.name).toEqual('String')
-    expect(result.startDate).toEqual(new Date('2023-12-07T18:38:12.341Z'))
-    expect(result.endDate).toEqual(new Date('2023-12-07T18:38:12.341Z'))
+    expect(result.startDate).toEqual(new Date('2023-12-07T00:00:00.000Z'))
+    expect(result.endDate).toEqual(new Date('2023-12-07T00:00:00.000Z'))
     expect(result.inputTemplateId).toEqual(
       scenario.reportingPeriod.two.inputTemplateId
     )

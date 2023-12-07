@@ -49,7 +49,7 @@ describe('outputTemplates', () => {
 
     expect(result.name).toEqual('String')
     expect(result.version).toEqual('String')
-    expect(result.effectiveDate).toEqual(new Date('2023-12-07T18:17:34.958Z'))
+    expect(result.effectiveDate).toEqual(new Date('2023-12-07T00:00:00.000Z'))
     expect(result.rulesGeneratedAt).toEqual(
       new Date('2023-12-07T18:17:34.958Z')
     )
