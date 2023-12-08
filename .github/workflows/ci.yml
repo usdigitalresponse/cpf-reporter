@@ -84,8 +84,7 @@ jobs:
       concurrency-group: run_terraform-staging
       api-functions-artifacts-key: ${{ needs.build.outputs.api-functions-artifacts-key }}
       api-functions-artifacts-path: ${{ needs.build.outputs.api-functions-artifacts-path }}
-      console-image-tag: ${{ github.event.pull_request.head.sha }}
-      console-image-digest: ${{ needs.build.outputs.console-image-digest }}
+      console-image: ${{ needs.build.outputs.console-image-full-name }}
       web-artifacts-key: ${{ needs.build.outputs.web-artifacts-key }}
       web-artifacts-path: ${{ needs.build.outputs.web-artifacts-path }}
       aws-region: us-west-2

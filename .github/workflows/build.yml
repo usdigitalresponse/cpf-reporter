@@ -97,6 +97,8 @@ on:
         value: ${{ jobs.web-bundle.result }}
       api-image-digest:
         value: ${{ jobs.api-docker-image.outputs.digest }}
+      api-image-full-name:
+        value: ${{ jobs.api-docker-image.outputs.full-name }}
       api-attestation-artifacts-key:
         value: ${{ jobs.api-docker-image.outputs.attestation-artifacts-key }}
       api-attestation-artifacts-path:
@@ -109,6 +111,8 @@ on:
         value: ${{ jobs.api-function-zips.outputs.checksums-sha256 }}
       console-image-digest:
         value: ${{ jobs.redwood-console-image.outputs.digest }}
+      console-image-full-name:
+        value: ${{ jobs.redwood-console-image.outputs.full-name }}
       console-attestation-artifacts-key:
         value: ${{ jobs.redwood-console-image.outputs.attestation-artifacts-key }}
       console-attestation-artifacts-path:
@@ -133,6 +137,7 @@ jobs:
     outputs:
       commit-tag: ${{ inputs.ref }}
       digest: ${{ steps.build-push.outputs.digest }}
+      full-name: ${{ inputs.docker-image-registry }}/${{ inputs.api-image-name }}@${{ steps.build-push.outputs.digest }}
       attestation-artifacts-key: ${{ env.ATTESTATION_ARTIFACTS_KEY }}
       attestation-artifacts-path: ${{ steps.store-attestations.outputs.path }}
     steps:
@@ -267,6 +272,7 @@ jobs:
     outputs:
       commit-tag: ${{ inputs.ref }}
       digest: ${{ steps.build-push.outputs.digest }}
+      full-name: ${{ inputs.docker-image-registry }}/${{ inputs.console-image-name }}@${{ steps.build-push.outputs.digest }}
       attestation-artifacts-key: ${{ env.ATTESTATION_ARTIFACTS_KEY }}
       attestation-artifacts-path: ${{ steps.store-attestations.outputs.path }}
     steps:

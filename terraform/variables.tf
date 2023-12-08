@@ -212,7 +212,7 @@ variable "postgres_snapshot_before_destroy" {
   default     = true
 }
 
-// ECS (currently unused)
+// ECS
 variable "ecs_cluster_container_insights_enabled" {
   description = "Whether to enable ECS container insights."
   type        = bool
