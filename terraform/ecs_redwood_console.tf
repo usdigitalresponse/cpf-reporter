@@ -176,8 +176,8 @@ resource "aws_ecs_task_definition" "console" {
   requires_compatibilities = ["FARGATE"]
   container_definitions    = jsonencode([module.ecs_console_container_definition.json_map_object])
 
-  cpu    = 256
-  memory = 512
+  cpu    = 512
+  memory = 1024
 
   runtime_platform {
     operating_system_family = "LINUX"
