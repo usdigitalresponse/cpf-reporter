@@ -7,6 +7,9 @@
 # Require admin approval when Postgres root CA bundle is modified
 /api/db/rds-combined-ca-bundle.pem @usdigitalresponse/grants-admins
 
+# Require admin approval when GPG keys are modified
+aws-public-key.gpg @usdigitalresponse/grants-admins
+
 # Require admin approval for special doc modifications
 README.md  @usdigitalresponse/grants-admins
 LICENSE  @usdigitalresponse/grants-admins
