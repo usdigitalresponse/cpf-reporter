@@ -1,6 +1,7 @@
 // Lambda defaults
 locals {
   lambda_artifacts_base_path = trimsuffix(coalesce(var.lambda_artifacts_base_path, "${path.module}/../api/dist/zipballs"), "/")
+  datadog_lambda_handler     = "/opt/nodejs/node_modules/datadog-lambda-js/handler.handler"
   datadog_lambda_custom_tags = {
     "git.repository_url" = var.git_repository_url
     "git.commit.sha"     = var.git_commit_sha
@@ -31,7 +32,9 @@ locals {
         DD_API_KEY_SECRET_ARN        = data.aws_ssm_parameter.datadog_api_key_secret_arn[0].value
         DD_APM_ENABLED               = "true"
         DD_CAPTURE_LAMBDA_PAYLOAD    = "false"
+        DD_COMMIT_SHA                = var.git_commit_sha
         DD_ENV                       = var.environment
+        DD_GIT_REPOSITORY_URL        = var.git_repository_url
         DD_SERVERLESS_APPSEC_ENABLED = "true"
         DD_SERVICE                   = "cpf-reporter"
         DD_SITE                      = "datadoghq.com"
@@ -39,7 +42,9 @@ locals {
         DD_TRACE_ENABLED             = "true"
         DD_VERSION                   = var.version_identifier
       },
-      var.datadog_reserved_tags, // Allow conflicting variable-defined tags to override the above defaults
+      // Allow variable-defined unified service tags and env vars to override the above defaults
+      var.datadog_reserved_tags,
+      var.datadog_default_environment_variables,
     ),
     {
       LOG_LEVEL = var.lambda_log_level
@@ -159,7 +164,7 @@ module "lambda_function-graphql" {
     }
   }
 
-  handler       = "graphql.handler"
+  handler       = var.datadog_enabled ? local.datadog_lambda_handler : "graphql.handler"
   runtime       = var.lambda_runtime
   architectures = [var.lambda_arch]
   publish       = true
@@ -183,10 +188,12 @@ module "lambda_function-graphql" {
       module.postgres.cluster_database_name,
       join("&", [
         "sslmode=verify",
+        "connection_limit=1", // Can be tuned for parallel query performance: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections#serverless-environments-faas
       ])
     )
     DATABASE_SECRET_SOURCE             = "ssm"
     DATABASE_SECRET_SSM_PARAMETER_PATH = aws_ssm_parameter.postgres_master_password.name
+    DD_LAMBDA_HANDLER                  = "graphql.handler"
   })
 
   allowed_triggers = {

@@ -1,5 +1,7 @@
 // See https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-client/constructor
 // for options.
+// eslint-disable-next-line import/order, @typescript-eslint/no-unused-vars
+import { tracer } from './tracer'
 
 import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm'
 import { Signer } from '@aws-sdk/rds-signer'

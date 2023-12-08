@@ -47,6 +47,10 @@ jobs:
       web-artifact-retention-days: 14
       web-dotenv: |
         API_URL=api.staging.cpf.usdr.dev
+        DD_RUM_ENABLED='true'
+        DD_ENABLED='true'
+        DD_ENV='staging'
+        DD_VERSION='${{ github.sha }}'
 
   aws-auth:
     name: Configure AWS Credentials
