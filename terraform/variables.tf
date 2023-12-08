@@ -213,10 +213,15 @@ variable "postgres_snapshot_before_destroy" {
 }
 
 // ECS (currently unused)
-variable "api_container_image_tag" {
-  description = "Complete Docker image tag to pull for API tasks."
+variable "ecs_cluster_container_insights_enabled" {
+  description = "Whether to enable ECS container insights."
+  type        = bool
+  default     = false
+}
+
+variable "console_container_image" {
+  description = "Complete Docker image tag to pull for RedwoodJS console ECS tasks."
   type        = string
-  default     = ""
 }
 
 // Lambda
