@@ -149,3 +149,5 @@ USER node
 COPY --chown=node:node api api
 COPY --chown=node:node web web
 COPY --chown=node:node scripts scripts
+
+CMD sleep infinity
