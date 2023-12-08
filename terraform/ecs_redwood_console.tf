@@ -39,13 +39,13 @@ module "ecs_console_container_definition" {
   }
 
   map_secrets = {
-    PGPASSWORD = join("", aws_ssm_parameter.postgres_master_password.arn)
+    PGPASSWORD = aws_ssm_parameter.postgres_master_password.arn
   }
 
   log_configuration = {
     logDriver = "awslogs"
     options = {
-      awslogs-group         = join("", aws_cloudwatch_log_group.ecs.name)
+      awslogs-group         = aws_cloudwatch_log_group.ecs.name
       awslogs-region        = data.aws_region.current.name
       awslogs-stream-prefix = "console"
     }
@@ -164,7 +164,7 @@ data "aws_iam_policy_document" "ecs_console_task" {
 }
 
 resource "aws_iam_role_policy" "ecs_console_task" {
-  role   = aws_iam_role.ecs_console_task
+  role   = aws_iam_role.ecs_console_task.name
   policy = data.aws_iam_policy_document.ecs_console_task.json
 }
 
