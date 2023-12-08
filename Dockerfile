@@ -127,6 +127,24 @@ FROM base as console
 #
 # USER node
 # ```
+USER root
+
+RUN DEBIAN_FRONTEND="noninteractive" apt update && apt install -y \
+    curl gnupg gnupg2 gnupg1 groff postgresql-client-15 unzip
+
+# Install awscli
+RUN mkdir -p /tmp/awscli
+COPY aws-public-key.gpg /tmp/awscli/key.gpg
+RUN gpg --import /tmp/awscli/key.gpg
+RUN sh -c 'curl -o "/tmp/awscli/awscliv2.sig" https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip.sig'
+RUN sh -c 'curl -o "/tmp/awscli/awscliv2.zip" "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip"'
+RUN gpg --verify /tmp/awscli/awscliv2.sig /tmp/awscli/awscliv2.zip
+RUN unzip -u -d /tmp/awscli/ /tmp/awscli/awscliv2.zip
+RUN /tmp/awscli/aws/install
+RUN aws --version
+RUN rm -rf /tmp/awscli
+
+USER node
 
 COPY --chown=node:node api api
 COPY --chown=node:node web web
