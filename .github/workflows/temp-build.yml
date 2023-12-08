@@ -20,7 +20,7 @@ jobs:
       docker-image-args-ref: ${{ github.ref }}
       docker-image-tag-latest: false
       docker-image-tag-pr: "${{ github.event.pull_request.number }}"
-      docker-image-upload-attestations: false
+      docker-image-upload-attestations: true
       docker-image-artifacts-retention-days: 14
       docker-image-version: "rc-pr-${{ github.event.pull_request.number }}"
       build-api-image: false
