@@ -76,8 +76,8 @@ data "aws_iam_policy_document" "ecs_console_execution" {
       "ssm:GetParameters",
     ]
     resources = [
-      data.data.aws_kms_key.ssm.arn,
-      aws_ssm_parameter.postgres_master_password.arnm,
+      data.aws_kms_key.ssm.arn,
+      aws_ssm_parameter.postgres_master_password.arn,
     ]
   }
   statement {
@@ -146,7 +146,7 @@ data "aws_iam_policy_document" "ecs_console_task" {
   statement {
     sid       = "InventoryLogGroupsForExec"
     effect    = "Allow"
-    actions   = "logs:DescribeLogGroups"
+    actions   = ["logs:DescribeLogGroups"]
     resources = ["*"]
   }
   statement {
@@ -211,7 +211,7 @@ resource "aws_ecs_service" "console" {
     assign_public_ip = false
     subnets          = local.private_subnet_ids
     security_groups = [
-      module.module.ecs_console_security_group.id,
+      module.ecs_console_security_group.id,
       module.postgres.security_group_id,
     ]
   }
