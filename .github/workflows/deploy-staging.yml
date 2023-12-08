@@ -39,7 +39,7 @@ jobs:
       docker-image-upload-attestations: true
       docker-image-artifacts-retention-days: 14
       docker-image-version: "rc-${{ github.sha }}"
-      build-api-image: true
+      build-api-image: false
       build-console-image: true
       build-api-functions: true
       api-function-artifact-retention-days: 14
