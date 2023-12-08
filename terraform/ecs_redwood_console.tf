@@ -21,6 +21,8 @@ module "ecs_console_container_definition" {
   }
 
   map_environment = {
+    AWS_REGION = data.aws_region.current.name
+    AWS_DEFAULT_REGION = data.aws_region.current.name
     DATABASE_URL = format(
       "postgres://%s@%s:%s/%s?%s",
       module.postgres.cluster_master_username,
@@ -29,7 +31,7 @@ module "ecs_console_container_definition" {
       module.postgres.cluster_database_name,
       join("&", [
         "sslmode=verify",
-        "sslcert=rds-combined-ca-bundle.pem"
+        "sslcert=/home/node/app/api/db/rds-combined-ca-bundle.pem"
       ])
     )
     CI       = ""
