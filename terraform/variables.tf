@@ -141,6 +141,28 @@ variable "datadog_reserved_tags" {
   }
 }
 
+variable "datadog_default_environment_variables" {
+  description = "Datadog environment variables to configure in Lambda function environments (when var.datadog_enabled is true)."
+  type        = map(string)
+  default     = {}
+
+  validation {
+    condition = alltrue([
+      for k in keys(var.datadog_default_environment_variables) :
+      startswith(k, "DD_")
+    ])
+    error_message = "Datadog environment variable `DD_` prefix is required."
+  }
+
+  validation {
+    condition = !anytrue([
+      for k in keys(var.datadog_default_environment_variables) :
+      contains(["DD_ENV", "DD_SERVICE", "DD_VERSION"], k)
+    ])
+    error_message = "Use var.datadog_reserved_tags to configure unified service tags."
+  }
+}
+
 variable "datadog_metrics_metadata" {
   description = "Map of metadata describing custom Datadog metrics, keyed by the metric name. All metrics are automatically prefixed with cpf_reporter."
   type = map(object({
