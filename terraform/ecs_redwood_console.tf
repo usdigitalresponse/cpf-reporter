@@ -21,7 +21,7 @@ module "ecs_console_container_definition" {
   }
 
   map_environment = {
-    AWS_REGION = data.aws_region.current.name
+    AWS_REGION         = data.aws_region.current.name
     AWS_DEFAULT_REGION = data.aws_region.current.name
     DATABASE_URL = format(
       "postgres://%s@%s:%s/%s?%s",
