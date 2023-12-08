@@ -197,7 +197,7 @@ jobs:
           TF_VAR_git_commit_sha: ${{ inputs.ref }}
           TF_VAR_datadog_api_key: ${{ secrets.datadog-api-key }}
           TF_VAR_datadog_app_key: ${{ secrets.datadog-app-key }}
-          TF_VAR_console_container_image: "${{ inputs.console-image-tag }}@sha256:${{ inputs.console-image-digest }}"
+          TF_VAR_console_container_image: "${{ inputs.console-image-tag }}@${{ inputs.console-image-digest }}"
           TF_VAR_lambda_artifacts_base_path: ${{ inputs.api-functions-artifacts-path }}
           TF_VAR_website_origin_artifacts_dist_path: "${{ inputs.web-artifacts-path }}"
       - name: Generate plaintext plan
