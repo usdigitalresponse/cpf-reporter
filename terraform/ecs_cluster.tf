@@ -14,7 +14,7 @@ resource "aws_ecs_cluster" "default" {
 }
 
 resource "aws_ecs_cluster_capacity_providers" "default" {
-  cluster_name       = aws_ecs_cluster.default[count.index].name
+  cluster_name       = aws_ecs_cluster.default.name
   capacity_providers = ["FARGATE"]
 }
 
