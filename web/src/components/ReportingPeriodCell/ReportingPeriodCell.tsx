@@ -29,5 +29,9 @@ export const Success = ({
   FindReportingPeriodQuery,
   FindReportingPeriodQueryVariables
 >) => {
-  return <span>{reportingPeriod.name}</span>
+  return (
+    <p>
+      This upload will be used as the template for period {reportingPeriod.name}
+    </p>
+  )
 }
