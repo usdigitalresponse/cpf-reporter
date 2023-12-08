@@ -34,6 +34,11 @@ export type CreateAgencyInput = {
   name: Scalars['String'];
 };
 
+export type CreateExpenditureCategoryInput = {
+  code: Scalars['String'];
+  name: Scalars['String'];
+};
+
 export type CreateInputTemplateInput = {
   effectiveDate: Scalars['DateTime'];
   name: Scalars['String'];
@@ -67,12 +72,44 @@ export type CreateRoleInput = {
   name: Scalars['String'];
 };
 
+export type CreateUploadInput = {
+  agencyId: Scalars['Int'];
+  expenditureCategoryId: Scalars['Int'];
+  filename: Scalars['String'];
+  organizationId: Scalars['Int'];
+  reportingPeriodId: Scalars['Int'];
+  uploadedById: Scalars['Int'];
+};
+
+export type CreateUploadValidationInput = {
+  agencyId: Scalars['Int'];
+  inputTemplateId: Scalars['Int'];
+  invalidatedAt?: InputMaybe<Scalars['DateTime']>;
+  invalidatedById?: InputMaybe<Scalars['Int']>;
+  invalidationResults?: InputMaybe<Scalars['JSON']>;
+  organizationId: Scalars['Int'];
+  uploadId: Scalars['Int'];
+  validatedAt?: InputMaybe<Scalars['DateTime']>;
+  validatedById?: InputMaybe<Scalars['Int']>;
+  validationResults?: InputMaybe<Scalars['JSON']>;
+};
+
 export type CreateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   email: Scalars['String'];
   name?: InputMaybe<Scalars['String']>;
   organizationId: Scalars['Int'];
   roleId?: InputMaybe<Scalars['Int']>;
+};
+
+export type ExpenditureCategory = {
+  __typename?: 'ExpenditureCategory';
+  Uploads: Array<Maybe<Upload>>;
+  code: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
 };
 
 export type InputTemplate = {
@@ -90,31 +127,45 @@ export type InputTemplate = {
 export type Mutation = {
   __typename?: 'Mutation';
   createAgency: Agency;
+  createExpenditureCategory: ExpenditureCategory;
   createInputTemplate: InputTemplate;
   createOrganization: Organization;
   createOutputTemplate: OutputTemplate;
   createReportingPeriod: ReportingPeriod;
   createRole: Role;
+  createUpload: Upload;
+  createUploadValidation: UploadValidation;
   createUser: User;
   deleteAgency: Agency;
+  deleteExpenditureCategory: ExpenditureCategory;
   deleteInputTemplate: InputTemplate;
   deleteOrganization: Organization;
   deleteOutputTemplate: OutputTemplate;
   deleteReportingPeriod: ReportingPeriod;
   deleteRole: Role;
+  deleteUpload: Upload;
+  deleteUploadValidation: UploadValidation;
   deleteUser: User;
   updateAgency: Agency;
+  updateExpenditureCategory: ExpenditureCategory;
   updateInputTemplate: InputTemplate;
   updateOrganization: Organization;
   updateOutputTemplate: OutputTemplate;
   updateReportingPeriod: ReportingPeriod;
   updateRole: Role;
+  updateUpload: Upload;
+  updateUploadValidation: UploadValidation;
   updateUser: User;
 };
 
 
 export type MutationcreateAgencyArgs = {
   input: CreateAgencyInput;
+};
+
+
+export type MutationcreateExpenditureCategoryArgs = {
+  input: CreateExpenditureCategoryInput;
 };
 
 
@@ -143,12 +194,27 @@ export type MutationcreateRoleArgs = {
 };
 
 
+export type MutationcreateUploadArgs = {
+  input: CreateUploadInput;
+};
+
+
+export type MutationcreateUploadValidationArgs = {
+  input: CreateUploadValidationInput;
+};
+
+
 export type MutationcreateUserArgs = {
   input: CreateUserInput;
 };
 
 
 export type MutationdeleteAgencyArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationdeleteExpenditureCategoryArgs = {
   id: Scalars['Int'];
 };
 
@@ -178,6 +244,16 @@ export type MutationdeleteRoleArgs = {
 };
 
 
+export type MutationdeleteUploadArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationdeleteUploadValidationArgs = {
+  id: Scalars['Int'];
+};
+
+
 export type MutationdeleteUserArgs = {
   id: Scalars['Int'];
 };
@@ -186,6 +262,12 @@ export type MutationdeleteUserArgs = {
 export type MutationupdateAgencyArgs = {
   id: Scalars['Int'];
   input: UpdateAgencyInput;
+};
+
+
+export type MutationupdateExpenditureCategoryArgs = {
+  id: Scalars['Int'];
+  input: UpdateExpenditureCategoryInput;
 };
 
 
@@ -219,6 +301,18 @@ export type MutationupdateRoleArgs = {
 };
 
 
+export type MutationupdateUploadArgs = {
+  id: Scalars['Int'];
+  input: UpdateUploadInput;
+};
+
+
+export type MutationupdateUploadValidationArgs = {
+  id: Scalars['Int'];
+  input: UpdateUploadValidationInput;
+};
+
+
 export type MutationupdateUserArgs = {
   id: Scalars['Int'];
   input: UpdateUserInput;
@@ -249,6 +343,8 @@ export type Query = {
   agencies: Array<Agency>;
   agenciesByOrganization: Array<Agency>;
   agency?: Maybe<Agency>;
+  expenditureCategories: Array<ExpenditureCategory>;
+  expenditureCategory?: Maybe<ExpenditureCategory>;
   inputTemplate?: Maybe<InputTemplate>;
   inputTemplates: Array<InputTemplate>;
   organization?: Maybe<Organization>;
@@ -261,6 +357,10 @@ export type Query = {
   reportingPeriods: Array<ReportingPeriod>;
   role?: Maybe<Role>;
   roles: Array<Role>;
+  upload?: Maybe<Upload>;
+  uploadValidation?: Maybe<UploadValidation>;
+  uploadValidations: Array<UploadValidation>;
+  uploads: Array<Upload>;
   user?: Maybe<User>;
   users: Array<User>;
 };
@@ -274,6 +374,12 @@ export type QueryagenciesByOrganizationArgs = {
 
 /** About the Redwood queries. */
 export type QueryagencyArgs = {
+  id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QueryexpenditureCategoryArgs = {
   id: Scalars['Int'];
 };
 
@@ -304,6 +410,18 @@ export type QueryreportingPeriodArgs = {
 
 /** About the Redwood queries. */
 export type QueryroleArgs = {
+  id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QueryuploadArgs = {
+  id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QueryuploadValidationArgs = {
   id: Scalars['Int'];
 };
 
@@ -361,6 +479,11 @@ export type UpdateAgencyInput = {
   name?: InputMaybe<Scalars['String']>;
 };
 
+export type UpdateExpenditureCategoryInput = {
+  code?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+};
+
 export type UpdateInputTemplateInput = {
   effectiveDate?: InputMaybe<Scalars['DateTime']>;
   name?: InputMaybe<Scalars['String']>;
@@ -394,12 +517,76 @@ export type UpdateRoleInput = {
   name?: InputMaybe<Scalars['String']>;
 };
 
+export type UpdateUploadInput = {
+  agencyId?: InputMaybe<Scalars['Int']>;
+  expenditureCategoryId?: InputMaybe<Scalars['Int']>;
+  filename?: InputMaybe<Scalars['String']>;
+  organizationId?: InputMaybe<Scalars['Int']>;
+  reportingPeriodId?: InputMaybe<Scalars['Int']>;
+  uploadedById?: InputMaybe<Scalars['Int']>;
+};
+
+export type UpdateUploadValidationInput = {
+  agencyId?: InputMaybe<Scalars['Int']>;
+  inputTemplateId?: InputMaybe<Scalars['Int']>;
+  invalidatedAt?: InputMaybe<Scalars['DateTime']>;
+  invalidatedById?: InputMaybe<Scalars['Int']>;
+  invalidationResults?: InputMaybe<Scalars['JSON']>;
+  organizationId?: InputMaybe<Scalars['Int']>;
+  uploadId?: InputMaybe<Scalars['Int']>;
+  validatedAt?: InputMaybe<Scalars['DateTime']>;
+  validatedById?: InputMaybe<Scalars['Int']>;
+  validationResults?: InputMaybe<Scalars['JSON']>;
+};
+
 export type UpdateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   email?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
   organizationId?: InputMaybe<Scalars['Int']>;
   roleId?: InputMaybe<Scalars['Int']>;
+};
+
+export type Upload = {
+  __typename?: 'Upload';
+  agency: Agency;
+  agencyId: Scalars['Int'];
+  createdAt: Scalars['DateTime'];
+  expenditureCategory: ExpenditureCategory;
+  expenditureCategoryId: Scalars['Int'];
+  filename: Scalars['String'];
+  id: Scalars['Int'];
+  organizaiton: Organization;
+  organizationId: Scalars['Int'];
+  reportingPeriod: ReportingPeriod;
+  reportingPeriodId: Scalars['Int'];
+  updatedAt: Scalars['DateTime'];
+  uploadedBy: User;
+  uploadedById: Scalars['Int'];
+  validations: Array<Maybe<UploadValidation>>;
+};
+
+export type UploadValidation = {
+  __typename?: 'UploadValidation';
+  agency: Agency;
+  agencyId: Scalars['Int'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  inputTemplate: InputTemplate;
+  inputTemplateId: Scalars['Int'];
+  invalidatedAt?: Maybe<Scalars['DateTime']>;
+  invalidatedBy?: Maybe<User>;
+  invalidatedById?: Maybe<Scalars['Int']>;
+  invalidationResults?: Maybe<Scalars['JSON']>;
+  organizaiton: Organization;
+  organizationId: Scalars['Int'];
+  updatedAt: Scalars['DateTime'];
+  upload: Upload;
+  uploadId: Scalars['Int'];
+  validatedAt?: Maybe<Scalars['DateTime']>;
+  validatedBy?: Maybe<User>;
+  validatedById?: Maybe<Scalars['Int']>;
+  validationResults?: Maybe<Scalars['JSON']>;
 };
 
 export type User = {

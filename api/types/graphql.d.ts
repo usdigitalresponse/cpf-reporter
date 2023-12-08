@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client"
 import { MergePrismaWithSdlTypes, MakeRelationsOptional } from '@redwoodjs/api'
-import { Agency as PrismaAgency, Organization as PrismaOrganization, User as PrismaUser, Role as PrismaRole, InputTemplate as PrismaInputTemplate, OutputTemplate as PrismaOutputTemplate, ReportingPeriod as PrismaReportingPeriod } from '@prisma/client'
+import { Agency as PrismaAgency, Organization as PrismaOrganization, User as PrismaUser, Role as PrismaRole, InputTemplate as PrismaInputTemplate, OutputTemplate as PrismaOutputTemplate, ReportingPeriod as PrismaReportingPeriod, ExpenditureCategory as PrismaExpenditureCategory, Upload as PrismaUpload, UploadValidation as PrismaUploadValidation } from '@prisma/client'
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { RedwoodGraphQLContext } from '@redwoodjs/graphql-server/dist/types';
 export type Maybe<T> = T | null;
@@ -52,6 +52,11 @@ export type CreateAgencyInput = {
   name: Scalars['String'];
 };
 
+export type CreateExpenditureCategoryInput = {
+  code: Scalars['String'];
+  name: Scalars['String'];
+};
+
 export type CreateInputTemplateInput = {
   effectiveDate: Scalars['DateTime'];
   name: Scalars['String'];
@@ -85,12 +90,44 @@ export type CreateRoleInput = {
   name: Scalars['String'];
 };
 
+export type CreateUploadInput = {
+  agencyId: Scalars['Int'];
+  expenditureCategoryId: Scalars['Int'];
+  filename: Scalars['String'];
+  organizationId: Scalars['Int'];
+  reportingPeriodId: Scalars['Int'];
+  uploadedById: Scalars['Int'];
+};
+
+export type CreateUploadValidationInput = {
+  agencyId: Scalars['Int'];
+  inputTemplateId: Scalars['Int'];
+  invalidatedAt?: InputMaybe<Scalars['DateTime']>;
+  invalidatedById?: InputMaybe<Scalars['Int']>;
+  invalidationResults?: InputMaybe<Scalars['JSON']>;
+  organizationId: Scalars['Int'];
+  uploadId: Scalars['Int'];
+  validatedAt?: InputMaybe<Scalars['DateTime']>;
+  validatedById?: InputMaybe<Scalars['Int']>;
+  validationResults?: InputMaybe<Scalars['JSON']>;
+};
+
 export type CreateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   email: Scalars['String'];
   name?: InputMaybe<Scalars['String']>;
   organizationId: Scalars['Int'];
   roleId?: InputMaybe<Scalars['Int']>;
+};
+
+export type ExpenditureCategory = {
+  __typename?: 'ExpenditureCategory';
+  Uploads: Array<Maybe<Upload>>;
+  code: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
 };
 
 export type InputTemplate = {
@@ -108,31 +145,45 @@ export type InputTemplate = {
 export type Mutation = {
   __typename?: 'Mutation';
   createAgency: Agency;
+  createExpenditureCategory: ExpenditureCategory;
   createInputTemplate: InputTemplate;
   createOrganization: Organization;
   createOutputTemplate: OutputTemplate;
   createReportingPeriod: ReportingPeriod;
   createRole: Role;
+  createUpload: Upload;
+  createUploadValidation: UploadValidation;
   createUser: User;
   deleteAgency: Agency;
+  deleteExpenditureCategory: ExpenditureCategory;
   deleteInputTemplate: InputTemplate;
   deleteOrganization: Organization;
   deleteOutputTemplate: OutputTemplate;
   deleteReportingPeriod: ReportingPeriod;
   deleteRole: Role;
+  deleteUpload: Upload;
+  deleteUploadValidation: UploadValidation;
   deleteUser: User;
   updateAgency: Agency;
+  updateExpenditureCategory: ExpenditureCategory;
   updateInputTemplate: InputTemplate;
   updateOrganization: Organization;
   updateOutputTemplate: OutputTemplate;
   updateReportingPeriod: ReportingPeriod;
   updateRole: Role;
+  updateUpload: Upload;
+  updateUploadValidation: UploadValidation;
   updateUser: User;
 };
 
 
 export type MutationcreateAgencyArgs = {
   input: CreateAgencyInput;
+};
+
+
+export type MutationcreateExpenditureCategoryArgs = {
+  input: CreateExpenditureCategoryInput;
 };
 
 
@@ -161,12 +212,27 @@ export type MutationcreateRoleArgs = {
 };
 
 
+export type MutationcreateUploadArgs = {
+  input: CreateUploadInput;
+};
+
+
+export type MutationcreateUploadValidationArgs = {
+  input: CreateUploadValidationInput;
+};
+
+
 export type MutationcreateUserArgs = {
   input: CreateUserInput;
 };
 
 
 export type MutationdeleteAgencyArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationdeleteExpenditureCategoryArgs = {
   id: Scalars['Int'];
 };
 
@@ -196,6 +262,16 @@ export type MutationdeleteRoleArgs = {
 };
 
 
+export type MutationdeleteUploadArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationdeleteUploadValidationArgs = {
+  id: Scalars['Int'];
+};
+
+
 export type MutationdeleteUserArgs = {
   id: Scalars['Int'];
 };
@@ -204,6 +280,12 @@ export type MutationdeleteUserArgs = {
 export type MutationupdateAgencyArgs = {
   id: Scalars['Int'];
   input: UpdateAgencyInput;
+};
+
+
+export type MutationupdateExpenditureCategoryArgs = {
+  id: Scalars['Int'];
+  input: UpdateExpenditureCategoryInput;
 };
 
 
@@ -237,6 +319,18 @@ export type MutationupdateRoleArgs = {
 };
 
 
+export type MutationupdateUploadArgs = {
+  id: Scalars['Int'];
+  input: UpdateUploadInput;
+};
+
+
+export type MutationupdateUploadValidationArgs = {
+  id: Scalars['Int'];
+  input: UpdateUploadValidationInput;
+};
+
+
 export type MutationupdateUserArgs = {
   id: Scalars['Int'];
   input: UpdateUserInput;
@@ -267,6 +361,8 @@ export type Query = {
   agencies: Array<Agency>;
   agenciesByOrganization: Array<Agency>;
   agency?: Maybe<Agency>;
+  expenditureCategories: Array<ExpenditureCategory>;
+  expenditureCategory?: Maybe<ExpenditureCategory>;
   inputTemplate?: Maybe<InputTemplate>;
   inputTemplates: Array<InputTemplate>;
   organization?: Maybe<Organization>;
@@ -279,6 +375,10 @@ export type Query = {
   reportingPeriods: Array<ReportingPeriod>;
   role?: Maybe<Role>;
   roles: Array<Role>;
+  upload?: Maybe<Upload>;
+  uploadValidation?: Maybe<UploadValidation>;
+  uploadValidations: Array<UploadValidation>;
+  uploads: Array<Upload>;
   user?: Maybe<User>;
   users: Array<User>;
 };
@@ -292,6 +392,12 @@ export type QueryagenciesByOrganizationArgs = {
 
 /** About the Redwood queries. */
 export type QueryagencyArgs = {
+  id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QueryexpenditureCategoryArgs = {
   id: Scalars['Int'];
 };
 
@@ -322,6 +428,18 @@ export type QueryreportingPeriodArgs = {
 
 /** About the Redwood queries. */
 export type QueryroleArgs = {
+  id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QueryuploadArgs = {
+  id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QueryuploadValidationArgs = {
   id: Scalars['Int'];
 };
 
@@ -379,6 +497,11 @@ export type UpdateAgencyInput = {
   name?: InputMaybe<Scalars['String']>;
 };
 
+export type UpdateExpenditureCategoryInput = {
+  code?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+};
+
 export type UpdateInputTemplateInput = {
   effectiveDate?: InputMaybe<Scalars['DateTime']>;
   name?: InputMaybe<Scalars['String']>;
@@ -412,12 +535,76 @@ export type UpdateRoleInput = {
   name?: InputMaybe<Scalars['String']>;
 };
 
+export type UpdateUploadInput = {
+  agencyId?: InputMaybe<Scalars['Int']>;
+  expenditureCategoryId?: InputMaybe<Scalars['Int']>;
+  filename?: InputMaybe<Scalars['String']>;
+  organizationId?: InputMaybe<Scalars['Int']>;
+  reportingPeriodId?: InputMaybe<Scalars['Int']>;
+  uploadedById?: InputMaybe<Scalars['Int']>;
+};
+
+export type UpdateUploadValidationInput = {
+  agencyId?: InputMaybe<Scalars['Int']>;
+  inputTemplateId?: InputMaybe<Scalars['Int']>;
+  invalidatedAt?: InputMaybe<Scalars['DateTime']>;
+  invalidatedById?: InputMaybe<Scalars['Int']>;
+  invalidationResults?: InputMaybe<Scalars['JSON']>;
+  organizationId?: InputMaybe<Scalars['Int']>;
+  uploadId?: InputMaybe<Scalars['Int']>;
+  validatedAt?: InputMaybe<Scalars['DateTime']>;
+  validatedById?: InputMaybe<Scalars['Int']>;
+  validationResults?: InputMaybe<Scalars['JSON']>;
+};
+
 export type UpdateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   email?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
   organizationId?: InputMaybe<Scalars['Int']>;
   roleId?: InputMaybe<Scalars['Int']>;
+};
+
+export type Upload = {
+  __typename?: 'Upload';
+  agency: Agency;
+  agencyId: Scalars['Int'];
+  createdAt: Scalars['DateTime'];
+  expenditureCategory: ExpenditureCategory;
+  expenditureCategoryId: Scalars['Int'];
+  filename: Scalars['String'];
+  id: Scalars['Int'];
+  organizaiton: Organization;
+  organizationId: Scalars['Int'];
+  reportingPeriod: ReportingPeriod;
+  reportingPeriodId: Scalars['Int'];
+  updatedAt: Scalars['DateTime'];
+  uploadedBy: User;
+  uploadedById: Scalars['Int'];
+  validations: Array<Maybe<UploadValidation>>;
+};
+
+export type UploadValidation = {
+  __typename?: 'UploadValidation';
+  agency: Agency;
+  agencyId: Scalars['Int'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  inputTemplate: InputTemplate;
+  inputTemplateId: Scalars['Int'];
+  invalidatedAt?: Maybe<Scalars['DateTime']>;
+  invalidatedBy?: Maybe<User>;
+  invalidatedById?: Maybe<Scalars['Int']>;
+  invalidationResults?: Maybe<Scalars['JSON']>;
+  organizaiton: Organization;
+  organizationId: Scalars['Int'];
+  updatedAt: Scalars['DateTime'];
+  upload: Upload;
+  uploadId: Scalars['Int'];
+  validatedAt?: Maybe<Scalars['DateTime']>;
+  validatedBy?: Maybe<User>;
+  validatedById?: Maybe<Scalars['Int']>;
+  validationResults?: Maybe<Scalars['JSON']>;
 };
 
 export type User = {
@@ -437,7 +624,7 @@ export type User = {
 };
 
 type MaybeOrArrayOfMaybe<T> = T | Maybe<T> | Maybe<T>[];
-type AllMappedModels = MaybeOrArrayOfMaybe<Agency | InputTemplate | Organization | OutputTemplate | ReportingPeriod | Role | User>
+type AllMappedModels = MaybeOrArrayOfMaybe<Agency | ExpenditureCategory | InputTemplate | Organization | OutputTemplate | ReportingPeriod | Role | Upload | UploadValidation | User>
 
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -502,14 +689,18 @@ export type ResolversTypes = {
   BigInt: ResolverTypeWrapper<Scalars['BigInt']>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   CreateAgencyInput: CreateAgencyInput;
+  CreateExpenditureCategoryInput: CreateExpenditureCategoryInput;
   CreateInputTemplateInput: CreateInputTemplateInput;
   CreateOrganizationInput: CreateOrganizationInput;
   CreateOutputTemplateInput: CreateOutputTemplateInput;
   CreateReportingPeriodInput: CreateReportingPeriodInput;
   CreateRoleInput: CreateRoleInput;
+  CreateUploadInput: CreateUploadInput;
+  CreateUploadValidationInput: CreateUploadValidationInput;
   CreateUserInput: CreateUserInput;
   Date: ResolverTypeWrapper<Scalars['Date']>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']>;
+  ExpenditureCategory: ResolverTypeWrapper<MergePrismaWithSdlTypes<PrismaExpenditureCategory, MakeRelationsOptional<ExpenditureCategory, AllMappedModels>, AllMappedModels>>;
   InputTemplate: ResolverTypeWrapper<MergePrismaWithSdlTypes<PrismaInputTemplate, MakeRelationsOptional<InputTemplate, AllMappedModels>, AllMappedModels>>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   JSON: ResolverTypeWrapper<Scalars['JSON']>;
@@ -524,12 +715,17 @@ export type ResolversTypes = {
   String: ResolverTypeWrapper<Scalars['String']>;
   Time: ResolverTypeWrapper<Scalars['Time']>;
   UpdateAgencyInput: UpdateAgencyInput;
+  UpdateExpenditureCategoryInput: UpdateExpenditureCategoryInput;
   UpdateInputTemplateInput: UpdateInputTemplateInput;
   UpdateOrganizationInput: UpdateOrganizationInput;
   UpdateOutputTemplateInput: UpdateOutputTemplateInput;
   UpdateReportingPeriodInput: UpdateReportingPeriodInput;
   UpdateRoleInput: UpdateRoleInput;
+  UpdateUploadInput: UpdateUploadInput;
+  UpdateUploadValidationInput: UpdateUploadValidationInput;
   UpdateUserInput: UpdateUserInput;
+  Upload: ResolverTypeWrapper<MergePrismaWithSdlTypes<PrismaUpload, MakeRelationsOptional<Upload, AllMappedModels>, AllMappedModels>>;
+  UploadValidation: ResolverTypeWrapper<MergePrismaWithSdlTypes<PrismaUploadValidation, MakeRelationsOptional<UploadValidation, AllMappedModels>, AllMappedModels>>;
   User: ResolverTypeWrapper<MergePrismaWithSdlTypes<PrismaUser, MakeRelationsOptional<User, AllMappedModels>, AllMappedModels>>;
 };
 
@@ -539,14 +735,18 @@ export type ResolversParentTypes = {
   BigInt: Scalars['BigInt'];
   Boolean: Scalars['Boolean'];
   CreateAgencyInput: CreateAgencyInput;
+  CreateExpenditureCategoryInput: CreateExpenditureCategoryInput;
   CreateInputTemplateInput: CreateInputTemplateInput;
   CreateOrganizationInput: CreateOrganizationInput;
   CreateOutputTemplateInput: CreateOutputTemplateInput;
   CreateReportingPeriodInput: CreateReportingPeriodInput;
   CreateRoleInput: CreateRoleInput;
+  CreateUploadInput: CreateUploadInput;
+  CreateUploadValidationInput: CreateUploadValidationInput;
   CreateUserInput: CreateUserInput;
   Date: Scalars['Date'];
   DateTime: Scalars['DateTime'];
+  ExpenditureCategory: MergePrismaWithSdlTypes<PrismaExpenditureCategory, MakeRelationsOptional<ExpenditureCategory, AllMappedModels>, AllMappedModels>;
   InputTemplate: MergePrismaWithSdlTypes<PrismaInputTemplate, MakeRelationsOptional<InputTemplate, AllMappedModels>, AllMappedModels>;
   Int: Scalars['Int'];
   JSON: Scalars['JSON'];
@@ -561,12 +761,17 @@ export type ResolversParentTypes = {
   String: Scalars['String'];
   Time: Scalars['Time'];
   UpdateAgencyInput: UpdateAgencyInput;
+  UpdateExpenditureCategoryInput: UpdateExpenditureCategoryInput;
   UpdateInputTemplateInput: UpdateInputTemplateInput;
   UpdateOrganizationInput: UpdateOrganizationInput;
   UpdateOutputTemplateInput: UpdateOutputTemplateInput;
   UpdateReportingPeriodInput: UpdateReportingPeriodInput;
   UpdateRoleInput: UpdateRoleInput;
+  UpdateUploadInput: UpdateUploadInput;
+  UpdateUploadValidationInput: UpdateUploadValidationInput;
   UpdateUserInput: UpdateUserInput;
+  Upload: MergePrismaWithSdlTypes<PrismaUpload, MakeRelationsOptional<Upload, AllMappedModels>, AllMappedModels>;
+  UploadValidation: MergePrismaWithSdlTypes<PrismaUploadValidation, MakeRelationsOptional<UploadValidation, AllMappedModels>, AllMappedModels>;
   User: MergePrismaWithSdlTypes<PrismaUser, MakeRelationsOptional<User, AllMappedModels>, AllMappedModels>;
 };
 
@@ -610,6 +815,26 @@ export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversT
   name: 'DateTime';
 }
 
+export type ExpenditureCategoryResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['ExpenditureCategory'] = ResolversParentTypes['ExpenditureCategory']> = {
+  Uploads: OptArgsResolverFn<Array<Maybe<ResolversTypes['Upload']>>, ParentType, ContextType>;
+  code: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  name: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  updatedAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ExpenditureCategoryRelationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['ExpenditureCategory'] = ResolversParentTypes['ExpenditureCategory']> = {
+  Uploads?: RequiredResolverFn<Array<Maybe<ResolversTypes['Upload']>>, ParentType, ContextType>;
+  code?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  name?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  updatedAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type InputTemplateResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['InputTemplate'] = ResolversParentTypes['InputTemplate']> = {
   createdAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   effectiveDate: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
@@ -644,49 +869,67 @@ export interface JSONObjectScalarConfig extends GraphQLScalarTypeConfig<Resolver
 
 export type MutationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createAgency: Resolver<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationcreateAgencyArgs, 'input'>>;
+  createExpenditureCategory: Resolver<ResolversTypes['ExpenditureCategory'], ParentType, ContextType, RequireFields<MutationcreateExpenditureCategoryArgs, 'input'>>;
   createInputTemplate: Resolver<ResolversTypes['InputTemplate'], ParentType, ContextType, RequireFields<MutationcreateInputTemplateArgs, 'input'>>;
   createOrganization: Resolver<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationcreateOrganizationArgs, 'input'>>;
   createOutputTemplate: Resolver<ResolversTypes['OutputTemplate'], ParentType, ContextType, RequireFields<MutationcreateOutputTemplateArgs, 'input'>>;
   createReportingPeriod: Resolver<ResolversTypes['ReportingPeriod'], ParentType, ContextType, RequireFields<MutationcreateReportingPeriodArgs, 'input'>>;
   createRole: Resolver<ResolversTypes['Role'], ParentType, ContextType, RequireFields<MutationcreateRoleArgs, 'input'>>;
+  createUpload: Resolver<ResolversTypes['Upload'], ParentType, ContextType, RequireFields<MutationcreateUploadArgs, 'input'>>;
+  createUploadValidation: Resolver<ResolversTypes['UploadValidation'], ParentType, ContextType, RequireFields<MutationcreateUploadValidationArgs, 'input'>>;
   createUser: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationcreateUserArgs, 'input'>>;
   deleteAgency: Resolver<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationdeleteAgencyArgs, 'id'>>;
+  deleteExpenditureCategory: Resolver<ResolversTypes['ExpenditureCategory'], ParentType, ContextType, RequireFields<MutationdeleteExpenditureCategoryArgs, 'id'>>;
   deleteInputTemplate: Resolver<ResolversTypes['InputTemplate'], ParentType, ContextType, RequireFields<MutationdeleteInputTemplateArgs, 'id'>>;
   deleteOrganization: Resolver<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationdeleteOrganizationArgs, 'id'>>;
   deleteOutputTemplate: Resolver<ResolversTypes['OutputTemplate'], ParentType, ContextType, RequireFields<MutationdeleteOutputTemplateArgs, 'id'>>;
   deleteReportingPeriod: Resolver<ResolversTypes['ReportingPeriod'], ParentType, ContextType, RequireFields<MutationdeleteReportingPeriodArgs, 'id'>>;
   deleteRole: Resolver<ResolversTypes['Role'], ParentType, ContextType, RequireFields<MutationdeleteRoleArgs, 'id'>>;
+  deleteUpload: Resolver<ResolversTypes['Upload'], ParentType, ContextType, RequireFields<MutationdeleteUploadArgs, 'id'>>;
+  deleteUploadValidation: Resolver<ResolversTypes['UploadValidation'], ParentType, ContextType, RequireFields<MutationdeleteUploadValidationArgs, 'id'>>;
   deleteUser: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationdeleteUserArgs, 'id'>>;
   updateAgency: Resolver<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationupdateAgencyArgs, 'id' | 'input'>>;
+  updateExpenditureCategory: Resolver<ResolversTypes['ExpenditureCategory'], ParentType, ContextType, RequireFields<MutationupdateExpenditureCategoryArgs, 'id' | 'input'>>;
   updateInputTemplate: Resolver<ResolversTypes['InputTemplate'], ParentType, ContextType, RequireFields<MutationupdateInputTemplateArgs, 'id' | 'input'>>;
   updateOrganization: Resolver<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationupdateOrganizationArgs, 'id' | 'input'>>;
   updateOutputTemplate: Resolver<ResolversTypes['OutputTemplate'], ParentType, ContextType, RequireFields<MutationupdateOutputTemplateArgs, 'id' | 'input'>>;
   updateReportingPeriod: Resolver<ResolversTypes['ReportingPeriod'], ParentType, ContextType, RequireFields<MutationupdateReportingPeriodArgs, 'id' | 'input'>>;
   updateRole: Resolver<ResolversTypes['Role'], ParentType, ContextType, RequireFields<MutationupdateRoleArgs, 'id' | 'input'>>;
+  updateUpload: Resolver<ResolversTypes['Upload'], ParentType, ContextType, RequireFields<MutationupdateUploadArgs, 'id' | 'input'>>;
+  updateUploadValidation: Resolver<ResolversTypes['UploadValidation'], ParentType, ContextType, RequireFields<MutationupdateUploadValidationArgs, 'id' | 'input'>>;
   updateUser: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationupdateUserArgs, 'id' | 'input'>>;
 };
 
 export type MutationRelationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createAgency?: RequiredResolverFn<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationcreateAgencyArgs, 'input'>>;
+  createExpenditureCategory?: RequiredResolverFn<ResolversTypes['ExpenditureCategory'], ParentType, ContextType, RequireFields<MutationcreateExpenditureCategoryArgs, 'input'>>;
   createInputTemplate?: RequiredResolverFn<ResolversTypes['InputTemplate'], ParentType, ContextType, RequireFields<MutationcreateInputTemplateArgs, 'input'>>;
   createOrganization?: RequiredResolverFn<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationcreateOrganizationArgs, 'input'>>;
   createOutputTemplate?: RequiredResolverFn<ResolversTypes['OutputTemplate'], ParentType, ContextType, RequireFields<MutationcreateOutputTemplateArgs, 'input'>>;
   createReportingPeriod?: RequiredResolverFn<ResolversTypes['ReportingPeriod'], ParentType, ContextType, RequireFields<MutationcreateReportingPeriodArgs, 'input'>>;
   createRole?: RequiredResolverFn<ResolversTypes['Role'], ParentType, ContextType, RequireFields<MutationcreateRoleArgs, 'input'>>;
+  createUpload?: RequiredResolverFn<ResolversTypes['Upload'], ParentType, ContextType, RequireFields<MutationcreateUploadArgs, 'input'>>;
+  createUploadValidation?: RequiredResolverFn<ResolversTypes['UploadValidation'], ParentType, ContextType, RequireFields<MutationcreateUploadValidationArgs, 'input'>>;
   createUser?: RequiredResolverFn<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationcreateUserArgs, 'input'>>;
   deleteAgency?: RequiredResolverFn<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationdeleteAgencyArgs, 'id'>>;
+  deleteExpenditureCategory?: RequiredResolverFn<ResolversTypes['ExpenditureCategory'], ParentType, ContextType, RequireFields<MutationdeleteExpenditureCategoryArgs, 'id'>>;
   deleteInputTemplate?: RequiredResolverFn<ResolversTypes['InputTemplate'], ParentType, ContextType, RequireFields<MutationdeleteInputTemplateArgs, 'id'>>;
   deleteOrganization?: RequiredResolverFn<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationdeleteOrganizationArgs, 'id'>>;
   deleteOutputTemplate?: RequiredResolverFn<ResolversTypes['OutputTemplate'], ParentType, ContextType, RequireFields<MutationdeleteOutputTemplateArgs, 'id'>>;
   deleteReportingPeriod?: RequiredResolverFn<ResolversTypes['ReportingPeriod'], ParentType, ContextType, RequireFields<MutationdeleteReportingPeriodArgs, 'id'>>;
   deleteRole?: RequiredResolverFn<ResolversTypes['Role'], ParentType, ContextType, RequireFields<MutationdeleteRoleArgs, 'id'>>;
+  deleteUpload?: RequiredResolverFn<ResolversTypes['Upload'], ParentType, ContextType, RequireFields<MutationdeleteUploadArgs, 'id'>>;
+  deleteUploadValidation?: RequiredResolverFn<ResolversTypes['UploadValidation'], ParentType, ContextType, RequireFields<MutationdeleteUploadValidationArgs, 'id'>>;
   deleteUser?: RequiredResolverFn<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationdeleteUserArgs, 'id'>>;
   updateAgency?: RequiredResolverFn<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationupdateAgencyArgs, 'id' | 'input'>>;
+  updateExpenditureCategory?: RequiredResolverFn<ResolversTypes['ExpenditureCategory'], ParentType, ContextType, RequireFields<MutationupdateExpenditureCategoryArgs, 'id' | 'input'>>;
   updateInputTemplate?: RequiredResolverFn<ResolversTypes['InputTemplate'], ParentType, ContextType, RequireFields<MutationupdateInputTemplateArgs, 'id' | 'input'>>;
   updateOrganization?: RequiredResolverFn<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationupdateOrganizationArgs, 'id' | 'input'>>;
   updateOutputTemplate?: RequiredResolverFn<ResolversTypes['OutputTemplate'], ParentType, ContextType, RequireFields<MutationupdateOutputTemplateArgs, 'id' | 'input'>>;
   updateReportingPeriod?: RequiredResolverFn<ResolversTypes['ReportingPeriod'], ParentType, ContextType, RequireFields<MutationupdateReportingPeriodArgs, 'id' | 'input'>>;
   updateRole?: RequiredResolverFn<ResolversTypes['Role'], ParentType, ContextType, RequireFields<MutationupdateRoleArgs, 'id' | 'input'>>;
+  updateUpload?: RequiredResolverFn<ResolversTypes['Upload'], ParentType, ContextType, RequireFields<MutationupdateUploadArgs, 'id' | 'input'>>;
+  updateUploadValidation?: RequiredResolverFn<ResolversTypes['UploadValidation'], ParentType, ContextType, RequireFields<MutationupdateUploadValidationArgs, 'id' | 'input'>>;
   updateUser?: RequiredResolverFn<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationupdateUserArgs, 'id' | 'input'>>;
 };
 
@@ -732,6 +975,8 @@ export type QueryResolvers<ContextType = RedwoodGraphQLContext, ParentType exten
   agencies: OptArgsResolverFn<Array<ResolversTypes['Agency']>, ParentType, ContextType>;
   agenciesByOrganization: Resolver<Array<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagenciesByOrganizationArgs, 'organizationId'>>;
   agency: Resolver<Maybe<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagencyArgs, 'id'>>;
+  expenditureCategories: OptArgsResolverFn<Array<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType>;
+  expenditureCategory: Resolver<Maybe<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType, RequireFields<QueryexpenditureCategoryArgs, 'id'>>;
   inputTemplate: Resolver<Maybe<ResolversTypes['InputTemplate']>, ParentType, ContextType, RequireFields<QueryinputTemplateArgs, 'id'>>;
   inputTemplates: OptArgsResolverFn<Array<ResolversTypes['InputTemplate']>, ParentType, ContextType>;
   organization: Resolver<Maybe<ResolversTypes['Organization']>, ParentType, ContextType, RequireFields<QueryorganizationArgs, 'id'>>;
@@ -743,6 +988,10 @@ export type QueryResolvers<ContextType = RedwoodGraphQLContext, ParentType exten
   reportingPeriods: OptArgsResolverFn<Array<ResolversTypes['ReportingPeriod']>, ParentType, ContextType>;
   role: Resolver<Maybe<ResolversTypes['Role']>, ParentType, ContextType, RequireFields<QueryroleArgs, 'id'>>;
   roles: OptArgsResolverFn<Array<ResolversTypes['Role']>, ParentType, ContextType>;
+  upload: Resolver<Maybe<ResolversTypes['Upload']>, ParentType, ContextType, RequireFields<QueryuploadArgs, 'id'>>;
+  uploadValidation: Resolver<Maybe<ResolversTypes['UploadValidation']>, ParentType, ContextType, RequireFields<QueryuploadValidationArgs, 'id'>>;
+  uploadValidations: OptArgsResolverFn<Array<ResolversTypes['UploadValidation']>, ParentType, ContextType>;
+  uploads: OptArgsResolverFn<Array<ResolversTypes['Upload']>, ParentType, ContextType>;
   user: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryuserArgs, 'id'>>;
   users: OptArgsResolverFn<Array<ResolversTypes['User']>, ParentType, ContextType>;
 };
@@ -751,6 +1000,8 @@ export type QueryRelationResolvers<ContextType = RedwoodGraphQLContext, ParentTy
   agencies?: RequiredResolverFn<Array<ResolversTypes['Agency']>, ParentType, ContextType>;
   agenciesByOrganization?: RequiredResolverFn<Array<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagenciesByOrganizationArgs, 'organizationId'>>;
   agency?: RequiredResolverFn<Maybe<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagencyArgs, 'id'>>;
+  expenditureCategories?: RequiredResolverFn<Array<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType>;
+  expenditureCategory?: RequiredResolverFn<Maybe<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType, RequireFields<QueryexpenditureCategoryArgs, 'id'>>;
   inputTemplate?: RequiredResolverFn<Maybe<ResolversTypes['InputTemplate']>, ParentType, ContextType, RequireFields<QueryinputTemplateArgs, 'id'>>;
   inputTemplates?: RequiredResolverFn<Array<ResolversTypes['InputTemplate']>, ParentType, ContextType>;
   organization?: RequiredResolverFn<Maybe<ResolversTypes['Organization']>, ParentType, ContextType, RequireFields<QueryorganizationArgs, 'id'>>;
@@ -762,6 +1013,10 @@ export type QueryRelationResolvers<ContextType = RedwoodGraphQLContext, ParentTy
   reportingPeriods?: RequiredResolverFn<Array<ResolversTypes['ReportingPeriod']>, ParentType, ContextType>;
   role?: RequiredResolverFn<Maybe<ResolversTypes['Role']>, ParentType, ContextType, RequireFields<QueryroleArgs, 'id'>>;
   roles?: RequiredResolverFn<Array<ResolversTypes['Role']>, ParentType, ContextType>;
+  upload?: RequiredResolverFn<Maybe<ResolversTypes['Upload']>, ParentType, ContextType, RequireFields<QueryuploadArgs, 'id'>>;
+  uploadValidation?: RequiredResolverFn<Maybe<ResolversTypes['UploadValidation']>, ParentType, ContextType, RequireFields<QueryuploadValidationArgs, 'id'>>;
+  uploadValidations?: RequiredResolverFn<Array<ResolversTypes['UploadValidation']>, ParentType, ContextType>;
+  uploads?: RequiredResolverFn<Array<ResolversTypes['Upload']>, ParentType, ContextType>;
   user?: RequiredResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryuserArgs, 'id'>>;
   users?: RequiredResolverFn<Array<ResolversTypes['User']>, ParentType, ContextType>;
 };
@@ -838,6 +1093,90 @@ export interface TimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
   name: 'Time';
 }
 
+export type UploadResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['Upload'] = ResolversParentTypes['Upload']> = {
+  agency: OptArgsResolverFn<ResolversTypes['Agency'], ParentType, ContextType>;
+  agencyId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  createdAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  expenditureCategory: OptArgsResolverFn<ResolversTypes['ExpenditureCategory'], ParentType, ContextType>;
+  expenditureCategoryId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  filename: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  organizaiton: OptArgsResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
+  organizationId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  reportingPeriod: OptArgsResolverFn<ResolversTypes['ReportingPeriod'], ParentType, ContextType>;
+  reportingPeriodId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  updatedAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  uploadedBy: OptArgsResolverFn<ResolversTypes['User'], ParentType, ContextType>;
+  uploadedById: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  validations: OptArgsResolverFn<Array<Maybe<ResolversTypes['UploadValidation']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type UploadRelationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['Upload'] = ResolversParentTypes['Upload']> = {
+  agency?: RequiredResolverFn<ResolversTypes['Agency'], ParentType, ContextType>;
+  agencyId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  createdAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  expenditureCategory?: RequiredResolverFn<ResolversTypes['ExpenditureCategory'], ParentType, ContextType>;
+  expenditureCategoryId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  filename?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  organizaiton?: RequiredResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
+  organizationId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  reportingPeriod?: RequiredResolverFn<ResolversTypes['ReportingPeriod'], ParentType, ContextType>;
+  reportingPeriodId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  updatedAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  uploadedBy?: RequiredResolverFn<ResolversTypes['User'], ParentType, ContextType>;
+  uploadedById?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  validations?: RequiredResolverFn<Array<Maybe<ResolversTypes['UploadValidation']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type UploadValidationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['UploadValidation'] = ResolversParentTypes['UploadValidation']> = {
+  agency: OptArgsResolverFn<ResolversTypes['Agency'], ParentType, ContextType>;
+  agencyId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  createdAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  inputTemplate: OptArgsResolverFn<ResolversTypes['InputTemplate'], ParentType, ContextType>;
+  inputTemplateId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  invalidatedAt: OptArgsResolverFn<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  invalidatedBy: OptArgsResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  invalidatedById: OptArgsResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  invalidationResults: OptArgsResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
+  organizaiton: OptArgsResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
+  organizationId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  updatedAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  upload: OptArgsResolverFn<ResolversTypes['Upload'], ParentType, ContextType>;
+  uploadId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  validatedAt: OptArgsResolverFn<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  validatedBy: OptArgsResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  validatedById: OptArgsResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  validationResults: OptArgsResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type UploadValidationRelationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['UploadValidation'] = ResolversParentTypes['UploadValidation']> = {
+  agency?: RequiredResolverFn<ResolversTypes['Agency'], ParentType, ContextType>;
+  agencyId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  createdAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  inputTemplate?: RequiredResolverFn<ResolversTypes['InputTemplate'], ParentType, ContextType>;
+  inputTemplateId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  invalidatedAt?: RequiredResolverFn<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  invalidatedBy?: RequiredResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  invalidatedById?: RequiredResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  invalidationResults?: RequiredResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
+  organizaiton?: RequiredResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
+  organizationId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  updatedAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  upload?: RequiredResolverFn<ResolversTypes['Upload'], ParentType, ContextType>;
+  uploadId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  validatedAt?: RequiredResolverFn<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  validatedBy?: RequiredResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  validatedById?: RequiredResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  validationResults?: RequiredResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type UserResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   agency: OptArgsResolverFn<Maybe<ResolversTypes['Agency']>, ParentType, ContextType>;
   agencyId: OptArgsResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
@@ -875,6 +1214,7 @@ export type Resolvers<ContextType = RedwoodGraphQLContext> = {
   BigInt: GraphQLScalarType;
   Date: GraphQLScalarType;
   DateTime: GraphQLScalarType;
+  ExpenditureCategory: ExpenditureCategoryResolvers<ContextType>;
   InputTemplate: InputTemplateResolvers<ContextType>;
   JSON: GraphQLScalarType;
   JSONObject: GraphQLScalarType;
@@ -886,6 +1226,8 @@ export type Resolvers<ContextType = RedwoodGraphQLContext> = {
   ReportingPeriod: ReportingPeriodResolvers<ContextType>;
   Role: RoleResolvers<ContextType>;
   Time: GraphQLScalarType;
+  Upload: UploadResolvers<ContextType>;
+  UploadValidation: UploadValidationResolvers<ContextType>;
   User: UserResolvers<ContextType>;
 };
 
