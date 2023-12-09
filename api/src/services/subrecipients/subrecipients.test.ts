@@ -47,8 +47,8 @@ describe('subrecipients', () => {
     expect(result.organizationId).toEqual(
       scenario.subrecipient.two.organizationId
     )
-    expect(result.startDate).toEqual(new Date('2023-12-09T14:50:18.092Z'))
-    expect(result.endDate).toEqual(new Date('2023-12-09T14:50:18.092Z'))
+    expect(result.startDate).toEqual(new Date('2023-12-09T00:00:00.000Z'))
+    expect(result.endDate).toEqual(new Date('2023-12-09T00:00:00.000Z'))
     expect(result.originationUploadId).toEqual(
       scenario.subrecipient.two.originationUploadId
     )
