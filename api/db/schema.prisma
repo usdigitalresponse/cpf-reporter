@@ -19,6 +19,7 @@ model Agency {
   users             User[]
   uploads           Upload[]
   uploadValidations UploadValidation[]
+  projects          Project[]
 }
 
 model Organization {
@@ -28,6 +29,8 @@ model Organization {
   name              String
   uploads           Upload[]
   uploadValidations UploadValidation[]
+  subrecipients     Subrecipient[]
+  projects          Project[]
 }
 
 model User {
@@ -46,6 +49,7 @@ model User {
   uploaded       Upload[]
   validated      UploadValidation[] @relation("ValidatedUploads")
   invalidated    UploadValidation[] @relation("InvalidatedUploads")
+  subrecipients  Subrecipient[]
 }
 
 model Role {
@@ -95,6 +99,7 @@ model ReportingPeriod {
   createdAt        DateTime       @default(now()) @db.Timestamptz(6)
   updatedAt        DateTime       @db.Timestamptz(6)
   uploads          Upload[]
+  projects         Project[]
 }
 
 model ExpenditureCategory {
@@ -122,6 +127,7 @@ model Upload {
   createdAt             DateTime            @default(now()) @db.Timestamptz(6)
   updatedAt             DateTime            @db.Timestamptz(6)
   validations           UploadValidation[]
+  subrecipients         Subrecipient[]
 }
 
 model UploadValidation {
@@ -144,4 +150,36 @@ model UploadValidation {
   invalidatedBy       User?         @relation("InvalidatedUploads", fields: [invalidatedById], references: [id])
   createdAt           DateTime      @default(now()) @db.Timestamptz(6)
   updatedAt           DateTime      @db.Timestamptz(6)
+}
+
+model Subrecipient {
+  id                  Int          @id @default(autoincrement())
+  name String
+  organizationId      Int
+  organization        Organization @relation(fields: [organizationId], references: [id])
+  startDate           DateTime     @db.Date
+  endDate             DateTime     @db.Date
+  certifiedAt         DateTime?    @db.Timestamptz(6)
+  certifiedById       Int?
+  certifiedBy         User?        @relation(fields: [certifiedById], references: [id])
+  originationUploadId Int
+  originationUpload   Upload       @relation(fields: [originationUploadId], references: [id])
+  createdAt           DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime     @db.Timestamptz(6)
+}
+
+model Project {
+  id                  Int             @id @default(autoincrement())
+  code                String
+  name                String
+  agencyId            Int
+  agency              Agency          @relation(fields: [agencyId], references: [id])
+  organizationId      Int
+  organization        Organization    @relation(fields: [organizationId], references: [id])
+  status              String
+  description         String
+  originationPeriodId Int
+  originationPeriod   ReportingPeriod @relation(fields: [originationPeriodId], references: [id])
+  createdAt           DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime        @db.Timestamptz(6)
 }
