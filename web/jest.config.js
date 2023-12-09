@@ -3,6 +3,11 @@
 const config = {
   rootDir: '../',
   preset: '@redwoodjs/testing/config/jest/web',
+  coverageReporters: [
+    'json',
+    'html',
+    ['text', { file: 'coverage.txt', path: './' }],
+  ],
 }
 
 module.exports = config

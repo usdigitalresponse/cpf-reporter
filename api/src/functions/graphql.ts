@@ -1,3 +1,6 @@
+// eslint-disable-next-line import/order, @typescript-eslint/no-unused-vars
+import { tracer } from 'src/lib/tracer'
+
 import { createGraphQLHandler } from '@redwoodjs/graphql-server'
 
 import directives from 'src/directives/**/*.{js,ts}'
@@ -8,7 +11,7 @@ import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 
 export const handler = createGraphQLHandler({
-  loggerConfig: { logger, options: {} },
+  loggerConfig: { logger, options: { requestId: true, operationName: true } },
   directives,
   sdls,
   services,

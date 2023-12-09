@@ -3,7 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
-    "@redwoodjs/api": "6.3.2",
-    "@redwoodjs/graphql-server": "6.3.2"
+    "@aws-sdk/client-ssm": "^3.462.0",
+    "@aws-sdk/rds-signer": "^3.462.0",
+    "@opentelemetry/instrumentation": "^0.45.1",
+    "@prisma/instrumentation": "^5.7.0",
+    "@redwoodjs/api": "6.4.2",
+    "@redwoodjs/graphql-server": "6.4.2",
+    "dd-trace": "^4.20.0"
   }
 }
