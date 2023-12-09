@@ -58,7 +58,7 @@ module "api_gateway" {
     allow_methods = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     allow_origins = sort([
       "https://${local.api_domain_name}",
-      "http://${var.website_domain_name}",
+      "https://${var.website_domain_name}",
     ])
     allow_credentials = true
     allow_headers = [
