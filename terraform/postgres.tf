@@ -61,6 +61,10 @@ module "postgres" {
       type                     = "ingress"
       source_security_group_id = module.lambda_security_group.id
     }
+    from_ecs_console = {
+      type                     = "ingress"
+      source_security_group_id = module.ecs_console_security_group.id
+    }
   }
 
   db_parameter_group_name         = aws_db_parameter_group.postgres15.id
