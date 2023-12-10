@@ -47,10 +47,10 @@ export const UploadValidation: UploadValidationRelationResolvers = {
   agency: (_obj, { root }) => {
     return db.uploadValidation.findUnique({ where: { id: root?.id } }).agency()
   },
-  organizaiton: (_obj, { root }) => {
+  organization: (_obj, { root }) => {
     return db.uploadValidation
       .findUnique({ where: { id: root?.id } })
-      .organizaiton()
+      .organization()
   },
   inputTemplate: (_obj, { root }) => {
     return db.uploadValidation

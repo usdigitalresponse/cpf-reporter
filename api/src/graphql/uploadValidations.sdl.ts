@@ -6,7 +6,7 @@ export const schema = gql`
     agencyId: Int!
     agency: Agency!
     organizationId: Int!
-    organizaiton: Organization!
+    organization: Organization!
     inputTemplateId: Int!
     inputTemplate: InputTemplate!
     validationResults: JSON

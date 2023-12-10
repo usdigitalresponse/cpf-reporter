@@ -45,8 +45,8 @@ export const Upload: UploadRelationResolvers = {
   agency: (_obj, { root }) => {
     return db.upload.findUnique({ where: { id: root?.id } }).agency()
   },
-  organizaiton: (_obj, { root }) => {
-    return db.upload.findUnique({ where: { id: root?.id } }).organizaiton()
+  organization: (_obj, { root }) => {
+    return db.upload.findUnique({ where: { id: root?.id } }).organization()
   },
   reportingPeriod: (_obj, { root }) => {
     return db.upload.findUnique({ where: { id: root?.id } }).reportingPeriod()
