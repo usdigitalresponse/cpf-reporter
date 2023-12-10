@@ -14,7 +14,7 @@ model Agency {
   name              String
   abbreviation      String?
   code              String
-  tenant            Organization?      @relation(fields: [organizationId], references: [id])
+  organization      Organization?      @relation(fields: [organizationId], references: [id])
   organizationId    Int?
   users             User[]
   uploads           Upload[]
@@ -114,7 +114,7 @@ model Upload {
   agencyId              Int
   agency                Agency              @relation(fields: [agencyId], references: [id])
   organizationId        Int
-  organizaiton          Organization        @relation(fields: [organizationId], references: [id])
+  organization          Organization        @relation(fields: [organizationId], references: [id])
   reportingPeriodId     Int
   reportingPeriod       ReportingPeriod     @relation(fields: [reportingPeriodId], references: [id])
   expenditureCategoryId Int
@@ -131,7 +131,7 @@ model UploadValidation {
   agencyId            Int
   agency              Agency         @relation(fields: [agencyId], references: [id])
   organizationId      Int
-  organizaiton        Organization   @relation(fields: [organizationId], references: [id])
+  organization        Organization   @relation(fields: [organizationId], references: [id])
   inputTemplateId     Int
   inputTemplate       InputTemplate @relation(fields: [inputTemplateId], references: [id])
   validationResults   Json?         @db.JsonB

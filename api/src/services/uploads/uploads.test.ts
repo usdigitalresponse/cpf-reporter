@@ -37,7 +37,7 @@ describe('uploads', () => {
         organizationId: scenario.upload.two.organizationId,
         reportingPeriodId: scenario.upload.two.reportingPeriodId,
         expenditureCategoryId: scenario.upload.two.expenditureCategoryId,
-        updatedAt: '2023-12-08T21:03:09.551Z',
+        updatedAt: '2023-12-10T04:48:04.888Z',
       },
     })
 
@@ -51,7 +51,7 @@ describe('uploads', () => {
     expect(result.expenditureCategoryId).toEqual(
       scenario.upload.two.expenditureCategoryId
     )
-    expect(result.updatedAt).toEqual(new Date('2023-12-08T21:03:09.551Z'))
+    expect(result.updatedAt).toEqual(new Date('2023-12-10T04:48:04.888Z'))
   })
 
   scenario('updates a upload', async (scenario: StandardScenario) => {
