@@ -30,6 +30,8 @@ const Routes = () => {
         <Route path="/agencies/new" page={AgencyNewAgencyPage} name="newAgency" />
         <Route path="/agencies" page={AgencyAgenciesPage} name="agencies" />
         <Route path="/" page={DashboardPage} name="dashboard" />
+        <Route path="/upload-template/{id:Int}" page={UploadTemplatePage} name="uploadTemplate" />
+        <Route path="/reporting-periods" page={ReportingPeriodsPage} name="reportingPeriods" />
       </Set>
       <Route notfound page={NotFoundPage} />
     </Router>

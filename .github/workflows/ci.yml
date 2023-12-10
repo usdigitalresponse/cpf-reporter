@@ -56,7 +56,7 @@ jobs:
       build-web: true
       web-artifact-retention-days: 14
       web-dotenv: |
-        API_URL=api.staging.cpf.usdr.dev
+        API_URL=https://api.staging.cpf.usdr.dev
 
   aws-auth:
     name: Configure AWS Credentials
@@ -78,7 +78,6 @@ jobs:
       - aws-auth
       - build
     uses: ./.github/workflows/terraform-plan.yml
-    if: needs.build.outputs.build-api-image-result == 'success' && needs.build.outputs.build-web-result == 'success' && needs.aws-auth.result == 'success'
     with:
       ref: ${{ github.event.pull_request.head.sha }}
       concurrency-group: run_terraform-staging

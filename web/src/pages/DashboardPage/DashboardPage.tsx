@@ -3,7 +3,7 @@ import { Button, ButtonGroup } from 'react-bootstrap'
 import { Link, routes } from '@redwoodjs/router'
 import { MetaTags } from '@redwoodjs/web'
 
-import UploadsList from '../../components/Upload/Uploads' // Import the UploadsList component
+import MyUploadsList from '../../components/MyUpload/MyUploads' // Import the MyUploadsList component
 
 const DashboardPage = () => {
   return (
@@ -51,7 +51,7 @@ const DashboardPage = () => {
         </Button>
       </ButtonGroup>
 
-      <UploadsList />
+      <MyUploadsList />
     </>
   )
 }

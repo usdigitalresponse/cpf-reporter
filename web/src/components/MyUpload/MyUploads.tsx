@@ -5,7 +5,7 @@ import { Link, routes } from '@redwoodjs/router'
 
 import { truncate } from 'src/lib/formatters'
 
-const UploadsList = () => {
+const MyUploadsList = () => {
   const uploads = [
     {
       filename: 'Test EC1-4 v20231007 - CLEAN.xlsm',
@@ -82,4 +82,4 @@ const UploadsList = () => {
   )
 }
 
-export default UploadsList
+export default MyUploadsList
