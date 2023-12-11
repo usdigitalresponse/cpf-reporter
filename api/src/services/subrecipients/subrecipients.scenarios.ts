@@ -1,4 +1,5 @@
 import type { Prisma, Subrecipient } from '@prisma/client'
+
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
 export const standard = defineScenario<Prisma.SubrecipientCreateArgs>({
@@ -22,7 +23,7 @@ export const standard = defineScenario<Prisma.SubrecipientCreateArgs>({
               },
             },
             agency: { create: { name: 'String', code: 'String' } },
-            organizaiton: { create: { name: 'String' } },
+            organization: { create: { name: 'String' } },
             reportingPeriod: {
               create: {
                 name: 'String',
@@ -77,7 +78,7 @@ export const standard = defineScenario<Prisma.SubrecipientCreateArgs>({
               },
             },
             agency: { create: { name: 'String', code: 'String' } },
-            organizaiton: { create: { name: 'String' } },
+            organization: { create: { name: 'String' } },
             reportingPeriod: {
               create: {
                 name: 'String',
