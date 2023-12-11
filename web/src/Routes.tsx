@@ -18,7 +18,7 @@ const Routes = () => {
         <Route path="/uploads/new" page={UploadNewUploadPage} name="newUpload" />
         <Route path="/uploads/{id:Int}/edit" page={UploadEditUploadPage} name="editUpload" />
         <Route path="/uploads/{id:Int}" page={UploadUploadPage} name="upload" />
-        <Route path="/uploads" page={UploadUploadsPage} name="uploads" />
+        <Route path="/" page={UploadUploadsPage} name="uploads" />
       </Set>
       <Set wrap={ScaffoldLayout} title="Organizations" titleTo="organizations" buttonLabel="New Organization" buttonTo="newOrganization">
         <Route path="/organizations/new" page={OrganizationNewOrganizationPage} name="newOrganization" />
@@ -35,7 +35,6 @@ const Routes = () => {
         <Route path="/agencies/{id:Int}" page={AgencyAgencyPage} name="agency" />
         <Route path="/agencies/new" page={AgencyNewAgencyPage} name="newAgency" />
         <Route path="/agencies" page={AgencyAgenciesPage} name="agencies" />
-        <Route path="/" page={DashboardPage} name="dashboard" />
         <Route path="/upload-template/{id:Int}" page={UploadTemplatePage} name="uploadTemplate" />
         <Route path="/reporting-periods" page={ReportingPeriodsPage} name="reportingPeriods" />
       </Set>

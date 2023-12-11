@@ -10,11 +10,21 @@ export const QUERY = gql`
     uploads {
       id
       filename
-      uploadedById
-      agencyId
+      uploadedBy {
+        id
+        email
+      }
+      agency {
+        id
+        name
+      }
       organizationId
       reportingPeriodId
-      expenditureCategoryId
+      expenditureCategory {
+        id
+        name
+        code
+      }
       createdAt
       updatedAt
     }
