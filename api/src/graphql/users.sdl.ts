@@ -12,6 +12,9 @@ export const schema = gql`
     organization: Organization!
     role: Role
     certified: [ReportingPeriod]!
+    uploaded: [Upload]!
+    validated: [UploadValidation]!
+    invalidated: [UploadValidation]!
   }
 
   type Query {
