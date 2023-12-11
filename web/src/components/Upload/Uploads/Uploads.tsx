@@ -1,52 +1,113 @@
+import {
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  createColumnHelper,
+  flexRender,
+} from '@tanstack/react-table'
 import Table from 'react-bootstrap/Table'
 import type { FindUploads } from 'types/graphql'
 
 import { Link, routes } from '@redwoodjs/router'
 
-import { truncate } from 'src/lib/formatters'
-
 const UploadsList = ({ uploads }: FindUploads) => {
+  const data = React.useMemo(() => uploads, [uploads])
+
+  const [sorting, setSorting] = React.useState([])
+
+  const columnHelper = createColumnHelper()
+
+  const columns = [
+    columnHelper.accessor('id', {
+      cell: (info) => {
+        const id = info.getValue() as number
+
+        return (
+          <Link
+            to={routes.upload({ id })}
+            title={`Show upload ${info.getValue()} detail`}
+          >
+            {id}
+          </Link>
+        )
+      },
+      header: () => <span>ID</span>,
+    }),
+    columnHelper.accessor('agency.code', {
+      cell: (info) => info.getValue(),
+      header: () => <span>Agency</span>,
+    }),
+    columnHelper.accessor('expenditureCategory.code', {
+      cell: (info) => info.getValue(),
+      header: () => <span>EC Code</span>,
+    }),
+    columnHelper.accessor('uploadedBy.email', {
+      cell: (info) => info.getValue(),
+      header: () => <span>Uploaded By</span>,
+    }),
+    columnHelper.accessor('filename', {
+      cell: (info) => info.getValue(),
+      header: () => <span>Filename</span>,
+    }),
+    columnHelper.accessor('validated_at', {
+      cell: (info) => info.getValue(),
+      header: () => <span>Validated?</span>,
+    }),
+  ]
+
+  const tableInstance = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
+  })
+
   return (
     <div>
       <Table striped borderless>
         <thead>
-          <tr>
-            <th className="border">Id</th>
-            <th className="border">Agency</th>
-            <th className="border">EC Code</th>
-            <th className="border">Uploaded By</th>
-            <th className="border">Filename</th>
-            <th className="border">Validated?</th>
-          </tr>
+          {tableInstance.getHeaderGroups().map((headerGroup) => (
+            <tr key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <th
+                    key={header.id}
+                    className="border"
+                    colSpan={header.colSpan}
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+
+                    {header.column.getIsSorted() === 'asc' ? (
+                      <span> 🔼</span> // For ascending order
+                    ) : header.column.getIsSorted() === 'desc' ? (
+                      <span> 🔽</span> // For descending order
+                    ) : null}
+                  </th>
+                )
+              })}
+            </tr>
+          ))}
         </thead>
         <tbody>
-          {uploads.map((upload) => (
-            <tr key={upload.id}>
-              <td className="border border-slate-700">
-                <Link
-                  to={routes.upload({ id: upload.id })}
-                  title={'Show upload ' + upload.id + ' detail'}
-                >
-                  {upload.id}
-                </Link>
-              </td>
-              <td className="border border-slate-700">
-                {truncate(upload.agency.name)}
-              </td>
-              <td className="border border-slate-700">
-                {truncate(upload.expenditureCategory.code)}
-              </td>
-              <td className="border border-slate-700">
-                {truncate(upload.uploadedBy.email)}
-              </td>
-              <td className="border border-slate-700">
-                {upload.filename}{' '}
-                {/* TODO: Add file download when the API is ready */}
-                {/* <Button size="sm" variant="primary">
-                  Download file
-                </Button> */}
-              </td>
-              <td className="border border-slate-700">Validation here!</td>
+          {tableInstance.getRowModel().rows.map((row) => (
+            <tr key={row.id}>
+              {row.getVisibleCells().map((cell) => (
+                <td key={cell.id} className="border border-slate-700">
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </td>
+              ))}
             </tr>
           ))}
         </tbody>

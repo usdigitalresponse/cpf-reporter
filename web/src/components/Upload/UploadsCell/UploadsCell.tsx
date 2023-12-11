@@ -16,7 +16,7 @@ export const QUERY = gql`
       }
       agency {
         id
-        name
+        code
       }
       organizationId
       reportingPeriodId

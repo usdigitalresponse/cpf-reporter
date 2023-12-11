@@ -740,4 +740,4 @@ export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Up
 export type FindUploadsVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, organizationId: number, reportingPeriodId: number, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, name: string }, expenditureCategory: { __typename?: 'ExpenditureCategory', id: number, name: string, code: string } }> };
+export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, organizationId: number, reportingPeriodId: number, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, code: string }, expenditureCategory: { __typename?: 'ExpenditureCategory', id: number, name: string, code: string } }> };
