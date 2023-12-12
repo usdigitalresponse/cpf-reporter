@@ -1,3 +1,5 @@
+import Button from 'react-bootstrap/Button'
+import Table from 'react-bootstrap/Table'
 import type {
   DeleteUserMutationVariables,
   FindUsersByOrganizationId,
@@ -19,84 +21,57 @@ const DELETE_USER_MUTATION = gql`
 `
 
 const UsersList = ({ usersByOrganization }: FindUsersByOrganizationId) => {
-  const [deleteUser] = useMutation(DELETE_USER_MUTATION, {
-    onCompleted: () => {
-      toast.success('User deleted')
-    },
-    onError: (error) => {
-      toast.error(error.message)
-    },
-    // This refetches the query on the list page. Read more about other ways to
-    // update the cache over here:
-    // https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
-    refetchQueries: [{ query: QUERY }],
-    awaitRefetchQueries: true,
-  })
-
-  const onDeleteClick = (id: DeleteUserMutationVariables['id']) => {
-    if (confirm('Are you sure you want to delete user ' + id + '?')) {
-      deleteUser({ variables: { id } })
-    }
-  }
-
   return (
-    <div className="rw-segment rw-table-wrapper-responsive">
-      <table className="rw-table">
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Email</th>
-            <th>Name</th>
-            <th>Agency id</th>
-            <th>Organization id</th>
-            <th>Role id</th>
-            <th>Created at</th>
-            <th>Updated at</th>
-            <th>&nbsp;</th>
-          </tr>
-        </thead>
-        <tbody>
-          {usersByOrganization.map((user) => (
-            <tr key={user.id}>
-              <td>{truncate(user.id)}</td>
-              <td>{truncate(user.email)}</td>
-              <td>{truncate(user.name)}</td>
-              <td>{truncate(user.agencyId)}</td>
-              <td>{truncate(user.organizationId)}</td>
-              <td>{truncate(user.roleId)}</td>
-              <td>{timeTag(user.createdAt)}</td>
-              <td>{timeTag(user.updatedAt)}</td>
-              <td>
-                <nav className="rw-table-actions">
-                  <Link
-                    to={routes.user({ id: user.id })}
-                    title={'Show user ' + user.id + ' detail'}
-                    className="rw-button rw-button-small"
-                  >
-                    Show
-                  </Link>
-                  <Link
-                    to={routes.editUser({ id: user.id })}
-                    title={'Edit user ' + user.id}
-                    className="rw-button rw-button-small rw-button-blue"
-                  >
+    <Table striped borderless>
+      <thead>
+        <tr>
+          <th className="border">Id</th>
+          <th className="border">Email</th>
+          <th className="border">Name</th>
+          <th className="border">Agency id</th>
+          <th className="border">Organization id</th>
+          <th className="border">Role id</th>
+          <th className="border">Created at</th>
+          <th className="border">Updated at</th>
+          <th className="border">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {usersByOrganization.map((user) => (
+          <tr key={user.id}>
+            <td className="border border-slate-700">{truncate(user.id)}</td>
+            <td className="border border-slate-700">{truncate(user.email)}</td>
+            <td className="border border-slate-700">{truncate(user.name)}</td>
+            <td className="border border-slate-700">
+              {truncate(user.agencyId)}
+            </td>
+            <td className="border border-slate-700">
+              {truncate(user.organizationId)}
+            </td>
+            <td className="border border-slate-700">{truncate(user.roleId)}</td>
+            <td className="border border-slate-700">
+              {timeTag(user.createdAt)}
+            </td>
+            <td className="border border-slate-700">
+              {timeTag(user.updatedAt)}
+            </td>
+            <td className="border border-slate-700">
+              <nav className="rw-table-actions">
+                <Link
+                  to={routes.editUser({ id: user.id })}
+                  title={'Edit user ' + user.id}
+                  className="rw-button rw-button-small rw-button-blue"
+                >
+                  <Button size="sm" variant="secondary">
                     Edit
-                  </Link>
-                  <button
-                    type="button"
-                    title={'Delete user ' + user.id}
-                    className="rw-button rw-button-small rw-button-red"
-                    onClick={() => onDeleteClick(user.id)}
-                  >
-                    Delete
-                  </button>
-                </nav>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+                  </Button>
+                </Link>
+              </nav>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
   )
 }
 
