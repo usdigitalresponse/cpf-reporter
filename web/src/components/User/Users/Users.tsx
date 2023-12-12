@@ -25,35 +25,25 @@ const UsersList = ({ usersByOrganization }: FindUsersByOrganizationId) => {
     <Table striped borderless>
       <thead>
         <tr>
-          <th className="border">Id</th>
           <th className="border">Email</th>
           <th className="border">Name</th>
           <th className="border">Agency id</th>
-          <th className="border">Organization id</th>
           <th className="border">Role id</th>
           <th className="border">Created at</th>
-          <th className="border">Updated at</th>
           <th className="border">Actions</th>
         </tr>
       </thead>
       <tbody>
         {usersByOrganization.map((user) => (
           <tr key={user.id}>
-            <td className="border border-slate-700">{truncate(user.id)}</td>
             <td className="border border-slate-700">{truncate(user.email)}</td>
             <td className="border border-slate-700">{truncate(user.name)}</td>
             <td className="border border-slate-700">
               {truncate(user.agencyId)}
             </td>
-            <td className="border border-slate-700">
-              {truncate(user.organizationId)}
-            </td>
             <td className="border border-slate-700">{truncate(user.roleId)}</td>
             <td className="border border-slate-700">
               {timeTag(user.createdAt)}
-            </td>
-            <td className="border border-slate-700">
-              {timeTag(user.updatedAt)}
             </td>
             <td className="border border-slate-700">
               <nav className="rw-table-actions">
