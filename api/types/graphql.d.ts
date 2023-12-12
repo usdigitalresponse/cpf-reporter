@@ -150,7 +150,6 @@ export type CreateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>
   email: Scalars['String']
   name?: InputMaybe<Scalars['String']>
-  organizationId: Scalars['Int']
   roleId?: InputMaybe<Scalars['Int']>
 }
 
@@ -385,6 +384,7 @@ export type Query = {
   uploads: Array<Upload>
   user?: Maybe<User>
   users: Array<User>
+  usersByOrganization: Array<User>
 }
 
 /** About the Redwood queries. */
@@ -559,7 +559,6 @@ export type UpdateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>
   email?: InputMaybe<Scalars['String']>
   name?: InputMaybe<Scalars['String']>
-  organizationId?: InputMaybe<Scalars['Int']>
   roleId?: InputMaybe<Scalars['Int']>
 }
 
@@ -1736,7 +1735,7 @@ export type QueryResolvers<
     ParentType,
     ContextType
   >
-  usersByOrganization: OptArgsResolverFn<
+  usersByOrganization: Resolver<
     Array<ResolversTypes['User']>,
     ParentType,
     ContextType,

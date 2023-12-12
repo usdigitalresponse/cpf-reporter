@@ -45,10 +45,29 @@ const UserForm = (props: UserFormProps) => {
     >
       {user && (
         <div className="row">
-          <Label name="id" className="form-label col-sm-2 col-form-label">
-            Agency Code
+          <Label
+            name="createdAt"
+            className="form-label col-sm-2 col-form-label"
+          >
+            Created:
           </Label>
-          <div className="col-sm-2">
+          <div className="col-sm-6">
+            <TextField
+              name="createdAt"
+              defaultValue={user?.createdAt}
+              className="form-control mb-3 col-auto"
+              disabled
+            />
+          </div>
+        </div>
+      )}
+
+      {user && (
+        <div className="row">
+          <Label name="id" className="form-label col-sm-2 col-form-label">
+            ID
+          </Label>
+          <div className="col-sm-6">
             <TextField
               name="id"
               defaultValue={user?.id}
@@ -98,6 +117,7 @@ const UserForm = (props: UserFormProps) => {
             defaultValue={props.user?.name}
             className="form-control"
             errorClassName="form-control is-invalid"
+            validation={{ required: 'This field is required' }}
           />
         </div>
 
@@ -109,7 +129,7 @@ const UserForm = (props: UserFormProps) => {
 
       <div className="row mb-3">
         <Label name="role" className="form-label col-sm-2 col-form-label">
-          Role
+          Role id
         </Label>
 
         <div className="col-sm-6">
@@ -119,6 +139,7 @@ const UserForm = (props: UserFormProps) => {
             className="form-control"
             errorClassName="form-control is-invalid"
             emptyAs={'undefined'}
+            validation={{ required: 'This field is required' }}
           />
         </div>
 
@@ -140,35 +161,12 @@ const UserForm = (props: UserFormProps) => {
             className="form-control"
             errorClassName="form-control is-invalid"
             emptyAs={'undefined'}
+            validation={{ required: 'This field is required' }}
           />
         </div>
 
         <FieldError
           name="agencyId"
-          className="error-message offset-2 invalid-feedback"
-        />
-      </div>
-
-      <div className="row mb-3">
-        <Label
-          name="organizationId"
-          className="form-label col-sm-2 col-form-label"
-        >
-          Organization id
-        </Label>
-
-        <div className="col-sm-6">
-          <NumberField
-            name="organizationId"
-            defaultValue={props.user?.organizationId}
-            className="form-control"
-            errorClassName="form-control is-invalid"
-            emptyAs={'undefined'}
-          />
-        </div>
-
-        <FieldError
-          name="organizationId"
           className="error-message offset-2 invalid-feedback"
         />
       </div>

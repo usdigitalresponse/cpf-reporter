@@ -27,7 +27,6 @@ export const schema = gql`
     email: String!
     name: String
     agencyId: Int
-    organizationId: Int!
     roleId: Int
   }
 
@@ -35,7 +34,6 @@ export const schema = gql`
     email: String
     name: String
     agencyId: Int
-    organizationId: Int
     roleId: Int
   }
 
