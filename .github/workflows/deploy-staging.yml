@@ -33,19 +33,24 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       ref: ${{ github.sha }}
-      build-api-image: true
-      api-image-push: true
-      api-image-args-ref: ${{ github.ref }}
-      api-image-tag-latest: true
-      api-image-version: "rc-${{ github.sha }}"
-      api-image-upload-attestations: true
-      api-image-artifacts-retention-days: 14
+      docker-image-push: true
+      docker-image-args-ref: ${{ github.ref }}
+      docker-image-tag-latest: true
+      docker-image-upload-attestations: true
+      docker-image-artifacts-retention-days: 14
+      docker-image-version: "rc-${{ github.sha }}"
+      build-api-image: false
+      build-console-image: true
       build-api-functions: true
       api-function-artifact-retention-days: 14
       build-web: true
       web-artifact-retention-days: 14
       web-dotenv: |
-        API_URL=api.staging.cpf.usdr.dev
+        API_URL=https://api.staging.cpf.usdr.dev
+        DD_RUM_ENABLED='true'
+        DD_ENABLED='true'
+        DD_ENV='staging'
+        DD_VERSION='${{ github.sha }}'
 
   aws-auth:
     name: Configure AWS Credentials
@@ -75,8 +80,7 @@ jobs:
       concurrency-group: run_terraform-staging
       api-functions-artifacts-key: ${{ needs.build.outputs.api-functions-artifacts-key }}
       api-functions-artifacts-path: ${{ needs.build.outputs.api-functions-artifacts-path }}
-      api-image-tag: ${{ github.sha }}
-      api-image-digest: ${{ needs.build.outputs.api-image-digest }}
+      console-image: ${{ needs.build.outputs.console-image-full-name }}
       web-artifacts-key: ${{ needs.build.outputs.web-artifacts-key }}
       web-artifacts-path: ${{ needs.build.outputs.web-artifacts-path }}
       aws-region: us-west-2

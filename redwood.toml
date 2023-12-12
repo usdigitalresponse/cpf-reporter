@@ -9,10 +9,24 @@
   bundler = "webpack"
   title = "Redwood App"
   port = 8910
-  apiUrl = "/.redwood/functions" # You can customize graphql and dbauth urls individually too: see https://redwoodjs.com/docs/app-configuration-redwood-toml#api-paths
+  # You can customize graphql and dbauth urls individually too:
+  # see https://redwoodjs.com/docs/app-configuration-redwood-toml#api-paths
+  apiUrl = "${API_URL:/.redwood/functions}"
   includeEnvironmentVariables = [
     # Add any ENV vars that should be available to the web side to this array
     # See https://redwoodjs.com/docs/environment-variables#web
+    'DD_ENV',
+    'DD_RUM_APP_ID',
+    'DD_RUM_CLIENT_TOKEN',
+    'DD_RUM_ENABLED',
+    'DD_RUM_SESSION_REPLAY_SAMPLE_RATE',
+    'DD_RUM_SESSION_SAMPLE_RATE',
+    'DD_RUM_TRACK_USER_INTERACTIONS',
+    'DD_RUM_TRACK_RESOURCES',
+    'DD_RUM_TRACK_LONG_TASKS',
+    'DD_SERVICE',
+    'DD_SITE',
+    'DD_VERSION',
   ]
 
 [api]

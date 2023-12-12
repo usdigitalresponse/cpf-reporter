@@ -58,16 +58,21 @@ module "api_gateway" {
     allow_methods = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     allow_origins = sort([
       "https://${local.api_domain_name}",
-      "http://${var.website_domain_name}",
+      "https://${var.website_domain_name}",
     ])
     allow_credentials = true
     allow_headers = [
       "authorization",
       "content-type",
+      "traceparent",
       "x-amz-date",
       "x-amz-security-token",
       "x-amz-user-agent",
       "x-api-key",
+      "x-datadog-trace-id",
+      "x-datadog-parent-id",
+      "x-datadog-origin",
+      "x-datadog-sampling-priority",
     ]
     max_age = 86400 // 24 hours, in seconds
   }

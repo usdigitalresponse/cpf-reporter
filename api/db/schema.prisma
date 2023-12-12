@@ -1,6 +1,7 @@
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-1.0.x"]
+  previewFeatures = ["metrics", "tracing"]
 }
 
 datasource db {
@@ -9,34 +10,46 @@ datasource db {
 }
 
 model Agency {
-  id             Int           @id @default(autoincrement())
-  name           String
-  abbreviation   String?
-  code           String
-  tenant         Organization? @relation(fields: [organizationId], references: [id])
-  organizationId Int?
-  users          User[]
+  id                Int                @id @default(autoincrement())
+  name              String
+  abbreviation      String?
+  code              String
+  organization      Organization?      @relation(fields: [organizationId], references: [id])
+  organizationId    Int?
+  users             User[]
+  uploads           Upload[]
+  uploadValidations UploadValidation[]
+  projects          Project[]
 }
 
 model Organization {
-  id       Int      @id @default(autoincrement())
-  agencies Agency[]
-  users    User[]
-  name     String
+  id                Int                 @id @default(autoincrement())
+  agencies          Agency[]
+  users             User[]
+  name              String
+  uploads           Upload[]
+  uploadValidations UploadValidation[]
+  subrecipients     Subrecipient[]
+  projects          Project[]
 }
 
 model User {
-  id             Int          @id @default(autoincrement())
+  id             Int                 @id @default(autoincrement())
   email          String
   name           String?
   agencyId       Int?
   organizationId Int
   roleId         Int?
-  createdAt      DateTime     @default(now())
+  createdAt      DateTime            @default(now())
   updatedAt      DateTime
-  agency         Agency?      @relation(fields: [agencyId], references: [id])
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  role           Role?        @relation(fields: [roleId], references: [id])
+  agency         Agency?             @relation(fields: [agencyId], references: [id])
+  organization   Organization        @relation(fields: [organizationId], references: [id])
+  role           Role?               @relation(fields: [roleId], references: [id])
+  certified      ReportingPeriod[]
+  uploaded       Upload[]
+  validated      UploadValidation[] @relation("ValidatedUploads")
+  invalidated    UploadValidation[] @relation("InvalidatedUploads")
+  subrecipients  Subrecipient[]
 }
 
 model Role {
@@ -45,4 +58,128 @@ model Role {
   createdAt DateTime @default(now())
   updatedAt DateTime
   users     User[]
+}
+
+model InputTemplate {
+  id                  Int                @id @default(autoincrement())
+  name                String
+  version             String
+  effectiveDate       DateTime           @db.Date
+  rulesGeneratedAt    DateTime?          @db.Timestamptz(6)
+  createdAt           DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime           @db.Timestamptz(6)
+  reportingPeriods    ReportingPeriod[]
+  uploadValidations   UploadValidation[]
+}
+
+model OutputTemplate {
+  id                 Int               @id @default(autoincrement())
+  name               String
+  version            String
+  effectiveDate      DateTime          @db.Date
+  rulesGeneratedAt   DateTime?         @db.Timestamptz(6)
+  createdAt          DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime          @db.Timestamptz(6)
+  reportingPeriods   ReportingPeriod[]
+}
+
+model ReportingPeriod {
+  id               Int            @id @default(autoincrement())
+  name             String
+  startDate        DateTime       @db.Date
+  endDate          DateTime       @db.Date
+  certifiedAt      DateTime?      @db.Timestamptz(6)
+  certifiedById    Int?
+  certifiedBy      User?          @relation(fields: [certifiedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  inputTemplateId  Int
+  inputTemplate    InputTemplate  @relation(fields: [inputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  outputTemplateId Int
+  outputTemplate   OutputTemplate @relation(fields: [outputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  isCurrentPeriod  Boolean        @default(false)
+  createdAt        DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime       @db.Timestamptz(6)
+  uploads          Upload[]
+  projects         Project[]
+}
+
+model ExpenditureCategory {
+  id        Int      @id @default(autoincrement())
+  name      String
+  code      String
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  Uploads   Upload[]
+}
+
+model Upload {
+  id                    Int                 @id @default(autoincrement())
+  filename              String
+  uploadedById          Int
+  uploadedBy            User                @relation(fields: [uploadedById], references: [id])
+  agencyId              Int
+  agency                Agency              @relation(fields: [agencyId], references: [id])
+  organizationId        Int
+  organization          Organization        @relation(fields: [organizationId], references: [id])
+  reportingPeriodId     Int
+  reportingPeriod       ReportingPeriod     @relation(fields: [reportingPeriodId], references: [id])
+  expenditureCategoryId Int
+  expenditureCategory   ExpenditureCategory @relation(fields: [expenditureCategoryId], references: [id])
+  createdAt             DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime            @db.Timestamptz(6)
+  validations           UploadValidation[]
+  subrecipients         Subrecipient[]
+}
+
+model UploadValidation {
+  id                  Int            @id @default(autoincrement())
+  uploadId            Int
+  upload              Upload         @relation(fields: [uploadId], references: [id])
+  agencyId            Int
+  agency              Agency         @relation(fields: [agencyId], references: [id])
+  organizationId      Int
+  organization        Organization   @relation(fields: [organizationId], references: [id])
+  inputTemplateId     Int
+  inputTemplate       InputTemplate @relation(fields: [inputTemplateId], references: [id])
+  validationResults   Json?         @db.JsonB
+  validatedAt         DateTime?     @db.Timestamptz(6)
+  validatedById       Int?
+  validatedBy         User?         @relation("ValidatedUploads", fields: [validatedById], references: [id])
+  invalidationResults Json?         @db.JsonB
+  invalidatedAt       DateTime?     @db.Timestamptz(6)
+  invalidatedById     Int?
+  invalidatedBy       User?         @relation("InvalidatedUploads", fields: [invalidatedById], references: [id])
+  createdAt           DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime      @db.Timestamptz(6)
+}
+
+model Subrecipient {
+  id                  Int          @id @default(autoincrement())
+  name String
+  organizationId      Int
+  organization        Organization @relation(fields: [organizationId], references: [id])
+  startDate           DateTime     @db.Date
+  endDate             DateTime     @db.Date
+  certifiedAt         DateTime?    @db.Timestamptz(6)
+  certifiedById       Int?
+  certifiedBy         User?        @relation(fields: [certifiedById], references: [id])
+  originationUploadId Int
+  originationUpload   Upload       @relation(fields: [originationUploadId], references: [id])
+  createdAt           DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime     @db.Timestamptz(6)
+}
+
+model Project {
+  id                  Int             @id @default(autoincrement())
+  code                String
+  name                String
+  agencyId            Int
+  agency              Agency          @relation(fields: [agencyId], references: [id])
+  organizationId      Int
+  organization        Organization    @relation(fields: [organizationId], references: [id])
+  status              String
+  description         String
+  originationPeriodId Int
+  originationPeriod   ReportingPeriod @relation(fields: [originationPeriodId], references: [id])
+  createdAt           DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime        @db.Timestamptz(6)
 }
