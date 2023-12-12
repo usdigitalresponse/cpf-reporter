@@ -17,6 +17,7 @@ if (process.env.DD_RUM_ENABLED === 'true') {
     service: process.env.DD_SERVICE || 'cpf-reporter',
     env: process.env.DD_ENV,
     version: process.env.DD_VERSION,
+    allowedTracingUrls: [global.RWJS_API_URL],
   })
 }
 
