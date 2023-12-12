@@ -22,7 +22,6 @@
     "seed": "yarn rw exec seed"
   },
   "dependencies": {
-    "@tanstack/react-table": "^8.10.7",
     "fsevents": "^2.3.3"
   },
   "packageManager": "yarn@3.7.0",

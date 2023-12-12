@@ -927,9 +927,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-define-polyfill-provider@npm:^0.4.3":
-  version: 0.4.3
-  resolution: "@babel/helper-define-polyfill-provider@npm:0.4.3"
+"@babel/helper-define-polyfill-provider@npm:^0.4.4":
+  version: 0.4.4
+  resolution: "@babel/helper-define-polyfill-provider@npm:0.4.4"
   dependencies:
     "@babel/helper-compilation-targets": ^7.22.6
     "@babel/helper-plugin-utils": ^7.22.5
@@ -938,7 +938,7 @@ __metadata:
     resolve: ^1.14.2
   peerDependencies:
     "@babel/core": ^7.4.0 || ^8.0.0-0 <8.0.0
-  checksum: 5d21e3f47b320e4b5b644195ec405e7ebc3739e48e65899efc808c5fa9c3bf5b06ce0d8ff5246ca99d1411e368f4557bc66730196c5781a5c4e986ee703bee79
+  checksum: 2453cdd79f18a4cb8653d8a7e06b2eb0d8e31bae0d35070fc5abadbddca246a36d82b758064b421cca49b48d0e696d331d54520ba8582c1d61fb706d6d831817
   languageName: node
   linkType: hard
 
@@ -6332,8 +6332,8 @@ __metadata:
   linkType: hard
 
 "@smithy/signature-v4@npm:^2.0.0":
-  version: 2.0.17
-  resolution: "@smithy/signature-v4@npm:2.0.17"
+  version: 2.0.18
+  resolution: "@smithy/signature-v4@npm:2.0.18"
   dependencies:
     "@smithy/eventstream-codec": ^2.0.15
     "@smithy/is-array-buffer": ^2.0.0
@@ -6343,7 +6343,7 @@ __metadata:
     "@smithy/util-uri-escape": ^2.0.0
     "@smithy/util-utf8": ^2.0.2
     tslib: ^2.5.0
-  checksum: 8449ae428dc6f3c98ad09b11b769776ba2980d7c06d2d891c5c15f26615b28dd6737056be3a0e0304f3042f2d853a7c0812260be5c5ecf436d4a22bcc8a0c216
+  checksum: 3e4c41fb4c6aacda8f795d1b4d8075774b241a8e3d69b40fa1530ec9e195b4562300d3023c1dca4ae9e0d07f3262c451708f07869d0c6386bcfdabe976f020da
   languageName: node
   linkType: hard
 
@@ -8031,12 +8031,12 @@ __metadata:
   linkType: hard
 
 "@whatwg-node/server@npm:^0.9.1":
-  version: 0.9.20
-  resolution: "@whatwg-node/server@npm:0.9.20"
+  version: 0.9.21
+  resolution: "@whatwg-node/server@npm:0.9.21"
   dependencies:
     "@whatwg-node/fetch": ^0.9.10
     tslib: ^2.3.1
-  checksum: ca2660260eaa4fd969072e2e63a1296708200faa03a6cbe09ded91d0c19e2c498cd0e8c54a6db4c6f41e21b24799ce2488157314ca2605ab27808d311ab90584
+  checksum: 5371af1eb3ff12fcd694dd2cfb93cf3c5baaf21fc2dd500022b9953f8af23bf65c552087c122a7990aced3f01a2083b490601ce52ccc96c0778f584fdd8f4766
   languageName: node
   linkType: hard
 
@@ -9040,38 +9040,38 @@ __metadata:
   linkType: hard
 
 "babel-plugin-polyfill-corejs2@npm:^0.4.6":
-  version: 0.4.6
-  resolution: "babel-plugin-polyfill-corejs2@npm:0.4.6"
+  version: 0.4.7
+  resolution: "babel-plugin-polyfill-corejs2@npm:0.4.7"
   dependencies:
     "@babel/compat-data": ^7.22.6
-    "@babel/helper-define-polyfill-provider": ^0.4.3
+    "@babel/helper-define-polyfill-provider": ^0.4.4
     semver: ^6.3.1
   peerDependencies:
     "@babel/core": ^7.4.0 || ^8.0.0-0 <8.0.0
-  checksum: 08896811df31530be6a9bcdd630cb9fd4b5ae5181039d18db3796efbc54e38d57a42af460845c10a04434e1bc45c0d47743c7e6c860383cc6b141083cde22030
+  checksum: b3c84ce44d00211c919a94f76453fb2065861612f3e44862eb7acf854e325c738a7441ad82690deba2b6fddfa2ad2cf2c46960f46fab2e3b17c6ed4fd2d73b38
   languageName: node
   linkType: hard
 
 "babel-plugin-polyfill-corejs3@npm:^0.8.5":
-  version: 0.8.6
-  resolution: "babel-plugin-polyfill-corejs3@npm:0.8.6"
+  version: 0.8.7
+  resolution: "babel-plugin-polyfill-corejs3@npm:0.8.7"
   dependencies:
-    "@babel/helper-define-polyfill-provider": ^0.4.3
+    "@babel/helper-define-polyfill-provider": ^0.4.4
     core-js-compat: ^3.33.1
   peerDependencies:
     "@babel/core": ^7.4.0 || ^8.0.0-0 <8.0.0
-  checksum: 36951c2edac42ac0f05b200502e90d77bf66ccee5b52e2937d23496c6ef2372cce31b8c64144da374b77bd3eb65e2721703a52eac56cad16a152326c092cbf77
+  checksum: 51bc215ab0c062bbb2225d912f69f8a6705d1837c8e01f9651307b5b937804287c1d73ebd8015689efcc02c3c21f37688b9ee6f5997635619b7a9cc4b7d9908d
   languageName: node
   linkType: hard
 
 "babel-plugin-polyfill-regenerator@npm:^0.5.3":
-  version: 0.5.3
-  resolution: "babel-plugin-polyfill-regenerator@npm:0.5.3"
+  version: 0.5.4
+  resolution: "babel-plugin-polyfill-regenerator@npm:0.5.4"
   dependencies:
-    "@babel/helper-define-polyfill-provider": ^0.4.3
+    "@babel/helper-define-polyfill-provider": ^0.4.4
   peerDependencies:
     "@babel/core": ^7.4.0 || ^8.0.0-0 <8.0.0
-  checksum: 2bb546582cda1870d19e646a7183baeb2cccd56e0ef3e4eaeabd28e120daf17cb87399194a9ccdcf32506bcaa68d23e73440fc8ab990a7a0f8c5a77c12d5d4bc
+  checksum: 461b735c6c0eca3c7b4434d14bfa98c2ab80f00e2bdc1c69eb46d1d300092a9786d76bbd3ee55e26d2d1a2380c14592d8d638e271dfd2a2b78a9eacffa3645d1
   languageName: node
   linkType: hard
 
@@ -9313,6 +9313,13 @@ __metadata:
   version: 1.0.0
   resolution: "boolbase@npm:1.0.0"
   checksum: 3e25c80ef626c3a3487c73dbfc70ac322ec830666c9ad915d11b701142fab25ec1e63eff2c450c74347acfd2de854ccde865cd79ef4db1683f7c7b046ea43bb0
+  languageName: node
+  linkType: hard
+
+"bootstrap-icons@npm:^1.11.2":
+  version: 1.11.2
+  resolution: "bootstrap-icons@npm:1.11.2"
+  checksum: 3dfd4601bf8a48450310a8bffe1ab9f74ca3b19336257bb9dbc1400bd72a4252e60422e08062a0afa0f4cf51b60749e46958f7dc38a26a12f92b15ec866ea4cd
   languageName: node
   linkType: hard
 
@@ -11868,9 +11875,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.601":
-  version: 1.4.609
-  resolution: "electron-to-chromium@npm:1.4.609"
-  checksum: 4ef3c32b11adc01ed8227d7bdbe0978b436b817e6b3bd09f19b42afbf9affdb6ddf99f4d20a3b28a494772a2985df12ec95abca849a38cccb217c4ee338561bb
+  version: 1.4.610
+  resolution: "electron-to-chromium@npm:1.4.610"
+  checksum: 30e57a1483717e6e27882e7e35b167258b669f44a4e66f4f40460825b77c12646140d220f5e1f95668890fc76dd511c93fa73c6374cbf443fc78077d9634864d
   languageName: node
   linkType: hard
 
@@ -20412,7 +20419,6 @@ __metadata:
   dependencies:
     "@netlify/zip-it-and-ship-it": ^9.27.0
     "@redwoodjs/core": 6.4.2
-    "@tanstack/react-table": ^8.10.7
     fsevents: ^2.3.3
   languageName: unknown
   linkType: soft
@@ -23113,11 +23119,13 @@ __metadata:
     "@redwoodjs/router": 6.4.2
     "@redwoodjs/vite": 6.4.2
     "@redwoodjs/web": 6.4.2
+    "@tanstack/react-table": ^8.10.7
     "@types/node": ^20.10.4
     "@types/react": 18.2.39
     "@types/react-dom": 18.2.17
     autoprefixer: ^10.4.16
     bootstrap: ^5.3.2
+    bootstrap-icons: ^1.11.2
     humanize-string: 2.1.0
     postcss: ^8.4.31
     postcss-loader: ^7.3.3
