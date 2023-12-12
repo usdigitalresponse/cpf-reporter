@@ -187,9 +187,6 @@ resource "aws_ecs_task_definition" "console" {
   lifecycle {
     create_before_destroy = true
   }
-
-  // Empty map prevents `{} -> null` perma-diff in plans
-  tags = null
 }
 
 module "ecs_console_security_group" {
@@ -211,6 +208,7 @@ resource "aws_ecs_service" "console" {
   desired_count          = 1
   launch_type            = "FARGATE"
   enable_execute_command = true
+  propagate_tags         = "SERVICE"
 
   network_configuration {
     assign_public_ip = false
