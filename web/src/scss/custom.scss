@@ -70,6 +70,10 @@ span.invalid-feedback {
   color: $raw-gray-400;
 }
 
+.bi-arrow-down-up {
+  font-size: 0.9rem;
+}
+
 @import '~bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 

@@ -3,6 +3,7 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  getFilteredRowModel,
   flexRender,
 } from '@tanstack/react-table'
 import Table from 'react-bootstrap/Table'
@@ -14,6 +15,7 @@ const UploadsList = ({ uploads }: FindUploads) => {
   const data = React.useMemo(() => uploads, [uploads])
 
   const [sorting, setSorting] = React.useState([])
+  const [columnFilters, setColumnFilters] = React.useState([])
 
   const tableInstance = useReactTable({
     data,
@@ -23,21 +25,30 @@ const UploadsList = ({ uploads }: FindUploads) => {
     getSortedRowModel: getSortedRowModel(),
     state: {
       sorting,
+      columnFilters,
     },
+    onColumnFiltersChange: setColumnFilters,
     onSortingChange: setSorting,
+    getFilteredRowModel: getFilteredRowModel(),
   })
 
   const createColumnHeader = (header) => {
     const renderIcon = (sortDirection: 'asc' | 'desc' | null) => {
-      const iconClass = sortDirection === 'asc' ? 'bi-sort-up' : 'bi-sort-down'
-      const classNames = `bi ${
-        sortDirection ? iconClass : 'bi-sort-up inactive'
-      }`
+      const iconMapping = {
+        asc: 'bi-arrow-up',
+        desc: 'bi-arrow-down',
+        inactive: 'bi-arrow-down-up inactive',
+      }
+
+      const iconClass = sortDirection
+        ? iconMapping[sortDirection]
+        : iconMapping['inactive']
+
+      const classNames = `bi ${iconClass} me-1`
 
       return (
         <span>
-          {' '}
-          <i className={classNames}></i>{' '}
+          <i className={classNames}></i>
         </span>
       )
     }
