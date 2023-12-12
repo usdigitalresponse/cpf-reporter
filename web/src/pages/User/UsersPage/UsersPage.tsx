@@ -5,6 +5,9 @@ import { Link, routes } from '@redwoodjs/router'
 import UsersCell from 'src/components/User/UsersCell'
 
 const UsersPage = () => {
+  // temporarily hardcode organizationId to 1
+  const organizationIdOfUser = 1
+
   return (
     <div>
       <h2>Users</h2>
@@ -13,7 +16,7 @@ const UsersPage = () => {
           Create New User
         </Button>
       </Link>
-      <UsersCell />
+      <UsersCell organizationId={organizationIdOfUser} />
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import type { FindUsers } from 'types/graphql'
+import type { FindUsersByOrganizationId } from 'types/graphql'
 
 import { Link, routes } from '@redwoodjs/router'
 import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
@@ -6,8 +6,8 @@ import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 import Users from 'src/components/User/Users'
 
 export const QUERY = gql`
-  query FindUsers {
-    users {
+  query FindUsersByOrganizationId($organizationId: Int!) {
+    usersByOrganization(organizationId: $organizationId) {
       id
       email
       name
@@ -37,6 +37,8 @@ export const Failure = ({ error }: CellFailureProps) => (
   <div className="rw-cell-error">{error?.message}</div>
 )
 
-export const Success = ({ users }: CellSuccessProps<FindUsers>) => {
-  return <Users users={users} />
+export const Success = ({
+  usersByOrganization,
+}: CellSuccessProps<FindUsersByOrganizationId>) => {
+  return <Users usersByOrganization={usersByOrganization} />
 }

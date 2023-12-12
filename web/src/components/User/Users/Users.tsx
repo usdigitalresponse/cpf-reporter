@@ -1,4 +1,7 @@
-import type { DeleteUserMutationVariables, FindUsers } from 'types/graphql'
+import type {
+  DeleteUserMutationVariables,
+  FindUsersByOrganizationId,
+} from 'types/graphql'
 
 import { Link, routes } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
@@ -15,7 +18,7 @@ const DELETE_USER_MUTATION = gql`
   }
 `
 
-const UsersList = ({ users }: FindUsers) => {
+const UsersList = ({ usersByOrganization }: FindUsersByOrganizationId) => {
   const [deleteUser] = useMutation(DELETE_USER_MUTATION, {
     onCompleted: () => {
       toast.success('User deleted')
@@ -53,7 +56,7 @@ const UsersList = ({ users }: FindUsers) => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
+          {usersByOrganization.map((user) => (
             <tr key={user.id}>
               <td>{truncate(user.id)}</td>
               <td>{truncate(user.email)}</td>

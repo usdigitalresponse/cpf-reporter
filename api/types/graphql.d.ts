@@ -442,6 +442,11 @@ export type QueryuserArgs = {
   id: Scalars['Int']
 }
 
+/** About the Redwood queries. */
+export type QueryusersByOrganizationArgs = {
+  organizationId: Scalars['Int']
+}
+
 /**
  * The RedwoodJS Root Schema
  *
@@ -1731,6 +1736,12 @@ export type QueryResolvers<
     ParentType,
     ContextType
   >
+  usersByOrganization: OptArgsResolverFn<
+    Array<ResolversTypes['User']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryusersByOrganizationArgs, 'organizationId'>
+  >
 }
 
 export type QueryRelationResolvers<
@@ -1857,6 +1868,12 @@ export type QueryRelationResolvers<
     Array<ResolversTypes['User']>,
     ParentType,
     ContextType
+  >
+  usersByOrganization?: RequiredResolverFn<
+    Array<ResolversTypes['User']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryusersByOrganizationArgs, 'organizationId'>
   >
 }
 
