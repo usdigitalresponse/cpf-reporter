@@ -1,4 +1,5 @@
 import type { Prisma, UploadValidation } from '@prisma/client'
+
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
 export const standard = defineScenario<Prisma.UploadValidationCreateArgs>({
@@ -18,7 +19,7 @@ export const standard = defineScenario<Prisma.UploadValidationCreateArgs>({
               },
             },
             agency: { create: { name: 'String', code: 'String' } },
-            organizaiton: { create: { name: 'String' } },
+            organization: { create: { name: 'String' } },
             reportingPeriod: {
               create: {
                 name: 'String',
@@ -53,7 +54,7 @@ export const standard = defineScenario<Prisma.UploadValidationCreateArgs>({
           },
         },
         agency: { create: { name: 'String', code: 'String' } },
-        organizaiton: { create: { name: 'String' } },
+        organization: { create: { name: 'String' } },
         inputTemplate: {
           create: {
             name: 'String',
@@ -79,7 +80,7 @@ export const standard = defineScenario<Prisma.UploadValidationCreateArgs>({
               },
             },
             agency: { create: { name: 'String', code: 'String' } },
-            organizaiton: { create: { name: 'String' } },
+            organization: { create: { name: 'String' } },
             reportingPeriod: {
               create: {
                 name: 'String',
@@ -114,7 +115,7 @@ export const standard = defineScenario<Prisma.UploadValidationCreateArgs>({
           },
         },
         agency: { create: { name: 'String', code: 'String' } },
-        organizaiton: { create: { name: 'String' } },
+        organization: { create: { name: 'String' } },
         inputTemplate: {
           create: {
             name: 'String',
