@@ -175,6 +175,7 @@ resource "aws_ecs_task_definition" "console" {
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   container_definitions    = jsonencode([module.ecs_console_container_definition.json_map_object])
+  tags                     = {}
 
   cpu    = 512
   memory = 1024
