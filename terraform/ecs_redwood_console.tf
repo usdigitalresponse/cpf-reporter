@@ -175,6 +175,7 @@ resource "aws_ecs_task_definition" "console" {
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   container_definitions    = jsonencode([module.ecs_console_container_definition.json_map_object])
+  tags                     = {}
 
   cpu    = 512
   memory = 1024
@@ -208,6 +209,7 @@ resource "aws_ecs_service" "console" {
   desired_count          = 1
   launch_type            = "FARGATE"
   enable_execute_command = true
+  propagate_tags         = "SERVICE"
 
   network_configuration {
     assign_public_ip = false
