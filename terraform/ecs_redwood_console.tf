@@ -189,7 +189,7 @@ resource "aws_ecs_task_definition" "console" {
   }
 
   // Empty map prevents `{} -> null` perma-diff in plans
-  tags = {}
+  tags = null
 }
 
 module "ecs_console_security_group" {
