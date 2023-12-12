@@ -1,24 +1,10 @@
 import Button from 'react-bootstrap/Button'
 import Table from 'react-bootstrap/Table'
-import type {
-  DeleteUserMutationVariables,
-  FindUsersByOrganizationId,
-} from 'types/graphql'
+import type { FindUsersByOrganizationId } from 'types/graphql'
 
 import { Link, routes } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
 
-import { QUERY } from 'src/components/User/UsersCell'
 import { timeTag, truncate } from 'src/lib/formatters'
-
-const DELETE_USER_MUTATION = gql`
-  mutation DeleteUserMutation($id: Int!) {
-    deleteUser(id: $id) {
-      id
-    }
-  }
-`
 
 const UsersList = ({ usersByOrganization }: FindUsersByOrganizationId) => {
   return (
