@@ -1,5 +1,7 @@
 import { Link, routes } from '@redwoodjs/router'
 import { MetaTags } from '@redwoodjs/web'
+// add a authGuard() to this page to ensure only logged in users as per the docs.passage.id docs
+// https://docs.passage.id/docs/redwoodjs
 
 const DashboardPage = () => {
   return (

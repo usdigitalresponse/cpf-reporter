@@ -16,12 +16,13 @@
   },
   "engines": {
     "node": "18.18.2",
-    "yarn": "1.22.19"
+    "yarn": "3.7.0"
   },
   "prisma": {
     "seed": "yarn rw exec seed"
   },
   "dependencies": {
+    "@passageidentity/passage-elements": "^1.17.0",
     "fsevents": "^2.3.3"
   },
   "packageManager": "yarn@3.7.0",
