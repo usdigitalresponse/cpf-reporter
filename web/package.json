@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@datadog/browser-rum": "^5.4.0",
+    "@passageidentity/passage-elements": "^1.17.0",
     "@redwoodjs/forms": "6.4.2",
     "@redwoodjs/router": "6.4.2",
     "@redwoodjs/web": "6.4.2",
