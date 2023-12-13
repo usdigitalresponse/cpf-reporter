@@ -18,9 +18,6 @@ export const QUERY = gql`
         id
         code
       }
-      agency_code: agency {
-        code
-      }
       organizationId
       reportingPeriodId
       expenditureCategory {

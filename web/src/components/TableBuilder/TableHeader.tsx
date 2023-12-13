@@ -1,11 +1,8 @@
 import { flexRender } from '@tanstack/react-table'
 
-const TableHeader = ({
-  headerGroup,
-  filters,
-  filterableInputs,
-  handleFilterChange,
-}) => {
+import Filter from './Filter'
+
+const TableHeader = ({ headerGroup, filterableInputs }) => {
   const renderSortingIcon = (sortDirection: 'asc' | 'desc' | null) => {
     const iconMapping = {
       asc: 'bi-arrow-up',
@@ -35,20 +32,27 @@ const TableHeader = ({
 
   return (
     <tr key={headerGroup.id}>
-      {headerGroup.headers.map((header) => (
-        <th key={header.id} className="border" colSpan={header.colSpan}>
-          {createColumnHeader(header)}
-          {/* {console.log('Header def', header.column)} */}
+      {headerGroup.headers.map((header) => {
+        const hasFilter =
+          filterableInputs.includes(header.id.toString()) &&
+          header.column.getCanFilter()
 
-          {filterableInputs.includes(header.id.toString()) && (
-            <input
-              className="form-control form-control-sm my-2"
-              onChange={handleFilterChange(header.id.toString())}
-              value={filters[header.id.toString()] || ''}
-            />
-          )}
-        </th>
-      ))}
+        return (
+          <th
+            key={header.id}
+            className={`border ${!hasFilter ? 'align-top' : ''}`}
+            colSpan={header.colSpan}
+          >
+            {createColumnHeader(header)}
+
+            {hasFilter ? (
+              <div>
+                <Filter column={header.column} />
+              </div>
+            ) : null}
+          </th>
+        )
+      })}
     </tr>
   )
 }

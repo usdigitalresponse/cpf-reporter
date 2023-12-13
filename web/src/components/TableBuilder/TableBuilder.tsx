@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 
 import {
   useReactTable,
   getCoreRowModel,
   getSortedRowModel,
   getFilteredRowModel,
+  ColumnFiltersState,
 } from '@tanstack/react-table'
 import { Button } from 'react-bootstrap'
 import Table from 'react-bootstrap/Table'
@@ -13,54 +14,26 @@ import TableHeader from './TableHeader'
 import TableRow from './TableRow'
 
 function TableBuilder({ data, columns, filterableInputs = [] }) {
-  const [filters, setFilters] = useState({})
-  const [sorting, setSorting] = React.useState([])
-
-  const filteredData = useMemo(() => {
-    if (!filterableInputs) return data
-
-    return data.filter((row) =>
-      filterableInputs.every((input) => {
-        console.log('Row', row)
-
-        let value = ''
-
-        // if (typeof input === 'function') {
-        //   value = input(row)
-        // }
-        // else {
-
-        const rawValue = row[input]
-        // Check if the value is not undefined and is a string or can be converted to a string
-        value =
-          typeof rawValue === 'string' || typeof rawValue === 'number'
-            ? rawValue.toString()
-            : ''
-
-        // console.log(value.includes(filters[input.toString()]))
-        // Check if value is not undefined before calling .toString()
-        return value.includes(filters[input.toString()] || '')
-      })
-    )
-  }, [data, filters, filterableInputs])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [sorting, setSorting] = useState([])
 
   const table = useReactTable({
-    data: filteredData,
+    data,
     columns: columns,
     state: {
       sorting,
-      // columnFilters, // should be used
+      columnFilters,
     },
+    onColumnFiltersChange: setColumnFilters,
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
   })
 
-  const handleFilterChange =
-    (accessor: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      setFilters({ ...filters, [accessor]: e.target.value })
-    }
+  const resetColumnFilters = () => {
+    table.resetColumnFilters()
+  }
 
   return (
     <div className="p-2">
@@ -72,7 +45,7 @@ function TableBuilder({ data, columns, filterableInputs = [] }) {
                 <Button
                   className="btn btn-secondary"
                   size="sm"
-                  // onClick={resetColumnFilters()}
+                  onClick={resetColumnFilters}
                 >
                   Reset filters
                 </Button>
@@ -83,9 +56,7 @@ function TableBuilder({ data, columns, filterableInputs = [] }) {
             <TableHeader
               headerGroup={headerGroup}
               key={headerGroup.id}
-              filters={filters}
               filterableInputs={filterableInputs}
-              handleFilterChange={handleFilterChange}
             />
           ))}
         </thead>

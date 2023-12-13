@@ -10,9 +10,8 @@ const UploadsList = ({ uploads }: FindUploads) => {
   const filterableInputs = [
     'id',
     'agency_code',
-    'agency.code',
-    'expenditureCategory.code',
-    'uploadedBy.email',
+    'expenditureCategory_code',
+    'uploadedBy_email',
     'filename',
   ]
 

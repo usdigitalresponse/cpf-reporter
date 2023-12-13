@@ -27,6 +27,7 @@ function DebouncedInput({
   return (
     <input
       {...props}
+      className="form-control form-control-sm my-1"
       value={value}
       onChange={(e) => setValue(e.target.value)}
     />
