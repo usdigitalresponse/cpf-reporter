@@ -5515,6 +5515,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@redwoodjs/auth-custom-setup@npm:6.4.2":
+  version: 6.4.2
+  resolution: "@redwoodjs/auth-custom-setup@npm:6.4.2"
+  dependencies:
+    "@babel/runtime-corejs3": 7.23.2
+    "@redwoodjs/cli-helpers": 6.4.2
+    core-js: 3.33.2
+  checksum: dde842111cc5d4b39b1b492d1a9499e473fb355615e2228cd9e3022d3d3e1ac6dd72db578c6db085387897a74c0f7db02f07edf3c1bfdc183963ae5ca4097e00
+  languageName: node
+  linkType: hard
+
 "@redwoodjs/auth@npm:6.4.2":
   version: 6.4.2
   resolution: "@redwoodjs/auth@npm:6.4.2"
@@ -20632,6 +20643,7 @@ __metadata:
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
     "@netlify/zip-it-and-ship-it": ^9.27.0
+    "@redwoodjs/auth-custom-setup": 6.4.2
     "@redwoodjs/core": 6.4.2
     fsevents: ^2.3.3
   languageName: unknown
@@ -23379,6 +23391,7 @@ __metadata:
   dependencies:
     "@datadog/browser-rum": ^5.4.0
     "@passageidentity/passage-elements": ^1.17.0
+    "@redwoodjs/auth": 6.4.2
     "@redwoodjs/forms": 6.4.2
     "@redwoodjs/router": 6.4.2
     "@redwoodjs/vite": 6.4.2
