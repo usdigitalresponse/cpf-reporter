@@ -18,29 +18,72 @@ function valueAsLink(cell): JSX.Element {
   )
 }
 
+// export const columnDefs = [
+//   columnHelper.accessor('id', {
+//     cell: valueAsLink,
+//     header: 'ID',
+//   }),
+//   columnHelper.accessor('agency.code', {
+//     cell: (info) => info.getValue(),
+//     header: 'Agency',
+//   }),
+//   columnHelper.accessor('expenditureCategory.code', {
+//     cell: (info) => info.getValue(),
+//     header: 'EC Code',
+//   }),
+//   columnHelper.accessor('uploadedBy.email', {
+//     cell: (info) => info.getValue(),
+//     header: 'Uploaded By',
+//   }),
+//   columnHelper.accessor('filename', {
+//     cell: (info) => info.getValue(),
+//     header: 'Filename',
+//   }),
+//   columnHelper.accessor('validated_at', {
+//     cell: (info) => info.getValue(),
+//     header: 'Validated?',
+//   }),
+// ]
+
 export const columnDefs = [
-  columnHelper.accessor('id', {
+  {
+    accessorKey: 'id',
     cell: valueAsLink,
-    header: 'ID',
-  }),
-  columnHelper.accessor('agency.code', {
+    header: () => <span>ID</span>,
+  },
+  {
+    accessorFn: (row) => row.agency.code,
+    id: 'agency_code',
     cell: (info) => info.getValue(),
-    header: 'Agency',
-  }),
-  columnHelper.accessor('expenditureCategory.code', {
+    header: () => <span>Agency</span>,
+  },
+  {
+    accessorFn: (row) => row.agency.code,
+    id: 'agency.code',
     cell: (info) => info.getValue(),
-    header: 'EC Code',
-  }),
-  columnHelper.accessor('uploadedBy.email', {
-    cell: (info) => info.getValue(),
-    header: 'Uploaded By',
-  }),
+    header: () => <span>Agency.Code</span>,
+  },
+  // {
+  //   accessorFn: (row) => row.agency.code,
+  //   id: "Agency",
+  //   cell: (info) => info.getValue(),
+  //   header: () => <span>Agency</span>,
+  // },
+
+  // columnHelper.accessor('expenditureCategory.code', {
+  //   cell: (info) => info.getValue(),
+  //   header: 'EC Code',
+  // }),
+  // columnHelper.accessor('uploadedBy.email', {
+  //   cell: (info) => info.getValue(),
+  //   header: 'Uploaded By',
+  // }),
   columnHelper.accessor('filename', {
     cell: (info) => info.getValue(),
     header: 'Filename',
   }),
-  columnHelper.accessor('validated_at', {
-    cell: (info) => info.getValue(),
-    header: 'Validated?',
-  }),
+  // columnHelper.accessor('validated_at', {
+  //   cell: (info) => info.getValue(),
+  //   header: 'Validated?',
+  // }),
 ]
