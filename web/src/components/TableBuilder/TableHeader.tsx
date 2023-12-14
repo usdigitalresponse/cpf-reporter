@@ -18,14 +18,16 @@ const TableHeader = ({ headerGroup, filterableInputs }) => {
   }
 
   const createColumnHeader = (header) => {
+    const columnData = header.column
+
     return (
       <button
         className="btn btn-sort d-flex justify-content-between"
-        onClick={header.column.getToggleSortingHandler()}
+        onClick={columnData.getToggleSortingHandler()}
       >
         {!header.isPlaceholder &&
-          flexRender(header.column.columnDef.header, header.getContext())}
-        {renderSortingIcon(header.column.getIsSorted())}
+          flexRender(columnData.columnDef.header, header.getContext())}
+        {columnData.getCanSort() && renderSortingIcon(columnData.getIsSorted())}
       </button>
     )
   }
@@ -45,11 +47,7 @@ const TableHeader = ({ headerGroup, filterableInputs }) => {
           >
             {createColumnHeader(header)}
 
-            {hasFilter ? (
-              <div>
-                <Filter column={header.column} />
-              </div>
-            ) : null}
+            {hasFilter && <Filter column={header.column} />}
           </th>
         )
       })}

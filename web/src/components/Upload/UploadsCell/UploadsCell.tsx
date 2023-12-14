@@ -18,12 +18,13 @@ export const QUERY = gql`
         id
         code
       }
-      organizationId
-      reportingPeriodId
       expenditureCategory {
         id
-        name
         code
+      }
+      validations {
+        invalidatedAt
+        validatedAt
       }
       createdAt
       updatedAt

@@ -2,6 +2,8 @@ import { createColumnHelper } from '@tanstack/react-table'
 
 import { Link, routes } from '@redwoodjs/router'
 
+import { formatDateString } from '../../../utils/index'
+
 const columnHelper = createColumnHelper()
 
 function valueAsLink(cell): JSX.Element {
@@ -16,6 +18,22 @@ function valueAsLink(cell): JSX.Element {
       {value}
     </Link>
   )
+}
+
+function validationDisplay(row) {
+  if (row.latestInvalidationDate) {
+    const formattedDate = formatDateString(row.latestInvalidationDate)
+    return `Invalidated at ${formattedDate}`
+  }
+
+  // Else, display 'Validated at' if latestValidationDate is available
+  if (row.latestValidationDate) {
+    const formattedDate = formatDateString(row.latestValidationDate)
+    return `Validated at ${formattedDate}`
+  }
+
+  // If neither date is available, display nothing or a default message
+  return 'Not set'
 }
 
 export const columnDefs = [
@@ -39,8 +57,11 @@ export const columnDefs = [
     cell: (info) => info.getValue(),
     header: 'Filename',
   }),
-  columnHelper.accessor('validated_at', {
+  {
+    accessorFn: validationDisplay,
     cell: (info) => info.getValue(),
+    id: 'validatedAt',
     header: 'Validated?',
-  }),
+    enableSorting: false,
+  },
 ]
