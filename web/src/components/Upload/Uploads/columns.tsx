@@ -21,15 +21,15 @@ function valueAsLink(cell): JSX.Element {
 }
 
 function validationDisplay(row) {
-  if (row.latestInvalidationDate) {
-    const formattedDate = formatDateString(row.latestInvalidationDate)
-    return `Invalidated at ${formattedDate}`
+  const validations = row.latestValidation
+
+  if (validations.invalidatedAt) {
+    const formattedDate = formatDateString(validations.invalidatedAt)
+    return <span className="text-danger">Invalidated at {formattedDate}</span>
   }
 
-  // Else, display 'Validated at' if latestValidationDate is available
-  if (row.latestValidationDate) {
-    const formattedDate = formatDateString(row.latestValidationDate)
-    return `Validated at ${formattedDate}`
+  if (validations.validatedAt) {
+    return formatDateString(validations.validatedAt)
   }
 
   // If neither date is available, display nothing or a default message
