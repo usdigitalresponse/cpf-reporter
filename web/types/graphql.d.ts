@@ -57,6 +57,16 @@ export type CreateOutputTemplateInput = {
   version: Scalars['String'];
 };
 
+export type CreateProjectInput = {
+  agencyId: Scalars['Int'];
+  code: Scalars['String'];
+  description: Scalars['String'];
+  name: Scalars['String'];
+  organizationId: Scalars['Int'];
+  originationPeriodId: Scalars['Int'];
+  status: Scalars['String'];
+};
+
 export type CreateReportingPeriodInput = {
   certifiedAt?: InputMaybe<Scalars['DateTime']>;
   certifiedById?: InputMaybe<Scalars['Int']>;
@@ -70,6 +80,16 @@ export type CreateReportingPeriodInput = {
 
 export type CreateRoleInput = {
   name: Scalars['String'];
+};
+
+export type CreateSubrecipientInput = {
+  certifiedAt?: InputMaybe<Scalars['DateTime']>;
+  certifiedById?: InputMaybe<Scalars['Int']>;
+  endDate: Scalars['DateTime'];
+  name: Scalars['String'];
+  organizationId: Scalars['Int'];
+  originationUploadId: Scalars['Int'];
+  startDate: Scalars['DateTime'];
 };
 
 export type CreateUploadInput = {
@@ -131,8 +151,10 @@ export type Mutation = {
   createInputTemplate: InputTemplate;
   createOrganization: Organization;
   createOutputTemplate: OutputTemplate;
+  createProject: Project;
   createReportingPeriod: ReportingPeriod;
   createRole: Role;
+  createSubrecipient: Subrecipient;
   createUpload: Upload;
   createUploadValidation: UploadValidation;
   createUser: User;
@@ -141,8 +163,10 @@ export type Mutation = {
   deleteInputTemplate: InputTemplate;
   deleteOrganization: Organization;
   deleteOutputTemplate: OutputTemplate;
+  deleteProject: Project;
   deleteReportingPeriod: ReportingPeriod;
   deleteRole: Role;
+  deleteSubrecipient: Subrecipient;
   deleteUpload: Upload;
   deleteUploadValidation: UploadValidation;
   deleteUser: User;
@@ -151,8 +175,10 @@ export type Mutation = {
   updateInputTemplate: InputTemplate;
   updateOrganization: Organization;
   updateOutputTemplate: OutputTemplate;
+  updateProject: Project;
   updateReportingPeriod: ReportingPeriod;
   updateRole: Role;
+  updateSubrecipient: Subrecipient;
   updateUpload: Upload;
   updateUploadValidation: UploadValidation;
   updateUser: User;
@@ -184,6 +210,11 @@ export type MutationcreateOutputTemplateArgs = {
 };
 
 
+export type MutationcreateProjectArgs = {
+  input: CreateProjectInput;
+};
+
+
 export type MutationcreateReportingPeriodArgs = {
   input: CreateReportingPeriodInput;
 };
@@ -191,6 +222,11 @@ export type MutationcreateReportingPeriodArgs = {
 
 export type MutationcreateRoleArgs = {
   input: CreateRoleInput;
+};
+
+
+export type MutationcreateSubrecipientArgs = {
+  input: CreateSubrecipientInput;
 };
 
 
@@ -234,12 +270,22 @@ export type MutationdeleteOutputTemplateArgs = {
 };
 
 
+export type MutationdeleteProjectArgs = {
+  id: Scalars['Int'];
+};
+
+
 export type MutationdeleteReportingPeriodArgs = {
   id: Scalars['Int'];
 };
 
 
 export type MutationdeleteRoleArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationdeleteSubrecipientArgs = {
   id: Scalars['Int'];
 };
 
@@ -289,6 +335,12 @@ export type MutationupdateOutputTemplateArgs = {
 };
 
 
+export type MutationupdateProjectArgs = {
+  id: Scalars['Int'];
+  input: UpdateProjectInput;
+};
+
+
 export type MutationupdateReportingPeriodArgs = {
   id: Scalars['Int'];
   input: UpdateReportingPeriodInput;
@@ -298,6 +350,12 @@ export type MutationupdateReportingPeriodArgs = {
 export type MutationupdateRoleArgs = {
   id: Scalars['Int'];
   input: UpdateRoleInput;
+};
+
+
+export type MutationupdateSubrecipientArgs = {
+  id: Scalars['Int'];
+  input: UpdateSubrecipientInput;
 };
 
 
@@ -337,6 +395,23 @@ export type OutputTemplate = {
   version: Scalars['String'];
 };
 
+export type Project = {
+  __typename?: 'Project';
+  agency: Agency;
+  agencyId: Scalars['Int'];
+  code: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  description: Scalars['String'];
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  organization: Organization;
+  organizationId: Scalars['Int'];
+  originationPeriod: ReportingPeriod;
+  originationPeriodId: Scalars['Int'];
+  status: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+};
+
 /** About the Redwood queries. */
 export type Query = {
   __typename?: 'Query';
@@ -351,12 +426,16 @@ export type Query = {
   organizations: Array<Organization>;
   outputTemplate?: Maybe<OutputTemplate>;
   outputTemplates: Array<OutputTemplate>;
+  project?: Maybe<Project>;
+  projects: Array<Project>;
   /** Fetches the Redwood root schema. */
   redwood?: Maybe<Redwood>;
   reportingPeriod?: Maybe<ReportingPeriod>;
   reportingPeriods: Array<ReportingPeriod>;
   role?: Maybe<Role>;
   roles: Array<Role>;
+  subrecipient?: Maybe<Subrecipient>;
+  subrecipients: Array<Subrecipient>;
   upload?: Maybe<Upload>;
   uploadValidation?: Maybe<UploadValidation>;
   uploadValidations: Array<UploadValidation>;
@@ -403,6 +482,12 @@ export type QueryoutputTemplateArgs = {
 
 
 /** About the Redwood queries. */
+export type QueryprojectArgs = {
+  id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
 export type QueryreportingPeriodArgs = {
   id: Scalars['Int'];
 };
@@ -410,6 +495,12 @@ export type QueryreportingPeriodArgs = {
 
 /** About the Redwood queries. */
 export type QueryroleArgs = {
+  id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QuerysubrecipientArgs = {
   id: Scalars['Int'];
 };
 
@@ -473,6 +564,23 @@ export type Role = {
   users: Array<Maybe<User>>;
 };
 
+export type Subrecipient = {
+  __typename?: 'Subrecipient';
+  certifiedAt?: Maybe<Scalars['DateTime']>;
+  certifiedBy?: Maybe<User>;
+  certifiedById?: Maybe<Scalars['Int']>;
+  createdAt: Scalars['DateTime'];
+  endDate: Scalars['DateTime'];
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  organization: Organization;
+  organizationId: Scalars['Int'];
+  originationUpload: Upload;
+  originationUploadId: Scalars['Int'];
+  startDate: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+};
+
 export type UpdateAgencyInput = {
   abbreviation?: InputMaybe<Scalars['String']>;
   code?: InputMaybe<Scalars['String']>;
@@ -502,6 +610,16 @@ export type UpdateOutputTemplateInput = {
   version?: InputMaybe<Scalars['String']>;
 };
 
+export type UpdateProjectInput = {
+  agencyId?: InputMaybe<Scalars['Int']>;
+  code?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
+  name?: InputMaybe<Scalars['String']>;
+  organizationId?: InputMaybe<Scalars['Int']>;
+  originationPeriodId?: InputMaybe<Scalars['Int']>;
+  status?: InputMaybe<Scalars['String']>;
+};
+
 export type UpdateReportingPeriodInput = {
   certifiedAt?: InputMaybe<Scalars['DateTime']>;
   certifiedById?: InputMaybe<Scalars['Int']>;
@@ -515,6 +633,16 @@ export type UpdateReportingPeriodInput = {
 
 export type UpdateRoleInput = {
   name?: InputMaybe<Scalars['String']>;
+};
+
+export type UpdateSubrecipientInput = {
+  certifiedAt?: InputMaybe<Scalars['DateTime']>;
+  certifiedById?: InputMaybe<Scalars['Int']>;
+  endDate?: InputMaybe<Scalars['DateTime']>;
+  name?: InputMaybe<Scalars['String']>;
+  organizationId?: InputMaybe<Scalars['Int']>;
+  originationUploadId?: InputMaybe<Scalars['Int']>;
+  startDate?: InputMaybe<Scalars['DateTime']>;
 };
 
 export type UpdateUploadInput = {
@@ -740,4 +868,4 @@ export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Up
 export type FindUploadsVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, organizationId: number, reportingPeriodId: number, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, code: string }, expenditureCategory: { __typename?: 'ExpenditureCategory', id: number, name: string, code: string } }> };
+export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, code: string }, expenditureCategory: { __typename?: 'ExpenditureCategory', id: number, code: string }, validations: Array<{ __typename?: 'UploadValidation', invalidatedAt?: string | null, validatedAt?: string | null } | null> }> };
