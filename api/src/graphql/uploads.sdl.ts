@@ -7,7 +7,7 @@ export const schema = gql`
     agencyId: Int!
     agency: Agency!
     organizationId: Int!
-    organizaiton: Organization!
+    organization: Organization!
     reportingPeriodId: Int!
     reportingPeriod: ReportingPeriod!
     expenditureCategoryId: Int!
