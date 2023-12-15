@@ -62,8 +62,9 @@ const passageClient = {
     const token = await passageUser.getAuthToken()
     return token
   },
-  getUserMetadata: () => {
+  getUserMetadata: async () => {
     console.log('passageUser.userInfo()')
+    console.log(await passageUser.userInfo())
     return passageUser.userInfo()
   },
   login: (event) => {
@@ -118,7 +119,7 @@ function createAuthImplementation(client: AuthClient) {
      *   "updated_at": "2016-05-15T19:53:12.368652374-07:00"
      * }
      */
-    getUserMetadata: async () => client.getUserMetadata(),
+    getUserMetadata: async () => await client.getUserMetadata(),
   }
 }
 

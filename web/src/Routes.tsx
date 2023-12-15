@@ -28,7 +28,7 @@ const Routes = () => {
       {/* <Set private unauthenticated="forbidden" hasRole="admin"> */}
       {/* </Set> */}
 
-      <PrivateSet unauthenticated="login" wrap={ScaffoldLayout} title="Agencies" titleTo="agencies" roles="admin">
+      <PrivateSet unauthenticated="login" wrap={ScaffoldLayout} title="Agencies" titleTo="agencies">
         <Route path="/agencies/{id:Int}/edit" page={AgencyEditAgencyPage} name="editAgency" />
         <Route path="/agencies/{id:Int}" page={AgencyAgencyPage} name="agency" />
         <Route path="/agencies/new" page={AgencyNewAgencyPage} name="newAgency" />
