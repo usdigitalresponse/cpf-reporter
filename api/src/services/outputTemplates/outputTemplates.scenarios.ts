@@ -1,4 +1,5 @@
 import type { Prisma, OutputTemplate } from '@prisma/client'
+
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
 export const standard = defineScenario<Prisma.OutputTemplateCreateArgs>({

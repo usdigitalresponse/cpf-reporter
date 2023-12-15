@@ -65,7 +65,19 @@ span.invalid-feedback {
   display: block;
 }
 
+// Gray out inactive icons
+.bi.inactive {
+  color: $raw-gray-300;
+}
+
+.bi-arrow-down-up {
+  font-size: 0.9rem;
+}
+
 @import '~bootstrap/scss/bootstrap';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
 
 // SET USDR FONTS
 @import './fonts.scss';
+
+@import './tables.scss';
