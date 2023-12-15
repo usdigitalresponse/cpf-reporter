@@ -31,25 +31,25 @@ export interface ValidateResetTokenResponse {
 }
 
 // Replace this with the auth service provider client sdk
-const client = {
-  login: () => ({
-    id: 'unique-user-id',
-    email: 'email@example.com',
-    roles: [],
-  }),
-  signup: () => ({
-    id: 'unique-user-id',
-    email: 'email@example.com',
-    roles: [],
-  }),
-  logout: () => {},
-  getToken: () => 'super-secret-short-lived-token',
-  getUserMetadata: () => ({
-    id: 'unique-user-id',
-    email: 'email@example.com',
-    roles: [],
-  }),
-}
+// const client = {
+//   login: () => ({
+//     id: 'unique-user-id',
+//     email: 'email@example.com',
+//     roles: [],
+//   }),
+//   signup: () => ({
+//     id: 'unique-user-id',
+//     email: 'email@example.com',
+//     roles: [],
+//   }),
+//   logout: () => {},
+//   getToken: () => 'super-secret-short-lived-token',
+//   getUserMetadata: () => ({
+//     id: 'unique-user-id',
+//     email: 'email@example.com',
+//     roles: [],
+//   }),
+// }
 
 const passageUser = new PassageUser()
 
@@ -66,9 +66,13 @@ const passageClient = {
     console.log('passageUser.userInfo()')
     return passageUser.userInfo()
   },
-  login: () => {
+  login: (event) => {
     console.log('unsure how to login with passage')
-    return { id: 'unique-user-id', email: '', roles: [] }
+    //return { id: 'unique-user-id', email: '', roles: [] }
+    console.log(`successfully authenticated. ${event}`)
+    console.log(event)
+    localStorage.setItem('psg_auth_token', event.auth_token)
+    // window.location.href = event.redirect_url
   },
   signup: () => {
     console.log('unsure how to signup with passage')
@@ -94,7 +98,7 @@ function createAuthImplementation(client: AuthClient) {
   return {
     type: 'custom-auth',
     client,
-    login: async () => client.login(),
+    login: async (e) => client.login(e),
     logout: async () => await passageUser.signOut(),
     signup: async () => client.signup(),
     getToken: async () => await passageUser.getAuthToken(),

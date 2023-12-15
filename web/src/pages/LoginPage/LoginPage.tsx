@@ -9,16 +9,19 @@ import { useAuth } from 'src/auth'
 
 const LoginPage = () => {
   const ref = useRef()
+  const { isAuthenticated, currentUser, logOut, logIn } = useAuth()
   console.log('ref', ref)
   const beforeAuth = (email) => {
     console.log(email)
     return true
   }
   const onSuccess = (event: any) => {
-    console.log(`successfully authenticated. ${event}`)
-    console.log(event)
-    localStorage.setItem('psg_auth_token', event.auth_token)
-    window.location.href = event.redirect_url
+    // console.log(`successfully authenticated. ${event}`)
+    // console.log(event)
+    // localStorage.setItem('psg_auth_token', event.auth_token)
+    // window.location.href = event.redirect_url
+    /* add user information into redwood auth context */
+    logIn(event)
   }
   useEffect(() => {
     const { current } = ref
@@ -27,7 +30,6 @@ const LoginPage = () => {
     current.onSuccess = onSuccess
     return () => {}
   })
-  const { isAuthenticated, currentUser, logOut } = useAuth()
   console.log('isAuthenticated', isAuthenticated)
   console.log('currentUser', currentUser)
   console.log('logout', logOut)
