@@ -5,6 +5,7 @@ import type {
 } from 'types/graphql'
 
 import { db } from 'src/lib/db'
+import { validateUpload } from 'src/lib/validate-upload'
 
 export const uploads: QueryResolvers['uploads'] = () => {
   return db.upload.findMany()
@@ -17,6 +18,7 @@ export const upload: QueryResolvers['upload'] = ({ id }) => {
 }
 
 export const createUpload: MutationResolvers['createUpload'] = ({ input }) => {
+  validateUpload(input, context.currentUser)
   return db.upload.create({
     data: input,
   })

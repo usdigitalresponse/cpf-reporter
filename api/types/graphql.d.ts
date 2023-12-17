@@ -444,12 +444,14 @@ export type Query = {
   organizations: Array<Organization>;
   outputTemplate?: Maybe<OutputTemplate>;
   outputTemplates: Array<OutputTemplate>;
+  previousReportingPeriods: Array<ReportingPeriod>;
   project?: Maybe<Project>;
   projects: Array<Project>;
   /** Fetches the Redwood root schema. */
   redwood?: Maybe<Redwood>;
   reportingPeriod?: Maybe<ReportingPeriod>;
   reportingPeriods: Array<ReportingPeriod>;
+  reportingPeriodsByOrg: Array<ReportingPeriod>;
   role?: Maybe<Role>;
   roles: Array<Role>;
   subrecipient?: Maybe<Subrecipient>;
@@ -500,6 +502,13 @@ export type QueryoutputTemplateArgs = {
 
 
 /** About the Redwood queries. */
+export type QuerypreviousReportingPeriodsArgs = {
+  id: Scalars['Int'];
+  organizationId: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
 export type QueryprojectArgs = {
   id: Scalars['Int'];
 };
@@ -508,6 +517,12 @@ export type QueryprojectArgs = {
 /** About the Redwood queries. */
 export type QueryreportingPeriodArgs = {
   id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QueryreportingPeriodsByOrgArgs = {
+  organizationId: Scalars['Int'];
 };
 
 
@@ -1169,11 +1184,13 @@ export type QueryResolvers<ContextType = RedwoodGraphQLContext, ParentType exten
   organizations: OptArgsResolverFn<Array<ResolversTypes['Organization']>, ParentType, ContextType>;
   outputTemplate: Resolver<Maybe<ResolversTypes['OutputTemplate']>, ParentType, ContextType, RequireFields<QueryoutputTemplateArgs, 'id'>>;
   outputTemplates: OptArgsResolverFn<Array<ResolversTypes['OutputTemplate']>, ParentType, ContextType>;
+  previousReportingPeriods: Resolver<Array<ResolversTypes['ReportingPeriod']>, ParentType, ContextType, RequireFields<QuerypreviousReportingPeriodsArgs, 'id' | 'organizationId'>>;
   project: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryprojectArgs, 'id'>>;
   projects: OptArgsResolverFn<Array<ResolversTypes['Project']>, ParentType, ContextType>;
   redwood: OptArgsResolverFn<Maybe<ResolversTypes['Redwood']>, ParentType, ContextType>;
   reportingPeriod: Resolver<Maybe<ResolversTypes['ReportingPeriod']>, ParentType, ContextType, RequireFields<QueryreportingPeriodArgs, 'id'>>;
   reportingPeriods: OptArgsResolverFn<Array<ResolversTypes['ReportingPeriod']>, ParentType, ContextType>;
+  reportingPeriodsByOrg: Resolver<Array<ResolversTypes['ReportingPeriod']>, ParentType, ContextType, RequireFields<QueryreportingPeriodsByOrgArgs, 'organizationId'>>;
   role: Resolver<Maybe<ResolversTypes['Role']>, ParentType, ContextType, RequireFields<QueryroleArgs, 'id'>>;
   roles: OptArgsResolverFn<Array<ResolversTypes['Role']>, ParentType, ContextType>;
   subrecipient: Resolver<Maybe<ResolversTypes['Subrecipient']>, ParentType, ContextType, RequireFields<QuerysubrecipientArgs, 'id'>>;
@@ -1198,11 +1215,13 @@ export type QueryRelationResolvers<ContextType = RedwoodGraphQLContext, ParentTy
   organizations?: RequiredResolverFn<Array<ResolversTypes['Organization']>, ParentType, ContextType>;
   outputTemplate?: RequiredResolverFn<Maybe<ResolversTypes['OutputTemplate']>, ParentType, ContextType, RequireFields<QueryoutputTemplateArgs, 'id'>>;
   outputTemplates?: RequiredResolverFn<Array<ResolversTypes['OutputTemplate']>, ParentType, ContextType>;
+  previousReportingPeriods?: RequiredResolverFn<Array<ResolversTypes['ReportingPeriod']>, ParentType, ContextType, RequireFields<QuerypreviousReportingPeriodsArgs, 'id' | 'organizationId'>>;
   project?: RequiredResolverFn<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryprojectArgs, 'id'>>;
   projects?: RequiredResolverFn<Array<ResolversTypes['Project']>, ParentType, ContextType>;
   redwood?: RequiredResolverFn<Maybe<ResolversTypes['Redwood']>, ParentType, ContextType>;
   reportingPeriod?: RequiredResolverFn<Maybe<ResolversTypes['ReportingPeriod']>, ParentType, ContextType, RequireFields<QueryreportingPeriodArgs, 'id'>>;
   reportingPeriods?: RequiredResolverFn<Array<ResolversTypes['ReportingPeriod']>, ParentType, ContextType>;
+  reportingPeriodsByOrg?: RequiredResolverFn<Array<ResolversTypes['ReportingPeriod']>, ParentType, ContextType, RequireFields<QueryreportingPeriodsByOrgArgs, 'organizationId'>>;
   role?: RequiredResolverFn<Maybe<ResolversTypes['Role']>, ParentType, ContextType, RequireFields<QueryroleArgs, 'id'>>;
   roles?: RequiredResolverFn<Array<ResolversTypes['Role']>, ParentType, ContextType>;
   subrecipient?: RequiredResolverFn<Maybe<ResolversTypes['Subrecipient']>, ParentType, ContextType, RequireFields<QuerysubrecipientArgs, 'id'>>;

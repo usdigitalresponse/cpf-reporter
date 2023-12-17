@@ -1,13 +1,17 @@
+import { Button } from 'react-bootstrap'
+import { useForm } from 'react-hook-form'
 import type { EditUploadById, UpdateUploadInput } from 'types/graphql'
 
 import {
   Form,
+  FileField,
+  SelectField,
+  HiddenField,
   FormError,
   FieldError,
   Label,
-  TextField,
-  NumberField,
   Submit,
+  TextAreaField,
 } from '@redwoodjs/forms'
 import type { RWGqlError } from '@redwoodjs/forms'
 
@@ -21,135 +25,73 @@ interface UploadFormProps {
 }
 
 const UploadForm = (props: UploadFormProps) => {
-  const onSubmit = (data: FormUpload) => {
-    props.onSave(data, props?.upload?.id)
+  const formMethods = useForm()
+
+  const onSubmit = (data) => {
+    data.filename = data.file[0].name
+    data.agencyId = parseInt(data.agencyId)
+    data.reportingPeriodId = parseInt(data.reportingPeriodId)
+    console.log(data)
+    props.onSave({ filename: data.file[0].name }, props?.upload?.id)
+  }
+
+  const onReset = () => {
+    console.log('resetting form...')
+    formMethods.reset()
   }
 
   return (
-    <div className="rw-form-wrapper">
-      <Form<FormUpload> onSubmit={onSubmit} error={props.error}>
-        <FormError
-          error={props.error}
-          wrapperClassName="rw-form-error-wrapper"
-          titleClassName="rw-form-error-title"
-          listClassName="rw-form-error-list"
-        />
-
-        <Label
-          name="filename"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Filename
-        </Label>
-
-        <TextField
-          name="filename"
-          defaultValue={props.upload?.filename}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
-        />
-
-        <FieldError name="filename" className="rw-field-error" />
-
-        <Label
-          name="uploadedById"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Uploaded by id
-        </Label>
-
-        <NumberField
-          name="uploadedById"
-          defaultValue={props.upload?.uploadedById}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
-        />
-
-        <FieldError name="uploadedById" className="rw-field-error" />
-
-        <Label
-          name="agencyId"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Agency id
-        </Label>
-
-        <NumberField
-          name="agencyId"
-          defaultValue={props.upload?.agencyId}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
-        />
-
-        <FieldError name="agencyId" className="rw-field-error" />
-
-        <Label
-          name="organizationId"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Organization id
-        </Label>
-
-        <NumberField
-          name="organizationId"
-          defaultValue={props.upload?.organizationId}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
-        />
-
-        <FieldError name="organizationId" className="rw-field-error" />
-
-        <Label
-          name="reportingPeriodId"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Reporting period id
-        </Label>
-
-        <NumberField
-          name="reportingPeriodId"
-          defaultValue={props.upload?.reportingPeriodId}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
-        />
-
-        <FieldError name="reportingPeriodId" className="rw-field-error" />
-
-        <Label
-          name="expenditureCategoryId"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Expenditure category id
-        </Label>
-
-        <NumberField
-          name="expenditureCategoryId"
-          defaultValue={props.upload?.expenditureCategoryId}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
-        />
-
-        <FieldError name="expenditureCategoryId" className="rw-field-error" />
-
-        <div className="rw-button-group">
-          <Submit disabled={props.loading} className="rw-button rw-button-blue">
-            Save
-          </Submit>
-        </div>
-      </Form>
-    </div>
+    <Form onSubmit={onSubmit}>
+      <FormError
+        error={props.error}
+        wrapperClassName="rw-form-error-wrapper"
+        titleClassName="rw-form-error-title"
+        listClassName="rw-form-error-list"
+      />
+      {/* <HiddenField name="uploadedBy">1</HiddenField> */}
+      <Label
+        name="reportingPeriodId"
+        className="rw-label"
+        errorClassName="rw-label rw-label-error"
+      >
+        Reporting Period
+      </Label>
+      <SelectField name="reportingPeriodId">
+        <option value={1}>23Q3</option>
+        <option value={2}>23Q4</option>
+        <option value={3}>24Q1</option>
+      </SelectField>
+      <Label
+        name="agencyId"
+        className="rw-label"
+        errorClassName="rw-label rw-label-error"
+      >
+        Agency Code
+      </Label>
+      <SelectField name="agencyId">
+        <option value={1}>ABC123</option>
+        <option value={2}>EXT</option>
+        <option value={3}>MISC</option>
+      </SelectField>
+      <FileField name="file" validation={{ required: true }} />
+      <FieldError name="file" className="rw-field-error" />
+      <Label
+        name="notes"
+        className="rw-label"
+        errorClassName="rw-label rw-label-error"
+      >
+        Notes
+      </Label>
+      <TextAreaField name="notes"></TextAreaField>
+      <div className="rw-button-group">
+        <Submit disabled={props.loading} className="rw-button rw-button-blue">
+          Submit
+        </Submit>
+        <Button className="rw-button rw-button-red" onClick={onReset}>
+          Reset
+        </Button>
+      </div>
+    </Form>
   )
 }
 

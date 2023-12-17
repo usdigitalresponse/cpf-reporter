@@ -13,6 +13,8 @@
     "@prisma/instrumentation": "^5.7.0",
     "@redwoodjs/api": "6.4.2",
     "@redwoodjs/graphql-server": "6.4.2",
-    "dd-trace": "^4.20.0"
+    "cryo": "^0.0.6",
+    "dd-trace": "^4.20.0",
+    "xlsx": "^0.18.5"
   }
 }

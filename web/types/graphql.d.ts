@@ -426,12 +426,14 @@ export type Query = {
   organizations: Array<Organization>;
   outputTemplate?: Maybe<OutputTemplate>;
   outputTemplates: Array<OutputTemplate>;
+  previousReportingPeriods: Array<ReportingPeriod>;
   project?: Maybe<Project>;
   projects: Array<Project>;
   /** Fetches the Redwood root schema. */
   redwood?: Maybe<Redwood>;
   reportingPeriod?: Maybe<ReportingPeriod>;
   reportingPeriods: Array<ReportingPeriod>;
+  reportingPeriodsByOrg: Array<ReportingPeriod>;
   role?: Maybe<Role>;
   roles: Array<Role>;
   subrecipient?: Maybe<Subrecipient>;
@@ -482,6 +484,13 @@ export type QueryoutputTemplateArgs = {
 
 
 /** About the Redwood queries. */
+export type QuerypreviousReportingPeriodsArgs = {
+  id: Scalars['Int'];
+  organizationId: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
 export type QueryprojectArgs = {
   id: Scalars['Int'];
 };
@@ -490,6 +499,12 @@ export type QueryprojectArgs = {
 /** About the Redwood queries. */
 export type QueryreportingPeriodArgs = {
   id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QueryreportingPeriodsByOrgArgs = {
+  organizationId: Scalars['Int'];
 };
 
 
