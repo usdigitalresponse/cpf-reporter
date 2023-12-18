@@ -25,23 +25,30 @@ const Navigation = () => {
           </NavLink>
         </Nav.Item>
         <Nav.Item>
+          <div className="nav-link disabled">Subrecipients</div>
+        </Nav.Item>
+        <Nav.Item>
+          <div className="nav-link disabled">Users</div>
+        </Nav.Item>
+        {/* TODO: Replace disabled tabs with the tabs below when Users and Subrecipients pages are ready */}
+        {/* <Nav.Item>
           <NavLink
-            to={routes.uploads()}
+            to={routes.subrecipients()}
             activeClassName="active"
             className="nav-link"
           >
             Subrecipients
           </NavLink>
-        </Nav.Item>
-        <Nav.Item>
+        </Nav.Item> */}
+        {/* <Nav.Item>
           <NavLink
-            to={routes.uploads()}
+            to={routes.users()}
             activeClassName="active"
             className="nav-link"
           >
             Users
           </NavLink>
-        </Nav.Item>
+        </Nav.Item> */}
         <Nav.Item>
           <NavLink
             to={routes.reportingPeriods()}
