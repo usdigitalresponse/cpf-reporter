@@ -27,10 +27,7 @@ const Navigation = () => {
         <Nav.Item>
           <div className="nav-link disabled">Subrecipients</div>
         </Nav.Item>
-        <Nav.Item>
-          <div className="nav-link disabled">Users</div>
-        </Nav.Item>
-        {/* TODO: Replace disabled tabs with the tabs below when Users and Subrecipients pages are ready */}
+        {/* TODO: Use the code below when "Subrecipients" page is ready */}
         {/* <Nav.Item>
           <NavLink
             to={routes.subrecipients()}
@@ -40,7 +37,7 @@ const Navigation = () => {
             Subrecipients
           </NavLink>
         </Nav.Item> */}
-        {/* <Nav.Item>
+        <Nav.Item>
           <NavLink
             to={routes.users()}
             activeClassName="active"
@@ -48,7 +45,7 @@ const Navigation = () => {
           >
             Users
           </NavLink>
-        </Nav.Item> */}
+        </Nav.Item>
         <Nav.Item>
           <NavLink
             to={routes.reportingPeriods()}

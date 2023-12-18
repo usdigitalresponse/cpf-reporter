@@ -27,6 +27,11 @@ const Routes = () => {
         <Route path="/agencies/{id:Int}" page={AgencyAgencyPage} name="agency" />
         <Route path="/agencies/new" page={AgencyNewAgencyPage} name="newAgency" />
         <Route path="/agencies" page={AgencyAgenciesPage} name="agencies" />
+        {/* Users */}
+        <Route path="/users/new" page={UserNewUserPage} name="newUser" />
+        <Route path="/users/{id:Int}/edit" page={UserEditUserPage} name="editUser" />
+        <Route path="/users/{id:Int}" page={UserUserPage} name="user" />
+        <Route path="/users" page={UserUsersPage} name="users" />
         {/* Reporting Periods */}
         <Route path="/reporting-periods" page={ReportingPeriodsPage} name="reportingPeriods" />
         {/* Organizations */}

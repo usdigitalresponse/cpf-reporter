@@ -136,7 +136,6 @@ export type CreateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   email: Scalars['String'];
   name?: InputMaybe<Scalars['String']>;
-  organizationId: Scalars['Int'];
   roleId?: InputMaybe<Scalars['Int']>;
 };
 
@@ -460,6 +459,7 @@ export type Query = {
   uploads: Array<Upload>;
   user?: Maybe<User>;
   users: Array<User>;
+  usersByOrganization: Array<User>;
 };
 
 
@@ -538,6 +538,12 @@ export type QueryuploadValidationArgs = {
 /** About the Redwood queries. */
 export type QueryuserArgs = {
   id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QueryusersByOrganizationArgs = {
+  organizationId: Scalars['Int'];
 };
 
 /**
@@ -689,7 +695,6 @@ export type UpdateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   email?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
-  organizationId?: InputMaybe<Scalars['Int']>;
   roleId?: InputMaybe<Scalars['Int']>;
 };
 
@@ -743,12 +748,15 @@ export type User = {
   createdAt: Scalars['DateTime'];
   email: Scalars['String'];
   id: Scalars['Int'];
+  invalidated: Array<Maybe<UploadValidation>>;
   name?: Maybe<Scalars['String']>;
   organization: Organization;
   organizationId: Scalars['Int'];
   role?: Maybe<Role>;
   roleId?: Maybe<Scalars['Int']>;
   updatedAt: Scalars['DateTime'];
+  uploaded: Array<Maybe<Upload>>;
+  validated: Array<Maybe<UploadValidation>>;
 };
 
 type MaybeOrArrayOfMaybe<T> = T | Maybe<T> | Maybe<T>[];
@@ -1184,6 +1192,7 @@ export type QueryResolvers<ContextType = RedwoodGraphQLContext, ParentType exten
   uploads: OptArgsResolverFn<Array<ResolversTypes['Upload']>, ParentType, ContextType>;
   user: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryuserArgs, 'id'>>;
   users: OptArgsResolverFn<Array<ResolversTypes['User']>, ParentType, ContextType>;
+  usersByOrganization: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryusersByOrganizationArgs, 'organizationId'>>;
 };
 
 export type QueryRelationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
@@ -1213,6 +1222,7 @@ export type QueryRelationResolvers<ContextType = RedwoodGraphQLContext, ParentTy
   uploads?: RequiredResolverFn<Array<ResolversTypes['Upload']>, ParentType, ContextType>;
   user?: RequiredResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryuserArgs, 'id'>>;
   users?: RequiredResolverFn<Array<ResolversTypes['User']>, ParentType, ContextType>;
+  usersByOrganization?: RequiredResolverFn<Array<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryusersByOrganizationArgs, 'organizationId'>>;
 };
 
 export type RedwoodResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['Redwood'] = ResolversParentTypes['Redwood']> = {
@@ -1412,12 +1422,15 @@ export type UserResolvers<ContextType = RedwoodGraphQLContext, ParentType extend
   createdAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   email: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  invalidated: OptArgsResolverFn<Array<Maybe<ResolversTypes['UploadValidation']>>, ParentType, ContextType>;
   name: OptArgsResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   organization: OptArgsResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
   organizationId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   role: OptArgsResolverFn<Maybe<ResolversTypes['Role']>, ParentType, ContextType>;
   roleId: OptArgsResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   updatedAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  uploaded: OptArgsResolverFn<Array<Maybe<ResolversTypes['Upload']>>, ParentType, ContextType>;
+  validated: OptArgsResolverFn<Array<Maybe<ResolversTypes['UploadValidation']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -1428,12 +1441,15 @@ export type UserRelationResolvers<ContextType = RedwoodGraphQLContext, ParentTyp
   createdAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   email?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  invalidated?: RequiredResolverFn<Array<Maybe<ResolversTypes['UploadValidation']>>, ParentType, ContextType>;
   name?: RequiredResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   organization?: RequiredResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
   organizationId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   role?: RequiredResolverFn<Maybe<ResolversTypes['Role']>, ParentType, ContextType>;
   roleId?: RequiredResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   updatedAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  uploaded?: RequiredResolverFn<Array<Maybe<ResolversTypes['Upload']>>, ParentType, ContextType>;
+  validated?: RequiredResolverFn<Array<Maybe<ResolversTypes['UploadValidation']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
