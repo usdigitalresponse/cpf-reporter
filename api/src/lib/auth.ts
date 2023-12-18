@@ -32,17 +32,12 @@ type RedwoodUser = Record<string, unknown> & { roles?: string[] }
 export const getCurrentUser = async (
   decoded: Decoded
 ): Promise<RedwoodUser | null> => {
-  if (!decoded) {
-    return null
+  console.log(decoded)
+  return {
+    id: 'unique-user-id',
+    email: 'email@example.com',
+    roles: ['admin'],
   }
-
-  const { roles } = parseJWT({ decoded })
-
-  if (roles) {
-    return { ...decoded, roles }
-  }
-
-  return { ...decoded }
 }
 
 /**
@@ -51,6 +46,7 @@ export const getCurrentUser = async (
  * @returns {boolean} - If the currentUser is authenticated
  */
 export const isAuthenticated = (): boolean => {
+  console.log('isAuthenticated has been called')
   return !!context.currentUser
 }
 
@@ -69,6 +65,7 @@ type AllowedRoles = string | string[] | undefined
  * or when no roles are provided to check against. Otherwise returns false.
  */
 export const hasRole = (roles: AllowedRoles): boolean => {
+  console.log('hasRole has been called')
   if (!isAuthenticated()) {
     return false
   }
