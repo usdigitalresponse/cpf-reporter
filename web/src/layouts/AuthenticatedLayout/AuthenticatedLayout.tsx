@@ -10,7 +10,7 @@ type AuthenticatedLayoutProps = {
 }
 
 const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
-  const { isAuthenticated, currentUser, logOut } = useAuth()
+  const { currentUser, isAuthenticated, logOut } = useAuth()
 
   return (
     <div className="container-fluid" style={{ width: '90%' }}>
@@ -21,19 +21,7 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
           </Link>
         </div>
         <div className="col d-flex justify-content-end">
-          {/* Replace the code below when authentication is complete */}
-          <div className="navbar-text">email@email.com</div>
-          <Button
-            size="sm"
-            variant="link"
-            className="nav-link navbar-text mx-2"
-            onClick={logOut}
-          >
-            Logout
-          </Button>
-
-          {/* Use the code below for conditional currentUser logic */}
-          {/* {isAuthenticated && (
+          {isAuthenticated && (
             <>
               <div className="navbar-text">{currentUser.email}</div>
               <Button
@@ -45,7 +33,7 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
                 Logout
               </Button>
             </>
-          )} */}
+          )}
         </div>
       </nav>
       <Navigation />
