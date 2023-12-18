@@ -144,3 +144,5 @@ dist
 # Terraform cache
 terraform/.terraform
 .tool-versions
+
+localstack/volume

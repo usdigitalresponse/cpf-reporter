@@ -7,11 +7,11 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
     one: {
       data: {
         filename: 'String',
-        updatedAt: '2023-12-08T21:03:09.638Z',
+        updatedAt: '2023-12-10T04:48:04.896Z',
         uploadedBy: {
           create: {
             email: 'String',
-            updatedAt: '2023-12-08T21:03:09.638Z',
+            updatedAt: '2023-12-10T04:48:04.896Z',
             organization: { create: { name: 'String' } },
           },
         },
@@ -20,23 +20,23 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
         reportingPeriod: {
           create: {
             name: 'String',
-            startDate: '2023-12-08T21:03:09.638Z',
-            endDate: '2023-12-08T21:03:09.638Z',
-            updatedAt: '2023-12-08T21:03:09.638Z',
+            startDate: '2023-12-10T04:48:04.896Z',
+            endDate: '2023-12-10T04:48:04.896Z',
+            updatedAt: '2023-12-10T04:48:04.896Z',
             inputTemplate: {
               create: {
                 name: 'String',
                 version: 'String',
-                effectiveDate: '2023-12-08T21:03:09.638Z',
-                updatedAt: '2023-12-08T21:03:09.638Z',
+                effectiveDate: '2023-12-10T04:48:04.896Z',
+                updatedAt: '2023-12-10T04:48:04.896Z',
               },
             },
             outputTemplate: {
               create: {
                 name: 'String',
                 version: 'String',
-                effectiveDate: '2023-12-08T21:03:09.638Z',
-                updatedAt: '2023-12-08T21:03:09.638Z',
+                effectiveDate: '2023-12-10T04:48:04.896Z',
+                updatedAt: '2023-12-10T04:48:04.896Z',
               },
             },
           },
@@ -45,7 +45,7 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
           create: {
             name: 'String',
             code: 'String',
-            updatedAt: '2023-12-08T21:03:09.638Z',
+            updatedAt: '2023-12-10T04:48:04.896Z',
           },
         },
       },
@@ -53,11 +53,11 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
     two: {
       data: {
         filename: 'String',
-        updatedAt: '2023-12-08T21:03:09.638Z',
+        updatedAt: '2023-12-10T04:48:04.896Z',
         uploadedBy: {
           create: {
             email: 'String',
-            updatedAt: '2023-12-08T21:03:09.638Z',
+            updatedAt: '2023-12-10T04:48:04.896Z',
             organization: { create: { name: 'String' } },
           },
         },
@@ -66,23 +66,23 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
         reportingPeriod: {
           create: {
             name: 'String',
-            startDate: '2023-12-08T21:03:09.638Z',
-            endDate: '2023-12-08T21:03:09.638Z',
-            updatedAt: '2023-12-08T21:03:09.638Z',
+            startDate: '2023-12-10T04:48:04.896Z',
+            endDate: '2023-12-10T04:48:04.896Z',
+            updatedAt: '2023-12-10T04:48:04.896Z',
             inputTemplate: {
               create: {
                 name: 'String',
                 version: 'String',
-                effectiveDate: '2023-12-08T21:03:09.638Z',
-                updatedAt: '2023-12-08T21:03:09.638Z',
+                effectiveDate: '2023-12-10T04:48:04.896Z',
+                updatedAt: '2023-12-10T04:48:04.896Z',
               },
             },
             outputTemplate: {
               create: {
                 name: 'String',
                 version: 'String',
-                effectiveDate: '2023-12-08T21:03:09.639Z',
-                updatedAt: '2023-12-08T21:03:09.639Z',
+                effectiveDate: '2023-12-10T04:48:04.896Z',
+                updatedAt: '2023-12-10T04:48:04.896Z',
               },
             },
           },
@@ -91,7 +91,7 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
           create: {
             name: 'String',
             code: 'String',
-            updatedAt: '2023-12-08T21:03:09.639Z',
+            updatedAt: '2023-12-10T04:48:04.896Z',
           },
         },
       },
