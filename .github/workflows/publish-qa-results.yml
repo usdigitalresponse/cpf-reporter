@@ -54,6 +54,8 @@ jobs:
           cat >> $REPORT_FILE << 'ENDOFREPORT'
           ## QA Summary
 
+          _[See our documentation for tips on how to resolve failing QA checks.](${{ env.GH_SERVER}}/${{ env.GH_REPO }}/blob/main/docs/resolving-qa-failures.md)_
+
           | QA Check        | Result  |
           |:----------------|:-------:|
           | 🌐 Web Tests | ${{ (env.WEB_TEST_OUTCOME == 'success' && '✅') || (env.WEB_TEST_OUTCOME == 'skipped' && '➖') || '❌' }} |
