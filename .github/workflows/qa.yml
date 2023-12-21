@@ -167,12 +167,10 @@ jobs:
         env:
           CI: 1
       - name: Run linter for api side
-        continue-on-error: true
-        run: |
-          yarn eslint api/src
+        run: yarn eslint api/src
       - name: Run linter for web side
-        run: |
-          yarn eslint web/src
+        if: ${{ !cancelled() }}
+        run: yarn eslint web/src
 
   tflint:
     name: Lint terraform
