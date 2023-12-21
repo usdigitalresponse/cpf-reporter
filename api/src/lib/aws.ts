@@ -10,6 +10,7 @@ import {
   SQSClient,
 } from '@aws-sdk/client-sqs'
 import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { StreamingBlobPayloadInputTypes } from '@smithy/types'
 
 function getS3Client() {
   let s3: S3Client
@@ -41,8 +42,8 @@ function getS3Client() {
 async function sendPutObjectToS3Bucket(
   bucketName: string,
   key: string,
-  body: any
-) {
+  body: StreamingBlobPayloadInputTypes
+): Promise<void> {
   const s3 = getS3Client()
   const uploadParams: PutObjectCommandInput = {
     Bucket: bucketName,
