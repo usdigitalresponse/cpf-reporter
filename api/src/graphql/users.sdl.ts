@@ -12,10 +12,14 @@ export const schema = gql`
     organization: Organization!
     role: Role
     certified: [ReportingPeriod]!
+    uploaded: [Upload]!
+    validated: [UploadValidation]!
+    invalidated: [UploadValidation]!
   }
 
   type Query {
     users: [User!]! @requireAuth
+    usersByOrganization(organizationId: Int!): [User!]! @requireAuth
     user(id: Int!): User @requireAuth
   }
 
@@ -23,7 +27,6 @@ export const schema = gql`
     email: String!
     name: String
     agencyId: Int
-    organizationId: Int!
     roleId: Int
   }
 
@@ -31,7 +34,6 @@ export const schema = gql`
     email: String
     name: String
     agencyId: Int
-    organizationId: Int
     roleId: Int
   }
 

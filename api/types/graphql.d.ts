@@ -10,8 +10,6 @@ import {
   ExpenditureCategory as PrismaExpenditureCategory,
   Upload as PrismaUpload,
   UploadValidation as PrismaUploadValidation,
-  Subrecipient as PrismaSubrecipient,
-  Project as PrismaProject,
 } from '@prisma/client'
 import {
   GraphQLResolveInfo,
@@ -36,6 +34,7 @@ export type ResolverFn<TResult, TParent, TContext, TArgs> = (
   args?: TArgs,
   obj?: { root: TParent; context: TContext; info: GraphQLResolveInfo }
 ) => TResult | Promise<TResult>
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & {
   [P in K]-?: NonNullable<T[P]>
 }
@@ -172,7 +171,6 @@ export type CreateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>
   email: Scalars['String']
   name?: InputMaybe<Scalars['String']>
-  organizationId: Scalars['Int']
   roleId?: InputMaybe<Scalars['Int']>
 }
 
@@ -460,6 +458,7 @@ export type Query = {
   uploads: Array<Upload>
   user?: Maybe<User>
   users: Array<User>
+  usersByOrganization: Array<User>
 }
 
 /** About the Redwood queries. */
@@ -525,6 +524,11 @@ export type QueryuploadValidationArgs = {
 /** About the Redwood queries. */
 export type QueryuserArgs = {
   id: Scalars['Int']
+}
+
+/** About the Redwood queries. */
+export type QueryusersByOrganizationArgs = {
+  organizationId: Scalars['Int']
 }
 
 /**
@@ -676,7 +680,6 @@ export type UpdateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>
   email?: InputMaybe<Scalars['String']>
   name?: InputMaybe<Scalars['String']>
-  organizationId?: InputMaybe<Scalars['Int']>
   roleId?: InputMaybe<Scalars['Int']>
 }
 
@@ -730,12 +733,15 @@ export type User = {
   createdAt: Scalars['DateTime']
   email: Scalars['String']
   id: Scalars['Int']
+  invalidated: Array<Maybe<UploadValidation>>
   name?: Maybe<Scalars['String']>
   organization: Organization
   organizationId: Scalars['Int']
   role?: Maybe<Role>
   roleId?: Maybe<Scalars['Int']>
   updatedAt: Scalars['DateTime']
+  uploaded: Array<Maybe<Upload>>
+  validated: Array<Maybe<UploadValidation>>
 }
 
 type MaybeOrArrayOfMaybe<T> = T | Maybe<T> | Maybe<T>[]
@@ -745,10 +751,8 @@ type AllMappedModels = MaybeOrArrayOfMaybe<
   | InputTemplate
   | Organization
   | OutputTemplate
-  | Project
   | ReportingPeriod
   | Role
-  | Subrecipient
   | Upload
   | UploadValidation
   | User
@@ -910,11 +914,11 @@ export type ResolversTypes = {
     >
   >
   Project: ResolverTypeWrapper<
-    MergePrismaWithSdlTypes<
-      PrismaProject,
-      MakeRelationsOptional<Project, AllMappedModels>,
-      AllMappedModels
-    >
+    Omit<Project, 'agency' | 'organization' | 'originationPeriod'> & {
+      agency: ResolversTypes['Agency']
+      organization: ResolversTypes['Organization']
+      originationPeriod: ResolversTypes['ReportingPeriod']
+    }
   >
   Query: ResolverTypeWrapper<{}>
   Redwood: ResolverTypeWrapper<Redwood>
@@ -934,11 +938,11 @@ export type ResolversTypes = {
   >
   String: ResolverTypeWrapper<Scalars['String']>
   Subrecipient: ResolverTypeWrapper<
-    MergePrismaWithSdlTypes<
-      PrismaSubrecipient,
-      MakeRelationsOptional<Subrecipient, AllMappedModels>,
-      AllMappedModels
-    >
+    Omit<Subrecipient, 'certifiedBy' | 'organization' | 'originationUpload'> & {
+      certifiedBy: Maybe<ResolversTypes['User']>
+      organization: ResolversTypes['Organization']
+      originationUpload: ResolversTypes['Upload']
+    }
   >
   Time: ResolverTypeWrapper<Scalars['Time']>
   UpdateAgencyInput: UpdateAgencyInput
@@ -1023,11 +1027,11 @@ export type ResolversParentTypes = {
     MakeRelationsOptional<OutputTemplate, AllMappedModels>,
     AllMappedModels
   >
-  Project: MergePrismaWithSdlTypes<
-    PrismaProject,
-    MakeRelationsOptional<Project, AllMappedModels>,
-    AllMappedModels
-  >
+  Project: Omit<Project, 'agency' | 'organization' | 'originationPeriod'> & {
+    agency: ResolversParentTypes['Agency']
+    organization: ResolversParentTypes['Organization']
+    originationPeriod: ResolversParentTypes['ReportingPeriod']
+  }
   Query: {}
   Redwood: Redwood
   ReportingPeriod: MergePrismaWithSdlTypes<
@@ -1041,11 +1045,14 @@ export type ResolversParentTypes = {
     AllMappedModels
   >
   String: Scalars['String']
-  Subrecipient: MergePrismaWithSdlTypes<
-    PrismaSubrecipient,
-    MakeRelationsOptional<Subrecipient, AllMappedModels>,
-    AllMappedModels
-  >
+  Subrecipient: Omit<
+    Subrecipient,
+    'certifiedBy' | 'organization' | 'originationUpload'
+  > & {
+    certifiedBy: Maybe<ResolversParentTypes['User']>
+    organization: ResolversParentTypes['Organization']
+    originationUpload: ResolversParentTypes['Upload']
+  }
   Time: Scalars['Time']
   UpdateAgencyInput: UpdateAgencyInput
   UpdateExpenditureCategoryInput: UpdateExpenditureCategoryInput
@@ -2074,6 +2081,12 @@ export type QueryResolvers<
     ParentType,
     ContextType
   >
+  usersByOrganization: Resolver<
+    Array<ResolversTypes['User']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryusersByOrganizationArgs, 'organizationId'>
+  >
 }
 
 export type QueryRelationResolvers<
@@ -2222,6 +2235,12 @@ export type QueryRelationResolvers<
     Array<ResolversTypes['User']>,
     ParentType,
     ContextType
+  >
+  usersByOrganization?: RequiredResolverFn<
+    Array<ResolversTypes['User']>,
+    ParentType,
+    ContextType,
+    RequireFields<QueryusersByOrganizationArgs, 'organizationId'>
   >
 }
 
@@ -2910,6 +2929,11 @@ export type UserResolvers<
   >
   email: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>
   id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>
+  invalidated: OptArgsResolverFn<
+    Array<Maybe<ResolversTypes['UploadValidation']>>,
+    ParentType,
+    ContextType
+  >
   name: OptArgsResolverFn<
     Maybe<ResolversTypes['String']>,
     ParentType,
@@ -2937,6 +2961,16 @@ export type UserResolvers<
   >
   updatedAt: OptArgsResolverFn<
     ResolversTypes['DateTime'],
+    ParentType,
+    ContextType
+  >
+  uploaded: OptArgsResolverFn<
+    Array<Maybe<ResolversTypes['Upload']>>,
+    ParentType,
+    ContextType
+  >
+  validated: OptArgsResolverFn<
+    Array<Maybe<ResolversTypes['UploadValidation']>>,
     ParentType,
     ContextType
   >
@@ -2969,6 +3003,11 @@ export type UserRelationResolvers<
   >
   email?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>
   id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>
+  invalidated?: RequiredResolverFn<
+    Array<Maybe<ResolversTypes['UploadValidation']>>,
+    ParentType,
+    ContextType
+  >
   name?: RequiredResolverFn<
     Maybe<ResolversTypes['String']>,
     ParentType,
@@ -2996,6 +3035,16 @@ export type UserRelationResolvers<
   >
   updatedAt?: RequiredResolverFn<
     ResolversTypes['DateTime'],
+    ParentType,
+    ContextType
+  >
+  uploaded?: RequiredResolverFn<
+    Array<Maybe<ResolversTypes['Upload']>>,
+    ParentType,
+    ContextType
+  >
+  validated?: RequiredResolverFn<
+    Array<Maybe<ResolversTypes['UploadValidation']>>,
     ParentType,
     ContextType
   >
