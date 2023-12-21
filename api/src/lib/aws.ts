@@ -89,7 +89,7 @@ function getSQSClient() {
   return sqs
 }
 
-async function sendSqsMessage(queueUrl: string, messageBody: any) {
+async function sendSqsMessage(queueUrl: string, messageBody: unknown) {
   const sqs = getSQSClient()
   await sqs.send(
     new SendMessageCommand({
