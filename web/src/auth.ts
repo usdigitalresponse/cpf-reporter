@@ -1,3 +1,5 @@
+import { PassageUser } from '@passageidentity/passage-elements/passage-user'
+
 import { createAuthentication } from '@redwoodjs/auth'
 
 // If you're integrating with an auth service provider you should delete this interface.
@@ -29,28 +31,60 @@ export interface ValidateResetTokenResponse {
 }
 
 // Replace this with the auth service provider client sdk
-const client = {
-  login: () => ({
-    id: 'unique-user-id',
-    email: 'email@example.com',
-    roles: [],
-  }),
-  signup: () => ({
-    id: 'unique-user-id',
-    email: 'email@example.com',
-    roles: [],
-  }),
-  logout: () => {},
-  getToken: () => 'super-secret-short-lived-token',
-  getUserMetadata: () => ({
-    id: 'unique-user-id',
-    email: 'email@example.com',
-    roles: [],
-  }),
+// const client = {
+//   login: () => ({
+//     id: 'unique-user-id',
+//     email: 'email@example.com',
+//     roles: [],
+//   }),
+//   signup: () => ({
+//     id: 'unique-user-id',
+//     email: 'email@example.com',
+//     roles: [],
+//   }),
+//   logout: () => {},
+//   getToken: () => 'super-secret-short-lived-token',
+//   getUserMetadata: () => ({
+//     id: 'unique-user-id',
+//     email: 'email@example.com',
+//     roles: [],
+//   }),
+// }
+
+const passageUser = new PassageUser()
+
+const passageClient = {
+  logout: async () => {
+    return await passageUser.signOut()
+  },
+  getToken: async () => {
+    console.log('getAuthToken')
+    const token = await passageUser.getAuthToken()
+    return token
+  },
+  getUserMetadata: async () => {
+    console.log('passageUser.userInfo()')
+    console.log(await passageUser.userInfo())
+    return passageUser.userInfo()
+  },
+  login: (event) => {
+    console.log('unsure how to login with passage')
+    //return { id: 'unique-user-id', email: '', roles: [] }
+    console.log(`successfully authenticated. ${event}`)
+    console.log(event)
+    localStorage.setItem('psg_auth_token', event.auth_token)
+    // window.location.href = event.redirect_url
+  },
+  signup: () => {
+    console.log('unsure how to signup with passage')
+    return { id: 'unique-user-id', email: '', roles: [] }
+  },
 }
 
+console.log('passageUser', passageUser)
+
 function createAuth() {
-  const authImplementation = createAuthImplementation(client)
+  const authImplementation = createAuthImplementation(passageClient)
 
   // You can pass custom provider hooks here if you need to as a second
   // argument. See the Redwood framework source code for how that's used
@@ -65,10 +99,10 @@ function createAuthImplementation(client: AuthClient) {
   return {
     type: 'custom-auth',
     client,
-    login: async () => client.login(),
-    logout: async () => client.logout(),
+    login: async (e) => client.login(e),
+    logout: async () => await passageUser.signOut(),
     signup: async () => client.signup(),
-    getToken: async () => client.getToken(),
+    getToken: async () => await passageUser.getAuthToken(),
     /**
      * Actual user metadata might look something like this
      * {
@@ -85,7 +119,7 @@ function createAuthImplementation(client: AuthClient) {
      *   "updated_at": "2016-05-15T19:53:12.368652374-07:00"
      * }
      */
-    getUserMetadata: async () => client.getUserMetadata(),
+    getUserMetadata: async () => await client.getUserMetadata(),
   }
 }
 

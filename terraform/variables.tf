@@ -274,3 +274,11 @@ variable "website_feature_flags" {
     error_message = "Value must be JSON-serializable."
   }
 }
+
+// Passage Authentication (docs.passage.id)
+variable "passage_app_id" {
+  description = "Passage Application ID"
+  type        = string
+  default     = ""
+  sensitive   = true
+}
