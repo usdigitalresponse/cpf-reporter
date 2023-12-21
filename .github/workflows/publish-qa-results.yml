@@ -23,7 +23,7 @@ on:
         required: true
       pr-number:
         type: string
-        required: false
+        required: true
       write-summary:
         type: boolean
         default: true
@@ -101,19 +101,16 @@ jobs:
           echo "REPORT_CONTENT<<ENDOFREPORT" >> $GITHUB_OUTPUT
           echo "$CONTENT" >> $GITHUB_OUTPUT
           echo "ENDOFREPORT" >> $GITHUB_OUTPUT
-      - name: Warn on missing comment requirements
-        if: inputs.write-comment && inputs.pr-number == ''
-        run: "echo 'WARNING: Cannot write a comment because pr-number is not set'"
       - name: Find previous report comment
         id: find-comment
-        if: inputs.write-comment && inputs.pr-number != ''
+        if: inputs.write-comment
         uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2.4.0
         with:
           issue-number: ${{ inputs.pr-number }}
           comment-author: 'github-actions[bot]'
           body-includes: QA Summary
       - name: Create or update comment
-        if: inputs.write-comment && inputs.pr-number != ''
+        if: inputs.write-comment
         uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
