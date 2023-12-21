@@ -145,4 +145,4 @@ dist
 terraform/.terraform
 .tool-versions
 
-localstack/
+localstack/volume/
