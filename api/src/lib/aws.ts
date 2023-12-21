@@ -10,6 +10,9 @@ import {
   SQSClient,
 } from '@aws-sdk/client-sqs'
 import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { CreateUploadInput } from 'types/graphql'
+
+const CPF_REPORTER_BUCKET_NAME = 'cpf-reporter'
 
 function getS3Client() {
   let s3: S3Client
@@ -38,7 +41,16 @@ function getS3Client() {
   return s3
 }
 
-export async function sendPutObjectToS3Bucket(
+export function uploadWorkbook(
+  upload: CreateUploadInput,
+  uploadId: number,
+  body: any
+) {
+  const folderName = `${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/uploads/${upload.expenditureCategoryId}/${uploadId}/${upload.filename}`
+  return sendPutObjectToS3Bucket(CPF_REPORTER_BUCKET_NAME, folderName, body)
+}
+
+async function sendPutObjectToS3Bucket(
   bucketName: string,
   key: string,
   body: any

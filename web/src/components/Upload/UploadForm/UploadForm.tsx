@@ -6,7 +6,7 @@ import {
   Form,
   FileField,
   SelectField,
-  HiddenField,
+  // HiddenField,
   FormError,
   FieldError,
   Label,
@@ -15,11 +15,11 @@ import {
 } from '@redwoodjs/forms'
 import type { RWGqlError } from '@redwoodjs/forms'
 
-type FormUpload = NonNullable<EditUploadById['upload']>
+// type FormUpload = NonNullable<EditUploadById['upload']>
 
 interface UploadFormProps {
   upload?: EditUploadById['upload']
-  onSave: (data: UpdateUploadInput, id?: FormUpload['id']) => void
+  onSave: (data: UpdateUploadInput) => void
   error: RWGqlError
   loading: boolean
 }
@@ -31,8 +31,16 @@ const UploadForm = (props: UploadFormProps) => {
     data.filename = data.file[0].name
     data.agencyId = parseInt(data.agencyId)
     data.reportingPeriodId = parseInt(data.reportingPeriodId)
-    console.log(data)
-    props.onSave({ filename: data.file[0].name }, props?.upload?.id)
+    // console.log(data)
+
+    props.onSave({
+      uploadedById: 1,
+      agencyId: 1,
+      filename: data.file[0].name,
+      organizationId: 1,
+      reportingPeriodId: data.reportingPeriodId,
+      expenditureCategoryId: 1,
+    })
   }
 
   const onReset = () => {

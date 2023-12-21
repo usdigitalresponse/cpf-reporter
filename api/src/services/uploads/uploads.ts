@@ -4,9 +4,8 @@ import type {
   UploadRelationResolvers,
 } from 'types/graphql'
 
+import { uploadWorkbook } from 'src/lib/aws'
 import { db } from 'src/lib/db'
-import { validateUpload } from 'src/lib/validate-upload'
-
 export const uploads: QueryResolvers['uploads'] = () => {
   return db.upload.findMany()
 }
@@ -17,11 +16,18 @@ export const upload: QueryResolvers['upload'] = ({ id }) => {
   })
 }
 
-export const createUpload: MutationResolvers['createUpload'] = ({ input }) => {
-  validateUpload(input, context.currentUser)
-  return db.upload.create({
+export const createUpload: MutationResolvers['createUpload'] = async ({
+  input,
+}) => {
+  // validateUpload(input, context.currentUser)
+  const upload = await db.upload.create({
     data: input,
   })
+  console.log('input', input)
+  console.log('upload', upload)
+  await uploadWorkbook(upload, upload.id, 'Hello World')
+
+  return upload
 }
 
 export const updateUpload: MutationResolvers['updateUpload'] = ({
