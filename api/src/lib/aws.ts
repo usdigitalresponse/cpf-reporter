@@ -133,3 +133,11 @@ async function receiveSqsMessage(queueUrl: string) {
     })
   )
 }
+
+export default {
+  sendPutObjectToS3Bucket,
+  sendHeadObjectToS3Bucket,
+  getSignedUrl,
+  sendSqsMessage,
+  receiveSqsMessage,
+}

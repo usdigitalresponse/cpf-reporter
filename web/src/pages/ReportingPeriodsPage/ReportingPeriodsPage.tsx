@@ -7,7 +7,7 @@ const ReportingPeriodsPage = () => {
     <>
       <MetaTags title="ReportingPeriods" description="ReportingPeriods page" />
 
-      <h1>Reporting Periods</h1>
+      <h2>Reporting Periods</h2>
       <ReportingPeriodsCell />
     </>
   )

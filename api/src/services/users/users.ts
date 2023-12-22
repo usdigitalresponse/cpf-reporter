@@ -35,6 +35,20 @@ export const deleteUser: MutationResolvers['deleteUser'] = ({ id }) => {
   })
 }
 
+export const usersByOrganization: QueryResolvers['usersByOrganization'] =
+  async ({ organizationId }) => {
+    try {
+      const users = await db.user.findMany({
+        where: { organizationId },
+      })
+      return users || [] // Return an empty array if null is received
+    } catch (error) {
+      console.error(error)
+      // Handle the error appropriately; maybe log it and return an empty array
+      return []
+    }
+  }
+
 export const User: UserRelationResolvers = {
   agency: (_obj, { root }) => {
     return db.user.findUnique({ where: { id: root?.id } }).agency()
@@ -47,5 +61,14 @@ export const User: UserRelationResolvers = {
   },
   certified: (_obj, { root }) => {
     return db.user.findUnique({ where: { id: root?.id } }).certified()
+  },
+  uploaded: (_obj, { root }) => {
+    return db.user.findUnique({ where: { id: root?.id } }).uploaded()
+  },
+  validated: (_obj, { root }) => {
+    return db.user.findUnique({ where: { id: root?.id } }).validated()
+  },
+  invalidated: (_obj, { root }) => {
+    return db.user.findUnique({ where: { id: root?.id } }).invalidated()
   },
 }

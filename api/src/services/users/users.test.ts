@@ -27,13 +27,13 @@ describe('users', () => {
       input: {
         email: 'String',
         organizationId: scenario.user.two.organizationId,
-        updatedAt: '2023-12-07T18:20:20.664Z',
+        updatedAt: '2023-12-10T00:37:26.029Z',
       },
     })
 
     expect(result.email).toEqual('String')
     expect(result.organizationId).toEqual(scenario.user.two.organizationId)
-    expect(result.updatedAt).toEqual(new Date('2023-12-07T18:20:20.664Z'))
+    expect(result.updatedAt).toEqual(new Date('2023-12-10T00:37:26.029Z'))
   })
 
   scenario('updates a user', async (scenario: StandardScenario) => {
