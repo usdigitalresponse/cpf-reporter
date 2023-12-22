@@ -96,6 +96,7 @@ export type CreateUploadInput = {
   agencyId: Scalars['Int'];
   expenditureCategoryId: Scalars['Int'];
   filename: Scalars['String'];
+  notes?: InputMaybe<Scalars['String']>;
   organizationId: Scalars['Int'];
   reportingPeriodId: Scalars['Int'];
   uploadedById: Scalars['Int'];
@@ -670,6 +671,7 @@ export type UpdateUploadInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   expenditureCategoryId?: InputMaybe<Scalars['Int']>;
   filename?: InputMaybe<Scalars['String']>;
+  notes?: InputMaybe<Scalars['String']>;
   organizationId?: InputMaybe<Scalars['Int']>;
   reportingPeriodId?: InputMaybe<Scalars['Int']>;
   uploadedById?: InputMaybe<Scalars['Int']>;
@@ -704,6 +706,7 @@ export type Upload = {
   expenditureCategoryId: Scalars['Int'];
   filename: Scalars['String'];
   id: Scalars['Int'];
+  notes?: Maybe<Scalars['String']>;
   organization: Organization;
   organizationId: Scalars['Int'];
   reportingPeriod: ReportingPeriod;

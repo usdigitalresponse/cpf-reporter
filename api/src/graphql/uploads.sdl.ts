@@ -2,6 +2,7 @@ export const schema = gql`
   type Upload {
     id: Int!
     filename: String!
+    notes: String
     uploadedById: Int!
     uploadedBy: User!
     agencyId: Int!
@@ -24,6 +25,7 @@ export const schema = gql`
 
   input CreateUploadInput {
     filename: String!
+    notes: String
     uploadedById: Int!
     agencyId: Int!
     organizationId: Int!
@@ -33,6 +35,7 @@ export const schema = gql`
 
   input UpdateUploadInput {
     filename: String
+    notes: String
     uploadedById: Int
     agencyId: Int
     organizationId: Int

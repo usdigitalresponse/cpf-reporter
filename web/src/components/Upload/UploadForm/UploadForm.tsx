@@ -36,6 +36,7 @@ const UploadForm = (props: UploadFormProps) => {
     props.onSave({
       uploadedById: 1,
       agencyId: 1,
+      notes: data.notes,
       filename: data.file[0].name,
       organizationId: 1,
       reportingPeriodId: data.reportingPeriodId,
