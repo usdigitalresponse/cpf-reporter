@@ -3,7 +3,6 @@
 import fs from 'fs/promises'
 import path from 'path'
 
-import Cryo from 'cryo'
 import tracer from 'dd-trace'
 import _ from 'lodash'
 
