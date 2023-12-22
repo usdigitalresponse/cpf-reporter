@@ -1,7 +1,7 @@
 import { _ } from 'lodash'
 
 // FIXME: we need to bring this JSON in.
-// const srcRules = require('src/lib/templateRules.json')
+import srcRules from './templateRules'
 
 const recordValueFormatters = {
   makeString: (val) => String(val),
@@ -119,7 +119,7 @@ const dropdownCorrections = {
 
 function generateRules() {
   // FIXME: this is supposed to be the contents of templateRules.json
-  const rules = {}
+  const rules = srcRules
 
   // subrecipient EIN is actually a length-10 string
   rules.subrecipient.EIN__c.dataType = 'String'
