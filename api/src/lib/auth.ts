@@ -1,3 +1,8 @@
+import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+} from '@aws-sdk/client-secrets-manager'
+
 import { Decoded } from '@redwoodjs/api'
 import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
 
@@ -118,4 +123,34 @@ export const requireAuth = ({ roles }: { roles?: AllowedRoles } = {}) => {
   if (roles && !hasRole(roles)) {
     throw new ForbiddenError("You don't have access to do that.")
   }
+}
+
+/**
+ * Gets the Passage API key to use for authenticating Passage SDK calls.
+ *
+ * @param setEnv - If true, caches the Passage API key to $PASSAGE_API_KEY environment variable.
+ * @param force - If true, forces retrieval of the Passage API key from AWS Secrets Manager,
+ *  even if the $PASSAGE_API_KEY environment variable is already set.
+ *
+ * @returns The Passage API key
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function getPassageAPIKey(setEnv = true, force = false): Promise<string> {
+  if (process.env.PASSAGE_API_KEY && !force) {
+    // API key is already cached in env var
+    return process.env.PASSAGE_API_KEY
+  }
+
+  const client = new SecretsManagerClient()
+  const resp = await client.send(
+    new GetSecretValueCommand({
+      SecretId: process.env.PASSAGE_API_KEY_SECRET_ARN,
+    })
+  )
+
+  if (setEnv) {
+    process.env.PASSAGE_API_KEY = resp.SecretString
+  }
+
+  return resp.SecretString
 }
