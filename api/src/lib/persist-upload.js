@@ -216,7 +216,7 @@ async function persistJson(upload, workbook) {
     try {
       const filename = jsonFSName(upload)
       await fs.mkdir(path.dirname(filename), { recursive: true })
-      await fs.writeFile(filename, Cryo.stringify(workbook), { flag: 'w' })
+      await fs.writeFile(filename, JSON.stringify(workbook), { flag: 'w' })
     } catch (e) {
       throw new ValidationError(
         `Cannot persist ${upload.filename} to filesystem: ${e}`
@@ -251,7 +251,7 @@ async function jsonForUpload(upload) {
       span.setTag('reporting-period-id', upload.reporting_period_id)
       return f
     })
-    return tracer.trace('Cryo.parse', () => Cryo.parse(file))
+    return tracer.trace('JSON.parse', () => JSON.parse(file))
   })
 }
 
