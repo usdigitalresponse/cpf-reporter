@@ -130,7 +130,11 @@ export const requireAuth = ({ roles }: { roles?: AllowedRoles } = {}) => {
  *
  * @param setEnv - If true, caches the Passage API key to $PASSAGE_API_KEY environment variable.
  * @param force - If true, forces retrieval of the Passage API key from AWS Secrets Manager,
- *  even if the $PASSAGE_API_KEY environment variable is already set.
+ *  even if the $PASSAGE_API_KEY environment variable is already set. This can be useful when
+ *  the secret API key value has changed (e.g. due to rotation). If the value returned by this
+ *  function is rejected by a subsequent Passage API operation, it may be worth calling this function
+ *  once more with `force = true` to attempt to retrieve a more recent, valid key, instead of
+ *  failing immediately.
  *
  * @returns The Passage API key
  */
