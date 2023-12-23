@@ -1,5 +1,7 @@
 import {
   GetObjectCommand,
+  HeadObjectCommand,
+  HeadObjectCommandInput,
   PutObjectCommand,
   PutObjectCommandInput,
   S3Client,
@@ -80,14 +82,20 @@ async function sendPutObjectToS3Bucket(
   await s3.send(new PutObjectCommand(uploadParams))
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function getTemplateRules(inputTemplateId: number) {
+  return sendHeadObjectToS3Bucket(
+    CPF_REPORTER_BUCKET_NAME,
+    `templates/input_templates/${inputTemplateId}/rules/`
+  )
+}
+
 async function sendHeadObjectToS3Bucket(bucketName: string, key: string) {
   const s3 = getS3Client()
-  const uploadParams: PutObjectCommandInput = {
+  const uploadParams: HeadObjectCommandInput = {
     Bucket: bucketName,
     Key: key,
   }
-  await s3.send(new PutObjectCommand(uploadParams))
+  await s3.send(new HeadObjectCommand(uploadParams))
 }
 
 export async function s3PutSignedUrl(
