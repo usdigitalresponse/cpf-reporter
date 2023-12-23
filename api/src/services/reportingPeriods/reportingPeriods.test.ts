@@ -46,7 +46,7 @@ describe('reportingPeriods', () => {
         endDate: '2023-12-07T18:38:12.341Z',
         inputTemplateId: scenario.reportingPeriod.two.inputTemplateId,
         outputTemplateId: scenario.reportingPeriod.two.outputTemplateId,
-        updatedAt: '2023-12-07T18:38:12.341Z',
+        isCurrentPeriod: true,
       },
     })
 
