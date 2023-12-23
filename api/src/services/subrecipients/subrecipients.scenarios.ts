@@ -46,6 +46,7 @@ export const standard = defineScenario<Prisma.SubrecipientCreateArgs>({
                     updatedAt: '2023-12-09T14:50:18.317Z',
                   },
                 },
+                organization: { create: { name: 'String' } },
               },
             },
             expenditureCategory: {
@@ -100,6 +101,9 @@ export const standard = defineScenario<Prisma.SubrecipientCreateArgs>({
                     effectiveDate: '2023-12-09T14:50:18.317Z',
                     updatedAt: '2023-12-09T14:50:18.317Z',
                   },
+                },
+                organization: {
+                  create: { name: 'String' },
                 },
               },
             },

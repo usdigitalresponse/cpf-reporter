@@ -18,7 +18,13 @@ export const schema = gql`
 
   type Query {
     reportingPeriods: [ReportingPeriod!]! @requireAuth
+    reportingPeriodsByOrg(organizationId: Int!): [ReportingPeriod!]!
+      @requireAuth
     reportingPeriod(id: Int!): ReportingPeriod @requireAuth
+    previousReportingPeriods(
+      id: Int!
+      organizationId: Int!
+    ): [ReportingPeriod!]! @requireAuth
   }
 
   input CreateReportingPeriodInput {
