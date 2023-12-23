@@ -13,7 +13,7 @@ import { reportingPeriod as getReportingPeriod } from 'src/services/reportingPer
 import { createUpload } from 'src/services/uploads'
 import { user as getUser } from 'src/services/users'
 
-const XLSX = require('xlsx')
+const ExcelJS = require('exceljs')
 
 /**
  * Get the path to the upload file for the given upload
@@ -48,7 +48,7 @@ const jsonFSName = (upload) => {
  */
 async function validateBuffer(buffer) {
   try {
-    await XLSX.read(buffer, { type: 'buffer' })
+    await new ExcelJS.Workbook().xlsx.load(buffer)
   } catch (e) {
     throw new ValidationError(`Cannot parse XLSX from supplied data: ${e}`)
   }
@@ -262,6 +262,8 @@ async function jsonForUpload(upload) {
  * This function abstracts XLSX.read, and incorporates a local disk cache to
  * avoid running the parse operation more than once per upload.
  *
+ * TODO: we use ExcelJS now, so investigate whether we still need this cache
+ *
  * @param {*} upload DB upload content
  * @param {XLSX.ParsingOptions} options The options object that will be passed to XLSX.read
  * @return {XLSX.Workbook}s The uploaded workbook, as parsed by XLSX.read.
@@ -281,8 +283,11 @@ async function workbookForUpload(upload, options) {
       const buffer = await bufferForUpload(upload)
 
       // NOTE: This is the slow line!
-      logger.info(`XLSX.read(${upload.id})`)
-      workbook = tracer.trace('XLSX.read()', () => XLSX.read(buffer, options))
+      logger.info(`ExcelJS.load(${upload.id})`)
+      workbook = new ExcelJS.Workbook()
+      workbook = tracer.trace('ExcelJS.load()', () =>
+        workbook.xlsx.load(buffer, options)
+      )
 
       persistJson(upload, workbook)
     }

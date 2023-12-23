@@ -1,5 +1,5 @@
+import { ExcelJS } from 'exceljs'
 import { merge } from 'lodash'
-import { XLSX } from 'xlsx'
 
 import { logger } from 'src/lib/logger'
 import { workbookForUpload } from 'src/lib/persist-upload'
@@ -36,10 +36,11 @@ function readVersionRecord(workbook) {
     e: { r: 0, c: 1 },
   }
 
-  const [row] = XLSX.utils.sheet_to_json(workbook.Sheets[LOGIC_SHEET], {
-    header: 1,
-    range,
-  })
+  // TODO: make this work with ExcelJS
+  const [row] = [1.0] // XLSX.utils.sheet_to_json(workbook.Sheets[LOGIC_SHEET], {
+  //   header: 1,
+  //   range,
+  // })
 
   return {
     version: row[0],
@@ -52,7 +53,8 @@ function readVersionRecord(workbook) {
  *
  * @param {object} upload The upload to read
  * @returns {Promise<object[]>}
- */
+ *
+ * TODO: make this work with ExcelJS
 async function loadRecordsForUpload(upload) {
   logger.info(`loadRecordsForUpload(${upload.id})`)
 
@@ -169,6 +171,7 @@ async function loadRecordsForUpload(upload) {
 
   return records
 }
+*/
 
 /**
  * Wraps loadRecordsForUpload with per-request memoization. This ensures that

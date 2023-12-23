@@ -14,6 +14,6 @@
     "@redwoodjs/api": "6.4.2",
     "@redwoodjs/graphql-server": "6.4.2",
     "dd-trace": "^4.20.0",
-    "xlsx": "^0.18.5"
+    "exceljs": "^4.4.0"
   }
 }
