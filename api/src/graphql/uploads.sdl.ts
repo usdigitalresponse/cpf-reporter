@@ -16,6 +16,7 @@ export const schema = gql`
     createdAt: DateTime!
     updatedAt: DateTime!
     validations: [UploadValidation]!
+    signedUrl: String
   }
 
   type Query {

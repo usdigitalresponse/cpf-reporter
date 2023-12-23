@@ -711,6 +711,7 @@ export type Upload = {
   organizationId: Scalars['Int'];
   reportingPeriod: ReportingPeriod;
   reportingPeriodId: Scalars['Int'];
+  signedUrl?: Maybe<Scalars['String']>;
   updatedAt: Scalars['DateTime'];
   uploadedBy: User;
   uploadedById: Scalars['Int'];
@@ -875,7 +876,7 @@ export type CreateUploadMutationVariables = Exact<{
 }>;
 
 
-export type CreateUploadMutation = { __typename?: 'Mutation', createUpload: { __typename?: 'Upload', id: number } };
+export type CreateUploadMutation = { __typename?: 'Mutation', createUpload: { __typename?: 'Upload', id: number, signedUrl?: string | null } };
 
 export type DeleteUploadMutationVariables = Exact<{
   id: Scalars['Int'];

@@ -31,19 +31,19 @@ export interface ValidateResetTokenResponse {
 // Replace this with the auth service provider client sdk
 const client = {
   login: () => ({
-    id: 'unique-user-id',
+    id: 1,
     email: 'email@example.com',
     roles: [],
   }),
   signup: () => ({
-    id: 'unique-user-id',
+    id: 1,
     email: 'email@example.com',
     roles: [],
   }),
   logout: () => {},
   getToken: () => 'super-secret-short-lived-token',
   getUserMetadata: () => ({
-    id: 'unique-user-id',
+    id: 1,
     email: 'email@example.com',
     roles: [],
   }),

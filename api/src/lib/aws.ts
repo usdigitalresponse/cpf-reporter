@@ -10,7 +10,7 @@ import {
   SQSClient,
 } from '@aws-sdk/client-sqs'
 import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
-import { CreateUploadInput } from 'types/graphql'
+import { QueryResolvers, CreateUploadInput } from 'types/graphql'
 
 const CPF_REPORTER_BUCKET_NAME = 'cpf-reporter'
 
@@ -20,10 +20,25 @@ function getS3Client() {
     /*
         1. Make sure the local environment has awslocal installed.
         2. Use the commands to create a bucket to test with.
-            - awslocal s3api create-bucket --bucket arpa-audit-reports --region us-west-2 --create-bucket-configuration '{"LocationConstraint": "us-west-2"}'
+            - awslocal s3api create-bucket --bucket cpf-reporter --region us-west-2 --create-bucket-configuration '{"LocationConstraint": "us-west-2"}'
         3. Access bucket resource metadata through the following URL.
             - awslocal s3api list-buckets
-            - awslocal s3api list-objects --bucket arpa-audit-reports
+            - awslocal s3api list-objects --bucket cpf-reporter
+        4. Configure cors to allow uploads via signed URLs
+
+        ===== cors-config.json =====
+        {
+          "CORSRules": [
+            {
+              "AllowedHeaders": ["*"],
+              "AllowedMethods": ["GET", "POST", "PUT"],
+              "AllowedOrigins": ["http://localhost:8910"],
+              "ExposeHeaders": ["ETag"]
+            }
+          ]
+        }
+
+            - awslocal s3api put-bucket-cors --bucket cpf-reporter --cors-configuration file://cors-config.json
     */
     console.log('------------ USING LOCALSTACK ------------')
     const endpoint = `http://${process.env.LOCALSTACK_HOSTNAME}:${
@@ -75,6 +90,23 @@ async function sendHeadObjectToS3Bucket(bucketName: string, key: string) {
   await s3.send(new PutObjectCommand(uploadParams))
 }
 
+export async function s3PutSignedUrl(
+  upload: CreateUploadInput,
+  uploadId: number
+): Promise<string> {
+  const s3 = getS3Client()
+  const key = `${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/uploads/${upload.expenditureCategoryId}/${uploadId}/${upload.filename}`
+  const baseParams: PutObjectCommandInput = {
+    Bucket: CPF_REPORTER_BUCKET_NAME,
+    Key: key,
+    ContentType:
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  }
+  const url = await awsGetSignedUrl(s3, new PutObjectCommand(baseParams), {
+    expiresIn: 60,
+  })
+  return url
+}
 /**
  *  This function is a wrapper around the getSignedUrl function from the @aws-sdk/s3-request-presigner package.
  *  Exists to organize the imports and to make it easier to mock in tests.
@@ -132,6 +164,13 @@ async function receiveSqsMessage(queueUrl: string) {
       MaxNumberOfMessages: 1,
     })
   )
+}
+
+export const s3PutObjectSignedUrl: QueryResolvers['s3PutObjectSignedUrl'] = ({
+  upload,
+  uploadId,
+}) => {
+  return s3PutSignedUrl(upload, uploadId)
 }
 
 export default {

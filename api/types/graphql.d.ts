@@ -729,6 +729,7 @@ export type Upload = {
   organizationId: Scalars['Int'];
   reportingPeriod: ReportingPeriod;
   reportingPeriodId: Scalars['Int'];
+  signedUrl?: Maybe<Scalars['String']>;
   updatedAt: Scalars['DateTime'];
   uploadedBy: User;
   uploadedById: Scalars['Int'];
@@ -1366,6 +1367,7 @@ export type UploadResolvers<ContextType = RedwoodGraphQLContext, ParentType exte
   organizationId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   reportingPeriod: OptArgsResolverFn<ResolversTypes['ReportingPeriod'], ParentType, ContextType>;
   reportingPeriodId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  signedUrl: OptArgsResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   updatedAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   uploadedBy: OptArgsResolverFn<ResolversTypes['User'], ParentType, ContextType>;
   uploadedById: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
@@ -1386,6 +1388,7 @@ export type UploadRelationResolvers<ContextType = RedwoodGraphQLContext, ParentT
   organizationId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   reportingPeriod?: RequiredResolverFn<ResolversTypes['ReportingPeriod'], ParentType, ContextType>;
   reportingPeriodId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  signedUrl?: RequiredResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   updatedAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   uploadedBy?: RequiredResolverFn<ResolversTypes['User'], ParentType, ContextType>;
   uploadedById?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;

@@ -1,6 +1,6 @@
 import { Button } from 'react-bootstrap'
 import { useForm } from 'react-hook-form'
-import type { EditUploadById, UpdateUploadInput } from 'types/graphql'
+import type { EditUploadById } from 'types/graphql'
 
 import {
   Form,
@@ -14,12 +14,22 @@ import {
   TextAreaField,
 } from '@redwoodjs/forms'
 import type { RWGqlError } from '@redwoodjs/forms'
+import { navigate, routes } from '@redwoodjs/router'
+import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
 
+const CREATE_UPLOAD = gql`
+  mutation CreateUploadMutation($input: CreateUploadInput!) {
+    createUpload(input: $input) {
+      id
+      signedUrl
+    }
+  }
+`
 // type FormUpload = NonNullable<EditUploadById['upload']>
 
 interface UploadFormProps {
   upload?: EditUploadById['upload']
-  onSave: (data: UpdateUploadInput) => void
   error: RWGqlError
   loading: boolean
 }
@@ -27,13 +37,25 @@ interface UploadFormProps {
 const UploadForm = (props: UploadFormProps) => {
   const formMethods = useForm()
 
-  const onSubmit = (data) => {
+  const [create] = useMutation<
+    CreateUploadMutation,
+    CreateUploadMutationVariables
+  >(CREATE_UPLOAD, {
+    onCompleted: () => {
+      toast.success('Upload created')
+      navigate(routes.uploads())
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+
+  const onSubmit = async (data) => {
     data.filename = data.file[0].name
     data.agencyId = parseInt(data.agencyId)
     data.reportingPeriodId = parseInt(data.reportingPeriodId)
-    // console.log(data)
 
-    props.onSave({
+    const uploadInput = {
       uploadedById: 1,
       agencyId: 1,
       notes: data.notes,
@@ -41,7 +63,28 @@ const UploadForm = (props: UploadFormProps) => {
       organizationId: 1,
       reportingPeriodId: data.reportingPeriodId,
       expenditureCategoryId: 1,
+    }
+    const res = await create({ variables: { input: uploadInput } })
+    const formData = new FormData()
+    formData.append('file', data.file[0])
+    fetch(res.data?.createUpload?.signedUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': data.file[0].type,
+      },
+      body: formData,
     })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`)
+        }
+      })
+      .then((responseData) => {
+        console.log('File upload successful. Response:', responseData)
+      })
+      .catch((error) => {
+        console.error('Error uploading file:', error)
+      })
   }
 
   const onReset = () => {
