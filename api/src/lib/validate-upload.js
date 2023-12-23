@@ -190,7 +190,7 @@ function validateIdentifier(recipient, recipientExists) {
 function recipientBelongsToUpload(existingRecipient, upload) {
   return (
     Boolean(existingRecipient) &&
-    existingRecipient.upload_id === upload.id &&
+    existingRecipient.upload_id === upload?.id &&
     !existingRecipient.updated_at
   )
 }
@@ -222,7 +222,7 @@ async function updateOrCreateRecipient(
         id: newRecipient.Unique_Entity_Identifier__c,
         tin: newRecipient.EIN__c,
         record: newRecipient,
-        originationUploadId: upload.id,
+        originationUploadId: upload?.id,
       },
       trns
     )
