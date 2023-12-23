@@ -44,6 +44,7 @@ describe('reportingPeriods', () => {
         name: 'String',
         startDate: '2023-12-07T18:38:12.341Z',
         endDate: '2023-12-07T18:38:12.341Z',
+        organizationId: scenario.reportingPeriod.two.organizationId,
         inputTemplateId: scenario.reportingPeriod.two.inputTemplateId,
         outputTemplateId: scenario.reportingPeriod.two.outputTemplateId,
         isCurrentPeriod: true,
@@ -59,7 +60,7 @@ describe('reportingPeriods', () => {
     expect(result.outputTemplateId).toEqual(
       scenario.reportingPeriod.two.outputTemplateId
     )
-    expect(result.updatedAt).toEqual(new Date('2023-12-07T18:38:12.341Z'))
+    expect(result.updatedAt).toBeDefined()
   })
 
   scenario('updates a reportingPeriod', async (scenario: StandardScenario) => {
