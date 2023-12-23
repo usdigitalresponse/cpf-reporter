@@ -1,13 +1,13 @@
-import { ExcelJS } from 'exceljs'
-import { merge } from 'lodash'
+// import { ExcelJS } from 'exceljs'
+// import { merge } from 'lodash'
 
 import { logger } from 'src/lib/logger'
-import { workbookForUpload } from 'src/lib/persist-upload'
-import { getRules } from 'src/lib/validation-rules'
+// import { workbookForUpload } from 'src/lib/persist-upload'
+// import { getRules } from 'src/lib/validation-rules'
 
-const CERTIFICATION_SHEET = 'Certification'
-const COVER_SHEET = 'Cover'
-const LOGIC_SHEET = 'Logic'
+// const CERTIFICATION_SHEET = 'Certification'
+// const COVER_SHEET = 'Cover'
+// const LOGIC_SHEET = 'Logic'
 
 const EC_SHEET_TYPES = {
   'EC 1 - Public Health': 'ec1',
@@ -30,11 +30,11 @@ const TYPE_TO_SHEET_NAME = Object.fromEntries(
   Object.entries(DATA_SHEET_TYPES).map(([sheetName, type]) => [type, sheetName])
 )
 
-function readVersionRecord(workbook) {
-  const range = {
-    s: { r: 0, c: 1 },
-    e: { r: 0, c: 1 },
-  }
+function readVersionRecord(_workbook) {
+  // const range = {
+  //   s: { r: 0, c: 1 },
+  //   e: { r: 0, c: 1 },
+  // }
 
   // TODO: make this work with ExcelJS
   const [row] = [1.0] // XLSX.utils.sheet_to_json(workbook.Sheets[LOGIC_SHEET], {
@@ -205,7 +205,7 @@ async function recordsForUpload(upload, req = null) {
   }
 
   logger.info(`recordsForUpload(${upload.id}): reading from disk`)
-  const recordPromise = loadRecordsForUpload(upload)
+  const recordPromise = [] // loadRecordsForUpload(upload)
 
   // By caching the promise, we ensure that parallel fetches won't start a new
   // filesystem read, even if the first read hasn't resolved yet.
