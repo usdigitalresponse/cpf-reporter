@@ -11,7 +11,7 @@ datasource db {
 
 model Agency {
   id                Int                @id @default(autoincrement())
-  name              String
+  name              String             @unique
   abbreviation      String?
   code              String
   organization      Organization?      @relation(fields: [organizationId], references: [id])
@@ -26,7 +26,7 @@ model Organization {
   id                Int                 @id @default(autoincrement())
   agencies          Agency[]
   users             User[]
-  name              String
+  name              String              @unique
   reportingPeriods  ReportingPeriod[]
   uploads           Upload[]
   uploadValidations UploadValidation[]
@@ -55,9 +55,9 @@ model User {
 
 model Role {
   id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime
+  name      String   @unique
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
   users     User[]
 }
 
@@ -107,7 +107,7 @@ model ReportingPeriod {
 
 model ExpenditureCategory {
   id        Int      @id @default(autoincrement())
-  name      String
+  name      String   @unique
   code      String
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @default(now()) @db.Timestamptz(6)
