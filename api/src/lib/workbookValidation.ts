@@ -1,6 +1,58 @@
+import projectUseCodes from 'src/lib/projectUseCodes'
 import { ValidationError } from 'src/lib/validation-error'
 
-export async function validateVersion({
+export function validateProjectUseCode({ records }) {
+  const coverRecord = records.find((record) => record?.type === 'cover')
+  if (!coverRecord) {
+    return new ValidationError(`Upload is missing Cover record`, {
+      tab: 'cover',
+      row: 1,
+      col: 'A',
+      severity: 'warn',
+    })
+  }
+  const coverSheet = coverRecord?.content
+  if (!coverSheet) {
+    return new ValidationError(`Cover record is missing "content"`, {
+      tab: 'cover',
+      row: 2,
+      col: 'A',
+      severity: 'warn',
+    })
+  }
+
+  const codeString = coverSheet['Project Use Code']
+
+  if (!codeString) {
+    return new ValidationError('Project Use Code must be set', {
+      tab: 'cover',
+      row: 2,
+      col: 'A',
+    })
+  }
+
+  const codeParts = codeString.split('-')
+  const code = codeParts[0]
+
+  if (!projectUseCodes[code]) {
+    return new ValidationError(
+      `Record Project Use Code (${code}) from entry (${codeString}) does not match any known Project Use Code`,
+      {
+        tab: 'cover',
+        row: 2,
+        col: 'A',
+        severity: 'err',
+      }
+    )
+  }
+
+  // TODO EC Code validation in ARPA caused a database update,
+  //  even if we want to do that for CPF it probably shouldn't happen as part of validation
+
+  return undefined
+}
+
+export function validateVersion({
   records,
   rules,
 }: {
@@ -24,6 +76,7 @@ export async function validateVersion({
       severity: 'warn',
     })
   }
+  // console.log(logicRecord)
   const { version } = logicRecord.content
 
   const versionRule = rules.logic.version
