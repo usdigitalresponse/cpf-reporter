@@ -8,7 +8,7 @@ import NewOrganizationForm from 'src/components/Organization/NewOrganizationForm
 
 const CREATE_ORGANIZATION_AGENCY_ADMIN_MUTATION = gql`
   mutation CreateOrgAgencyAdminMutation($input: CreateOrgAgencyAdminInput!) {
-    createOrgAgencyAdmin(input: $input) {
+    createOrganizationAgencyAdmin(input: $input) {
       organization {
         id
       }
@@ -37,7 +37,7 @@ const NewOrganization = () => {
   return (
     <div className="rw-segment">
       <header className="rw-segment-header">
-        <h2 className="rw-heading rw-heading-secondary">Organization</h2>
+        <h2 className="rw-heading rw-heading-secondary">Add Organization</h2>
       </header>
       <div className="rw-segment-main">
         <NewOrganizationForm onSave={onSave} loading={loading} error={error} />

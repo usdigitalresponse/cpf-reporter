@@ -1,6 +1,6 @@
 import { Button } from 'react-bootstrap'
 import { useForm, UseFormReturn } from 'react-hook-form'
-import type { EditOrganizationById } from 'types/graphql'
+import type { CreateOrgAgencyAdminInput } from 'types/graphql'
 
 import {
   Form,
@@ -12,20 +12,17 @@ import {
 } from '@redwoodjs/forms'
 import type { RWGqlError } from '@redwoodjs/forms'
 
-type FormOrganization = NonNullable<EditOrganizationById['organization']>
-
-interface AddOrganizationFormProps {
-  organization?: EditOrganizationById['organization']
-  onSave: (data: any, id?: FormOrganization['id']) => void
+interface NewOrganizationFormProps {
+  onSave: (data: CreateOrgAgencyAdminInput) => void
   error: RWGqlError
   loading: boolean
 }
 
 /* 
-  This form creates a new organization, a new agency assigned to that organization, 
-  and a new admin user assigned to that agency.
+  This form creates a new organization, assigns a new agency to that organization, 
+  and assigns a new admin user to both the organization and the agency.
 */
-const NewOrganizationForm = (props: AddOrganizationFormProps) => {
+const NewOrganizationForm = (props: NewOrganizationFormProps) => {
   const { onSave, error, loading } = props
   const formMethods: UseFormReturn = useForm()
   const hasErrors = Object.keys(formMethods.formState.errors).length > 0

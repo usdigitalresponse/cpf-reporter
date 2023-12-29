@@ -17,14 +17,14 @@ import type { RWGqlError } from '@redwoodjs/forms'
 
 type FormOrganization = NonNullable<EditOrganizationById['organization']>
 
-interface OrganizationFormProps {
+interface EditOrganizationFormProps {
   organization?: EditOrganizationById['organization']
   onSave: (data: UpdateOrganizationInput, id?: FormOrganization['id']) => void
   error: RWGqlError
   loading: boolean
 }
 
-const OrganizationForm = (props: OrganizationFormProps) => {
+const EditOrganizationForm = (props: EditOrganizationFormProps) => {
   const { organization, error, loading } = props
   const formMethods: UseFormReturn<FormOrganization> =
     useForm<FormOrganization>()
@@ -98,4 +98,4 @@ const OrganizationForm = (props: OrganizationFormProps) => {
   )
 }
 
-export default OrganizationForm
+export default EditOrganizationForm

@@ -26,7 +26,7 @@ export const schema = gql`
       input: UpdateOrganizationInput!
     ): Organization! @requireAuth
     deleteOrganization(id: Int!): Organization! @requireAuth
-    createOrgAgencyAdmin(
+    createOrganizationAgencyAdmin(
       input: CreateOrgAgencyAdminInput!
     ): CreateOrgAgencyAdminPayload @requireAuth
   }

@@ -41,6 +41,8 @@ const Routes = () => {
           <Route path="/organizations/{id:Int}" page={OrganizationOrganizationPage} name="organization" />
           <Route path="/organizations" page={OrganizationOrganizationsPage} name="organizations" />
         </PrivateSet>
+        {/* Forbidden page */}
+        <Route path="/forbidden" page={ForbiddenPage} name="forbidden" />
       </PrivateSet>
       <Route path="/login" page={LoginPage} name="login" />
       <Route notfound page={NotFoundPage} />

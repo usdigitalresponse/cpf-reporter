@@ -164,8 +164,8 @@ export type Mutation = {
   createAgency: Agency;
   createExpenditureCategory: ExpenditureCategory;
   createInputTemplate: InputTemplate;
-  createOrgAgencyAdmin?: Maybe<CreateOrgAgencyAdminPayload>;
   createOrganization: Organization;
+  createOrganizationAgencyAdmin?: Maybe<CreateOrgAgencyAdminPayload>;
   createOutputTemplate: OutputTemplate;
   createProject: Project;
   createReportingPeriod: ReportingPeriod;
@@ -216,13 +216,13 @@ export type MutationcreateInputTemplateArgs = {
 };
 
 
-export type MutationcreateOrgAgencyAdminArgs = {
-  input: CreateOrgAgencyAdminInput;
+export type MutationcreateOrganizationArgs = {
+  input: CreateOrganizationInput;
 };
 
 
-export type MutationcreateOrganizationArgs = {
-  input: CreateOrganizationInput;
+export type MutationcreateOrganizationAgencyAdminArgs = {
+  input: CreateOrgAgencyAdminInput;
 };
 
 
@@ -826,7 +826,7 @@ export type CreateOrgAgencyAdminMutationVariables = Exact<{
 }>;
 
 
-export type CreateOrgAgencyAdminMutation = { __typename?: 'Mutation', createOrgAgencyAdmin?: { __typename?: 'CreateOrgAgencyAdminPayload', organization?: { __typename?: 'Organization', id: number } | null } | null };
+export type CreateOrgAgencyAdminMutation = { __typename?: 'Mutation', createOrganizationAgencyAdmin?: { __typename?: 'CreateOrgAgencyAdminPayload', organization?: { __typename?: 'Organization', id: number } | null } | null };
 
 export type DeleteOrganizationMutationVariables = Exact<{
   id: Scalars['Int'];

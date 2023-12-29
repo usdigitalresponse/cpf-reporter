@@ -24,7 +24,7 @@ export const createOrganization: MutationResolvers['createOrganization'] = ({
   })
 }
 
-export const createOrgAgencyAdmin: MutationResolvers['createOrgAgencyAdmin'] =
+export const createOrganizationAgencyAdmin: MutationResolvers['createOrganizationAgencyAdmin'] =
   async ({ input }) => {
     const {
       organizationName,
