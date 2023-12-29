@@ -34,7 +34,7 @@ export const getCurrentUser = async (
 ): Promise<RedwoodUser | null> => {
   console.log(decoded)
   return {
-    id: 'unique-user-id',
+    id: 1,
     email: 'email@example.com',
     roles: ['admin', 'usdr-admin'],
   }

@@ -112,6 +112,7 @@ export type CreateUploadInput = {
   agencyId: Scalars['Int'];
   expenditureCategoryId: Scalars['Int'];
   filename: Scalars['String'];
+  notes?: InputMaybe<Scalars['String']>;
   organizationId: Scalars['Int'];
   reportingPeriodId: Scalars['Int'];
   uploadedById: Scalars['Int'];
@@ -447,12 +448,14 @@ export type Query = {
   organizations: Array<Organization>;
   outputTemplate?: Maybe<OutputTemplate>;
   outputTemplates: Array<OutputTemplate>;
+  previousReportingPeriods: Array<ReportingPeriod>;
   project?: Maybe<Project>;
   projects: Array<Project>;
   /** Fetches the Redwood root schema. */
   redwood?: Maybe<Redwood>;
   reportingPeriod?: Maybe<ReportingPeriod>;
   reportingPeriods: Array<ReportingPeriod>;
+  reportingPeriodsByOrg: Array<ReportingPeriod>;
   role?: Maybe<Role>;
   roles: Array<Role>;
   subrecipient?: Maybe<Subrecipient>;
@@ -504,6 +507,13 @@ export type QueryoutputTemplateArgs = {
 
 
 /** About the Redwood queries. */
+export type QuerypreviousReportingPeriodsArgs = {
+  id: Scalars['Int'];
+  organizationId: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
 export type QueryprojectArgs = {
   id: Scalars['Int'];
 };
@@ -512,6 +522,12 @@ export type QueryprojectArgs = {
 /** About the Redwood queries. */
 export type QueryreportingPeriodArgs = {
   id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QueryreportingPeriodsByOrgArgs = {
+  organizationId: Scalars['Int'];
 };
 
 
@@ -677,6 +693,7 @@ export type UpdateUploadInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   expenditureCategoryId?: InputMaybe<Scalars['Int']>;
   filename?: InputMaybe<Scalars['String']>;
+  notes?: InputMaybe<Scalars['String']>;
   organizationId?: InputMaybe<Scalars['Int']>;
   reportingPeriodId?: InputMaybe<Scalars['Int']>;
   uploadedById?: InputMaybe<Scalars['Int']>;
@@ -711,10 +728,12 @@ export type Upload = {
   expenditureCategoryId: Scalars['Int'];
   filename: Scalars['String'];
   id: Scalars['Int'];
+  notes?: Maybe<Scalars['String']>;
   organization: Organization;
   organizationId: Scalars['Int'];
   reportingPeriod: ReportingPeriod;
   reportingPeriodId: Scalars['Int'];
+  signedUrl?: Maybe<Scalars['String']>;
   updatedAt: Scalars['DateTime'];
   uploadedBy: User;
   uploadedById: Scalars['Int'];
@@ -879,7 +898,7 @@ export type CreateUploadMutationVariables = Exact<{
 }>;
 
 
-export type CreateUploadMutation = { __typename?: 'Mutation', createUpload: { __typename?: 'Upload', id: number } };
+export type CreateUploadMutation = { __typename?: 'Mutation', createUpload: { __typename?: 'Upload', id: number, signedUrl?: string | null } };
 
 export type DeleteUploadMutationVariables = Exact<{
   id: Scalars['Int'];
