@@ -1,22 +1,24 @@
-import type { CreateOrganizationInput } from 'types/graphql'
+import type { CreateOrgAgencyAdminInput } from 'types/graphql'
 
 import { navigate, routes } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
-import OrganizationForm from 'src/components/Organization/OrganizationForm'
+import NewOrganizationForm from 'src/components/Organization/NewOrganizationForm/NewOrganizationForm'
 
-const CREATE_ORGANIZATION_MUTATION = gql`
-  mutation CreateOrganizationMutation($input: CreateOrganizationInput!) {
-    createOrganization(input: $input) {
-      id
+const CREATE_ORGANIZATION_AGENCY_ADMIN_MUTATION = gql`
+  mutation CreateOrgAgencyAdminMutation($input: CreateOrgAgencyAdminInput!) {
+    createOrgAgencyAdmin(input: $input) {
+      organization {
+        id
+      }
     }
   }
 `
 
 const NewOrganization = () => {
   const [createOrganization, { loading, error }] = useMutation(
-    CREATE_ORGANIZATION_MUTATION,
+    CREATE_ORGANIZATION_AGENCY_ADMIN_MUTATION,
     {
       onCompleted: () => {
         toast.success('Organization created')
@@ -28,7 +30,7 @@ const NewOrganization = () => {
     }
   )
 
-  const onSave = (input: CreateOrganizationInput) => {
+  const onSave = (input: CreateOrgAgencyAdminInput) => {
     createOrganization({ variables: { input } })
   }
 
@@ -38,7 +40,7 @@ const NewOrganization = () => {
         <h2 className="rw-heading rw-heading-secondary">Organization</h2>
       </header>
       <div className="rw-segment-main">
-        <OrganizationForm onSave={onSave} loading={loading} error={error} />
+        <NewOrganizationForm onSave={onSave} loading={loading} error={error} />
       </div>
     </div>
   )

@@ -12,6 +12,7 @@ export type ResolverFn<TResult, TParent, TContext, TArgs> = (
       args?: TArgs,
       obj?: { root: TParent; context: TContext; info: GraphQLResolveInfo }
     ) => TResult | Promise<TResult>
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = Omit<T, K> & { [P in K]-?: NonNullable<T[P]> };
 export type OptArgsResolverFn<TResult, TParent = {}, TContext = {}, TArgs = {}> = (
       args?: TArgs,
@@ -62,6 +63,22 @@ export type CreateInputTemplateInput = {
   name: Scalars['String'];
   rulesGeneratedAt: Scalars['DateTime'];
   version: Scalars['String'];
+};
+
+export type CreateOrgAgencyAdminInput = {
+  agencyAbbreviation: Scalars['String'];
+  agencyCode: Scalars['String'];
+  agencyName: Scalars['String'];
+  organizationName: Scalars['String'];
+  userEmail: Scalars['String'];
+  userName: Scalars['String'];
+};
+
+export type CreateOrgAgencyAdminPayload = {
+  __typename?: 'CreateOrgAgencyAdminPayload';
+  agency?: Maybe<Agency>;
+  organization?: Maybe<Organization>;
+  user?: Maybe<User>;
 };
 
 export type CreateOrganizationInput = {
@@ -166,6 +183,7 @@ export type Mutation = {
   createAgency: Agency;
   createExpenditureCategory: ExpenditureCategory;
   createInputTemplate: InputTemplate;
+  createOrgAgencyAdmin?: Maybe<CreateOrgAgencyAdminPayload>;
   createOrganization: Organization;
   createOutputTemplate: OutputTemplate;
   createProject: Project;
@@ -214,6 +232,11 @@ export type MutationcreateExpenditureCategoryArgs = {
 
 export type MutationcreateInputTemplateArgs = {
   input: CreateInputTemplateInput;
+};
+
+
+export type MutationcreateOrgAgencyAdminArgs = {
+  input: CreateOrgAgencyAdminInput;
 };
 
 
@@ -827,6 +850,8 @@ export type ResolversTypes = {
   CreateAgencyInput: CreateAgencyInput;
   CreateExpenditureCategoryInput: CreateExpenditureCategoryInput;
   CreateInputTemplateInput: CreateInputTemplateInput;
+  CreateOrgAgencyAdminInput: CreateOrgAgencyAdminInput;
+  CreateOrgAgencyAdminPayload: ResolverTypeWrapper<Omit<CreateOrgAgencyAdminPayload, 'agency' | 'organization' | 'user'> & { agency: Maybe<ResolversTypes['Agency']>, organization: Maybe<ResolversTypes['Organization']>, user: Maybe<ResolversTypes['User']> }>;
   CreateOrganizationInput: CreateOrganizationInput;
   CreateOutputTemplateInput: CreateOutputTemplateInput;
   CreateProjectInput: CreateProjectInput;
@@ -879,6 +904,8 @@ export type ResolversParentTypes = {
   CreateAgencyInput: CreateAgencyInput;
   CreateExpenditureCategoryInput: CreateExpenditureCategoryInput;
   CreateInputTemplateInput: CreateInputTemplateInput;
+  CreateOrgAgencyAdminInput: CreateOrgAgencyAdminInput;
+  CreateOrgAgencyAdminPayload: Omit<CreateOrgAgencyAdminPayload, 'agency' | 'organization' | 'user'> & { agency: Maybe<ResolversParentTypes['Agency']>, organization: Maybe<ResolversParentTypes['Organization']>, user: Maybe<ResolversParentTypes['User']> };
   CreateOrganizationInput: CreateOrganizationInput;
   CreateOutputTemplateInput: CreateOutputTemplateInput;
   CreateProjectInput: CreateProjectInput;
@@ -955,6 +982,20 @@ export interface BigIntScalarConfig extends GraphQLScalarTypeConfig<ResolversTyp
   name: 'BigInt';
 }
 
+export type CreateOrgAgencyAdminPayloadResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['CreateOrgAgencyAdminPayload'] = ResolversParentTypes['CreateOrgAgencyAdminPayload']> = {
+  agency: OptArgsResolverFn<Maybe<ResolversTypes['Agency']>, ParentType, ContextType>;
+  organization: OptArgsResolverFn<Maybe<ResolversTypes['Organization']>, ParentType, ContextType>;
+  user: OptArgsResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CreateOrgAgencyAdminPayloadRelationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['CreateOrgAgencyAdminPayload'] = ResolversParentTypes['CreateOrgAgencyAdminPayload']> = {
+  agency?: RequiredResolverFn<Maybe<ResolversTypes['Agency']>, ParentType, ContextType>;
+  organization?: RequiredResolverFn<Maybe<ResolversTypes['Organization']>, ParentType, ContextType>;
+  user?: RequiredResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export interface DateScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Date'], any> {
   name: 'Date';
 }
@@ -1019,6 +1060,7 @@ export type MutationResolvers<ContextType = RedwoodGraphQLContext, ParentType ex
   createAgency: Resolver<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationcreateAgencyArgs, 'input'>>;
   createExpenditureCategory: Resolver<ResolversTypes['ExpenditureCategory'], ParentType, ContextType, RequireFields<MutationcreateExpenditureCategoryArgs, 'input'>>;
   createInputTemplate: Resolver<ResolversTypes['InputTemplate'], ParentType, ContextType, RequireFields<MutationcreateInputTemplateArgs, 'input'>>;
+  createOrgAgencyAdmin: Resolver<Maybe<ResolversTypes['CreateOrgAgencyAdminPayload']>, ParentType, ContextType, RequireFields<MutationcreateOrgAgencyAdminArgs, 'input'>>;
   createOrganization: Resolver<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationcreateOrganizationArgs, 'input'>>;
   createOutputTemplate: Resolver<ResolversTypes['OutputTemplate'], ParentType, ContextType, RequireFields<MutationcreateOutputTemplateArgs, 'input'>>;
   createProject: Resolver<ResolversTypes['Project'], ParentType, ContextType, RequireFields<MutationcreateProjectArgs, 'input'>>;
@@ -1058,6 +1100,7 @@ export type MutationRelationResolvers<ContextType = RedwoodGraphQLContext, Paren
   createAgency?: RequiredResolverFn<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationcreateAgencyArgs, 'input'>>;
   createExpenditureCategory?: RequiredResolverFn<ResolversTypes['ExpenditureCategory'], ParentType, ContextType, RequireFields<MutationcreateExpenditureCategoryArgs, 'input'>>;
   createInputTemplate?: RequiredResolverFn<ResolversTypes['InputTemplate'], ParentType, ContextType, RequireFields<MutationcreateInputTemplateArgs, 'input'>>;
+  createOrgAgencyAdmin?: RequiredResolverFn<Maybe<ResolversTypes['CreateOrgAgencyAdminPayload']>, ParentType, ContextType, RequireFields<MutationcreateOrgAgencyAdminArgs, 'input'>>;
   createOrganization?: RequiredResolverFn<ResolversTypes['Organization'], ParentType, ContextType, RequireFields<MutationcreateOrganizationArgs, 'input'>>;
   createOutputTemplate?: RequiredResolverFn<ResolversTypes['OutputTemplate'], ParentType, ContextType, RequireFields<MutationcreateOutputTemplateArgs, 'input'>>;
   createProject?: RequiredResolverFn<ResolversTypes['Project'], ParentType, ContextType, RequireFields<MutationcreateProjectArgs, 'input'>>;
@@ -1456,6 +1499,7 @@ export type UserRelationResolvers<ContextType = RedwoodGraphQLContext, ParentTyp
 export type Resolvers<ContextType = RedwoodGraphQLContext> = {
   Agency: AgencyResolvers<ContextType>;
   BigInt: GraphQLScalarType;
+  CreateOrgAgencyAdminPayload: CreateOrgAgencyAdminPayloadResolvers<ContextType>;
   Date: GraphQLScalarType;
   DateTime: GraphQLScalarType;
   ExpenditureCategory: ExpenditureCategoryResolvers<ContextType>;

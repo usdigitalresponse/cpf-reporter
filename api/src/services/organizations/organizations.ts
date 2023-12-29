@@ -24,6 +24,52 @@ export const createOrganization: MutationResolvers['createOrganization'] = ({
   })
 }
 
+export const createOrgAgencyAdmin: MutationResolvers['createOrgAgencyAdmin'] =
+  async ({ input }) => {
+    const {
+      organizationName,
+      agencyName,
+      agencyAbbreviation,
+      agencyCode,
+      userEmail,
+      userName,
+    } = input
+
+    // Create a new organization
+    const organization = await db.organization.create({
+      data: {
+        name: organizationName,
+      },
+    })
+
+    // Create a new agency associated with the organization
+    const agency = await db.agency.create({
+      data: {
+        name: agencyName,
+        abbreviation: agencyAbbreviation,
+        organizationId: organization.id,
+        code: agencyCode,
+      },
+    })
+
+    const usdrAdminRoleId = await db.role.findFirst({
+      where: { name: 'usdr-admin' },
+    })
+
+    // Create a new user (admin) that belongs to the agency and organization
+    const user = await db.user.create({
+      data: {
+        email: userEmail,
+        name: userName,
+        agencyId: agency.id,
+        organizationId: organization.id,
+        roleId: usdrAdminRoleId?.id,
+      },
+    })
+
+    return { organization, agency, user }
+  }
+
 export const updateOrganization: MutationResolvers['updateOrganization'] = ({
   id,
   input,

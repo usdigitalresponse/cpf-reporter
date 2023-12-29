@@ -35,10 +35,12 @@ const Routes = () => {
         {/* Reporting Periods */}
         <Route path="/reporting-periods" page={ReportingPeriodsPage} name="reportingPeriods" />
         {/* Organizations */}
-        <Route path="/organizations/new" page={OrganizationNewOrganizationPage} name="newOrganization" />
-        <Route path="/organizations/{id:Int}/edit" page={OrganizationEditOrganizationPage} name="editOrganization" />
-        <Route path="/organizations/{id:Int}" page={OrganizationOrganizationPage} name="organization" />
-        <Route path="/organizations" page={OrganizationOrganizationsPage} name="organizations" />
+        <PrivateSet unauthenticated="forbidden" roles="usdr-admin">
+          <Route path="/organizations/new" page={OrganizationNewOrganizationPage} name="newOrganization" />
+          <Route path="/organizations/{id:Int}/edit" page={OrganizationEditOrganizationPage} name="editOrganization" />
+          <Route path="/organizations/{id:Int}" page={OrganizationOrganizationPage} name="organization" />
+          <Route path="/organizations" page={OrganizationOrganizationsPage} name="organizations" />
+        </PrivateSet>
       </PrivateSet>
       <Route path="/login" page={LoginPage} name="login" />
       <Route notfound page={NotFoundPage} />

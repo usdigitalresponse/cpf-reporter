@@ -66,11 +66,11 @@ const OrganizationForm = (props: OrganizationFormProps) => {
         titleClassName="rw-form-error-title"
         listClassName="rw-form-error-list"
       />
-      <div className={'row mb-3'}>
+      <div className="row mb-3">
         <Label name="name" className="form-label col-sm-2 col-form-label">
           Organization Name
         </Label>
-        <div className={'col-sm-6'}>
+        <div className="col-sm-6">
           <TextField
             name="name"
             defaultValue={organization?.name}
@@ -84,7 +84,7 @@ const OrganizationForm = (props: OrganizationFormProps) => {
           className="error-message offset-2 invalid-feedback"
         />
       </div>
-      <div className={'row'}>
+      <div className="row">
         <div className="offset-2 col-sm-6">
           <Submit disabled={loading} className="btn btn-primary me-2">
             Save

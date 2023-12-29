@@ -46,6 +46,22 @@ export type CreateInputTemplateInput = {
   version: Scalars['String'];
 };
 
+export type CreateOrgAgencyAdminInput = {
+  agencyAbbreviation: Scalars['String'];
+  agencyCode: Scalars['String'];
+  agencyName: Scalars['String'];
+  organizationName: Scalars['String'];
+  userEmail: Scalars['String'];
+  userName: Scalars['String'];
+};
+
+export type CreateOrgAgencyAdminPayload = {
+  __typename?: 'CreateOrgAgencyAdminPayload';
+  agency?: Maybe<Agency>;
+  organization?: Maybe<Organization>;
+  user?: Maybe<User>;
+};
+
 export type CreateOrganizationInput = {
   name: Scalars['String'];
 };
@@ -148,6 +164,7 @@ export type Mutation = {
   createAgency: Agency;
   createExpenditureCategory: ExpenditureCategory;
   createInputTemplate: InputTemplate;
+  createOrgAgencyAdmin?: Maybe<CreateOrgAgencyAdminPayload>;
   createOrganization: Organization;
   createOutputTemplate: OutputTemplate;
   createProject: Project;
@@ -196,6 +213,11 @@ export type MutationcreateExpenditureCategoryArgs = {
 
 export type MutationcreateInputTemplateArgs = {
   input: CreateInputTemplateInput;
+};
+
+
+export type MutationcreateOrgAgencyAdminArgs = {
+  input: CreateOrgAgencyAdminInput;
 };
 
 
@@ -799,12 +821,12 @@ export type UpdateOrganizationMutationVariables = Exact<{
 
 export type UpdateOrganizationMutation = { __typename?: 'Mutation', updateOrganization: { __typename?: 'Organization', id: number, name: string } };
 
-export type CreateOrganizationMutationVariables = Exact<{
-  input: CreateOrganizationInput;
+export type CreateOrgAgencyAdminMutationVariables = Exact<{
+  input: CreateOrgAgencyAdminInput;
 }>;
 
 
-export type CreateOrganizationMutation = { __typename?: 'Mutation', createOrganization: { __typename?: 'Organization', id: number } };
+export type CreateOrgAgencyAdminMutation = { __typename?: 'Mutation', createOrgAgencyAdmin?: { __typename?: 'CreateOrgAgencyAdminPayload', organization?: { __typename?: 'Organization', id: number } | null } | null };
 
 export type DeleteOrganizationMutationVariables = Exact<{
   id: Scalars['Int'];

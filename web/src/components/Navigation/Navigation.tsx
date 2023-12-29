@@ -1,8 +1,11 @@
 import Nav from 'react-bootstrap/Nav'
+import { useAuth } from 'web/src/auth'
 
 import { NavLink, routes } from '@redwoodjs/router'
 
 const Navigation = () => {
+  const { currentUser } = useAuth()
+
   return (
     <div className="tabs-wrapper row">
       <Nav variant="tabs" defaultActiveKey="/">
@@ -55,15 +58,17 @@ const Navigation = () => {
             Reporting Periods
           </NavLink>
         </Nav.Item>
-        <Nav.Item>
-          <NavLink
-            to={routes.organizations()}
-            activeClassName="active"
-            className="nav-link"
-          >
-            Organizations
-          </NavLink>
-        </Nav.Item>
+        {currentUser?.roles?.includes('usdr-admin') && (
+          <Nav.Item>
+            <NavLink
+              to={routes.organizations()}
+              activeClassName="active"
+              className="nav-link"
+            >
+              Organizations
+            </NavLink>
+          </Nav.Item>
+        )}
       </Nav>
     </div>
   )
