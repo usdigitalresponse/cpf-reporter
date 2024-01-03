@@ -399,6 +399,12 @@ export type Organization = {
   agencies: Array<Maybe<Agency>>;
   id: Scalars['Int'];
   name: Scalars['String'];
+  projects: Array<Maybe<Project>>;
+  reportingPeriods: Array<Maybe<ReportingPeriod>>;
+  subrecipients: Array<Maybe<Subrecipient>>;
+  uploadValidations: Array<Maybe<UploadValidation>>;
+  uploads: Array<Maybe<Upload>>;
+  users: Array<Maybe<User>>;
 };
 
 export type OutputTemplate = {
@@ -1116,6 +1122,12 @@ export type OrganizationResolvers<ContextType = RedwoodGraphQLContext, ParentTyp
   agencies: OptArgsResolverFn<Array<Maybe<ResolversTypes['Agency']>>, ParentType, ContextType>;
   id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   name: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  projects: OptArgsResolverFn<Array<Maybe<ResolversTypes['Project']>>, ParentType, ContextType>;
+  reportingPeriods: OptArgsResolverFn<Array<Maybe<ResolversTypes['ReportingPeriod']>>, ParentType, ContextType>;
+  subrecipients: OptArgsResolverFn<Array<Maybe<ResolversTypes['Subrecipient']>>, ParentType, ContextType>;
+  uploadValidations: OptArgsResolverFn<Array<Maybe<ResolversTypes['UploadValidation']>>, ParentType, ContextType>;
+  uploads: OptArgsResolverFn<Array<Maybe<ResolversTypes['Upload']>>, ParentType, ContextType>;
+  users: OptArgsResolverFn<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -1123,6 +1135,12 @@ export type OrganizationRelationResolvers<ContextType = RedwoodGraphQLContext, P
   agencies?: RequiredResolverFn<Array<Maybe<ResolversTypes['Agency']>>, ParentType, ContextType>;
   id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   name?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  projects?: RequiredResolverFn<Array<Maybe<ResolversTypes['Project']>>, ParentType, ContextType>;
+  reportingPeriods?: RequiredResolverFn<Array<Maybe<ResolversTypes['ReportingPeriod']>>, ParentType, ContextType>;
+  subrecipients?: RequiredResolverFn<Array<Maybe<ResolversTypes['Subrecipient']>>, ParentType, ContextType>;
+  uploadValidations?: RequiredResolverFn<Array<Maybe<ResolversTypes['UploadValidation']>>, ParentType, ContextType>;
+  uploads?: RequiredResolverFn<Array<Maybe<ResolversTypes['Upload']>>, ParentType, ContextType>;
+  users?: RequiredResolverFn<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

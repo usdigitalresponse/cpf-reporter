@@ -5,7 +5,6 @@ import type { EditUploadById } from 'types/graphql'
 import {
   Form,
   FileField,
-  SelectField,
   // HiddenField,
   FormError,
   FieldError,
@@ -18,6 +17,8 @@ import { navigate, routes } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
+import OrganizationCell from 'src/components/OrganizationCell'
+
 const CREATE_UPLOAD = gql`
   mutation CreateUploadMutation($input: CreateUploadInput!) {
     createUpload(input: $input) {
@@ -29,6 +30,7 @@ const CREATE_UPLOAD = gql`
 // type FormUpload = NonNullable<EditUploadById['upload']>
 
 interface UploadFormProps {
+  organizationId: number
   upload?: EditUploadById['upload']
   error: RWGqlError
   loading: boolean
@@ -67,24 +69,25 @@ const UploadForm = (props: UploadFormProps) => {
     const res = await create({ variables: { input: uploadInput } })
     const formData = new FormData()
     formData.append('file', data.file[0])
-    fetch(res.data?.createUpload?.signedUrl, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': data.file[0].type,
-      },
-      body: formData,
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`)
-        }
+    res.data?.createUpload?.signedUrl &&
+      fetch(res.data?.createUpload?.signedUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': data.file[0].type,
+        },
+        body: formData,
       })
-      .then((responseData) => {
-        console.log('File upload successful. Response:', responseData)
-      })
-      .catch((error) => {
-        console.error('Error uploading file:', error)
-      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`)
+          }
+        })
+        .then((responseData) => {
+          console.log('File upload successful. Response:', responseData)
+        })
+        .catch((error) => {
+          console.error('Error uploading file:', error)
+        })
   }
 
   const onReset = () => {
@@ -101,30 +104,7 @@ const UploadForm = (props: UploadFormProps) => {
         listClassName="rw-form-error-list"
       />
       {/* <HiddenField name="uploadedBy">1</HiddenField> */}
-      <Label
-        name="reportingPeriodId"
-        className="rw-label"
-        errorClassName="rw-label rw-label-error"
-      >
-        Reporting Period
-      </Label>
-      <SelectField name="reportingPeriodId">
-        <option value={1}>23Q3</option>
-        <option value={2}>23Q4</option>
-        <option value={3}>24Q1</option>
-      </SelectField>
-      <Label
-        name="agencyId"
-        className="rw-label"
-        errorClassName="rw-label rw-label-error"
-      >
-        Agency Code
-      </Label>
-      <SelectField name="agencyId">
-        <option value={1}>ABC123</option>
-        <option value={2}>EXT</option>
-        <option value={3}>MISC</option>
-      </SelectField>
+      <OrganizationCell id={props.organizationId} />
       <FileField name="file" validation={{ required: true }} />
       <FieldError name="file" className="rw-field-error" />
       <Label
