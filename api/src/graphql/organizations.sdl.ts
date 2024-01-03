@@ -2,7 +2,13 @@ export const schema = gql`
   type Organization {
     id: Int!
     agencies: [Agency]!
+    users: [User]!
     name: String!
+    reportingPeriods: [ReportingPeriod]!
+    uploads: [Upload]!
+    uploadValidations: [UploadValidation]!
+    subrecipients: [Subrecipient]!
+    projects: [Project]!
   }
 
   type Query {

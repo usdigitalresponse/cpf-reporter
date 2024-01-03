@@ -35,6 +35,7 @@ export const getCurrentUser = async (
   console.log(decoded)
   return {
     id: 1,
+    organizationId: 1,
     email: 'email@example.com',
     roles: ['admin'],
   }

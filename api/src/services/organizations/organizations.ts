@@ -46,4 +46,28 @@ export const Organization: OrganizationRelationResolvers = {
   agencies: (_obj, { root }) => {
     return db.organization.findUnique({ where: { id: root?.id } }).agencies()
   },
+  users: (_obj, { root }) => {
+    return db.organization.findUnique({ where: { id: root?.id } }).users()
+  },
+  reportingPeriods: (_obj, { root }) => {
+    return db.organization
+      .findUnique({ where: { id: root?.id } })
+      .reportingPeriods()
+  },
+  uploads: (_obj, { root }) => {
+    return db.organization.findUnique({ where: { id: root?.id } }).uploads()
+  },
+  uploadValidations: (_obj, { root }) => {
+    return db.organization
+      .findUnique({ where: { id: root?.id } })
+      .uploadValidations()
+  },
+  subrecipients: (_obj, { root }) => {
+    return db.organization
+      .findUnique({ where: { id: root?.id } })
+      .subrecipients()
+  },
+  projects: (_obj, { root }) => {
+    return db.organization.findUnique({ where: { id: root?.id } }).projects()
+  },
 }
