@@ -87,7 +87,7 @@ const NewOrganizationForm = (props: NewOrganizationFormProps) => {
 
       <div className="row mb-3">
         <Label name="agencyName" className="form-label col-sm-3 col-form-label">
-          Team Name
+          Agency Name
         </Label>
         <div className="col-sm-6">
           <TextField
@@ -108,7 +108,7 @@ const NewOrganizationForm = (props: NewOrganizationFormProps) => {
           name="agencyAbbreviation"
           className="form-label col-sm-3 col-form-label"
         >
-          Team Abbreviation
+          Agency Abbreviation
         </Label>
         <div className="col-sm-6">
           <TextField

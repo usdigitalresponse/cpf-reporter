@@ -957,7 +957,7 @@ export type FindUserByIdVariables = Exact<{
 }>;
 
 
-export type FindUserById = { __typename?: 'Query', user?: { __typename?: 'User', id: number, email: string, name?: string | null, agencyId?: number | null, organizationId: number, createdAt: string, updatedAt: string } | null };
+export type FindUserById = { __typename?: 'Query', user?: { __typename?: 'User', id: number, email: string, name?: string | null, agencyId?: number | null, organizationId: number, role?: RoleEnum | null, createdAt: string, updatedAt: string } | null };
 
 export type FindUsersByOrganizationIdVariables = Exact<{
   organizationId: Scalars['Int'];

@@ -35,7 +35,7 @@ const Routes = () => {
         {/* Reporting Periods */}
         <Route path="/reporting-periods" page={ReportingPeriodsPage} name="reportingPeriods" />
         {/* Organizations */}
-        <PrivateSet unauthenticated="forbidden" roles="usdr-admin">
+        <PrivateSet unauthenticated="forbidden" roles="USDR_ADMIN">
           <Route path="/organizations/new" page={OrganizationNewOrganizationPage} name="newOrganization" />
           <Route path="/organizations/{id:Int}/edit" page={OrganizationEditOrganizationPage} name="editOrganization" />
           <Route path="/organizations/{id:Int}" page={OrganizationOrganizationPage} name="organization" />

@@ -1,5 +1,4 @@
 import { Button } from 'react-bootstrap'
-import { Select } from 'react-bootstrap/Form'
 import { useForm, UseFormReturn } from 'react-hook-form'
 import type { EditUserById, UpdateUserInput } from 'types/graphql'
 
@@ -129,16 +128,16 @@ const UserForm = (props: UserFormProps) => {
         />
       </div>
 
-      {/* <div className="row mb-3">
+      <div className="row mb-3">
         <Label name="role" className="form-label col-sm-2 col-form-label">
           Role
         </Label>
 
         <div className="col-sm-6">
-          <SelectField name="role">
-            <option>USDR_ADMIN</option>
-            <option>ORGANIZATION_ADMIN</option>
-            <option> ORGANIZATION_STAFF</option>
+          <SelectField name="role" className="form-select">
+            <option value="USDR_ADMIN">USDR admin</option>
+            <option value="ORGANIZATION_ADMIN">Organization admin</option>
+            <option value="ORGANIZATION_STAFF">Organization staff</option>
           </SelectField>
         </div>
 
@@ -146,7 +145,7 @@ const UserForm = (props: UserFormProps) => {
           name="role"
           className="error-message offset-2 invalid-feedback"
         />
-      </div> */}
+      </div>
 
       <div className="row mb-3">
         <Label name="agencyId" className="form-label col-sm-2 col-form-label">

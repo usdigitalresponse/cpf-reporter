@@ -58,7 +58,7 @@ const Navigation = () => {
             Reporting Periods
           </NavLink>
         </Nav.Item>
-        {currentUser?.roles?.includes('usdr-admin') && (
+        {currentUser?.roles?.includes('USDR_ADMIN') && (
           <Nav.Item>
             <NavLink
               to={routes.organizations()}

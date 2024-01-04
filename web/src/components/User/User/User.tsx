@@ -4,6 +4,7 @@ import { Link, routes, navigate } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
+import { formatEnum } from 'src/lib/formatters'
 import { timeTag } from 'src/lib/formatters'
 
 const DELETE_USER_MUTATION = gql`
@@ -65,10 +66,10 @@ const User = ({ user }: Props) => {
               <th>Organization id</th>
               <td>{user.organizationId}</td>
             </tr>
-            {/* <tr>
-              <th>Role id</th>
-              <td>{user.roleId}</td>
-            </tr> */}
+            <tr>
+              <th>Role</th>
+              <td>{formatEnum(user.role)}</td>
+            </tr>
             <tr>
               <th>Created at</th>
               <td>{timeTag(user.createdAt)}</td>
