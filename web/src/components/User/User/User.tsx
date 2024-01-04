@@ -65,10 +65,10 @@ const User = ({ user }: Props) => {
               <th>Organization id</th>
               <td>{user.organizationId}</td>
             </tr>
-            <tr>
+            {/* <tr>
               <th>Role id</th>
               <td>{user.roleId}</td>
-            </tr>
+            </tr> */}
             <tr>
               <th>Created at</th>
               <td>{timeTag(user.createdAt)}</td>

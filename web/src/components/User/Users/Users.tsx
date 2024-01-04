@@ -14,7 +14,7 @@ const UsersList = ({ usersByOrganization }: FindUsersByOrganizationId) => {
           <th className="border">Email</th>
           <th className="border">Name</th>
           <th className="border">Agency id</th>
-          <th className="border">Role id</th>
+          <th className="border">Role</th>
           <th className="border">Created at</th>
           <th className="border">Actions</th>
         </tr>
@@ -27,7 +27,7 @@ const UsersList = ({ usersByOrganization }: FindUsersByOrganizationId) => {
             <td className="border border-slate-700">
               {truncate(user.agencyId)}
             </td>
-            <td className="border border-slate-700">{truncate(user.roleId)}</td>
+            {/* <td className="border border-slate-700">{truncate(user.roleId)}</td> */}
             <td className="border border-slate-700">
               {timeTag(user.createdAt)}
             </td>

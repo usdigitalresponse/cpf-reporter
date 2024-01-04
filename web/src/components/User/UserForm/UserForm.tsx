@@ -1,4 +1,5 @@
 import { Button } from 'react-bootstrap'
+import { Select } from 'react-bootstrap/Form'
 import { useForm, UseFormReturn } from 'react-hook-form'
 import type { EditUserById, UpdateUserInput } from 'types/graphql'
 
@@ -9,6 +10,7 @@ import {
   Label,
   TextField,
   NumberField,
+  SelectField,
   Submit,
 } from '@redwoodjs/forms'
 import type { RWGqlError } from '@redwoodjs/forms'
@@ -127,27 +129,24 @@ const UserForm = (props: UserFormProps) => {
         />
       </div>
 
-      <div className="row mb-3">
+      {/* <div className="row mb-3">
         <Label name="role" className="form-label col-sm-2 col-form-label">
-          Role id
+          Role
         </Label>
 
         <div className="col-sm-6">
-          <NumberField
-            name="roleId"
-            defaultValue={props.user?.roleId}
-            className="form-control"
-            errorClassName="form-control is-invalid"
-            emptyAs={'undefined'}
-            validation={{ required: 'This field is required' }}
-          />
+          <SelectField name="role">
+            <option>USDR_ADMIN</option>
+            <option>ORGANIZATION_ADMIN</option>
+            <option> ORGANIZATION_STAFF</option>
+          </SelectField>
         </div>
 
         <FieldError
           name="role"
           className="error-message offset-2 invalid-feedback"
         />
-      </div>
+      </div> */}
 
       <div className="row mb-3">
         <Label name="agencyId" className="form-label col-sm-2 col-form-label">

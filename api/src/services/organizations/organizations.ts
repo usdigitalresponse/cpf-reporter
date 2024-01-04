@@ -52,10 +52,6 @@ export const createOrganizationAgencyAdmin: MutationResolvers['createOrganizatio
       },
     })
 
-    const usdrAdminRoleId = await db.role.findFirst({
-      where: { name: 'usdr-admin' },
-    })
-
     // Create a new user (admin) that belongs to the agency and organization
     const user = await db.user.create({
       data: {
@@ -63,7 +59,7 @@ export const createOrganizationAgencyAdmin: MutationResolvers['createOrganizatio
         name: userName,
         agencyId: agency.id,
         organizationId: organization.id,
-        roleId: usdrAdminRoleId?.id,
+        role: 'ORGANIZATION_ADMIN',
       },
     })
 
