@@ -116,12 +116,11 @@ export async function s3PutSignedUrl(
   })
   return url
 }
+
 /**
  *  This function is a wrapper around the getSignedUrl function from the @aws-sdk/s3-request-presigner package.
  *  Exists to organize the imports and to make it easier to mock in tests.
  */
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function getSignedUrl(bucketName: string, key: string) {
   const s3 = getS3Client()
   const baseParams = { Bucket: bucketName, Key: key }
@@ -144,7 +143,6 @@ function getSQSClient() {
   return sqs
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function sendSqsMessage(queueUrl: string, messageBody: unknown) {
   const sqs = getSQSClient()
   await sqs.send(
@@ -155,7 +153,6 @@ async function sendSqsMessage(queueUrl: string, messageBody: unknown) {
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function receiveSqsMessage(queueUrl: string) {
   const sqs = getSQSClient()
   // const receiveResp = await sqs.send(new ReceiveMessageCommand({
