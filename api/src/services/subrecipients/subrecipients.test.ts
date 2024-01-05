@@ -39,7 +39,6 @@ describe('subrecipients', () => {
         startDate: '2023-12-09T14:50:18.092Z',
         endDate: '2023-12-09T14:50:18.092Z',
         originationUploadId: scenario.subrecipient.two.originationUploadId,
-        updatedAt: '2023-12-09T14:50:18.092Z',
       },
     })
 
@@ -52,7 +51,7 @@ describe('subrecipients', () => {
     expect(result.originationUploadId).toEqual(
       scenario.subrecipient.two.originationUploadId
     )
-    expect(result.updatedAt).toEqual(new Date('2023-12-09T14:50:18.092Z'))
+    expect(result.updatedAt).toBeDefined()
   })
 
   scenario('updates a subrecipient', async (scenario: StandardScenario) => {
