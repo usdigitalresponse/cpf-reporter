@@ -47,6 +47,7 @@ $theme-colors: map-merge(
 );
 
 $form-feedback-invalid-color:       theme-color("danger") !default;
+$bs-nav-link-color:                    theme-color("primary") !default;
 
 // OVERRIDE BOOTSTRAP FORM VALIDATION STATES
 $form-validation-states: () !default;
@@ -59,6 +60,13 @@ $form-validation-states: map-merge(
   ),
   $form-validation-states
 );
+
+#redwood-app {
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #2c3e50;
+}
 
 // OVERRIDE BOOTSTRAP FORM ERROR STYLING
 span.invalid-feedback {
@@ -81,3 +89,4 @@ span.invalid-feedback {
 @import './fonts.scss';
 
 @import './tables.scss';
+@import './layouts.scss';

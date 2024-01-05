@@ -27,6 +27,7 @@ model Organization {
   agencies          Agency[]
   users             User[]
   name              String
+  reportingPeriods  ReportingPeriod[]
   uploads           Upload[]
   uploadValidations UploadValidation[]
   subrecipients     Subrecipient[]
@@ -41,7 +42,7 @@ model User {
   organizationId Int?
   roleId         Int?
   createdAt      DateTime            @default(now()) @db.Timestamptz(6)
-  updatedAt      DateTime            @updatedAt @db.Timestamptz(6)
+  updatedAt      DateTime            @default(now()) @db.Timestamptz(6)
   agency         Agency?             @relation(fields: [agencyId], references: [id])
   organization   Organization?       @relation(fields: [organizationId], references: [id])
   role           Role?               @relation(fields: [roleId], references: [id])
@@ -67,7 +68,7 @@ model InputTemplate {
   effectiveDate       DateTime           @db.Date
   rulesGeneratedAt    DateTime?          @db.Timestamptz(6)
   createdAt           DateTime           @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime           @db.Timestamptz(6)
+  updatedAt           DateTime           @default(now()) @db.Timestamptz(6)
   reportingPeriods    ReportingPeriod[]
   uploadValidations   UploadValidation[]
 }
@@ -79,7 +80,7 @@ model OutputTemplate {
   effectiveDate      DateTime          @db.Date
   rulesGeneratedAt   DateTime?         @db.Timestamptz(6)
   createdAt          DateTime          @default(now()) @db.Timestamptz(6)
-  updatedAt          DateTime          @db.Timestamptz(6)
+  updatedAt          DateTime          @default(now()) @db.Timestamptz(6)
   reportingPeriods   ReportingPeriod[]
 }
 
@@ -88,6 +89,8 @@ model ReportingPeriod {
   name             String
   startDate        DateTime       @db.Date
   endDate          DateTime       @db.Date
+  organizationId   Int
+  organization     Organization   @relation(fields: [organizationId], references: [id])
   certifiedAt      DateTime?      @db.Timestamptz(6)
   certifiedById    Int?
   certifiedBy      User?          @relation(fields: [certifiedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -97,7 +100,7 @@ model ReportingPeriod {
   outputTemplate   OutputTemplate @relation(fields: [outputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   isCurrentPeriod  Boolean        @default(false)
   createdAt        DateTime       @default(now()) @db.Timestamptz(6)
-  updatedAt        DateTime       @db.Timestamptz(6)
+  updatedAt        DateTime       @default(now()) @db.Timestamptz(6)
   uploads          Upload[]
   projects         Project[]
 }
@@ -107,13 +110,14 @@ model ExpenditureCategory {
   name      String
   code      String
   createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
   Uploads   Upload[]
 }
 
 model Upload {
   id                    Int                 @id @default(autoincrement())
   filename              String
+  notes                 String?
   uploadedById          Int
   uploadedBy            User                @relation(fields: [uploadedById], references: [id])
   agencyId              Int
@@ -125,7 +129,7 @@ model Upload {
   expenditureCategoryId Int
   expenditureCategory   ExpenditureCategory @relation(fields: [expenditureCategoryId], references: [id])
   createdAt             DateTime            @default(now()) @db.Timestamptz(6)
-  updatedAt             DateTime            @db.Timestamptz(6)
+  updatedAt             DateTime            @default(now()) @db.Timestamptz(6)
   validations           UploadValidation[]
   subrecipients         Subrecipient[]
 }
@@ -149,7 +153,7 @@ model UploadValidation {
   invalidatedById     Int?
   invalidatedBy       User?         @relation("InvalidatedUploads", fields: [invalidatedById], references: [id])
   createdAt           DateTime      @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime      @db.Timestamptz(6)
+  updatedAt           DateTime      @default(now()) @db.Timestamptz(6)
 }
 
 model Subrecipient {
@@ -165,7 +169,7 @@ model Subrecipient {
   originationUploadId Int
   originationUpload   Upload       @relation(fields: [originationUploadId], references: [id])
   createdAt           DateTime     @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime     @db.Timestamptz(6)
+  updatedAt           DateTime     @default(now()) @db.Timestamptz(6)
 }
 
 model Project {
@@ -181,5 +185,5 @@ model Project {
   originationPeriodId Int
   originationPeriod   ReportingPeriod @relation(fields: [originationPeriodId], references: [id])
   createdAt           DateTime        @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime        @db.Timestamptz(6)
+  updatedAt           DateTime        @default(now()) @db.Timestamptz(6)
 }

@@ -39,6 +39,9 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
                 updatedAt: '2023-12-10T04:48:04.896Z',
               },
             },
+            organization: {
+              create: { name: 'String' },
+            },
           },
         },
         expenditureCategory: {
@@ -84,6 +87,9 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
                 effectiveDate: '2023-12-10T04:48:04.896Z',
                 updatedAt: '2023-12-10T04:48:04.896Z',
               },
+            },
+            organization: {
+              create: { name: 'String' },
             },
           },
         },

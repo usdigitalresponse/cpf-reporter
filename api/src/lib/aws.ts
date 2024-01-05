@@ -1,5 +1,7 @@
 import {
   GetObjectCommand,
+  HeadObjectCommand,
+  HeadObjectCommandInput,
   PutObjectCommand,
   PutObjectCommandInput,
   S3Client,
@@ -11,6 +13,9 @@ import {
 } from '@aws-sdk/client-sqs'
 import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { StreamingBlobPayloadInputTypes } from '@smithy/types'
+import { QueryResolvers, CreateUploadInput } from 'types/graphql'
+
+const CPF_REPORTER_BUCKET_NAME = 'cpf-reporter'
 
 function getS3Client() {
   let s3: S3Client
@@ -18,10 +23,25 @@ function getS3Client() {
     /*
         1. Make sure the local environment has awslocal installed.
         2. Use the commands to create a bucket to test with.
-            - awslocal s3api create-bucket --bucket arpa-audit-reports --region us-west-2 --create-bucket-configuration '{"LocationConstraint": "us-west-2"}'
+            - awslocal s3api create-bucket --bucket cpf-reporter --region us-west-2 --create-bucket-configuration '{"LocationConstraint": "us-west-2"}'
         3. Access bucket resource metadata through the following URL.
             - awslocal s3api list-buckets
-            - awslocal s3api list-objects --bucket arpa-audit-reports
+            - awslocal s3api list-objects --bucket cpf-reporter
+        4. Configure cors to allow uploads via signed URLs
+
+        ===== cors-config.json =====
+        {
+          "CORSRules": [
+            {
+              "AllowedHeaders": ["*"],
+              "AllowedMethods": ["GET", "POST", "PUT"],
+              "AllowedOrigins": ["http://localhost:8910"],
+              "ExposeHeaders": ["ETag"]
+            }
+          ]
+        }
+
+            - awslocal s3api put-bucket-cors --bucket cpf-reporter --cors-configuration file://cors-config.json
     */
     console.log('------------ USING LOCALSTACK ------------')
     const endpoint = `http://${process.env.LOCALSTACK_HOSTNAME}:${
@@ -39,6 +59,15 @@ function getS3Client() {
   return s3
 }
 
+export function uploadWorkbook(
+  upload: CreateUploadInput,
+  uploadId: number,
+  body: StreamingBlobPayloadInputTypes
+) {
+  const folderName = `${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/uploads/${upload.expenditureCategoryId}/${uploadId}/${upload.filename}`
+  return sendPutObjectToS3Bucket(CPF_REPORTER_BUCKET_NAME, folderName, body)
+}
+
 async function sendPutObjectToS3Bucket(
   bucketName: string,
   key: string,
@@ -54,19 +83,45 @@ async function sendPutObjectToS3Bucket(
   await s3.send(new PutObjectCommand(uploadParams))
 }
 
+export function getTemplateRules(inputTemplateId: number) {
+  return sendHeadObjectToS3Bucket(
+    CPF_REPORTER_BUCKET_NAME,
+    `templates/input_templates/${inputTemplateId}/rules/`
+  )
+}
+
 async function sendHeadObjectToS3Bucket(bucketName: string, key: string) {
   const s3 = getS3Client()
-  const uploadParams: PutObjectCommandInput = {
+  const uploadParams: HeadObjectCommandInput = {
     Bucket: bucketName,
     Key: key,
   }
-  await s3.send(new PutObjectCommand(uploadParams))
+  await s3.send(new HeadObjectCommand(uploadParams))
 }
 
+export async function s3PutSignedUrl(
+  upload: CreateUploadInput,
+  uploadId: number
+): Promise<string> {
+  const s3 = getS3Client()
+  const key = `${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/uploads/${upload.expenditureCategoryId}/${uploadId}/${upload.filename}`
+  const baseParams: PutObjectCommandInput = {
+    Bucket: CPF_REPORTER_BUCKET_NAME,
+    Key: key,
+    ContentType:
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  }
+  const url = await awsGetSignedUrl(s3, new PutObjectCommand(baseParams), {
+    expiresIn: 60,
+  })
+  return url
+}
 /**
  *  This function is a wrapper around the getSignedUrl function from the @aws-sdk/s3-request-presigner package.
  *  Exists to organize the imports and to make it easier to mock in tests.
  */
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function getSignedUrl(bucketName: string, key: string) {
   const s3 = getS3Client()
   const baseParams = { Bucket: bucketName, Key: key }
@@ -89,6 +144,7 @@ function getSQSClient() {
   return sqs
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function sendSqsMessage(queueUrl: string, messageBody: unknown) {
   const sqs = getSQSClient()
   await sqs.send(
@@ -99,6 +155,7 @@ async function sendSqsMessage(queueUrl: string, messageBody: unknown) {
   )
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function receiveSqsMessage(queueUrl: string) {
   const sqs = getSQSClient()
   // const receiveResp = await sqs.send(new ReceiveMessageCommand({
@@ -116,6 +173,13 @@ async function receiveSqsMessage(queueUrl: string) {
       MaxNumberOfMessages: 1,
     })
   )
+}
+
+export const s3PutObjectSignedUrl: QueryResolvers['s3PutObjectSignedUrl'] = ({
+  upload,
+  uploadId,
+}) => {
+  return s3PutSignedUrl(upload, uploadId)
 }
 
 export default {
