@@ -64,6 +64,10 @@ data "aws_ssm_parameter" "datadog_api_key_secret_arn" {
   name = "${var.ssm_deployment_parameters_path_prefix}/datadog/api_key_secret_arn"
 }
 
+data "aws_ssm_parameter" "passage_api_key_secret_arn" {
+  name = "${var.ssm_deployment_parameters_path_prefix}/passage/api_key_secret_arn"
+}
+
 module "this" {
   source  = "cloudposse/label/null"
   version = "0.25.0"
