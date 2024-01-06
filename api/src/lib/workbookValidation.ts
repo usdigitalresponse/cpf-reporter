@@ -78,7 +78,7 @@ export function validateVersion({
   }
   // console.log(logicRecord)
   const { version } = logicRecord.content
-
+  if (!version) return
   const versionRule = rules.logic.version
 
   let error = null

@@ -36,16 +36,13 @@ describe('workbookValidation tests', () => {
         )
       })
     })
-    // TODO ARPA doesn't return an error when "version" is undefined
-    describe.skip('when "logic" content is is missing version', () => {
+    describe('when "logic" content is missing version', () => {
       beforeEach(() => {
         const records = [{ type: 'logic', content: {} }]
         actualResult = validateVersion({ records, rules })
       })
-      it('should return ValidationError', () => {
-        expect(actualResult).toEqual(
-          new ValidationError('Logic sheet is missing "version"')
-        )
+      it('should return undefined', () => {
+        expect(actualResult).toBeUndefined()
       })
     })
     describe('when version is older than the template', () => {
