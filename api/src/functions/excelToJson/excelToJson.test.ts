@@ -6,6 +6,9 @@
 //    https://redwoodjs.com/docs/testing#testing-functions
 
 describe('excelToJson function', () => {
+  it('Dummy test', () => {
+    expect(1 + 1).toBe(2)
+  })
   // it('Should respond with 200', async () => {
   //   const record: S3EventRecord = {
   //     eventVersion: '2.0',
