@@ -9,8 +9,8 @@ const CURRENCY_REGEX_PATTERN = /^\d+(?: \.\d{ 1, 2 })?$/g
 const EMAIL_REGEX_PATTERN =
   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
-const BETA_VALIDATION_MESSAGE =
-  '[BETA] This is a new validation that is running in beta mode (as a warning instead of a blocking error). If you see anything incorrect about this validation, please report it at grants-helpdesk@usdigitalresponse.org'
+// const BETA_VALIDATION_MESSAGE =
+//   '[BETA] This is a new validation that is running in beta mode (as a warning instead of a blocking error). If you see anything incorrect about this validation, please report it at grants-helpdesk@usdigitalresponse.org'
 
 const SHOULD_NOT_CONTAIN_PERIOD_REGEX_PATTERN = /^[^.]*$/
 
@@ -40,14 +40,15 @@ export type Rule = {
   version?: string
 }
 
+type FormatterFunction = (value: string | number) => string | number
+
 export interface TranslatedRule extends Rule {
   isRequiredFn?: (value: Record<string, string | number>) => boolean
-  validationFormatters: any[]
+  validationFormatters: FormatterFunction[]
 }
 
 export type WorkbookRecord = {
   type: string
-  upload: { id: number }
   content: Record<string, string | number>
   subcategory?: string
 }
@@ -156,7 +157,7 @@ export function validateVersion({
   return undefined
 }
 
-function validateFieldPattern(fieldName, value) {
+function validateFieldPattern(fieldName: string, value) {
   let error = null
   const matchedFieldPatternInfo = FIELD_NAME_TO_PATTERN[fieldName]
   if (matchedFieldPatternInfo) {
@@ -170,11 +171,9 @@ function validateFieldPattern(fieldName, value) {
 }
 
 export function validateRecord({
-  upload,
   record,
   typeRules,
 }: {
-  upload: unknown
   record: Record<string, string | number>
   typeRules: Record<string, TranslatedRule>
 }) {
@@ -318,7 +317,6 @@ export function validateRecord({
         }
       }
 
-      // make sure max length is not too long
       if (rule.maxLength) {
         if (
           (rule.dataType === 'String' || rule.dataType === 'String-Fixed') &&

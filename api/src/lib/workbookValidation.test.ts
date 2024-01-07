@@ -1,5 +1,3 @@
-import fs from 'fs'
-
 import { ValidationError } from 'src/lib/validation-error'
 import { getRules } from 'src/lib/validation-rules'
 import {
@@ -12,45 +10,6 @@ import {
 const translateRecords = (records: WorkbookRecord[], type: string | number) =>
   records.filter((rec) => rec.type === type).map((r) => r.content)
 const rules = getRules()
-const realRecords = fs.readFileSync(`${__dirname}/cpf_uploadFile.json`, 'utf-8')
-// console.log(workbook)
-describe('the real example', () => {
-  let records
-  beforeEach(() => {
-    records = JSON.parse(realRecords)
-  })
-  describe('validateVersion', () => {
-    it('should not return an error', () => {
-      expect(validateVersion({ rules, records })).toBeUndefined()
-    })
-  })
-  describe('validateProjectUseCode', () => {
-    it('should not return an error', () => {
-      expect(validateProjectUseCode({ records })).toBeUndefined()
-    })
-  })
-  describe('validateRecord', () => {
-    it('should return empty array for logic rules', () => {
-      expect(
-        validateRecord({
-          upload: {},
-          record: translateRecords(records, 'logic')[0],
-          typeRules: rules['logic'],
-        })
-      ).toHaveLength(0)
-    })
-  })
-  // describe('validateRules', () => {
-  //   it('should ', () => {
-  //     expect(
-  //       validateRules({
-  //         rules: JSON.parse(realRules),
-  //         records: [JSON.parse(workbook)],
-  //       })
-  //     ).toBe(undefined)
-  //   })
-  // })
-})
 
 describe('workbookValidation tests', () => {
   let actualResult: unknown
@@ -136,7 +95,6 @@ describe('workbookValidation tests', () => {
           {
             type: 'logic',
             content: { version: 'v:20231212' },
-            upload: { id: 1 },
           },
         ]
         actualResult = validateVersion({ records, rules })
@@ -218,23 +176,18 @@ describe('workbookValidation tests', () => {
     })
   })
   describe('validateRecord', () => {
-    let typeRules, record, upload
+    let typeRules, record
     afterEach(() => {
       typeRules = undefined
       record = undefined
-      upload = undefined
     })
     describe('required content', () => {
       beforeEach(() => {
-        upload = undefined
         const translatedRecords = translateRecords(
           [
             {
               type: 'ec1',
               subcategory: '1A-Broadband Infrastructure',
-              upload: {
-                id: 1,
-              },
               content: {
                 some: 'thing',
               },
@@ -247,7 +200,7 @@ describe('workbookValidation tests', () => {
       })
       describe('when a required key item is missing', () => {
         it('should return ValidationError', () => {
-          expect(validateRecord({ upload, record, typeRules })).toEqual(
+          expect(validateRecord({ record, typeRules })).toEqual(
             expect.arrayContaining([
               new ValidationError('Value is required for Project_Name__c'),
             ])
@@ -256,7 +209,7 @@ describe('workbookValidation tests', () => {
       })
       describe('when an optional key item is missing', () => {
         it('should not have error for missing item', () => {
-          expect(validateRecord({ upload, record, typeRules })).not.toEqual(
+          expect(validateRecord({ record, typeRules })).not.toEqual(
             expect.arrayContaining([
               new ValidationError(
                 'Value is required for Additional_Address__c'
@@ -269,15 +222,11 @@ describe('workbookValidation tests', () => {
     describe('listVals content', () => {
       describe('when a listValue does not match', () => {
         beforeEach(() => {
-          upload = undefined
           const translatedRecords = translateRecords(
             [
               {
                 type: 'ec1',
                 subcategory: '1A-Broadband Infrastructure',
-                upload: {
-                  id: 1,
-                },
                 content: {
                   Matching_Funds__c: 'Hello World',
                 },
@@ -289,7 +238,7 @@ describe('workbookValidation tests', () => {
           typeRules = rules['ec1']
         })
         it('should return a "one of" ValidationError', () => {
-          const errors = validateRecord({ upload, record, typeRules })
+          const errors = validateRecord({ record, typeRules })
           expect(errors).toEqual(
             expect.arrayContaining([
               new ValidationError(
@@ -308,9 +257,6 @@ describe('workbookValidation tests', () => {
               {
                 type: 'ec1',
                 subcategory: '1A-Broadband Infrastructure',
-                upload: {
-                  id: 1,
-                },
                 content: {
                   Total_from_all_funding_sources__c: 'hello world',
                 },
@@ -320,7 +266,7 @@ describe('workbookValidation tests', () => {
           )
           record = translatedRecords[0]
           typeRules = rules['ec1']
-          expect(validateRecord({ upload, record, typeRules })).toEqual(
+          expect(validateRecord({ record, typeRules })).toEqual(
             expect.arrayContaining([
               new ValidationError(
                 'Data entered in cell is "hello world", but it must be a number with at most 2 decimals'
@@ -336,9 +282,6 @@ describe('workbookValidation tests', () => {
               {
                 type: 'ec1',
                 subcategory: '1A-Broadband Infrastructure',
-                upload: {
-                  id: 1,
-                },
                 content: {
                   Total_from_all_funding_sources__c: 1234.98,
                 },
@@ -348,7 +291,7 @@ describe('workbookValidation tests', () => {
           )
           record = translatedRecords[0]
           typeRules = rules['ec1']
-          expect(validateRecord({ upload, record, typeRules })).not.toEqual(
+          expect(validateRecord({ record, typeRules })).not.toEqual(
             expect.arrayContaining([
               new ValidationError(
                 'Data entered in cell is "hello world", but it must be a number with at most 2 decimals'
@@ -366,9 +309,6 @@ describe('workbookValidation tests', () => {
               {
                 type: 'ec1',
                 subcategory: '1A-Broadband Infrastructure',
-                upload: {
-                  id: 1,
-                },
                 content: {
                   Projected_Con_Start_Date__c: 'hello world',
                 },
@@ -378,7 +318,7 @@ describe('workbookValidation tests', () => {
           )
           record = translatedRecords[0]
           typeRules = rules['ec1']
-          expect(validateRecord({ upload, record, typeRules })).toEqual(
+          expect(validateRecord({ record, typeRules })).toEqual(
             expect.arrayContaining([
               new ValidationError(
                 'Data entered in cell is "hello world", which is not a valid date.'
@@ -394,9 +334,6 @@ describe('workbookValidation tests', () => {
               {
                 type: 'ec1',
                 subcategory: '1A-Broadband Infrastructure',
-                upload: {
-                  id: 1,
-                },
                 content: {
                   Projected_Con_Start_Date__c: 1478148420000,
                 },
@@ -406,7 +343,7 @@ describe('workbookValidation tests', () => {
           )
           record = translatedRecords[0]
           typeRules = rules['ec1']
-          expect(validateRecord({ upload, record, typeRules })).not.toEqual(
+          expect(validateRecord({ record, typeRules })).not.toEqual(
             expect.arrayContaining([
               new ValidationError(
                 'Data entered in cell is "1478148420000", which is not a valid date.'
@@ -424,9 +361,6 @@ describe('workbookValidation tests', () => {
               {
                 type: 'subrecipient',
                 subcategory: '1A-Broadband Infrastructure',
-                upload: {
-                  id: 1,
-                },
                 content: {
                   POC_Email_Address__c: 'Hello.World',
                 },
@@ -436,7 +370,7 @@ describe('workbookValidation tests', () => {
           )
           record = translatedRecords[0]
           typeRules = rules['subrecipient']
-          const errors = validateRecord({ upload, record, typeRules })
+          const errors = validateRecord({ record, typeRules })
           expect(errors).toEqual(
             expect.arrayContaining([
               new ValidationError(
@@ -453,9 +387,6 @@ describe('workbookValidation tests', () => {
               {
                 type: 'subrecipient',
                 subcategory: '1A-Broadband Infrastructure',
-                upload: {
-                  id: 1,
-                },
                 content: {
                   POC_Email_Address__c: 'foo@example.com',
                 },
@@ -465,7 +396,7 @@ describe('workbookValidation tests', () => {
           )
           record = translatedRecords[0]
           typeRules = rules['subrecipient']
-          expect(validateRecord({ upload, record, typeRules })).not.toEqual(
+          expect(validateRecord({ record, typeRules })).not.toEqual(
             expect.arrayContaining([
               new ValidationError(
                 'Value entered in cell is "foo@example.com". Email must be of the form "user@email.com"'
@@ -483,9 +414,6 @@ describe('workbookValidation tests', () => {
               {
                 type: 'ec1',
                 subcategory: '1A-Broadband Infrastructure',
-                upload: {
-                  id: 1,
-                },
                 content: {
                   Total_Miles_Planned__c: 'Hello.World',
                 },
@@ -495,7 +423,7 @@ describe('workbookValidation tests', () => {
           )
           record = translatedRecords[0]
           typeRules = rules['ec1']
-          const errors = validateRecord({ upload, record, typeRules })
+          const errors = validateRecord({ record, typeRules })
           expect(errors).toEqual(
             expect.arrayContaining([
               new ValidationError(
@@ -512,9 +440,6 @@ describe('workbookValidation tests', () => {
               {
                 type: 'ec1',
                 subcategory: '1A-Broadband Infrastructure',
-                upload: {
-                  id: 1,
-                },
                 content: {
                   Total_Miles_Planned__c: 42,
                 },
@@ -524,7 +449,7 @@ describe('workbookValidation tests', () => {
           )
           record = translatedRecords[0]
           typeRules = rules['ec1']
-          expect(validateRecord({ upload, record, typeRules })).not.toEqual(
+          expect(validateRecord({ record, typeRules })).not.toEqual(
             expect.arrayContaining([
               new ValidationError("Expected a number, but the value was '42'"),
             ])
@@ -540,9 +465,6 @@ describe('workbookValidation tests', () => {
               {
                 type: 'ec1',
                 subcategory: '1A-Broadband Infrastructure',
-                upload: {
-                  id: 1,
-                },
                 content: {
                   Zip_Code_Planned__c: 'asdf_asdf_asdf',
                 },
@@ -552,7 +474,7 @@ describe('workbookValidation tests', () => {
           )
           record = translatedRecords[0]
           typeRules = rules['ec1']
-          const errors = validateRecord({ upload, record, typeRules })
+          const errors = validateRecord({ record, typeRules })
           expect(errors).toEqual(
             expect.arrayContaining([
               new ValidationError(
@@ -569,9 +491,6 @@ describe('workbookValidation tests', () => {
               {
                 type: 'ec1',
                 subcategory: '1A-Broadband Infrastructure',
-                upload: {
-                  id: 1,
-                },
                 content: {
                   Zip_Code_Planned__c: 'asdf',
                 },
@@ -581,7 +500,7 @@ describe('workbookValidation tests', () => {
           )
           record = translatedRecords[0]
           typeRules = rules['ec1']
-          expect(validateRecord({ upload, record, typeRules })).not.toEqual(
+          expect(validateRecord({ record, typeRules })).not.toEqual(
             expect.arrayContaining([
               new ValidationError(
                 'Value for Zip_Code_Planned__c cannot be longer than 5 (currently, 4)'
