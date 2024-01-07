@@ -1,14 +1,14 @@
 import { ValidationError } from 'src/lib/validation-error'
 import { getRules } from 'src/lib/validation-rules'
 import {
+  findContentItemsByType,
+  Rule,
   validateProjectUseCode,
   validateRecord,
   validateVersion,
-  WorkbookRecord,
+  WorkbookContentItem,
 } from 'src/lib/workbookValidation'
 
-const translateRecords = (records: WorkbookRecord[], type: string | number) =>
-  records.filter((rec) => rec.type === type).map((r) => r.content)
 const rules = getRules()
 
 describe('workbookValidation tests', () => {
@@ -176,14 +176,14 @@ describe('workbookValidation tests', () => {
     })
   })
   describe('validateRecord', () => {
-    let typeRules, record
+    let typeRules: Record<string, Rule>, record: WorkbookContentItem
     afterEach(() => {
       typeRules = undefined
       record = undefined
     })
     describe('required content', () => {
       beforeEach(() => {
-        const translatedRecords = translateRecords(
+        const translatedRecords = findContentItemsByType(
           [
             {
               type: 'ec1',
@@ -222,7 +222,7 @@ describe('workbookValidation tests', () => {
     describe('listVals content', () => {
       describe('when a listValue does not match', () => {
         beforeEach(() => {
-          const translatedRecords = translateRecords(
+          const translatedRecords = findContentItemsByType(
             [
               {
                 type: 'ec1',
@@ -252,7 +252,7 @@ describe('workbookValidation tests', () => {
     describe('currency', () => {
       describe('when the value does not match the currency type', () => {
         it('should have error for invalid currency', () => {
-          const translatedRecords = translateRecords(
+          const translatedRecords = findContentItemsByType(
             [
               {
                 type: 'ec1',
@@ -277,7 +277,7 @@ describe('workbookValidation tests', () => {
       })
       describe('when the value is a valid currency', () => {
         it('should not have error for invalid currency', () => {
-          const translatedRecords = translateRecords(
+          const translatedRecords = findContentItemsByType(
             [
               {
                 type: 'ec1',
@@ -304,7 +304,7 @@ describe('workbookValidation tests', () => {
     describe('date', () => {
       describe('when the value does not match the date type', () => {
         it('should have error for invalid Date', () => {
-          const translatedRecords = translateRecords(
+          const translatedRecords = findContentItemsByType(
             [
               {
                 type: 'ec1',
@@ -329,7 +329,7 @@ describe('workbookValidation tests', () => {
       })
       describe('when the value is a valid Date', () => {
         it('should not have error for invalid Date', () => {
-          const translatedRecords = translateRecords(
+          const translatedRecords = findContentItemsByType(
             [
               {
                 type: 'ec1',
@@ -356,7 +356,7 @@ describe('workbookValidation tests', () => {
     describe('String', () => {
       describe('when the POC_Email_Address__c is not a valid email', () => {
         it('should have the Email validation error', () => {
-          const translatedRecords = translateRecords(
+          const translatedRecords = findContentItemsByType(
             [
               {
                 type: 'subrecipient',
@@ -382,7 +382,7 @@ describe('workbookValidation tests', () => {
       })
       describe('when the POC_Email_Address__c is a valid email', () => {
         it('should not have the "email format" error', () => {
-          const translatedRecords = translateRecords(
+          const translatedRecords = findContentItemsByType(
             [
               {
                 type: 'subrecipient',
@@ -409,7 +409,7 @@ describe('workbookValidation tests', () => {
     describe('Numeric', () => {
       describe('when the Total_Miles_Planned__c is not a valid number', () => {
         it('should have the numeric validation error', () => {
-          const translatedRecords = translateRecords(
+          const translatedRecords = findContentItemsByType(
             [
               {
                 type: 'ec1',
@@ -435,7 +435,7 @@ describe('workbookValidation tests', () => {
       })
       describe('when the Total_Miles_Planned__c is a valid number', () => {
         it('should not have the "Expected a number" error', () => {
-          const translatedRecords = translateRecords(
+          const translatedRecords = findContentItemsByType(
             [
               {
                 type: 'ec1',
@@ -460,7 +460,7 @@ describe('workbookValidation tests', () => {
     describe('maxLength', () => {
       describe('when the Zip_Code_Planned__c is greater than maxLength', () => {
         it('should have the maxLength validation error', () => {
-          const translatedRecords = translateRecords(
+          const translatedRecords = findContentItemsByType(
             [
               {
                 type: 'ec1',
@@ -486,7 +486,7 @@ describe('workbookValidation tests', () => {
       })
       describe('when the Zip_Code_Planned__c is less than maxLength', () => {
         it('should not have the "Expected a number" error', () => {
-          const translatedRecords = translateRecords(
+          const translatedRecords = findContentItemsByType(
             [
               {
                 type: 'ec1',

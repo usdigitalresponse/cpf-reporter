@@ -27,6 +27,8 @@ const FIELD_NAME_TO_PATTERN = {
   },
 }
 
+type FormatterFunction = (value: string | number) => string | number
+
 export type Rule = {
   key: string
   index: number
@@ -38,21 +40,23 @@ export type Rule = {
   humanColName: string
   ecCodes: string[] | boolean
   version?: string
-}
-
-type FormatterFunction = (value: string | number) => string | number
-
-export interface TranslatedRule extends Rule {
-  isRequiredFn?: (value: Record<string, string | number>) => boolean
+  isRequiredFn?: (value: WorkbookContentItem) => boolean
   validationFormatters: FormatterFunction[]
 }
 
+export type WorkbookContentItem = Record<string, string | number>
+
 export type WorkbookRecord = {
   type: string
-  content: Record<string, string | number>
+  content: WorkbookContentItem
   subcategory?: string
 }
-
+export function findContentItemsByType(
+  records: WorkbookRecord[],
+  type: string
+): WorkbookContentItem[] {
+  return records.filter((rec) => rec.type === type).map((r) => r.content)
+}
 export function validateProjectUseCode({ records }) {
   const coverRecord = records.find(
     (record: { type: string }) => record?.type === 'cover'
@@ -111,7 +115,7 @@ export function validateVersion({
   rules,
 }: {
   records: WorkbookRecord[]
-  rules: { logic: { version: { version: string; columnName: string } } }
+  rules: { logic: { version: Rule } }
 }) {
   const logicRecord = records.find((record) => record?.type === 'logic')
   if (!logicRecord) {
@@ -130,7 +134,6 @@ export function validateVersion({
       severity: 'warn',
     })
   }
-  // console.log(logicRecord)
   const { version } = logicRecord.content
   if (!version) return
   const versionRule = rules.logic.version
@@ -174,8 +177,8 @@ export function validateRecord({
   record,
   typeRules,
 }: {
-  record: Record<string, string | number>
-  typeRules: Record<string, TranslatedRule>
+  record: WorkbookContentItem
+  typeRules: Record<string, Rule>
 }) {
   const errors = []
   for (const [key, rule] of Object.entries(typeRules)) {
@@ -331,7 +334,6 @@ export function validateRecord({
             )
           )
         }
-        // TODO: should we validate max length on currency? or numeric fields?
       }
     }
   }
