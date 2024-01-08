@@ -8,7 +8,7 @@ import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
-import OrganizationForm from 'src/components/Organization/OrganizationForm'
+import EditOrganizationForm from 'src/components/Organization/EditOrganizationForm/EditOrganizationForm'
 
 export const QUERY = gql`
   query EditOrganizationById($id: Int!) {
@@ -67,7 +67,7 @@ export const Success = ({
         </h2>
       </header>
       <div className="rw-segment-main">
-        <OrganizationForm
+        <EditOrganizationForm
           organization={organization}
           onSave={onSave}
           error={error}

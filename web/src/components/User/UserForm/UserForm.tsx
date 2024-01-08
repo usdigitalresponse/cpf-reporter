@@ -9,6 +9,7 @@ import {
   Label,
   TextField,
   NumberField,
+  SelectField,
   Submit,
 } from '@redwoodjs/forms'
 import type { RWGqlError } from '@redwoodjs/forms'
@@ -129,18 +130,15 @@ const UserForm = (props: UserFormProps) => {
 
       <div className="row mb-3">
         <Label name="role" className="form-label col-sm-2 col-form-label">
-          Role id
+          Role
         </Label>
 
         <div className="col-sm-6">
-          <NumberField
-            name="roleId"
-            defaultValue={props.user?.roleId}
-            className="form-control"
-            errorClassName="form-control is-invalid"
-            emptyAs={'undefined'}
-            validation={{ required: 'This field is required' }}
-          />
+          <SelectField name="role" className="form-select">
+            <option value="USDR_ADMIN">USDR admin</option>
+            <option value="ORGANIZATION_ADMIN">Organization admin</option>
+            <option value="ORGANIZATION_STAFF">Organization staff</option>
+          </SelectField>
         </div>
 
         <FieldError
