@@ -183,8 +183,8 @@ resource "aws_s3_bucket_notification" "json_notification" {
 
   lambda_function {
     lambda_function_arn = module.lambda_function-cpfValidation.lambda_function_arn
-    events             = ["s3:ObjectCreated:*"]
-    filter_suffix      = ".json"
+    events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".json"
   }
 }
 
@@ -278,25 +278,25 @@ module "lambda_function-excelToJson" {
     module.lambda_security_group.id,
     module.postgres.security_group_id,
   ]
-  handler       = "index.handler"
-  architectures = [var.lambda_arch]
-  runtime       = var.lambda_runtime
-  publish       = true
-  layers        = local.lambda_layer_arns
+  handler        = "index.handler"
+  architectures  = [var.lambda_arch]
+  runtime        = var.lambda_runtime
+  publish        = true
+  layers         = local.lambda_layer_arns
   create_package = false
   s3_existing_package = {
     bucket = aws_s3_object.lambda_artifact-excelToJson.bucket
     key    = aws_s3_object.lambda_artifact-excelToJson.key
   }
 
-  role_name = "lambda-role-excelToJson"
+  role_name     = "lambda-role-excelToJson"
   attach_policy = true
-  policy = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+  policy        = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
 module "lambda_function-cpfValidation" {
-  source  = "terraform-aws-modules/lambda/aws"
-  version = "6.5.0"
+  source        = "terraform-aws-modules/lambda/aws"
+  version       = "6.5.0"
   function_name = "cpf-validation"
   description   = "Reacts to S3 events and validates CPF JSON files."
 
@@ -305,19 +305,19 @@ module "lambda_function-cpfValidation" {
     module.lambda_security_group.id,
     module.postgres.security_group_id,
   ]
-  handler       = "index.handler"
-  architectures = [var.lambda_arch]
-  runtime       = var.lambda_runtime
-  publish       = true
-  layers        = local.lambda_layer_arns
+  handler        = "index.handler"
+  architectures  = [var.lambda_arch]
+  runtime        = var.lambda_runtime
+  publish        = true
+  layers         = local.lambda_layer_arns
   create_package = false
   s3_existing_package = {
     bucket = aws_s3_object.lambda_artifact-cpfValidation.bucket
     key    = aws_s3_object.lambda_artifact-cpfValidation.key
   }
-  
-  role_name = "lambda-role-cpfValidation"
+
+  role_name     = "lambda-role-cpfValidation"
   attach_policy = true
-  policy = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+  policy        = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
   # TODO: we need a policy for calling an API endpoint on the application for validation
 }
