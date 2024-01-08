@@ -117,6 +117,40 @@ module "lambda_artifacts_bucket" {
   ]
 }
 
+module "cpf_uploads_bucket" {
+  source  = "cloudposse/s3-bucket/aws"
+  version = "4.0.1"
+  context = module.s3_label.context
+  name    = "cpf-reporter-${var.environment}"
+
+  acl                          = "private"
+  versioning_enabled           = true
+  sse_algorithm                = "AES256"
+  allow_ssl_requests_only      = true
+  allow_encrypted_uploads_only = true
+  source_policy_documents      = []
+
+  lifecycle_configuration_rules = [
+    {
+      enabled                                = true
+      id                                     = "rule-1"
+      filter_and                             = null
+      abort_incomplete_multipart_upload_days = 7
+      transition                             = [{ days = null }]
+      expiration                             = { days = null }
+      noncurrent_version_transition = [
+        {
+          noncurrent_days = 30
+          storage_class   = "GLACIER"
+        },
+      ]
+      noncurrent_version_expiration = {
+        noncurrent_days = 90
+      }
+    }
+  ]
+}
+
 resource "aws_s3_object" "lambda_artifact-graphql" {
   bucket                 = module.lambda_artifacts_bucket.bucket_id
   key                    = "graphql.${filemd5("${local.lambda_artifacts_base_path}/graphql.zip")}.zip"
@@ -124,6 +158,44 @@ resource "aws_s3_object" "lambda_artifact-graphql" {
   source_hash            = filemd5("${local.lambda_artifacts_base_path}/graphql.zip")
   etag                   = filemd5("${local.lambda_artifacts_base_path}/graphql.zip")
   server_side_encryption = "AES256"
+}
+
+resource "aws_s3_object" "lambda_artifact-excelToJson" {
+  bucket                 = module.lambda_artifacts_bucket.bucket_id
+  key                    = "excelToJson.${filemd5("${local.lambda_artifacts_base_path}/excelToJson.zip")}.zip"
+  source                 = "${local.lambda_artifacts_base_path}/excelToJson.zip"
+  source_hash            = filemd5("${local.lambda_artifacts_base_path}/excelToJson.zip")
+  etag                   = filemd5("${local.lambda_artifacts_base_path}/excelToJson.zip")
+  server_side_encryption = "AES256"
+}
+
+resource "aws_s3_object" "lambda_artifact-cpfValidation" {
+  bucket                 = module.lambda_artifacts_bucket.bucket_id
+  key                    = "cpfValidation.${filemd5("${local.lambda_artifacts_base_path}/cpfValidation.zip")}.zip"
+  source                 = "${local.lambda_artifacts_base_path}/cpfValidation.zip"
+  source_hash            = filemd5("${local.lambda_artifacts_base_path}/cpfValidation.zip")
+  etag                   = filemd5("${local.lambda_artifacts_base_path}/cpfValidation.zip")
+  server_side_encryption = "AES256"
+}
+
+resource "aws_s3_bucket_notification" "json_notification" {
+  bucket = module.cpf_uploads_bucket.bucket_id
+
+  lambda_function {
+    lambda_function_arn = module.lambda_function-cpfValidation.lambda_function_arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".json"
+  }
+}
+
+resource "aws_s3_bucket_notification" "excel_notification" {
+  bucket = module.cpf_uploads_bucket.bucket_id
+
+  lambda_function {
+    lambda_function_arn = module.lambda_function-excelToJson.lambda_function_arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_suffix       = ".xlsm"
+  }
 }
 
 module "lambda_function-graphql" {
@@ -208,4 +280,60 @@ module "lambda_function-graphql" {
       source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*/graphql"
     }
   }
+}
+
+module "lambda_function-excelToJson" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "6.5.0"
+
+  function_name = "excel-to-json"
+  description   = "Reacts to S3 events and converts Excel files to JSON."
+
+  vpc_subnet_ids = local.private_subnet_ids
+  vpc_security_group_ids = [
+    module.lambda_security_group.id,
+    module.postgres.security_group_id,
+  ]
+  handler        = "index.handler"
+  architectures  = [var.lambda_arch]
+  runtime        = var.lambda_runtime
+  publish        = true
+  layers         = local.lambda_layer_arns
+  create_package = false
+  s3_existing_package = {
+    bucket = aws_s3_object.lambda_artifact-excelToJson.bucket
+    key    = aws_s3_object.lambda_artifact-excelToJson.key
+  }
+
+  role_name     = "lambda-role-excelToJson"
+  attach_policy = true
+  policy        = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+module "lambda_function-cpfValidation" {
+  source        = "terraform-aws-modules/lambda/aws"
+  version       = "6.5.0"
+  function_name = "cpf-validation"
+  description   = "Reacts to S3 events and validates CPF JSON files."
+
+  vpc_subnet_ids = local.private_subnet_ids
+  vpc_security_group_ids = [
+    module.lambda_security_group.id,
+    module.postgres.security_group_id,
+  ]
+  handler        = "index.handler"
+  architectures  = [var.lambda_arch]
+  runtime        = var.lambda_runtime
+  publish        = true
+  layers         = local.lambda_layer_arns
+  create_package = false
+  s3_existing_package = {
+    bucket = aws_s3_object.lambda_artifact-cpfValidation.bucket
+    key    = aws_s3_object.lambda_artifact-cpfValidation.key
+  }
+
+  role_name     = "lambda-role-cpfValidation"
+  attach_policy = true
+  policy        = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+  # TODO: we need a policy for calling an API endpoint on the application for validation
 }

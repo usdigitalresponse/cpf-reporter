@@ -15,7 +15,7 @@ import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { StreamingBlobPayloadInputTypes } from '@smithy/types'
 import { QueryResolvers, CreateUploadInput } from 'types/graphql'
 
-const CPF_REPORTER_BUCKET_NAME = 'cpf-reporter'
+const CPF_REPORTER_BUCKET_NAME = `cpf-reporter-${process.env.environment}`
 
 function getS3Client() {
   let s3: S3Client
