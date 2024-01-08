@@ -12,6 +12,7 @@ import {
   SQSClient,
 } from '@aws-sdk/client-sqs'
 import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { StreamingBlobPayloadInputTypes } from '@smithy/types'
 import { QueryResolvers, CreateUploadInput } from 'types/graphql'
 
 const CPF_REPORTER_BUCKET_NAME = `cpf-reporter-${process.env.environment}`
@@ -61,7 +62,7 @@ function getS3Client() {
 export function uploadWorkbook(
   upload: CreateUploadInput,
   uploadId: number,
-  body: any
+  body: StreamingBlobPayloadInputTypes
 ) {
   const folderName = `${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/uploads/${upload.expenditureCategoryId}/${uploadId}/${upload.filename}`
   return sendPutObjectToS3Bucket(CPF_REPORTER_BUCKET_NAME, folderName, body)
@@ -70,8 +71,8 @@ export function uploadWorkbook(
 async function sendPutObjectToS3Bucket(
   bucketName: string,
   key: string,
-  body: any
-) {
+  body: StreamingBlobPayloadInputTypes
+): Promise<void> {
   const s3 = getS3Client()
   const uploadParams: PutObjectCommandInput = {
     Bucket: bucketName,
@@ -115,12 +116,11 @@ export async function s3PutSignedUrl(
   })
   return url
 }
+
 /**
  *  This function is a wrapper around the getSignedUrl function from the @aws-sdk/s3-request-presigner package.
  *  Exists to organize the imports and to make it easier to mock in tests.
  */
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function getSignedUrl(bucketName: string, key: string) {
   const s3 = getS3Client()
   const baseParams = { Bucket: bucketName, Key: key }
@@ -143,8 +143,7 @@ function getSQSClient() {
   return sqs
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function sendSqsMessage(queueUrl: string, messageBody: any) {
+async function sendSqsMessage(queueUrl: string, messageBody: unknown) {
   const sqs = getSQSClient()
   await sqs.send(
     new SendMessageCommand({
@@ -154,7 +153,6 @@ async function sendSqsMessage(queueUrl: string, messageBody: any) {
   )
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function receiveSqsMessage(queueUrl: string) {
   const sqs = getSQSClient()
   // const receiveResp = await sqs.send(new ReceiveMessageCommand({
