@@ -234,6 +234,11 @@ module "lambda_function-graphql" {
       actions   = ["kms:Decrypt"]
       resources = [data.aws_kms_key.ssm.arn]
     }
+    GetPassageAPIKeySecretValue = {
+      effect    = "Allow"
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = [data.aws_ssm_parameter.passage_api_key_secret_arn.value]
+    }
   }
 
   handler       = var.datadog_enabled ? local.datadog_lambda_handler : "graphql.handler"
@@ -266,6 +271,7 @@ module "lambda_function-graphql" {
     DATABASE_SECRET_SOURCE             = "ssm"
     DATABASE_SECRET_SSM_PARAMETER_PATH = aws_ssm_parameter.postgres_master_password.name
     DD_LAMBDA_HANDLER                  = "graphql.handler"
+    PASSAGE_API_KEY_SECRET_ARN         = data.aws_ssm_parameter.passage_api_key_secret_arn.value
   })
 
   allowed_triggers = {
