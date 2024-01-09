@@ -290,28 +290,70 @@ module "lambda_function-excelToJson" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.5.0"
 
-  function_name = "excel-to-json"
+  // Metadata
+  function_name = "${var.namespace}-excelToJson"
   description   = "Reacts to S3 events and converts Excel files to JSON."
 
-  vpc_subnet_ids = local.private_subnet_ids
-  vpc_security_group_ids = [
-    module.lambda_security_group.id,
-    module.postgres.security_group_id,
-  ]
-  handler        = "index.handler"
-  architectures  = [var.lambda_arch]
-  runtime        = var.lambda_runtime
-  publish        = true
-  layers         = local.lambda_layer_arns
+  // Networking
+  attach_network_policy = false
+  vpc_subnet_ids = null
+  vpc_security_group_ids = null
+
+  // Permissions
+  role_permissions_boundary         = local.permissions_boundary_arn
+  attach_cloudwatch_logs_policy     = true
+  cloudwatch_logs_retention_in_days = var.log_retention_in_days
+  attach_policy_jsons               = true
+  number_of_policy_jsons            = length(local.lambda_default_execution_policies)
+  attach_policy_statements          = true
+  policy_statements = {
+    AllowDownloadExcelObjects = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:HeadObject",
+      ]
+      resources = [
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsx
+        "${module.cpf_uploads_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsx",
+      ]
+    }
+    AllowUploadJsonObjects = {
+      effect  = "Allow"
+      actions = ["s3:PutObject"]
+      resources = [
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsx.json
+        "${module.cpf_uploads_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsx.json",
+      ]
+    }
+  }
+
+  // Artifacts
   create_package = false
   s3_existing_package = {
     bucket = aws_s3_object.lambda_artifact-excelToJson.bucket
     key    = aws_s3_object.lambda_artifact-excelToJson.key
   }
 
-  role_name     = "lambda-role-excelToJson"
-  attach_policy = true
-  policy        = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+  // Runtime
+  handler       = var.datadog_enabled ? local.datadog_lambda_handler : "excelToJson.handler"
+  runtime       = var.lambda_runtime
+  architectures = [var.lambda_arch]
+  publish       = true
+  layers        = local.lambda_layer_arns
+  timeout     = 300 # 5 minutes, in seconds
+  memory_size = 512 # MB
+  environment_variables = merge(local.lambda_default_environment_variables, {
+    DD_LAMBDA_HANDLER = "excelToJson.handler"
+  })
+
+  // Triggers
+  allowed_triggers = {
+    S3BucketNotification = {
+      principal  = "s3.amazonaws.com"
+      source_arn = module.cpf_uploads_bucket.bucket_arn
+    }
+  }
 }
 
 module "lambda_function-cpfValidation" {
