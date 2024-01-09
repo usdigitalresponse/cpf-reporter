@@ -117,11 +117,11 @@ module "lambda_artifacts_bucket" {
   ]
 }
 
-module "cpf_uploads_bucket" {
+module "reporting_data_bucket" {
   source  = "cloudposse/s3-bucket/aws"
   version = "4.0.1"
   context = module.s3_label.context
-  name    = "cpf-reporter-${var.environment}"
+  name    = "reporting_data"
 
   acl                          = "private"
   versioning_enabled           = true
@@ -178,8 +178,8 @@ resource "aws_s3_object" "lambda_artifact-cpfValidation" {
   server_side_encryption = "AES256"
 }
 
-resource "aws_s3_bucket_notification" "cpf_uploads_bucket" {
-  bucket = module.cpf_uploads_bucket.bucket_id
+resource "aws_s3_bucket_notification" "reporting_data" {
+  bucket = module.reporting_data_bucket.bucket_id
 
   lambda_function {
     lambda_function_arn = module.lambda_function-excelToJson.lambda_function_arn
@@ -315,7 +315,7 @@ module "lambda_function-excelToJson" {
       ]
       resources = [
         # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsx
-        "${module.cpf_uploads_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsx",
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsx",
       ]
     }
     AllowUploadJsonObjects = {
@@ -323,7 +323,7 @@ module "lambda_function-excelToJson" {
       actions = ["s3:PutObject"]
       resources = [
         # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsx.json
-        "${module.cpf_uploads_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsx.json",
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsx.json",
       ]
     }
   }
@@ -351,7 +351,7 @@ module "lambda_function-excelToJson" {
   allowed_triggers = {
     S3BucketNotification = {
       principal  = "s3.amazonaws.com"
-      source_arn = module.cpf_uploads_bucket.bucket_arn
+      source_arn = module.reporting_data_bucket.bucket_arn
     }
   }
 }
@@ -385,7 +385,7 @@ module "lambda_function-cpfValidation" {
       ]
       resources = [
         # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsx.json
-        "${module.cpf_uploads_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsx.json",
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsx.json",
       ]
     }
   }
@@ -413,7 +413,7 @@ module "lambda_function-cpfValidation" {
   allowed_triggers = {
     S3BucketNotification = {
       principal  = "s3.amazonaws.com"
-      source_arn = module.cpf_uploads_bucket.bucket_arn
+      source_arn = module.reporting_data_bucket.bucket_arn
     }
   }
 }
