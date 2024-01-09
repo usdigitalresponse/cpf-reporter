@@ -200,15 +200,19 @@ module "lambda_function-graphql" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.5.0"
 
+  // Metadata
   function_name = "${var.namespace}-graphql"
   description   = "GraphQL API server for the CPF Reporter service."
 
-  vpc_subnet_ids = local.private_subnet_ids
+  // Networking
+  attach_network_policy = true
+  vpc_subnet_ids        = local.private_subnet_ids
   vpc_security_group_ids = [
     module.lambda_security_group.id,
     module.postgres.security_group_id,
   ]
-  attach_network_policy             = true
+
+  // Permissions
   role_permissions_boundary         = local.permissions_boundary_arn
   attach_cloudwatch_logs_policy     = true
   cloudwatch_logs_retention_in_days = var.log_retention_in_days
@@ -239,20 +243,21 @@ module "lambda_function-graphql" {
     }
   }
 
-  handler       = var.datadog_enabled ? local.datadog_lambda_handler : "graphql.handler"
-  runtime       = var.lambda_runtime
-  architectures = [var.lambda_arch]
-  publish       = true
-  layers        = local.lambda_layer_arns
-
+  // Artifacts
+  publish        = true
   create_package = false
   s3_existing_package = {
     bucket = aws_s3_object.lambda_artifact-graphql.bucket
     key    = aws_s3_object.lambda_artifact-graphql.key
   }
 
-  timeout     = 25  # seconds (API Gateway limit is 30 seconds)
-  memory_size = 512 # MB
+  // Runtime
+  handler       = var.datadog_enabled ? local.datadog_lambda_handler : "graphql.handler"
+  runtime       = var.lambda_runtime
+  architectures = [var.lambda_arch]
+  layers        = local.lambda_layer_arns
+  timeout       = 25  # seconds (API Gateway limit is 30 seconds)
+  memory_size   = 512 # MB
   environment_variables = merge(local.lambda_default_environment_variables, {
     // Function-specific environment variables go here:
     DATABASE_URL = format(
@@ -272,6 +277,7 @@ module "lambda_function-graphql" {
     PASSAGE_API_KEY_SECRET_ARN         = data.aws_ssm_parameter.passage_api_key_secret_arn.value
   })
 
+  // Triggers
   allowed_triggers = {
     APIGateway = {
       service    = "apigateway"
