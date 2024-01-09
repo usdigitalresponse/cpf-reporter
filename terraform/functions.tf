@@ -178,23 +178,21 @@ resource "aws_s3_object" "lambda_artifact-cpfValidation" {
   server_side_encryption = "AES256"
 }
 
-resource "aws_s3_bucket_notification" "json_notification" {
-  bucket = module.cpf_uploads_bucket.bucket_id
-
-  lambda_function {
-    lambda_function_arn = module.lambda_function-cpfValidation.lambda_function_arn
-    events              = ["s3:ObjectCreated:*"]
-    filter_suffix       = ".json"
-  }
-}
-
-resource "aws_s3_bucket_notification" "excel_notification" {
+resource "aws_s3_bucket_notification" "cpf_uploads_bucket" {
   bucket = module.cpf_uploads_bucket.bucket_id
 
   lambda_function {
     lambda_function_arn = module.lambda_function-excelToJson.lambda_function_arn
     events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "uploads/"
     filter_suffix       = ".xlsm"
+  }
+
+  lambda_function {
+    lambda_function_arn = module.lambda_function-cpfValidation.lambda_function_arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "uploads/"
+    filter_suffix       = ".xlsm.json"
   }
 }
 
