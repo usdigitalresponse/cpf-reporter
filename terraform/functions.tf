@@ -295,8 +295,8 @@ module "lambda_function-excelToJson" {
   description   = "Reacts to S3 events and converts Excel files to JSON."
 
   // Networking
-  attach_network_policy = false
-  vpc_subnet_ids = null
+  attach_network_policy  = false
+  vpc_subnet_ids         = null
   vpc_security_group_ids = null
 
   // Permissions
@@ -341,8 +341,8 @@ module "lambda_function-excelToJson" {
   architectures = [var.lambda_arch]
   publish       = true
   layers        = local.lambda_layer_arns
-  timeout     = 300 # 5 minutes, in seconds
-  memory_size = 512 # MB
+  timeout       = 300 # 5 minutes, in seconds
+  memory_size   = 512 # MB
   environment_variables = merge(local.lambda_default_environment_variables, {
     DD_LAMBDA_HANDLER = "excelToJson.handler"
   })
