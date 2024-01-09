@@ -217,7 +217,7 @@ module "lambda_function-graphql" {
   role_permissions_boundary         = local.permissions_boundary_arn
   attach_cloudwatch_logs_policy     = true
   cloudwatch_logs_retention_in_days = var.log_retention_in_days
-  attach_policy_jsons               = true
+  attach_policy_jsons               = length(local.lambda_default_execution_policies) > 0
   number_of_policy_jsons            = length(local.lambda_default_execution_policies)
   policy_jsons                      = local.lambda_default_execution_policies
   attach_policy_statements          = true
@@ -304,7 +304,7 @@ module "lambda_function-excelToJson" {
   role_permissions_boundary         = local.permissions_boundary_arn
   attach_cloudwatch_logs_policy     = true
   cloudwatch_logs_retention_in_days = var.log_retention_in_days
-  attach_policy_jsons               = true
+  attach_policy_jsons               = length(local.lambda_default_execution_policies) > 0
   number_of_policy_jsons            = length(local.lambda_default_execution_policies)
   attach_policy_statements          = true
   policy_statements = {
@@ -374,7 +374,7 @@ module "lambda_function-cpfValidation" {
   role_permissions_boundary         = local.permissions_boundary_arn
   attach_cloudwatch_logs_policy     = true
   cloudwatch_logs_retention_in_days = var.log_retention_in_days
-  attach_policy_jsons               = true
+  attach_policy_jsons               = length(local.lambda_default_execution_policies) > 0
   number_of_policy_jsons            = length(local.lambda_default_execution_policies)
   attach_policy_statements          = true
   policy_statements = {
