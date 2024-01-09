@@ -314,16 +314,16 @@ module "lambda_function-excelToJson" {
         "s3:HeadObject",
       ]
       resources = [
-        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsx
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsx",
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsm
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsm",
       ]
     }
     AllowUploadJsonObjects = {
       effect  = "Allow"
       actions = ["s3:PutObject"]
       resources = [
-        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsx.json
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsx.json",
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsm.json
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsm.json",
       ]
     }
   }
@@ -384,8 +384,8 @@ module "lambda_function-cpfValidation" {
         "s3:HeadObject",
       ]
       resources = [
-        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsx.json
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsx.json",
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsm.json
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsm.json",
       ]
     }
   }
