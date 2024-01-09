@@ -6,6 +6,7 @@ import { logger } from 'src/lib/logger'
 
 const apiEndpoint = 'https://example.com'
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export const handler: S3Handler = async (event: S3Event): Promise<void> => {
   try {
     const bucket = event.Records[0].s3.bucket.name
