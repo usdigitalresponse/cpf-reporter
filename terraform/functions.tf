@@ -47,8 +47,9 @@ locals {
       var.datadog_default_environment_variables,
     ),
     {
-      LOG_LEVEL = var.lambda_log_level
-      TZ        = "UTC"
+      LOG_LEVEL                  = var.lambda_log_level
+      REPORTING_DATA_BUCKET_NAME = module.reporting_data_bucket.bucket_id
+      TZ                         = "UTC"
     },
   )
   lambda_default_execution_policies = compact([
