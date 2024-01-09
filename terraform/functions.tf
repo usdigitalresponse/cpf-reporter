@@ -306,6 +306,7 @@ module "lambda_function-excelToJson" {
   cloudwatch_logs_retention_in_days = var.log_retention_in_days
   attach_policy_jsons               = length(local.lambda_default_execution_policies) > 0
   number_of_policy_jsons            = length(local.lambda_default_execution_policies)
+  policy_jsons                      = local.lambda_default_execution_policies
   attach_policy_statements          = true
   policy_statements = {
     AllowDownloadExcelObjects = {
@@ -376,6 +377,7 @@ module "lambda_function-cpfValidation" {
   cloudwatch_logs_retention_in_days = var.log_retention_in_days
   attach_policy_jsons               = length(local.lambda_default_execution_policies) > 0
   number_of_policy_jsons            = length(local.lambda_default_execution_policies)
+  policy_jsons                      = local.lambda_default_execution_policies
   attach_policy_statements          = true
   policy_statements = {
     AllowDownloadJSONObjects = {
