@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { Loading, Empty, Failure, Success } from './OrganizationCell'
-import { standard } from './OrganizationCell.mock'
+import { Loading, Empty, Failure, Success } from './OrganizationPickListsCell'
+import { standard } from './OrganizationPickListsCell.mock'
 
 const meta: Meta = {
   title: 'Cells/OrganizationCell',

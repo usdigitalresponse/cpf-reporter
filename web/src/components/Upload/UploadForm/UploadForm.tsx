@@ -17,7 +17,7 @@ import { navigate, routes } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
-import OrganizationCell from 'src/components/OrganizationCell'
+import OrganizationPickListsCell from 'src/components/Organization/OrganizationPickListsCell'
 
 const CREATE_UPLOAD = gql`
   mutation CreateUploadMutation($input: CreateUploadInput!) {
@@ -104,7 +104,7 @@ const UploadForm = (props: UploadFormProps) => {
         listClassName="rw-form-error-list"
       />
       {/* <HiddenField name="uploadedBy">1</HiddenField> */}
-      <OrganizationCell id={props.organizationId} />
+      <OrganizationPickListsCell id={props.organizationId} />
       <FileField name="file" validation={{ required: true }} />
       <FieldError name="file" className="rw-field-error" />
       <Label
