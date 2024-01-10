@@ -47,8 +47,9 @@ locals {
       var.datadog_default_environment_variables,
     ),
     {
-      LOG_LEVEL = var.lambda_log_level
-      TZ        = "UTC"
+      LOG_LEVEL                  = var.lambda_log_level
+      REPORTING_DATA_BUCKET_NAME = module.reporting_data_bucket.bucket_id
+      TZ                         = "UTC"
     },
   )
   lambda_default_execution_policies = compact([
@@ -117,11 +118,11 @@ module "lambda_artifacts_bucket" {
   ]
 }
 
-module "cpf_uploads_bucket" {
+module "reporting_data_bucket" {
   source  = "cloudposse/s3-bucket/aws"
   version = "4.0.1"
   context = module.s3_label.context
-  name    = "cpf-reporter-${var.environment}"
+  name    = "reporting_data"
 
   acl                          = "private"
   versioning_enabled           = true
@@ -178,23 +179,21 @@ resource "aws_s3_object" "lambda_artifact-cpfValidation" {
   server_side_encryption = "AES256"
 }
 
-resource "aws_s3_bucket_notification" "json_notification" {
-  bucket = module.cpf_uploads_bucket.bucket_id
-
-  lambda_function {
-    lambda_function_arn = module.lambda_function-cpfValidation.lambda_function_arn
-    events              = ["s3:ObjectCreated:*"]
-    filter_suffix       = ".json"
-  }
-}
-
-resource "aws_s3_bucket_notification" "excel_notification" {
-  bucket = module.cpf_uploads_bucket.bucket_id
+resource "aws_s3_bucket_notification" "reporting_data" {
+  bucket = module.reporting_data_bucket.bucket_id
 
   lambda_function {
     lambda_function_arn = module.lambda_function-excelToJson.lambda_function_arn
     events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "uploads/"
     filter_suffix       = ".xlsm"
+  }
+
+  lambda_function {
+    lambda_function_arn = module.lambda_function-cpfValidation.lambda_function_arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "uploads/"
+    filter_suffix       = ".xlsm.json"
   }
 }
 
@@ -202,19 +201,23 @@ module "lambda_function-graphql" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.5.0"
 
+  // Metadata
   function_name = "${var.namespace}-graphql"
   description   = "GraphQL API server for the CPF Reporter service."
 
-  vpc_subnet_ids = local.private_subnet_ids
+  // Networking
+  attach_network_policy = true
+  vpc_subnet_ids        = local.private_subnet_ids
   vpc_security_group_ids = [
     module.lambda_security_group.id,
     module.postgres.security_group_id,
   ]
-  attach_network_policy             = true
+
+  // Permissions
   role_permissions_boundary         = local.permissions_boundary_arn
   attach_cloudwatch_logs_policy     = true
   cloudwatch_logs_retention_in_days = var.log_retention_in_days
-  attach_policy_jsons               = true
+  attach_policy_jsons               = length(local.lambda_default_execution_policies) > 0
   number_of_policy_jsons            = length(local.lambda_default_execution_policies)
   policy_jsons                      = local.lambda_default_execution_policies
   attach_policy_statements          = true
@@ -241,20 +244,21 @@ module "lambda_function-graphql" {
     }
   }
 
-  handler       = var.datadog_enabled ? local.datadog_lambda_handler : "graphql.handler"
-  runtime       = var.lambda_runtime
-  architectures = [var.lambda_arch]
-  publish       = true
-  layers        = local.lambda_layer_arns
-
+  // Artifacts
+  publish        = true
   create_package = false
   s3_existing_package = {
     bucket = aws_s3_object.lambda_artifact-graphql.bucket
     key    = aws_s3_object.lambda_artifact-graphql.key
   }
 
-  timeout     = 25  # seconds (API Gateway limit is 30 seconds)
-  memory_size = 512 # MB
+  // Runtime
+  handler       = var.datadog_enabled ? local.datadog_lambda_handler : "graphql.handler"
+  runtime       = var.lambda_runtime
+  architectures = [var.lambda_arch]
+  layers        = local.lambda_layer_arns
+  timeout       = 25  # seconds (API Gateway limit is 30 seconds)
+  memory_size   = 512 # MB
   environment_variables = merge(local.lambda_default_environment_variables, {
     // Function-specific environment variables go here:
     DATABASE_URL = format(
@@ -274,6 +278,7 @@ module "lambda_function-graphql" {
     PASSAGE_API_KEY_SECRET_ARN         = data.aws_ssm_parameter.passage_api_key_secret_arn.value
   })
 
+  // Triggers
   allowed_triggers = {
     APIGateway = {
       service    = "apigateway"
@@ -286,54 +291,132 @@ module "lambda_function-excelToJson" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.5.0"
 
-  function_name = "excel-to-json"
+  // Metadata
+  function_name = "${var.namespace}-excelToJson"
   description   = "Reacts to S3 events and converts Excel files to JSON."
 
-  vpc_subnet_ids = local.private_subnet_ids
-  vpc_security_group_ids = [
-    module.lambda_security_group.id,
-    module.postgres.security_group_id,
-  ]
-  handler        = "index.handler"
-  architectures  = [var.lambda_arch]
-  runtime        = var.lambda_runtime
-  publish        = true
-  layers         = local.lambda_layer_arns
+  // Networking
+  attach_network_policy  = false
+  vpc_subnet_ids         = null
+  vpc_security_group_ids = null
+
+  // Permissions
+  role_permissions_boundary         = local.permissions_boundary_arn
+  attach_cloudwatch_logs_policy     = true
+  cloudwatch_logs_retention_in_days = var.log_retention_in_days
+  attach_policy_jsons               = length(local.lambda_default_execution_policies) > 0
+  number_of_policy_jsons            = length(local.lambda_default_execution_policies)
+  policy_jsons                      = local.lambda_default_execution_policies
+  attach_policy_statements          = true
+  policy_statements = {
+    AllowDownloadExcelObjects = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:HeadObject",
+      ]
+      resources = [
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsm
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsm",
+      ]
+    }
+    AllowUploadJsonObjects = {
+      effect  = "Allow"
+      actions = ["s3:PutObject"]
+      resources = [
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsm.json
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsm.json",
+      ]
+    }
+  }
+
+  // Artifacts
   create_package = false
   s3_existing_package = {
     bucket = aws_s3_object.lambda_artifact-excelToJson.bucket
     key    = aws_s3_object.lambda_artifact-excelToJson.key
   }
 
-  role_name     = "lambda-role-excelToJson"
-  attach_policy = true
-  policy        = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+  // Runtime
+  handler       = var.datadog_enabled ? local.datadog_lambda_handler : "excelToJson.handler"
+  runtime       = var.lambda_runtime
+  architectures = [var.lambda_arch]
+  publish       = true
+  layers        = local.lambda_layer_arns
+  timeout       = 300 # 5 minutes, in seconds
+  memory_size   = 512 # MB
+  environment_variables = merge(local.lambda_default_environment_variables, {
+    DD_LAMBDA_HANDLER = "excelToJson.handler"
+  })
+
+  // Triggers
+  allowed_triggers = {
+    S3BucketNotification = {
+      principal  = "s3.amazonaws.com"
+      source_arn = module.reporting_data_bucket.bucket_arn
+    }
+  }
 }
 
 module "lambda_function-cpfValidation" {
-  source        = "terraform-aws-modules/lambda/aws"
-  version       = "6.5.0"
-  function_name = "cpf-validation"
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "6.5.0"
+
+  // Metadata
+  function_name = "${var.namespace}-cpfValidation"
   description   = "Reacts to S3 events and validates CPF JSON files."
 
-  vpc_subnet_ids = local.private_subnet_ids
-  vpc_security_group_ids = [
-    module.lambda_security_group.id,
-    module.postgres.security_group_id,
-  ]
-  handler        = "index.handler"
-  architectures  = [var.lambda_arch]
-  runtime        = var.lambda_runtime
+  // Networking
+  vpc_subnet_ids         = null
+  vpc_security_group_ids = null
+  attach_network_policy  = false
+
+  // Permissions
+  role_permissions_boundary         = local.permissions_boundary_arn
+  attach_cloudwatch_logs_policy     = true
+  cloudwatch_logs_retention_in_days = var.log_retention_in_days
+  attach_policy_jsons               = length(local.lambda_default_execution_policies) > 0
+  number_of_policy_jsons            = length(local.lambda_default_execution_policies)
+  policy_jsons                      = local.lambda_default_execution_policies
+  attach_policy_statements          = true
+  policy_statements = {
+    AllowDownloadJSONObjects = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:HeadObject",
+      ]
+      resources = [
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsm.json
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsm.json",
+      ]
+    }
+  }
+
+  // Artifacts
   publish        = true
-  layers         = local.lambda_layer_arns
   create_package = false
   s3_existing_package = {
     bucket = aws_s3_object.lambda_artifact-cpfValidation.bucket
     key    = aws_s3_object.lambda_artifact-cpfValidation.key
   }
 
-  role_name     = "lambda-role-cpfValidation"
-  attach_policy = true
-  policy        = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
-  # TODO: we need a policy for calling an API endpoint on the application for validation
+  // Runtime
+  handler       = var.datadog_enabled ? local.datadog_lambda_handler : "cpfValidation.handler"
+  runtime       = var.lambda_runtime
+  architectures = [var.lambda_arch]
+  layers        = local.lambda_layer_arns
+  timeout       = 60 # 1 minute, in seconds
+  memory_size   = 512
+  environment_variables = merge(local.lambda_default_environment_variables, {
+    DD_LAMBDA_HANDLER = "cpfValidation.handler"
+  })
+
+  // Triggers
+  allowed_triggers = {
+    S3BucketNotification = {
+      principal  = "s3.amazonaws.com"
+      source_arn = module.reporting_data_bucket.bucket_arn
+    }
+  }
 }

@@ -15,7 +15,7 @@ import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { StreamingBlobPayloadInputTypes } from '@smithy/types'
 import { QueryResolvers, CreateUploadInput } from 'types/graphql'
 
-const CPF_REPORTER_BUCKET_NAME = `cpf-reporter-${process.env.environment}`
+const REPORTING_DATA_BUCKET_NAME = `${process.env.REPORTING_DATA_BUCKET_NAME}`
 
 function getS3Client() {
   let s3: S3Client
@@ -64,8 +64,8 @@ export function uploadWorkbook(
   uploadId: number,
   body: StreamingBlobPayloadInputTypes
 ) {
-  const folderName = `${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/uploads/${upload.expenditureCategoryId}/${uploadId}/${upload.filename}`
-  return sendPutObjectToS3Bucket(CPF_REPORTER_BUCKET_NAME, folderName, body)
+  const folderName = `uploads/${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.expenditureCategoryId}/${uploadId}/${upload.filename}`
+  return sendPutObjectToS3Bucket(REPORTING_DATA_BUCKET_NAME, folderName, body)
 }
 
 async function sendPutObjectToS3Bucket(
@@ -85,7 +85,7 @@ async function sendPutObjectToS3Bucket(
 
 export function getTemplateRules(inputTemplateId: number) {
   return sendHeadObjectToS3Bucket(
-    CPF_REPORTER_BUCKET_NAME,
+    REPORTING_DATA_BUCKET_NAME,
     `templates/input_templates/${inputTemplateId}/rules/`
   )
 }
@@ -104,9 +104,9 @@ export async function s3PutSignedUrl(
   uploadId: number
 ): Promise<string> {
   const s3 = getS3Client()
-  const key = `${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/uploads/${upload.expenditureCategoryId}/${uploadId}/${upload.filename}`
+  const key = `uploads/${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.expenditureCategoryId}/${uploadId}/${upload.filename}`
   const baseParams: PutObjectCommandInput = {
-    Bucket: CPF_REPORTER_BUCKET_NAME,
+    Bucket: REPORTING_DATA_BUCKET_NAME,
     Key: key,
     ContentType:
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
