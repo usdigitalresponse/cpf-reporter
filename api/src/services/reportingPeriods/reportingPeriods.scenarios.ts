@@ -26,6 +26,7 @@ export const standard = defineScenario<Prisma.ReportingPeriodCreateArgs>({
             updatedAt: '2023-12-07T18:38:12.356Z',
           },
         },
+        organization: { create: { name: 'String' } },
       },
     },
     two: {
@@ -50,6 +51,7 @@ export const standard = defineScenario<Prisma.ReportingPeriodCreateArgs>({
             updatedAt: '2023-12-07T18:38:12.356Z',
           },
         },
+        organization: { create: { name: 'String' } },
       },
     },
   },

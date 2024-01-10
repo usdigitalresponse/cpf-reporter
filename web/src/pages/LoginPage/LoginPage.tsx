@@ -2,7 +2,6 @@ import '@passageidentity/passage-elements/passage-login'
 
 import { useEffect, useRef } from 'react'
 
-import { Link, routes } from '@redwoodjs/router'
 import { MetaTags } from '@redwoodjs/web'
 
 import { useAuth } from 'src/auth'

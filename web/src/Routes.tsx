@@ -7,47 +7,39 @@
 // 'src/pages/HomePage/HomePage.js'         -> HomePage
 // 'src/pages/Admin/BooksPage/BooksPage.js' -> AdminBooksPage
 
-import { Set, Router, Route, PrivateSet } from '@redwoodjs/router'
-
-import ScaffoldLayout from 'src/layouts/ScaffoldLayout'
+import { PrivateSet, Router, Route } from '@redwoodjs/router'
 
 import { useAuth } from './auth'
+import AuthenticatedLayout from './layouts/AuthenticatedLayout/AuthenticatedLayout'
 
 const Routes = () => {
   return (
     <Router useAuth={useAuth}>
-      <Route path="/logout" page={LogoutPage} name="logout" />
+      <PrivateSet wrap={AuthenticatedLayout} unauthenticated="login"></PrivateSet>
+      {/* Uploads */}
+      <Route path="/" page={UploadUploadsPage} name="uploads" />
+      <Route path="/uploads/new" page={UploadNewUploadPage} name="newUpload" />
+      <Route path="/uploads/{id:Int}/edit" page={UploadEditUploadPage} name="editUpload" />
+      <Route path="/uploads/{id:Int}" page={UploadUploadPage} name="upload" />
+      <Route path="/upload-template/{id:Int}" page={UploadTemplatePage} name="uploadTemplate" />
+      {/* Agencies */}
+      <Route path="/agencies/{id:Int}/edit" page={AgencyEditAgencyPage} name="editAgency" />
+      <Route path="/agencies/{id:Int}" page={AgencyAgencyPage} name="agency" />
+      <Route path="/agencies/new" page={AgencyNewAgencyPage} name="newAgency" />
+      <Route path="/agencies" page={AgencyAgenciesPage} name="agencies" />
+      {/* Users */}
+      <Route path="/users/new" page={UserNewUserPage} name="newUser" />
+      <Route path="/users/{id:Int}/edit" page={UserEditUserPage} name="editUser" />
+      <Route path="/users/{id:Int}" page={UserUserPage} name="user" />
+      <Route path="/users" page={UserUsersPage} name="users" />
+      {/* Reporting Periods */}
+      <Route path="/reporting-periods" page={ReportingPeriodsPage} name="reportingPeriods" />
+      {/* Organizations */}
+      <Route path="/organizations/new" page={OrganizationNewOrganizationPage} name="newOrganization" />
+      <Route path="/organizations/{id:Int}/edit" page={OrganizationEditOrganizationPage} name="editOrganization" />
+      <Route path="/organizations/{id:Int}" page={OrganizationOrganizationPage} name="organization" />
+      <Route path="/organizations" page={OrganizationOrganizationsPage} name="organizations" />
       <Route path="/login" page={LoginPage} name="login" />
-      <Set wrap={ScaffoldLayout} title="Uploads" titleTo="uploads" buttonLabel="New Upload" buttonTo="newUpload">
-        <Route path="/uploads/new" page={UploadNewUploadPage} name="newUpload" />
-        <Route path="/uploads/{id:Int}/edit" page={UploadEditUploadPage} name="editUpload" />
-        <Route path="/uploads/{id:Int}" page={UploadUploadPage} name="upload" />
-        <Route path="/" page={UploadUploadsPage} name="uploads" />
-      </Set>
-      <Set wrap={ScaffoldLayout} title="Users" titleTo="users" buttonLabel="New User" buttonTo="newUser">
-        <Route path="/users/new" page={UserNewUserPage} name="newUser" />
-        <Route path="/users/{id:Int}/edit" page={UserEditUserPage} name="editUser" />
-        <Route path="/users/{id:Int}" page={UserUserPage} name="user" />
-        <Route path="/users" page={UserUsersPage} name="users" />
-      </Set>
-      <Set wrap={ScaffoldLayout} title="Organizations" titleTo="organizations" buttonLabel="New Organization" buttonTo="newOrganization">
-        <Route path="/organizations/new" page={OrganizationNewOrganizationPage} name="newOrganization" />
-        <Route path="/organizations/{id:Int}/edit" page={OrganizationEditOrganizationPage} name="editOrganization" />
-        <Route path="/organizations/{id:Int}" page={OrganizationOrganizationPage} name="organization" />
-        <Route path="/organizations" page={OrganizationOrganizationsPage} name="organizations" />
-      </Set>
-      {/* TODO: change to this Set after implementing user authentication */}
-      {/* <Set private unauthenticated="forbidden" hasRole="admin"> */}
-      {/* </Set> */}
-
-      <PrivateSet unauthenticated="login" wrap={ScaffoldLayout} title="Agencies" titleTo="agencies">
-        <Route path="/agencies/{id:Int}/edit" page={AgencyEditAgencyPage} name="editAgency" />
-        <Route path="/agencies/{id:Int}" page={AgencyAgencyPage} name="agency" />
-        <Route path="/agencies/new" page={AgencyNewAgencyPage} name="newAgency" />
-        <Route path="/agencies" page={AgencyAgenciesPage} name="agencies" />
-        <Route path="/upload-template/{id:Int}" page={UploadTemplatePage} name="uploadTemplate" />
-        <Route path="/reporting-periods" page={ReportingPeriodsPage} name="reportingPeriods" />
-      </PrivateSet>
       <Route notfound page={NotFoundPage} />
     </Router>
   )

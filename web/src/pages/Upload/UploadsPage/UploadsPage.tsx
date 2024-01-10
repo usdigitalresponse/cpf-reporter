@@ -15,7 +15,12 @@ const UploadsPage = () => {
         <Button size="sm" variant="primary">
           Download Empty Template
         </Button>
-        <Button size="sm" variant="" className="btn-outline-primary">
+        <Button
+          size="sm"
+          variant=""
+          className="btn-outline-primary"
+          href="/uploads/new"
+        >
           Upload Workbook
         </Button>
         <Button size="sm" variant="" className="btn-outline-primary">
