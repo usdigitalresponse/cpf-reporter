@@ -33,11 +33,13 @@ const client = {
   login: () => ({
     id: 1,
     email: 'email@example.com',
+    organizationId: 1,
     roles: [],
   }),
   signup: () => ({
     id: 1,
     email: 'email@example.com',
+    organizationId: 1,
     roles: [],
   }),
   logout: () => {},
@@ -45,6 +47,7 @@ const client = {
   getUserMetadata: () => ({
     id: 1,
     email: 'email@example.com',
+    organizationId: 1,
     roles: [],
   }),
 }
