@@ -62,6 +62,7 @@ module "api_gateway" {
     ])
     allow_credentials = true
     allow_headers = [
+      "auth-provider",
       "authorization",
       "content-type",
       "traceparent",
