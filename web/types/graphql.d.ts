@@ -381,6 +381,12 @@ export type Organization = {
   agencies: Array<Maybe<Agency>>;
   id: Scalars['Int'];
   name: Scalars['String'];
+  projects: Array<Maybe<Project>>;
+  reportingPeriods: Array<Maybe<ReportingPeriod>>;
+  subrecipients: Array<Maybe<Subrecipient>>;
+  uploadValidations: Array<Maybe<UploadValidation>>;
+  uploads: Array<Maybe<Upload>>;
+  users: Array<Maybe<User>>;
 };
 
 export type OutputTemplate = {
