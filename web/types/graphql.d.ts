@@ -871,6 +871,13 @@ export type FindOrganizationByIdVariables = Exact<{
 
 export type FindOrganizationById = { __typename?: 'Query', organization?: { __typename?: 'Organization', id: number, name: string } | null };
 
+export type FindOrganizationQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type FindOrganizationQuery = { __typename?: 'Query', organization?: { __typename?: 'Organization', id: number, reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, name: string } | null>, agencies: Array<{ __typename?: 'Agency', id: number, name: string } | null> } | null };
+
 export type FindOrganizationsVariables = Exact<{ [key: string]: never; }>;
 
 
