@@ -1,7 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { Loading, Empty, Failure, Success } from './ReportingPeriodCell'
-import { standard } from './ReportingPeriodCell.mock'
+import {
+  Loading,
+  Empty,
+  Failure,
+  Success,
+} from './TemplateUploadReportingPeriodCell'
+import { standard } from './TemplateUploadReportingPeriodCell.mock'
 
 const meta: Meta = {
   title: 'Cells/ReportingPeriodCell',

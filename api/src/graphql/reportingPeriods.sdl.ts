@@ -4,6 +4,8 @@ export const schema = gql`
     name: String!
     startDate: DateTime!
     endDate: DateTime!
+    organizationId: Int!
+    organization: Organization!
     certifiedAt: DateTime
     certifiedById: Int
     certifiedBy: User
@@ -14,23 +16,20 @@ export const schema = gql`
     isCurrentPeriod: Boolean!
     createdAt: DateTime!
     updatedAt: DateTime!
+    uploads: [Upload]!
+    projects: [Project]!
   }
 
   type Query {
     reportingPeriods: [ReportingPeriod!]! @requireAuth
-    reportingPeriodsByOrg(organizationId: Int!): [ReportingPeriod!]!
-      @requireAuth
     reportingPeriod(id: Int!): ReportingPeriod @requireAuth
-    previousReportingPeriods(
-      id: Int!
-      organizationId: Int!
-    ): [ReportingPeriod!]! @requireAuth
   }
 
   input CreateReportingPeriodInput {
     name: String!
     startDate: DateTime!
     endDate: DateTime!
+    organizationId: Int!
     certifiedAt: DateTime
     certifiedById: Int
     inputTemplateId: Int!
@@ -42,6 +41,7 @@ export const schema = gql`
     name: String
     startDate: DateTime
     endDate: DateTime
+    organizationId: Int
     certifiedAt: DateTime
     certifiedById: Int
     inputTemplateId: Int
