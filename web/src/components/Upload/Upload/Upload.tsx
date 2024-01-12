@@ -1,107 +1,63 @@
-import type {
-  DeleteUploadMutationVariables,
-  FindUploadById,
-} from 'types/graphql'
-
-import { Link, routes, navigate } from '@redwoodjs/router'
-import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
+import { Button } from 'react-bootstrap'
+import type { FindUploadById } from 'types/graphql'
 
 import { timeTag } from 'src/lib/formatters'
-
-const DELETE_UPLOAD_MUTATION = gql`
-  mutation DeleteUploadMutation($id: Int!) {
-    deleteUpload(id: $id) {
-      id
-    }
-  }
-`
 
 interface Props {
   upload: NonNullable<FindUploadById['upload']>
 }
 
 const Upload = ({ upload }: Props) => {
-  const [deleteUpload] = useMutation(DELETE_UPLOAD_MUTATION, {
-    onCompleted: () => {
-      toast.success('Upload deleted')
-      navigate(routes.uploads())
-    },
-    onError: (error) => {
-      toast.error(error.message)
-    },
-  })
-
-  const onDeleteClick = (id: DeleteUploadMutationVariables['id']) => {
-    if (confirm('Are you sure you want to delete upload ' + id + '?')) {
-      deleteUpload({ variables: { id } })
-    }
-  }
-
   return (
     <>
-      <div className="rw-segment">
-        <header className="rw-segment-header">
-          <h2 className="rw-heading rw-heading-secondary">
-            Upload {upload.id} Detail
-          </h2>
-        </header>
-        <table className="rw-table">
-          <tbody>
-            <tr>
-              <th>Id</th>
-              <td>{upload.id}</td>
-            </tr>
-            <tr>
-              <th>Filename</th>
-              <td>{upload.filename}</td>
-            </tr>
-            <tr>
-              <th>Uploaded by id</th>
-              <td>{upload.uploadedById}</td>
-            </tr>
-            <tr>
-              <th>Agency id</th>
-              <td>{upload.agencyId}</td>
-            </tr>
-            <tr>
-              <th>Organization id</th>
-              <td>{upload.organizationId}</td>
-            </tr>
-            <tr>
-              <th>Reporting period id</th>
-              <td>{upload.reportingPeriodId}</td>
-            </tr>
-            <tr>
-              <th>Expenditure category id</th>
-              <td>{upload.expenditureCategoryId}</td>
-            </tr>
-            <tr>
-              <th>Created at</th>
-              <td>{timeTag(upload.createdAt)}</td>
-            </tr>
-            <tr>
-              <th>Updated at</th>
-              <td>{timeTag(upload.updatedAt)}</td>
-            </tr>
-          </tbody>
-        </table>
+      <header className="rw-segment-header">
+        <h2 className="rw-heading rw-heading-secondary">
+          Upload {upload.id} details:
+        </h2>
+      </header>
+      <div className="row">
+        <div className="col-sm-12 col-md-6 mb-sm-3 mb-md-1">
+          <ul className="list-group">
+            <li className="list-group-item">
+              <span className="fw-bold">Filename: </span>
+              {upload.filename}
+            </li>
+            <li className="list-group-item">
+              <span className="fw-bold">Reporting period: </span>
+              {upload.reportingPeriod.name}
+            </li>
+            <li className="list-group-item">
+              <span className="fw-bold">EC Code: </span>
+              {upload.expenditureCategory.code}
+            </li>
+            <li className="list-group-item">
+              <span className="fw-bold">Created: </span>
+              {timeTag(upload.createdAt)} by {upload.uploadedBy.name}
+            </li>
+            <li className="list-group-item">
+              <span className="fw-bold">Notes: </span>
+              {upload.notes}
+            </li>
+            <li className="list-group-item">
+              <span className="fw-bold">Validation: </span>
+              WIP
+            </li>
+            <li className="list-group-item">
+              <div className="float-end">
+                <Button variant="primary" size="sm">
+                  Download file
+                </Button>{' '}
+                <Button variant="outline-primary" size="sm">
+                  Invalidate
+                </Button>{' '}
+                <Button variant="primary" size="sm">
+                  Re-validate
+                </Button>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
-      <nav className="rw-button-group">
-        <Link
-          to={routes.editUpload({ id: upload.id })}
-          className="rw-button rw-button-blue"
-        >
-          Edit
-        </Link>
-        <button
-          type="button"
-          className="rw-button rw-button-red"
-          onClick={() => onDeleteClick(upload.id)}
-        >
-          Delete
-        </button>
-      </nav>
     </>
   )
 }
