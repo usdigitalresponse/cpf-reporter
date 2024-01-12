@@ -1,16 +1,21 @@
 export const schema = gql`
+  enum RoleEnum {
+    USDR_ADMIN
+    ORGANIZATION_ADMIN
+    ORGANIZATION_STAFF
+  }
+
   type User {
     id: Int!
     email: String!
     name: String
     agencyId: Int
     organizationId: Int!
-    roleId: Int
     createdAt: DateTime!
     updatedAt: DateTime!
     agency: Agency
     organization: Organization!
-    role: Role
+    role: RoleEnum
     certified: [ReportingPeriod]!
     uploaded: [Upload]!
     validated: [UploadValidation]!
@@ -27,14 +32,14 @@ export const schema = gql`
     email: String!
     name: String
     agencyId: Int
-    roleId: Int
+    role: String
   }
 
   input UpdateUserInput {
     email: String
     name: String
     agencyId: Int
-    roleId: Int
+    role: String
   }
 
   type Mutation {

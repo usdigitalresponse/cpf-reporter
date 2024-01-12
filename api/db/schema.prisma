@@ -40,12 +40,11 @@ model User {
   name           String?
   agencyId       Int?
   organizationId Int?
-  roleId         Int?
   createdAt      DateTime            @default(now()) @db.Timestamptz(6)
   updatedAt      DateTime            @default(now()) @db.Timestamptz(6)
+  role           Role?
   agency         Agency?             @relation(fields: [agencyId], references: [id])
   organization   Organization?       @relation(fields: [organizationId], references: [id])
-  role           Role?               @relation(fields: [roleId], references: [id])
   certified      ReportingPeriod[]
   uploaded       Upload[]
   validated      UploadValidation[] @relation("ValidatedUploads")
@@ -53,12 +52,10 @@ model User {
   subrecipients  Subrecipient[]
 }
 
-model Role {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime
-  users     User[]
+enum Role {
+  USDR_ADMIN
+  ORGANIZATION_ADMIN
+  ORGANIZATION_STAFF
 }
 
 model InputTemplate {
