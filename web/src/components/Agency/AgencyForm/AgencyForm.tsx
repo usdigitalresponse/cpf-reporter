@@ -1,6 +1,7 @@
 import { Button } from 'react-bootstrap'
 import { useForm, UseFormReturn } from 'react-hook-form'
 import type { EditAgencyById, UpdateAgencyInput } from 'types/graphql'
+import { useAuth } from 'web/src/auth'
 
 import {
   Form,
@@ -25,6 +26,7 @@ const AgencyForm = (props: AgencyFormProps) => {
   const { agency, onSave, error, loading } = props
   const formMethods: UseFormReturn<FormAgency> = useForm<FormAgency>()
   const hasErrors = Object.keys(formMethods.formState.errors).length > 0
+  const { currentUser } = useAuth()
 
   // Resets the form to the previous values when editing the existing agency
   // Clears out the form when creating a new agency
@@ -33,7 +35,8 @@ const AgencyForm = (props: AgencyFormProps) => {
   }
 
   const onSubmit = (data: FormAgency) => {
-    onSave(data, props?.agency?.id)
+    const modifiedData = { ...data, organizationId: currentUser.organizationId }
+    onSave(modifiedData, props?.agency?.id)
   }
 
   return (
