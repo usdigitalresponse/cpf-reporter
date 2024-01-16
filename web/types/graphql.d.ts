@@ -917,13 +917,6 @@ export type CreateUploadMutationVariables = Exact<{
 
 export type CreateUploadMutation = { __typename?: 'Mutation', createUpload: { __typename?: 'Upload', id: number, signedUrl?: string | null } };
 
-export type DeleteUploadMutationVariables = Exact<{
-  id: Scalars['Int'];
-}>;
-
-
-export type DeleteUploadMutation = { __typename?: 'Mutation', deleteUpload: { __typename?: 'Upload', id: number } };
-
 export type FindUploadByIdVariables = Exact<{
   id: Scalars['Int'];
 }>;

@@ -26,17 +26,33 @@ const Upload = ({ upload }: Props) => {
               <span className="fw-bold">Reporting period: </span>
               {upload.reportingPeriod.name}
             </li>
-            <li className="list-group-item">
+            <li
+              className={`list-group-item ${
+                !upload.expenditureCategory.code && 'list-group-item-warning'
+              }`}
+            >
               <span className="fw-bold">EC Code: </span>
-              {upload.expenditureCategory.code}
+              {upload.expenditureCategory.code || 'Not set'}
+            </li>
+            <li
+              className={`list-group-item ${
+                !upload.agency.code && 'list-group-item-warning'
+              }`}
+            >
+              <span className="fw-bold">Agency: </span>
+              {upload.agency.code || 'Not set'}
             </li>
             <li className="list-group-item">
               <span className="fw-bold">Created: </span>
               {timeTag(upload.createdAt)} by {upload.uploadedBy.name}
             </li>
-            <li className="list-group-item">
+            <li
+              className={`list-group-item ${
+                !upload.notes && 'list-group-item-warning'
+              }`}
+            >
               <span className="fw-bold">Notes: </span>
-              {upload.notes}
+              {upload.notes || 'Not set'}
             </li>
             <li className="list-group-item">
               <span className="fw-bold">Validation: </span>
