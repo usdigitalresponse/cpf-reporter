@@ -8,14 +8,14 @@ import { useAuth } from 'src/auth'
 
 const LoginPage = () => {
   const ref = useRef()
-  const { isAuthenticated, currentUser, logOut, logIn } = useAuth()
+  const { isAuthenticated, currentUser, logIn } = useAuth()
   console.log('ref', ref)
   const beforeAuth = (email) => {
-    console.log(email)
+    console.log('beforeauth', email)
     return true
   }
   const onSuccess = (event: any) => {
-    // console.log(`successfully authenticated. ${event}`)
+    console.log(`successfully authenticated. ${event}`)
     // console.log(event)
     // localStorage.setItem('psg_auth_token', event.auth_token)
     // window.location.href = event.redirect_url
@@ -31,7 +31,7 @@ const LoginPage = () => {
   })
   console.log('isAuthenticated', isAuthenticated)
   console.log('currentUser', currentUser)
-  console.log('logout', logOut)
+  // console.log('logout', logOut)
 
   return (
     <>

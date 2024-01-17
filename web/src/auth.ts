@@ -51,39 +51,45 @@ export interface ValidateResetTokenResponse {
 //   }),
 // }
 
-const passageUser = new PassageUser()
-
-const passageClient = {
-  logout: async () => {
-    return await passageUser.signOut()
-  },
-  getToken: async () => {
-    console.log('getAuthToken')
-    const token = await passageUser.getAuthToken()
-    return token
-  },
-  getUserMetadata: async () => {
-    console.log('passageUser.userInfo()')
-    console.log(await passageUser.userInfo())
-    return passageUser.userInfo()
-  },
-  login: (event) => {
-    console.log('unsure how to login with passage')
-    //return { id: 'unique-user-id', email: '', roles: [] }
-    console.log(`successfully authenticated. ${event}`)
-    console.log(event)
-    localStorage.setItem('psg_auth_token', event.auth_token)
-    // window.location.href = event.redirect_url
-  },
-  signup: () => {
-    console.log('unsure how to signup with passage')
-    return { id: 'unique-user-id', email: '', roles: [] }
-  },
+function getPassageUser() {
+  if (localStorage.getItem('psg_auth_token')) {
+    return new PassageUser(localStorage.getItem('psg_auth_token'))
+  } else {
+    return null
+  }
 }
 
-console.log('passageUser', passageUser)
-
 function createAuth() {
+  // const passageUser = new PassageUser(localStorage.getItem('psg_auth_token'))
+
+  const passageClient = {
+    logout: async () => {
+      return await getPassageUser().signOut()
+    },
+    getToken: async () => {
+      console.log('getAuthToken')
+      const token = await getPassageUser().getAuthToken()
+      return token
+    },
+    getUserMetadata: async () => {
+      console.log('passageUser.userInfo()')
+      console.log(await getPassageUser().userInfo())
+      return getPassageUser().userInfo()
+    },
+    login: (event) => {
+      console.log('unsure how to login with passage')
+      //return { id: 'unique-user-id', email: '', roles: [] }
+      console.log(`successfully authenticated. ${event}`)
+      console.log(event)
+      localStorage.setItem('psg_auth_token', event.auth_token)
+      // window.location.href = event.redirect_url
+    },
+    signup: () => {
+      console.log('unsure how to signup with passage')
+      return { id: 'unique-user-id', email: '', roles: [] }
+    },
+  }
+
   const authImplementation = createAuthImplementation(passageClient)
 
   // You can pass custom provider hooks here if you need to as a second
@@ -100,9 +106,9 @@ function createAuthImplementation(client: AuthClient) {
     type: 'custom-auth',
     client,
     login: async (e) => client.login(e),
-    logout: async () => await passageUser.signOut(),
+    logout: async () => await getPassageUser().signOut(),
     signup: async () => client.signup(),
-    getToken: async () => await passageUser.getAuthToken(),
+    getToken: async () => await getPassageUser().getAuthToken(),
     /**
      * Actual user metadata might look something like this
      * {
