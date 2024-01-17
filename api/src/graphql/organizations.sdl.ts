@@ -2,7 +2,13 @@ export const schema = gql`
   type Organization {
     id: Int!
     agencies: [Agency]!
+    users: [User]!
     name: String!
+    reportingPeriods: [ReportingPeriod]!
+    uploads: [Upload]!
+    uploadValidations: [UploadValidation]!
+    subrecipients: [Subrecipient]!
+    projects: [Project]!
   }
 
   type Query {
@@ -26,5 +32,23 @@ export const schema = gql`
       input: UpdateOrganizationInput!
     ): Organization! @requireAuth
     deleteOrganization(id: Int!): Organization! @requireAuth
+    createOrganizationAgencyAdmin(
+      input: CreateOrgAgencyAdminInput!
+    ): CreateOrgAgencyAdminPayload @requireAuth
+  }
+
+  input CreateOrgAgencyAdminInput {
+    organizationName: String!
+    agencyName: String!
+    agencyAbbreviation: String!
+    agencyCode: String!
+    userEmail: String!
+    userName: String!
+  }
+
+  type CreateOrgAgencyAdminPayload {
+    organization: Organization
+    agency: Agency
+    user: User
   }
 `
