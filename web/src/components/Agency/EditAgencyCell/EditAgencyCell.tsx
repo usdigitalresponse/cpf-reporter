@@ -24,6 +24,7 @@ const UPDATE_AGENCY_MUTATION = gql`
       name
       abbreviation
       code
+      organizationId
     }
   }
 `

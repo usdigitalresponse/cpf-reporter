@@ -32,6 +32,7 @@ export type CreateAgencyInput = {
   abbreviation?: InputMaybe<Scalars['String']>;
   code: Scalars['String'];
   name: Scalars['String'];
+  organizationId: Scalars['Int'];
 };
 
 export type CreateExpenditureCategoryInput = {
@@ -640,6 +641,7 @@ export type UpdateAgencyInput = {
   abbreviation?: InputMaybe<Scalars['String']>;
   code?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
+  organizationId: Scalars['Int'];
 };
 
 export type UpdateExpenditureCategoryInput = {
@@ -826,7 +828,7 @@ export type UpdateAgencyMutationVariables = Exact<{
 }>;
 
 
-export type UpdateAgencyMutation = { __typename?: 'Mutation', updateAgency: { __typename?: 'Agency', id: number, name: string, abbreviation?: string | null, code: string } };
+export type UpdateAgencyMutation = { __typename?: 'Mutation', updateAgency: { __typename?: 'Agency', id: number, name: string, abbreviation?: string | null, code: string, organizationId: number } };
 
 export type CreateAgencyMutationVariables = Exact<{
   input: CreateAgencyInput;
