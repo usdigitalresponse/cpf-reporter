@@ -179,3 +179,13 @@ async function getPassageAPIKey(setEnv = true, force = false): Promise<string> {
 
   return resp.SecretString
 }
+
+async function createPassageUser() {
+  // add implementation details
+  return null
+}
+
+async function deletePassageUesr() {
+  // add implementation details
+  return null
+}
