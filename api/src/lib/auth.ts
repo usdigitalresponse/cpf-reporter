@@ -6,6 +6,19 @@ import {
 import { Decoded } from '@redwoodjs/api'
 import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
 
+const Passage = require('@passageidentity/passage-node')
+
+let passage
+getPassageAPIKey().then((key) => {
+  passage = new Passage({
+    appID: process.env.REACT_APP_PASSAGE_APP_ID,
+    apiKey: key,
+    authStrategy: 'HEADER',
+  })
+  console.log('inner', passage)
+})
+
+console.log('outer', passage)
 /**
  * Represents the user attributes returned by the decoding the
  * Authentication provider's JWT together with an optional list of roles.
@@ -35,9 +48,15 @@ type RedwoodUser = Record<string, unknown> & { roles?: string[] }
  * @returns RedwoodUser
  */
 export const getCurrentUser = async (
-  decoded: Decoded
+  decoded: Decoded,
+  token: any
 ): Promise<RedwoodUser | null> => {
+  console.log('API::getCurrentUser')
   console.log(decoded)
+  console.log(token)
+
+  const userId = await passage.validAuthToken(token.token)
+  console.log(userId)
   return {
     id: 1,
     organizationId: 1,
@@ -52,6 +71,7 @@ export const getCurrentUser = async (
  * @returns {boolean} - If the currentUser is authenticated
  */
 export const isAuthenticated = (): boolean => {
+  console.log('API:: checking if is authenticated')
   return !!context.currentUser
 }
 
