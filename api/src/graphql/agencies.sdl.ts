@@ -17,12 +17,14 @@ export const schema = gql`
     name: String!
     abbreviation: String
     code: String!
+    organizationId: Int!
   }
 
   input UpdateAgencyInput {
     name: String
     abbreviation: String
     code: String
+    organizationId: Int!
   }
 
   type Mutation {
