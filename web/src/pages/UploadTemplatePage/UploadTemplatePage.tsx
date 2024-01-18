@@ -2,7 +2,7 @@ import { Form, FileField, HiddenField, Submit } from '@redwoodjs/forms'
 import { Link, routes } from '@redwoodjs/router'
 import { MetaTags } from '@redwoodjs/web'
 
-import ReportingPeriodCell from 'src/components/ReportingPeriodCell'
+import TemplateUploadReportingPeriodCell from 'src/components/TemplateUploadReportingPeriodCell/TemplateUploadReportingPeriodCell'
 
 const UploadTemplatePage = ({ id }) => {
   const onSubmit = (data) => {
@@ -14,7 +14,7 @@ const UploadTemplatePage = ({ id }) => {
       <MetaTags title="UploadTemplate" description="UploadTemplate page" />
 
       <h1>Upload Period Template</h1>
-      <ReportingPeriodCell id={id} />
+      <TemplateUploadReportingPeriodCell id={id} />
 
       <Form onSubmit={onSubmit}>
         <FileField name="file" />
