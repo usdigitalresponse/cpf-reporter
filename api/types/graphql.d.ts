@@ -110,6 +110,7 @@ export type CreateReportingPeriodInput = {
   inputTemplateId: Scalars['Int'];
   isCurrentPeriod: Scalars['Boolean'];
   name: Scalars['String'];
+  organizationId: Scalars['Int'];
   outputTemplateId: Scalars['Int'];
   startDate: Scalars['DateTime'];
 };
@@ -474,14 +475,12 @@ export type Query = {
   organizations: Array<Organization>;
   outputTemplate?: Maybe<OutputTemplate>;
   outputTemplates: Array<OutputTemplate>;
-  previousReportingPeriods: Array<ReportingPeriod>;
   project?: Maybe<Project>;
   projects: Array<Project>;
   /** Fetches the Redwood root schema. */
   redwood?: Maybe<Redwood>;
   reportingPeriod?: Maybe<ReportingPeriod>;
   reportingPeriods: Array<ReportingPeriod>;
-  reportingPeriodsByOrg: Array<ReportingPeriod>;
   role?: Maybe<Role>;
   roles: Array<Role>;
   subrecipient?: Maybe<Subrecipient>;
@@ -533,13 +532,6 @@ export type QueryoutputTemplateArgs = {
 
 
 /** About the Redwood queries. */
-export type QuerypreviousReportingPeriodsArgs = {
-  id: Scalars['Int'];
-  organizationId: Scalars['Int'];
-};
-
-
-/** About the Redwood queries. */
 export type QueryprojectArgs = {
   id: Scalars['Int'];
 };
@@ -548,12 +540,6 @@ export type QueryprojectArgs = {
 /** About the Redwood queries. */
 export type QueryreportingPeriodArgs = {
   id: Scalars['Int'];
-};
-
-
-/** About the Redwood queries. */
-export type QueryreportingPeriodsByOrgArgs = {
-  organizationId: Scalars['Int'];
 };
 
 
@@ -619,10 +605,14 @@ export type ReportingPeriod = {
   inputTemplateId: Scalars['Int'];
   isCurrentPeriod: Scalars['Boolean'];
   name: Scalars['String'];
+  organization: Organization;
+  organizationId: Scalars['Int'];
   outputTemplate: OutputTemplate;
   outputTemplateId: Scalars['Int'];
+  projects: Array<Maybe<Project>>;
   startDate: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+  uploads: Array<Maybe<Upload>>;
 };
 
 export type Role = {
@@ -703,6 +693,7 @@ export type UpdateReportingPeriodInput = {
   inputTemplateId?: InputMaybe<Scalars['Int']>;
   isCurrentPeriod?: InputMaybe<Scalars['Boolean']>;
   name?: InputMaybe<Scalars['String']>;
+  organizationId?: InputMaybe<Scalars['Int']>;
   outputTemplateId?: InputMaybe<Scalars['Int']>;
   startDate?: InputMaybe<Scalars['DateTime']>;
 };
@@ -1264,13 +1255,11 @@ export type QueryResolvers<ContextType = RedwoodGraphQLContext, ParentType exten
   organizations: OptArgsResolverFn<Array<ResolversTypes['Organization']>, ParentType, ContextType>;
   outputTemplate: Resolver<Maybe<ResolversTypes['OutputTemplate']>, ParentType, ContextType, RequireFields<QueryoutputTemplateArgs, 'id'>>;
   outputTemplates: OptArgsResolverFn<Array<ResolversTypes['OutputTemplate']>, ParentType, ContextType>;
-  previousReportingPeriods: Resolver<Array<ResolversTypes['ReportingPeriod']>, ParentType, ContextType, RequireFields<QuerypreviousReportingPeriodsArgs, 'id' | 'organizationId'>>;
   project: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryprojectArgs, 'id'>>;
   projects: OptArgsResolverFn<Array<ResolversTypes['Project']>, ParentType, ContextType>;
   redwood: OptArgsResolverFn<Maybe<ResolversTypes['Redwood']>, ParentType, ContextType>;
   reportingPeriod: Resolver<Maybe<ResolversTypes['ReportingPeriod']>, ParentType, ContextType, RequireFields<QueryreportingPeriodArgs, 'id'>>;
   reportingPeriods: OptArgsResolverFn<Array<ResolversTypes['ReportingPeriod']>, ParentType, ContextType>;
-  reportingPeriodsByOrg: Resolver<Array<ResolversTypes['ReportingPeriod']>, ParentType, ContextType, RequireFields<QueryreportingPeriodsByOrgArgs, 'organizationId'>>;
   role: Resolver<Maybe<ResolversTypes['Role']>, ParentType, ContextType, RequireFields<QueryroleArgs, 'id'>>;
   roles: OptArgsResolverFn<Array<ResolversTypes['Role']>, ParentType, ContextType>;
   subrecipient: Resolver<Maybe<ResolversTypes['Subrecipient']>, ParentType, ContextType, RequireFields<QuerysubrecipientArgs, 'id'>>;
@@ -1296,13 +1285,11 @@ export type QueryRelationResolvers<ContextType = RedwoodGraphQLContext, ParentTy
   organizations?: RequiredResolverFn<Array<ResolversTypes['Organization']>, ParentType, ContextType>;
   outputTemplate?: RequiredResolverFn<Maybe<ResolversTypes['OutputTemplate']>, ParentType, ContextType, RequireFields<QueryoutputTemplateArgs, 'id'>>;
   outputTemplates?: RequiredResolverFn<Array<ResolversTypes['OutputTemplate']>, ParentType, ContextType>;
-  previousReportingPeriods?: RequiredResolverFn<Array<ResolversTypes['ReportingPeriod']>, ParentType, ContextType, RequireFields<QuerypreviousReportingPeriodsArgs, 'id' | 'organizationId'>>;
   project?: RequiredResolverFn<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryprojectArgs, 'id'>>;
   projects?: RequiredResolverFn<Array<ResolversTypes['Project']>, ParentType, ContextType>;
   redwood?: RequiredResolverFn<Maybe<ResolversTypes['Redwood']>, ParentType, ContextType>;
   reportingPeriod?: RequiredResolverFn<Maybe<ResolversTypes['ReportingPeriod']>, ParentType, ContextType, RequireFields<QueryreportingPeriodArgs, 'id'>>;
   reportingPeriods?: RequiredResolverFn<Array<ResolversTypes['ReportingPeriod']>, ParentType, ContextType>;
-  reportingPeriodsByOrg?: RequiredResolverFn<Array<ResolversTypes['ReportingPeriod']>, ParentType, ContextType, RequireFields<QueryreportingPeriodsByOrgArgs, 'organizationId'>>;
   role?: RequiredResolverFn<Maybe<ResolversTypes['Role']>, ParentType, ContextType, RequireFields<QueryroleArgs, 'id'>>;
   roles?: RequiredResolverFn<Array<ResolversTypes['Role']>, ParentType, ContextType>;
   subrecipient?: RequiredResolverFn<Maybe<ResolversTypes['Subrecipient']>, ParentType, ContextType, RequireFields<QuerysubrecipientArgs, 'id'>>;
@@ -1341,10 +1328,14 @@ export type ReportingPeriodResolvers<ContextType = RedwoodGraphQLContext, Parent
   inputTemplateId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   isCurrentPeriod: OptArgsResolverFn<ResolversTypes['Boolean'], ParentType, ContextType>;
   name: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  organization: OptArgsResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
+  organizationId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   outputTemplate: OptArgsResolverFn<ResolversTypes['OutputTemplate'], ParentType, ContextType>;
   outputTemplateId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  projects: OptArgsResolverFn<Array<Maybe<ResolversTypes['Project']>>, ParentType, ContextType>;
   startDate: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   updatedAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  uploads: OptArgsResolverFn<Array<Maybe<ResolversTypes['Upload']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -1359,10 +1350,14 @@ export type ReportingPeriodRelationResolvers<ContextType = RedwoodGraphQLContext
   inputTemplateId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   isCurrentPeriod?: RequiredResolverFn<ResolversTypes['Boolean'], ParentType, ContextType>;
   name?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  organization?: RequiredResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
+  organizationId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   outputTemplate?: RequiredResolverFn<ResolversTypes['OutputTemplate'], ParentType, ContextType>;
   outputTemplateId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  projects?: RequiredResolverFn<Array<Maybe<ResolversTypes['Project']>>, ParentType, ContextType>;
   startDate?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   updatedAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  uploads?: RequiredResolverFn<Array<Maybe<ResolversTypes['Upload']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

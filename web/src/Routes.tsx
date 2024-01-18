@@ -33,7 +33,10 @@ const Routes = () => {
         <Route path="/users/{id:Int}" page={UserUserPage} name="user" />
         <Route path="/users" page={UserUsersPage} name="users" />
         {/* Reporting Periods */}
-        <Route path="/reporting-periods" page={ReportingPeriodsPage} name="reportingPeriods" />
+        <Route path="/reporting-periods/new" page={ReportingPeriodNewReportingPeriodPage} name="newReportingPeriod" />
+        <Route path="/reporting-periods/{id:Int}/edit" page={ReportingPeriodEditReportingPeriodPage} name="editReportingPeriod" />
+        <Route path="/reporting-periods/{id:Int}" page={ReportingPeriodReportingPeriodPage} name="reportingPeriod" />
+        <Route path="/reporting-periods" page={ReportingPeriodReportingPeriodsPage} name="reportingPeriods" />
         {/* Organizations */}
         <PrivateSet unauthenticated="forbidden" roles="USDR_ADMIN">
           <Route path="/organizations/new" page={OrganizationNewOrganizationPage} name="newOrganization" />
