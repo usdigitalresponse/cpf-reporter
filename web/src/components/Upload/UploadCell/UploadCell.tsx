@@ -25,6 +25,20 @@ export const QUERY = gql`
       notes
       createdAt
       updatedAt
+      validations {
+        id
+        uploadId
+        agencyId
+        organizationId
+        inputTemplateId
+        validationResults
+        validatedAt
+        validatedById
+        invalidatedAt
+        invalidatedById
+        createdAt
+        updatedAt
+      }
     }
   }
 `

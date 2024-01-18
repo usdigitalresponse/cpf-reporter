@@ -1,13 +1,114 @@
+import { useState, useEffect } from 'react'
+
 import { Button } from 'react-bootstrap'
 import type { FindUploadById } from 'types/graphql'
 
 import { timeTag } from 'src/lib/formatters'
+
+import UploadValidationResultsTable from '../UploadValidationResultsTable/UploadValidationResultsTable'
 
 interface Props {
   upload: NonNullable<FindUploadById['upload']>
 }
 
 const Upload = ({ upload }: Props) => {
+  const errorsMock = [
+    {
+      severity: null,
+      message: 'EC Code must be set',
+      tab: 'Cover',
+      row: 1,
+      col: 'B',
+    },
+    {
+      severity: 'err',
+      message:
+        'Upload template version is older than the latest input template',
+      tab: 'Logic',
+      row: 2,
+      col: 'D',
+    },
+  ]
+
+  useEffect(() => {
+    // This function relies on invalidatedAt and validatedAt being set
+    const validation = findLatestValidationEntryTest(currentUpload)
+    console.log(validation)
+    // loadUpload()
+  }, [])
+
+  const [currentUpload, setCurrentUpload] = useState(upload)
+  const [isValidating, setIsValidating] = useState(false) // loading state
+  const [errors, setErrors] = useState(errorsMock) // validationErrors
+
+  // TODO: Implement load upload function
+  const loadUpload = async () => {
+    // setCurrentUpload(null)
+    // setErrors([])
+    // const result = await getJson(`/api/uploads/${upload.id}`)
+    // if (result.error) {
+    //   console.log('Load upload error')
+    // } else {
+    //   setCurrentUpload(result.upload)
+    // }
+  }
+
+  // TODO: Implement invalidate upload function
+  const invalidateUpload = async () => {
+    console.log('invalid')
+
+    // setIsValidating(true)
+
+    // try {
+    //   const result = await post(`/api/uploads/${upload.id}/invalidate`)
+    //   await loadUpload()
+
+    //   if (result.errors?.length) {
+    //     setErrors(result.errors)
+    //   } else {
+    //     console.log('Upload successfully invalidated!')
+    //   }
+    // } catch (error) {
+    //   // we got an error from the backend, but the backend didn't send reasons
+    //   console.log('invalidate upload error')
+    // }
+
+    // setIsValidating(false)
+  }
+
+  const validateUpload = async () => {
+    console.log('valid')
+
+    setIsValidating(true)
+
+    try {
+      const result = await post(`/api/uploads/${upload.id}/validate`)
+      await loadUpload()
+
+      if (result.errors?.length) {
+        setErrors(result.errors)
+      } else {
+        console.log('Upload successfully validated!')
+      }
+    } catch (error) {
+      console.log('Validate upload error')
+    }
+
+    setIsValidating(false)
+  }
+
+  // const getValidatedLiClass = () => {
+  //   if (!upload) return {}
+
+  //   return {
+  //     'text-success':
+  //       (upload.validated_at && !upload.invalidated_at) ||
+  //       upload.validated_at > upload.invalidated_at,
+  //     'text-warning': !upload.validated_at && !upload.invalidated_at,
+  //     'text-danger': upload.invalidated_at,
+  //   }
+  // }
+
   return (
     <>
       <header className="rw-segment-header">
@@ -15,8 +116,11 @@ const Upload = ({ upload }: Props) => {
           Upload {upload.id} details:
         </h2>
       </header>
+
+      {errors.length > 0 && <UploadValidationResultsTable errors={errors} />}
+
       <div className="row">
-        <div className="col-sm-12 col-md-6 mb-sm-3 mb-md-1">
+        <div className="col">
           <ul className="list-group">
             <li className="list-group-item">
               <span className="fw-bold">Filename: </span>
@@ -63,11 +167,15 @@ const Upload = ({ upload }: Props) => {
                 <Button variant="primary" size="sm">
                   Download file
                 </Button>{' '}
-                <Button variant="outline-primary" size="sm">
+                <Button
+                  variant="outline-primary"
+                  size="sm"
+                  onClick={invalidateUpload}
+                >
                   Invalidate
                 </Button>{' '}
-                <Button variant="primary" size="sm">
-                  Re-validate
+                <Button variant="primary" size="sm" onClick={validateUpload}>
+                  Validate
                 </Button>
               </div>
             </li>
