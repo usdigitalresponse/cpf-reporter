@@ -4,6 +4,7 @@ import type {
   UserRelationResolvers,
 } from 'types/graphql'
 
+import { createPassageUser, deletePassageUser } from 'src/lib/auth'
 import { db } from 'src/lib/db'
 
 export const users: QueryResolvers['users'] = () => {
@@ -17,8 +18,12 @@ export const user: QueryResolvers['user'] = ({ id }) => {
 }
 
 export const createUser: MutationResolvers['createUser'] = ({ input }) => {
-  return db.user.create({
-    data: input,
+  console.log('createUser', input)
+  createPassageUser(input.email).then((passageUser) => {
+    input.passageId = passageUser.id
+    return db.user.create({
+      data: input,
+    })
   })
 }
 
@@ -30,6 +35,8 @@ export const updateUser: MutationResolvers['updateUser'] = ({ id, input }) => {
 }
 
 export const deleteUser: MutationResolvers['deleteUser'] = ({ id }) => {
+  const user = db.user.findUnique({ where: { id } })
+  deletePassageUser(user.passageId)
   return db.user.delete({
     where: { id },
   })

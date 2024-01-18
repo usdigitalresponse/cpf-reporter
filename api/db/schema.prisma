@@ -39,6 +39,7 @@ model User {
   email          String
   name           String?
   agencyId       Int?
+  passageId      String?
   organizationId Int?
   createdAt      DateTime            @default(now()) @db.Timestamptz(6)
   updatedAt      DateTime            @default(now()) @db.Timestamptz(6)

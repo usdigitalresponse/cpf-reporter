@@ -10,6 +10,7 @@ export const schema = gql`
     email: String!
     name: String
     agencyId: Int
+    passageId: String
     organizationId: Int!
     createdAt: DateTime!
     updatedAt: DateTime!
@@ -33,6 +34,7 @@ export const schema = gql`
     name: String
     agencyId: Int
     role: String
+    passageId: String
   }
 
   input UpdateUserInput {
@@ -43,7 +45,7 @@ export const schema = gql`
   }
 
   type Mutation {
-    createUser(input: CreateUserInput!): User! @requireAuth
+    createUser(input: CreateUserInput!): User @requireAuth
     updateUser(id: Int!, input: UpdateUserInput!): User! @requireAuth
     deleteUser(id: Int!): User! @requireAuth
   }

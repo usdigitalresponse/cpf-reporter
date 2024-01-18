@@ -62,6 +62,7 @@ export const getCurrentUser = async (
     organizationId: 1,
     email: 'email@example.com',
     roles: ['USDR_ADMIN'],
+    passageId: userId,
   }
 }
 
@@ -180,12 +181,14 @@ async function getPassageAPIKey(setEnv = true, force = false): Promise<string> {
   return resp.SecretString
 }
 
-async function createPassageUser() {
-  // add implementation details
-  return null
+export const createPassageUser = async (email: string) => {
+  // https://docs.passage.id/backend/overview/node
+  return await passage.user.create({
+    email: email,
+  })
 }
 
-async function deletePassageUesr() {
-  // add implementation details
-  return null
+export const deletePassageUser = async (passageId: string) => {
+  // https://docs.passage.id/backend/overview/node
+  return await passage.user.delete(passageId)
 }
