@@ -23,8 +23,9 @@ export const QUERY = gql`
         code
       }
       validations {
-        invalidatedAt
-        validatedAt
+        reviewedAt
+        reviewedById
+        reviewType
       }
       createdAt
       updatedAt

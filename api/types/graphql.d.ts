@@ -140,13 +140,9 @@ export type CreateUploadInput = {
 export type CreateUploadValidationInput = {
   agencyId: Scalars['Int'];
   inputTemplateId: Scalars['Int'];
-  invalidatedAt?: InputMaybe<Scalars['DateTime']>;
-  invalidatedById?: InputMaybe<Scalars['Int']>;
   invalidationResults?: InputMaybe<Scalars['JSON']>;
   organizationId: Scalars['Int'];
   uploadId: Scalars['Int'];
-  validatedAt?: InputMaybe<Scalars['DateTime']>;
-  validatedById?: InputMaybe<Scalars['Int']>;
   validationResults?: InputMaybe<Scalars['JSON']>;
 };
 
@@ -624,6 +620,10 @@ export type ReportingPeriod = {
   updatedAt: Scalars['DateTime'];
 };
 
+export type ReviewTypeEnum =
+  | 'INVALIDATED'
+  | 'VALIDATED';
+
 export type Role = {
   __typename?: 'Role';
   createdAt: Scalars['DateTime'];
@@ -732,13 +732,9 @@ export type UpdateUploadInput = {
 export type UpdateUploadValidationInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   inputTemplateId?: InputMaybe<Scalars['Int']>;
-  invalidatedAt?: InputMaybe<Scalars['DateTime']>;
-  invalidatedById?: InputMaybe<Scalars['Int']>;
   invalidationResults?: InputMaybe<Scalars['JSON']>;
   organizationId?: InputMaybe<Scalars['Int']>;
   uploadId?: InputMaybe<Scalars['Int']>;
-  validatedAt?: InputMaybe<Scalars['DateTime']>;
-  validatedById?: InputMaybe<Scalars['Int']>;
   validationResults?: InputMaybe<Scalars['JSON']>;
 };
 
@@ -778,18 +774,16 @@ export type UploadValidation = {
   id: Scalars['Int'];
   inputTemplate: InputTemplate;
   inputTemplateId: Scalars['Int'];
-  invalidatedAt?: Maybe<Scalars['DateTime']>;
-  invalidatedBy?: Maybe<User>;
-  invalidatedById?: Maybe<Scalars['Int']>;
   invalidationResults?: Maybe<Scalars['JSON']>;
   organization: Organization;
   organizationId: Scalars['Int'];
+  reviewType?: Maybe<ReviewTypeEnum>;
+  reviewedAt?: Maybe<Scalars['DateTime']>;
+  reviewedBy?: Maybe<User>;
+  reviewedById?: Maybe<Scalars['Int']>;
   updatedAt: Scalars['DateTime'];
   upload: Upload;
   uploadId: Scalars['Int'];
-  validatedAt?: Maybe<Scalars['DateTime']>;
-  validatedBy?: Maybe<User>;
-  validatedById?: Maybe<Scalars['Int']>;
   validationResults?: Maybe<Scalars['JSON']>;
 };
 
@@ -904,6 +898,7 @@ export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
   Redwood: ResolverTypeWrapper<Redwood>;
   ReportingPeriod: ResolverTypeWrapper<MergePrismaWithSdlTypes<PrismaReportingPeriod, MakeRelationsOptional<ReportingPeriod, AllMappedModels>, AllMappedModels>>;
+  ReviewTypeEnum: ReviewTypeEnum;
   Role: ResolverTypeWrapper<Omit<Role, 'users'> & { users: Array<Maybe<ResolversTypes['User']>> }>;
   RoleEnum: RoleEnum;
   String: ResolverTypeWrapper<Scalars['String']>;
@@ -1469,18 +1464,16 @@ export type UploadValidationResolvers<ContextType = RedwoodGraphQLContext, Paren
   id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   inputTemplate: OptArgsResolverFn<ResolversTypes['InputTemplate'], ParentType, ContextType>;
   inputTemplateId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
-  invalidatedAt: OptArgsResolverFn<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  invalidatedBy: OptArgsResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  invalidatedById: OptArgsResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   invalidationResults: OptArgsResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   organization: OptArgsResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
   organizationId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  reviewType: OptArgsResolverFn<Maybe<ResolversTypes['ReviewTypeEnum']>, ParentType, ContextType>;
+  reviewedAt: OptArgsResolverFn<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  reviewedBy: OptArgsResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  reviewedById: OptArgsResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   updatedAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   upload: OptArgsResolverFn<ResolversTypes['Upload'], ParentType, ContextType>;
   uploadId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
-  validatedAt: OptArgsResolverFn<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  validatedBy: OptArgsResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  validatedById: OptArgsResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   validationResults: OptArgsResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -1492,18 +1485,16 @@ export type UploadValidationRelationResolvers<ContextType = RedwoodGraphQLContex
   id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   inputTemplate?: RequiredResolverFn<ResolversTypes['InputTemplate'], ParentType, ContextType>;
   inputTemplateId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
-  invalidatedAt?: RequiredResolverFn<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  invalidatedBy?: RequiredResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  invalidatedById?: RequiredResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   invalidationResults?: RequiredResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   organization?: RequiredResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
   organizationId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  reviewType?: RequiredResolverFn<Maybe<ResolversTypes['ReviewTypeEnum']>, ParentType, ContextType>;
+  reviewedAt?: RequiredResolverFn<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  reviewedBy?: RequiredResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  reviewedById?: RequiredResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   updatedAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   upload?: RequiredResolverFn<ResolversTypes['Upload'], ParentType, ContextType>;
   uploadId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
-  validatedAt?: RequiredResolverFn<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  validatedBy?: RequiredResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  validatedById?: RequiredResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   validationResults?: RequiredResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };

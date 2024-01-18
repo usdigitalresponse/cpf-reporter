@@ -47,8 +47,7 @@ model User {
   organization   Organization?       @relation(fields: [organizationId], references: [id])
   certified      ReportingPeriod[]
   uploaded       Upload[]
-  validated      UploadValidation[] @relation("ValidatedUploads")
-  invalidated    UploadValidation[] @relation("InvalidatedUploads")
+  reviewed       UploadValidation[]
   subrecipients  Subrecipient[]
 }
 
@@ -131,6 +130,11 @@ model Upload {
   subrecipients         Subrecipient[]
 }
 
+enum ReviewType {
+  VALIDATED
+  INVALIDATED
+}
+
 model UploadValidation {
   id                  Int            @id @default(autoincrement())
   uploadId            Int
@@ -142,13 +146,11 @@ model UploadValidation {
   inputTemplateId     Int
   inputTemplate       InputTemplate @relation(fields: [inputTemplateId], references: [id])
   validationResults   Json?         @db.JsonB
-  validatedAt         DateTime?     @db.Timestamptz(6)
-  validatedById       Int?
-  validatedBy         User?         @relation("ValidatedUploads", fields: [validatedById], references: [id])
   invalidationResults Json?         @db.JsonB
-  invalidatedAt       DateTime?     @db.Timestamptz(6)
-  invalidatedById     Int?
-  invalidatedBy       User?         @relation("InvalidatedUploads", fields: [invalidatedById], references: [id])
+  reviewedAt          DateTime?     @db.Timestamptz(6)
+  reviewedById        Int?
+  reviewedBy          User?         @relation(fields: [reviewedById], references: [id])
+  reviewType          ReviewType?
   createdAt           DateTime      @default(now()) @db.Timestamptz(6)
   updatedAt           DateTime      @default(now()) @db.Timestamptz(6)
 }

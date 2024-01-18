@@ -32,7 +32,7 @@ const Upload = ({ upload }: Props) => {
 
   useEffect(() => {
     // This function relies on invalidatedAt and validatedAt being set
-    const validation = findLatestValidationEntryTest(currentUpload)
+    const validation = getLastValidation(currentUpload)
     console.log(validation)
     // loadUpload()
   }, [])
@@ -40,6 +40,28 @@ const Upload = ({ upload }: Props) => {
   const [currentUpload, setCurrentUpload] = useState(upload)
   const [isValidating, setIsValidating] = useState(false) // loading state
   const [errors, setErrors] = useState(errorsMock) // validationErrors
+
+  function toDateOrNull(dateString) {
+    return dateString ? new Date(dateString) : null
+  }
+
+  function getLaterDate(date1, date2) {
+    if (!date1) return date2
+    if (!date2) return date1
+    return date1 > date2 ? date1 : date2
+  }
+
+  const getLastValidation = (currentUpload) => {
+    let latestReviewedDate = null
+
+    currentUpload.validations.forEach((validation) => {
+      const reviewedDate = toDateOrNull(validation.reviewedAt)
+
+      latestReviewedDate = getLaterDate(latestReviewedDate, reviewedDate)
+    })
+
+    return latestReviewedDate
+  }
 
   // TODO: Implement load upload function
   const loadUpload = async () => {
@@ -77,24 +99,20 @@ const Upload = ({ upload }: Props) => {
   }
 
   const validateUpload = async () => {
-    console.log('valid')
-
-    setIsValidating(true)
-
-    try {
-      const result = await post(`/api/uploads/${upload.id}/validate`)
-      await loadUpload()
-
-      if (result.errors?.length) {
-        setErrors(result.errors)
-      } else {
-        console.log('Upload successfully validated!')
-      }
-    } catch (error) {
-      console.log('Validate upload error')
-    }
-
-    setIsValidating(false)
+    // console.log('valid')
+    // setIsValidating(true)
+    // try {
+    //   const result = await post(`/api/uploads/${upload.id}/validate`)
+    //   await loadUpload()
+    //   if (result.errors?.length) {
+    //     setErrors(result.errors)
+    //   } else {
+    //     console.log('Upload successfully validated!')
+    //   }
+    // } catch (error) {
+    //   console.log('Validate upload error')
+    // }
+    // setIsValidating(false)
   }
 
   // const getValidatedLiClass = () => {
@@ -160,7 +178,7 @@ const Upload = ({ upload }: Props) => {
             </li>
             <li className="list-group-item">
               <span className="fw-bold">Validation: </span>
-              WIP
+              {displayValidationStatus()}
             </li>
             <li className="list-group-item">
               <div className="float-end">

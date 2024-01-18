@@ -32,10 +32,9 @@ export const QUERY = gql`
         organizationId
         inputTemplateId
         validationResults
-        validatedAt
-        validatedById
-        invalidatedAt
-        invalidatedById
+        reviewedById
+        reviewedAt
+        reviewType
         createdAt
         updatedAt
       }
