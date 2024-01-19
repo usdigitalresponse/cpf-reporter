@@ -7,60 +7,61 @@ import { timeTag } from 'src/lib/formatters'
 
 import UploadValidationResultsTable from '../UploadValidationResultsTable/UploadValidationResultsTable'
 
+import * as data from './testjson.json'
+
 interface Props {
   upload: NonNullable<FindUploadById['upload']>
 }
 
 const Upload = ({ upload }: Props) => {
-  const errorsMock = [
-    {
-      severity: null,
-      message: 'EC Code must be set',
-      tab: 'Cover',
-      row: 1,
-      col: 'B',
-    },
-    {
-      severity: 'err',
-      message:
-        'Upload template version is older than the latest input template',
-      tab: 'Logic',
-      row: 2,
-      col: 'D',
-    },
-  ]
-
+  console.log(upload)
+  // After loading the upload, we want to check for the latest validation
   useEffect(() => {
-    // This function relies on invalidatedAt and validatedAt being set
-    const validation = getLastValidation(currentUpload)
-    console.log(validation)
+    const lastValidation = getLastValidation(currentUpload)
+    setLastValidation(lastValidation)
+
+    // TODO: Parse incoming JSON into a JS array
+    // const errors = lastValidation?.invalidationResults
+    //   ? JSON.parse(lastValidation?.invalidationResults)
+    //   : []
+
+    // setErrors(JSON.parse(data.data))
+    const errorsString = JSON.stringify(data)
+    const errors = JSON.parse(errorsString)
+    setErrors(errors.data)
+
     // loadUpload()
   }, [])
 
   const [currentUpload, setCurrentUpload] = useState(upload)
   const [isValidating, setIsValidating] = useState(false) // loading state
-  const [errors, setErrors] = useState(errorsMock) // validationErrors
+  const [errors, setErrors] = useState([]) // validationErrors
+  const [lastValidation, setLastValidation] = useState(null)
 
-  function toDateOrNull(dateString) {
-    return dateString ? new Date(dateString) : null
-  }
+  function getLaterValidation(validation1, validation2) {
+    const date1 = validation1.reviewedAt
+    const date2 = validation2.reviewedAt
 
-  function getLaterDate(date1, date2) {
-    if (!date1) return date2
-    if (!date2) return date1
-    return date1 > date2 ? date1 : date2
+    if (!date1) return validation2
+    if (!date2) return validation1
+    return date1 > date2 ? validation1 : validation2
   }
 
   const getLastValidation = (currentUpload) => {
-    let latestReviewedDate = null
+    let latestReviewedValidation = null
 
     currentUpload.validations.forEach((validation) => {
-      const reviewedDate = toDateOrNull(validation.reviewedAt)
-
-      latestReviewedDate = getLaterDate(latestReviewedDate, reviewedDate)
+      if (!latestReviewedValidation) {
+        latestReviewedValidation = validation
+      } else if (validation.reviewedAt) {
+        latestReviewedValidation = getLaterValidation(
+          latestReviewedValidation,
+          validation
+        )
+      }
     })
 
-    return latestReviewedDate
+    return latestReviewedValidation
   }
 
   // TODO: Implement load upload function
@@ -98,6 +99,29 @@ const Upload = ({ upload }: Props) => {
     // setIsValidating(false)
   }
 
+  const displayValidationStatus = () => {
+    console.log(lastValidation)
+    if (lastValidation?.reviewType === 'INVALIDATED') {
+      return (
+        <span className="text-danger">
+          <i className="bi bi-x-circle-fill"></i> Invalidated on{' '}
+          {timeTag(lastValidation.reviewedAt)} by{' '}
+          {lastValidation.reviewedBy?.name}
+        </span>
+      )
+    } else if (lastValidation?.reviewType === 'VALIDATED') {
+      return (
+        <span className="text-success">
+          <i className="bi bi-check-lg"></i> Validated on{' '}
+          {timeTag(lastValidation.reviewedAt)} by{' '}
+          {lastValidation.reviewedBy?.name}
+        </span>
+      )
+    } else {
+      return <span className="text-warning">Not validated</span>
+    }
+  }
+
   const validateUpload = async () => {
     // console.log('valid')
     // setIsValidating(true)
@@ -114,18 +138,6 @@ const Upload = ({ upload }: Props) => {
     // }
     // setIsValidating(false)
   }
-
-  // const getValidatedLiClass = () => {
-  //   if (!upload) return {}
-
-  //   return {
-  //     'text-success':
-  //       (upload.validated_at && !upload.invalidated_at) ||
-  //       upload.validated_at > upload.invalidated_at,
-  //     'text-warning': !upload.validated_at && !upload.invalidated_at,
-  //     'text-danger': upload.invalidated_at,
-  //   }
-  // }
 
   return (
     <>

@@ -147,7 +147,7 @@ model UploadValidation {
   inputTemplate       InputTemplate @relation(fields: [inputTemplateId], references: [id])
   validationResults   Json?         @db.JsonB
   invalidationResults Json?         @db.JsonB
-  reviewedAt          DateTime?     @db.Timestamptz(6)
+  reviewedAt          DateTime      @default(now()) @db.Timestamptz(6)
   reviewedById        Int?
   reviewedBy          User?         @relation(fields: [reviewedById], references: [id])
   reviewType          ReviewType?

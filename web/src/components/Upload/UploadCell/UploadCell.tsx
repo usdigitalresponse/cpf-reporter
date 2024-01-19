@@ -32,7 +32,11 @@ export const QUERY = gql`
         organizationId
         inputTemplateId
         validationResults
+        invalidationResults
         reviewedById
+        reviewedBy {
+          name
+        }
         reviewedAt
         reviewType
         createdAt

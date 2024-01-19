@@ -1,0 +1,18 @@
+{
+  "data":[
+    {
+      "severity":null,
+      "message":"EC Code must be set",
+      "tab":"Cover",
+      "row":1,
+      "col":"B"
+    },
+    {
+      "severity":"err",
+      "message":"Upload template version is older than the latest input template",
+      "tab":"Logic",
+      "row":2,
+      "col":"D"
+    }
+  ]
+}
