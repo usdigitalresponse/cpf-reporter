@@ -1,21 +1,22 @@
 import { useState, useEffect } from 'react'
 
-import { Button } from 'react-bootstrap'
 import type { FindUploadById } from 'types/graphql'
 
 import { timeTag } from 'src/lib/formatters'
 
+import UploadValidationButtonGroup from '../UploadValidationButtonGroup/UploadValidationButtonGroup'
 import UploadValidationResultsTable from '../UploadValidationResultsTable/UploadValidationResultsTable'
+import UploadValidationStatus from '../UploadValidationStatus/UploadValidationStatus'
 
-import * as data from './testjson.json'
+import * as validationJson from './testjson.json'
 
 interface Props {
   upload: NonNullable<FindUploadById['upload']>
 }
 
 const Upload = ({ upload }: Props) => {
-  console.log(upload)
   // After loading the upload, we want to check for the latest validation
+
   useEffect(() => {
     const lastValidation = getLastValidation(currentUpload)
     setLastValidation(lastValidation)
@@ -26,10 +27,13 @@ const Upload = ({ upload }: Props) => {
     //   : []
 
     // setErrors(JSON.parse(data.data))
-    const errorsString = JSON.stringify(data)
-    const errors = JSON.parse(errorsString)
-    setErrors(errors.data)
 
+    const validationResult = JSON.stringify(validationJson)
+    const result = JSON.parse(validationResult)
+
+    if (result.errors.length) {
+      setErrors(result.errors)
+    }
     // loadUpload()
   }, [])
 
@@ -99,44 +103,27 @@ const Upload = ({ upload }: Props) => {
     // setIsValidating(false)
   }
 
-  const displayValidationStatus = () => {
-    console.log(lastValidation)
-    if (lastValidation?.reviewType === 'INVALIDATED') {
-      return (
-        <span className="text-danger">
-          <i className="bi bi-x-circle-fill"></i> Invalidated on{' '}
-          {timeTag(lastValidation.reviewedAt)} by{' '}
-          {lastValidation.reviewedBy?.name}
-        </span>
-      )
-    } else if (lastValidation?.reviewType === 'VALIDATED') {
-      return (
-        <span className="text-success">
-          <i className="bi bi-check-lg"></i> Validated on{' '}
-          {timeTag(lastValidation.reviewedAt)} by{' '}
-          {lastValidation.reviewedBy?.name}
-        </span>
-      )
-    } else {
-      return <span className="text-warning">Not validated</span>
-    }
-  }
-
+  // Attempt to validate the upload, and if there are errors, display them
   const validateUpload = async () => {
-    // console.log('valid')
-    // setIsValidating(true)
-    // try {
-    //   const result = await post(`/api/uploads/${upload.id}/validate`)
-    //   await loadUpload()
-    //   if (result.errors?.length) {
-    //     setErrors(result.errors)
-    //   } else {
-    //     console.log('Upload successfully validated!')
-    //   }
-    // } catch (error) {
-    //   console.log('Validate upload error')
-    // }
-    // setIsValidating(false)
+    setIsValidating(true)
+
+    try {
+      // TODO: Implement validate upload function
+      // const validationResult = await post(`/api/uploads/${upload.id}/validate`)
+      const validationResult = JSON.stringify(validationJson)
+      const result = JSON.parse(validationResult)
+
+      if (result.errors.length) {
+        console.log('Cannot validate upload', errors)
+        setErrors(result.errors)
+      } else {
+        console.log('Upload successfully validated!')
+      }
+    } catch (error) {
+      console.log('Validate upload error')
+    }
+
+    setIsValidating(false)
   }
 
   return (
@@ -188,27 +175,12 @@ const Upload = ({ upload }: Props) => {
               <span className="fw-bold">Notes: </span>
               {upload.notes || 'Not set'}
             </li>
-            <li className="list-group-item">
-              <span className="fw-bold">Validation: </span>
-              {displayValidationStatus()}
-            </li>
-            <li className="list-group-item">
-              <div className="float-end">
-                <Button variant="primary" size="sm">
-                  Download file
-                </Button>{' '}
-                <Button
-                  variant="outline-primary"
-                  size="sm"
-                  onClick={invalidateUpload}
-                >
-                  Invalidate
-                </Button>{' '}
-                <Button variant="primary" size="sm" onClick={validateUpload}>
-                  Validate
-                </Button>
-              </div>
-            </li>
+            <UploadValidationStatus uploadValidation={lastValidation} />
+            <UploadValidationButtonGroup
+              latestValidation={lastValidation}
+              validateUpload={validateUpload}
+              invalidateUpload={invalidateUpload}
+            />
           </ul>
         </div>
       </div>
