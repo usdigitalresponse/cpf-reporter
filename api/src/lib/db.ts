@@ -35,6 +35,12 @@ async function ssmAuthForURL(databaseURL: string): Promise<string> {
   return url.toString()
 }
 
+function pgpasswordAuthForURL(databaseURL: string): string {
+  const url = new URL(databaseURL)
+  url.password = process.env.PGPASSWORD
+  return url.toString()
+}
+
 /*
  * Instance of the Prisma Client
  */
@@ -45,6 +51,8 @@ async function createPrismaClient() {
     datasourceUrl = await rdsIAMAuthForURL(process.env.DATABASE_URL)
   } else if (process.env.DATABASE_SECRET_SOURCE === 'ssm') {
     datasourceUrl = await ssmAuthForURL(process.env.DATABASE_URL)
+  } else if (process.env.DATABASE_SECRET_SOURCE === 'env_PGPASSWORD') {
+    datasourceUrl = pgpasswordAuthForURL(process.env.DATABASE_URL)
   }
 
   db = new PrismaClient({
