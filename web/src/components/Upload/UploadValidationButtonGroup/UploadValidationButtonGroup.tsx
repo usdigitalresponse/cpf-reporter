@@ -36,8 +36,12 @@ const UploadValidationButtonGroup = ({
             >
               Invalidate
             </Button>{' '}
-            <Button variant="primary" size="sm" onClick={validateUpload}>
-              Re-Validate
+            <Button
+              variant="outline-primary"
+              size="sm"
+              onClick={validateUpload}
+            >
+              Re-validate
             </Button>
           </>
         )

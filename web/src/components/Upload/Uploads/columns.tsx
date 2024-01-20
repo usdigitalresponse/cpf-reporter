@@ -21,19 +21,21 @@ function valueAsLink(cell): JSX.Element {
 }
 
 function validationDisplay(row) {
-  const validations = row.latestValidation
+  const lastValidation = row.latestValidation
 
-  if (validations.invalidatedAt) {
-    const formattedDate = formatDateString(validations.invalidatedAt)
-    return <span className="text-danger">Invalidated at {formattedDate}</span>
+  if (!lastValidation) {
+    return <span className="text-danger">Not set</span>
   }
 
-  if (validations.validatedAt) {
-    return formatDateString(validations.validatedAt)
+  const formattedDate = formatDateString(lastValidation.reviewedAt)
+
+  if (lastValidation?.reviewType === 'INVALIDATED') {
+    return <span className="text-danger">Invalidated on {formattedDate}</span>
   }
 
-  // If neither date is available, display nothing or a default message
-  return 'Not set'
+  if (lastValidation?.reviewType === 'VALIDATED') {
+    return <span>Validated on {formattedDate}</span>
+  }
 }
 
 export const columnDefs = [

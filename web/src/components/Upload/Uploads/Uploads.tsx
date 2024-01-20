@@ -7,52 +7,36 @@ import TableBuilder from 'src/components/TableBuilder/TableBuilder'
 import { columnDefs } from './columns'
 
 const UploadsList = ({ uploads }: FindUploads) => {
-  function toDateOrNull(dateString) {
-    return dateString ? new Date(dateString) : null
+  function getLaterValidation(validation1, validation2) {
+    const date1 = validation1.reviewedAt
+    const date2 = validation2.reviewedAt
+
+    if (!date1) return validation2
+    if (!date2) return validation1
+    return date1 > date2 ? validation1 : validation2
   }
 
-  function getLaterDate(date1, date2) {
-    if (!date1) return date2
-    if (!date2) return date1
-    return date1 > date2 ? date1 : date2
-  }
+  const getLastValidation = (currentUpload) => {
+    let latestReviewedValidation = null
 
-  /*
-    Returns an object that either contains the latest validation date or the latest invalidation date
-    (depending which validation date is later) or an empty object if no dates are found
-  */
-  function findLatestValidationEntry(upload) {
-    let latestInvalidationDate = null
-    let latestValidationDate = null
-
-    upload.validations.forEach((validation) => {
-      const invalidatedDate = toDateOrNull(validation.invalidatedAt)
-      const validatedDate = toDateOrNull(validation.validatedAt)
-
-      latestInvalidationDate = getLaterDate(
-        latestInvalidationDate,
-        invalidatedDate
-      )
-      latestValidationDate = getLaterDate(latestValidationDate, validatedDate)
+    currentUpload.validations.forEach((validation) => {
+      if (!latestReviewedValidation) {
+        latestReviewedValidation = validation
+      } else if (validation.reviewedAt) {
+        latestReviewedValidation = getLaterValidation(
+          latestReviewedValidation,
+          validation
+        )
+      }
     })
 
-    if (!latestInvalidationDate && !latestValidationDate) {
-      return {} // Return an empty object if no dates are found
-    }
-
-    const isInvalidationLatest = latestInvalidationDate > latestValidationDate
-
-    return {
-      invalidatedAt: isInvalidationLatest ? latestInvalidationDate : null,
-      validatedAt: isInvalidationLatest ? null : latestValidationDate,
-    }
+    return latestReviewedValidation
   }
 
-  const uploadsWithValidationDates = uploads.map((upload) => {
-    const latestValidation = findLatestValidationEntry(upload)
+  const uploadsWithLatestValidation = uploads.map((upload) => {
     return {
       ...upload,
-      latestValidation,
+      latestValidation: getLastValidation(upload),
     }
   })
 
@@ -65,7 +49,7 @@ const UploadsList = ({ uploads }: FindUploads) => {
 
   return (
     <TableBuilder
-      data={uploadsWithValidationDates}
+      data={uploadsWithLatestValidation}
       columns={columnDefs}
       filterableInputs={filterableInputs}
     />
