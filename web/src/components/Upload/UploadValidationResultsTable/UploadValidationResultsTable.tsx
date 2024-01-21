@@ -4,7 +4,7 @@ const UploadValidationResultsTable = ({ errors }) => {
   return (
     <>
       <div className="row">
-        <h4 className="col text-danger">Validation Results</h4>
+        <h3 className="col text-danger">Validation Results</h3>
       </div>
 
       <div className="row">

@@ -25,7 +25,7 @@ export const QUERY = gql`
       notes
       createdAt
       updatedAt
-      validations {
+      latestValidation {
         id
         uploadId
         agencyId
@@ -33,14 +33,11 @@ export const QUERY = gql`
         inputTemplateId
         validationResults
         invalidationResults
-        reviewedById
         reviewedBy {
           name
         }
-        reviewedAt
         reviewType
         createdAt
-        updatedAt
       }
     }
   }

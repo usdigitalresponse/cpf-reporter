@@ -735,6 +735,7 @@ export type Upload = {
   expenditureCategoryId: Scalars['Int'];
   filename: Scalars['String'];
   id: Scalars['Int'];
+  latestValidation?: Maybe<UploadValidation>;
   notes?: Maybe<Scalars['String']>;
   organization: Organization;
   organizationId: Scalars['Int'];
@@ -916,12 +917,12 @@ export type FindUploadByIdVariables = Exact<{
 }>;
 
 
-export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, organizationId: number, notes?: string | null, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', name?: string | null }, agency: { __typename?: 'Agency', code: string }, reportingPeriod: { __typename?: 'ReportingPeriod', name: string }, expenditureCategory: { __typename?: 'ExpenditureCategory', code: string }, validations: Array<{ __typename?: 'UploadValidation', id: number, uploadId: number, agencyId: number, organizationId: number, inputTemplateId: number, validationResults?: Prisma.JsonValue | null, invalidationResults?: Prisma.JsonValue | null, reviewedById?: number | null, reviewedAt?: string | null, reviewType?: ReviewTypeEnum | null, createdAt: string, updatedAt: string, reviewedBy?: { __typename?: 'User', name?: string | null } | null } | null> } | null };
+export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, organizationId: number, notes?: string | null, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', name?: string | null }, agency: { __typename?: 'Agency', code: string }, reportingPeriod: { __typename?: 'ReportingPeriod', name: string }, expenditureCategory: { __typename?: 'ExpenditureCategory', code: string }, latestValidation?: { __typename?: 'UploadValidation', id: number, uploadId: number, agencyId: number, organizationId: number, inputTemplateId: number, validationResults?: Prisma.JsonValue | null, invalidationResults?: Prisma.JsonValue | null, reviewType?: ReviewTypeEnum | null, createdAt: string, reviewedBy?: { __typename?: 'User', name?: string | null } | null } | null } | null };
 
 export type FindUploadsVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, code: string }, expenditureCategory: { __typename?: 'ExpenditureCategory', id: number, code: string }, validations: Array<{ __typename?: 'UploadValidation', reviewedAt?: string | null, reviewedById?: number | null, reviewType?: ReviewTypeEnum | null } | null> }> };
+export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, code: string }, expenditureCategory: { __typename?: 'ExpenditureCategory', id: number, code: string }, latestValidation?: { __typename?: 'UploadValidation', reviewType?: ReviewTypeEnum | null, createdAt: string } | null }> };
 
 export type EditUserByIdVariables = Exact<{
   id: Scalars['Int'];

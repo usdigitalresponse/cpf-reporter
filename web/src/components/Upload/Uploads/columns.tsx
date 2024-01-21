@@ -27,7 +27,7 @@ function validationDisplay(row) {
     return <span className="text-danger">Not set</span>
   }
 
-  const formattedDate = formatDateString(lastValidation.reviewedAt)
+  const formattedDate = formatDateString(lastValidation.createdAt)
 
   if (lastValidation?.reviewType === 'INVALIDATED') {
     return <span className="text-danger">Invalidated on {formattedDate}</span>
@@ -62,7 +62,7 @@ export const columnDefs = [
   {
     accessorFn: validationDisplay,
     cell: (info) => info.getValue(),
-    id: 'validatedAt',
+    id: 'createdAt',
     header: 'Validated?',
     enableSorting: false,
   },

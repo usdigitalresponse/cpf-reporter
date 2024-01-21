@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 import type { FindUploadById } from 'types/graphql'
 
@@ -15,76 +15,20 @@ interface Props {
 }
 
 const Upload = ({ upload }: Props) => {
+  console.log('Upload', upload)
   // After loading the upload, we want to check for the latest validation
 
-  useEffect(() => {
-    const lastValidation = getLastValidation(currentUpload)
-    setLastValidation(lastValidation)
-
-    // TODO: Parse incoming JSON into a JS array
-    // const errors = lastValidation?.invalidationResults
-    //   ? JSON.parse(lastValidation?.invalidationResults)
-    //   : []
-
-    // setErrors(JSON.parse(data.data))
-
-    const validationResult = JSON.stringify(validationJson)
-    const result = JSON.parse(validationResult)
-
-    if (result.errors.length) {
-      setErrors(result.errors)
-    }
-    // loadUpload()
-  }, [])
-
-  const [currentUpload, setCurrentUpload] = useState(upload)
   const [isValidating, setIsValidating] = useState(false) // loading state
   const [errors, setErrors] = useState([]) // validationErrors
-  const [lastValidation, setLastValidation] = useState(null)
-
-  function getLaterValidation(validation1, validation2) {
-    const date1 = validation1.reviewedAt
-    const date2 = validation2.reviewedAt
-
-    if (!date1) return validation2
-    if (!date2) return validation1
-    return date1 > date2 ? validation1 : validation2
-  }
-
-  const getLastValidation = (currentUpload) => {
-    let latestReviewedValidation = null
-
-    currentUpload.validations.forEach((validation) => {
-      if (!latestReviewedValidation) {
-        latestReviewedValidation = validation
-      } else if (validation.reviewedAt) {
-        latestReviewedValidation = getLaterValidation(
-          latestReviewedValidation,
-          validation
-        )
-      }
-    })
-
-    return latestReviewedValidation
-  }
-
-  // TODO: Implement load upload function
-  const loadUpload = async () => {
-    // setCurrentUpload(null)
-    // setErrors([])
-    // const result = await getJson(`/api/uploads/${upload.id}`)
-    // if (result.error) {
-    //   console.log('Load upload error')
-    // } else {
-    //   setCurrentUpload(result.upload)
-    // }
-  }
 
   // TODO: Implement invalidate upload function
   const invalidateUpload = async () => {
-    console.log('invalid')
+    setIsValidating(true)
+    console.log('Waiting 2 seconds to invalidate upload...')
 
-    // setIsValidating(true)
+    setTimeout(() => {
+      setIsValidating(false)
+    }, 2000)
 
     // try {
     //   const result = await post(`/api/uploads/${upload.id}/invalidate`)
@@ -128,14 +72,9 @@ const Upload = ({ upload }: Props) => {
 
   return (
     <>
-      <header className="rw-segment-header">
-        <h2 className="rw-heading rw-heading-secondary">
-          Upload {upload.id} details:
-        </h2>
-      </header>
-
       {errors.length > 0 && <UploadValidationResultsTable errors={errors} />}
 
+      <h3>Upload {upload.id} details</h3>
       <div className="row">
         <div className="col">
           <ul className="list-group">
@@ -175,11 +114,14 @@ const Upload = ({ upload }: Props) => {
               <span className="fw-bold">Notes: </span>
               {upload.notes || 'Not set'}
             </li>
-            <UploadValidationStatus uploadValidation={lastValidation} />
+            <UploadValidationStatus
+              uploadValidation={upload.latestValidation}
+            />
             <UploadValidationButtonGroup
-              latestValidation={lastValidation}
+              latestValidation={upload.latestValidation}
               validateUpload={validateUpload}
               invalidateUpload={invalidateUpload}
+              isValidating={isValidating}
             />
           </ul>
         </div>

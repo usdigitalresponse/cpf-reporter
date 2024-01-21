@@ -1,17 +1,9 @@
+import { UploadValidation } from 'types/graphql'
+
 import { timeTag } from 'src/lib/formatters'
 
-interface User {
-  name: string
-}
-
-interface UploadValidation {
-  reviewType: 'VALIDATED' | 'INVALIDATED' | null
-  reviewedAt: string
-  reviewedBy?: User
-}
-
 interface Props {
-  uploadValidation?: UploadValidation
+  uploadValidation: UploadValidation
 }
 
 const VALIDATED = 'VALIDATED'
@@ -32,7 +24,7 @@ const UploadValidationStatus = ({ uploadValidation }: Props) => {
         return (
           <span className="text-danger">
             {renderValidationIcon(INVALIDATED)} Invalidated on{' '}
-            {timeTag(uploadValidation.reviewedAt)} by{' '}
+            {timeTag(uploadValidation.createdAt)} by{' '}
             {uploadValidation.reviewedBy?.name}
           </span>
         )
@@ -40,7 +32,7 @@ const UploadValidationStatus = ({ uploadValidation }: Props) => {
         return (
           <span className="text-success">
             {renderValidationIcon(VALIDATED)} Validated on{' '}
-            {timeTag(uploadValidation.reviewedAt)} by{' '}
+            {timeTag(uploadValidation.createdAt)} by{' '}
             {uploadValidation.reviewedBy?.name}
           </span>
         )

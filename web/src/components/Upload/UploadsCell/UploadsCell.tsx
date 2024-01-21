@@ -22,10 +22,9 @@ export const QUERY = gql`
         id
         code
       }
-      validations {
-        reviewedAt
-        reviewedById
+      latestValidation {
         reviewType
+        createdAt
       }
       createdAt
       updatedAt
