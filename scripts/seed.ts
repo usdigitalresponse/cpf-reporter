@@ -7,20 +7,22 @@ export default async () => {
     // Manually seed via `yarn rw prisma db seed`
     // Seeds automatically with `yarn rw prisma migrate dev` and `yarn rw prisma migrate reset`
     //
-    // Update "const data = []" to match your data model and seeding needs
-    //
-    const data: Prisma.UserExampleCreateArgs['data'][] = [
-      // To try this example data with the UserExample model in schema.prisma,
-      // uncomment the lines below and run 'yarn rw prisma migrate dev'
-      //
-      // { name: 'alice', email: 'alice@example.com' },
-      // { name: 'mark', email: 'mark@example.com' },
-      // { name: 'jackie', email: 'jackie@example.com' },
-      // { name: 'bob', email: 'bob@example.com' },
+
+    const inputTemplates: Prisma.InputTemplateCreateArgs['data'][] = [
+      {
+        name: 'Input Template 1',
+        version: '1.0.0',
+        effectiveDate: new Date(),
+      },
     ]
-    console.log(
-      "\nUsing the default './scripts/seed.{js,ts}' template\nEdit the file to add seed data\n"
-    )
+
+    const outputTemplates: Prisma.OutputTemplateCreateArgs['data'][] = [
+      {
+        name: 'Output Template 1',
+        version: '1.0.0',
+        effectiveDate: new Date(),
+      },
+    ]
 
     // Note: if using PostgreSQL, using `createMany` to insert multiple records is much faster
     // @see: https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#createmany
@@ -28,10 +30,21 @@ export default async () => {
       //
       // Change to match your data model and seeding needs
       //
-      data.map(async (data: Prisma.UserExampleCreateArgs['data']) => {
-        const record = await db.userExample.create({ data })
-        console.log(record)
-      })
+      inputTemplates.map(
+        async (data: Prisma.InputTemplateCreateArgs['data']) => {
+          const record = await db.inputTemplate.create({ data })
+          console.log(record)
+        }
+      )
+    )
+
+    await Promise.all(
+      outputTemplates.map(
+        async (data: Prisma.OutputTemplateCreateArgs['data']) => {
+          const record = await db.outputTemplate.create({ data })
+          console.log(record)
+        }
+      )
     )
 
     // If using dbAuth and seeding users, you'll need to add a `hashedPassword`

@@ -32,6 +32,7 @@ export type CreateAgencyInput = {
   abbreviation?: InputMaybe<Scalars['String']>;
   code: Scalars['String'];
   name: Scalars['String'];
+  organizationId: Scalars['Int'];
 };
 
 export type CreateExpenditureCategoryInput = {
@@ -90,6 +91,7 @@ export type CreateReportingPeriodInput = {
   inputTemplateId: Scalars['Int'];
   isCurrentPeriod: Scalars['Boolean'];
   name: Scalars['String'];
+  organizationId: Scalars['Int'];
   outputTemplateId: Scalars['Int'];
   startDate: Scalars['DateTime'];
 };
@@ -450,14 +452,12 @@ export type Query = {
   organizations: Array<Organization>;
   outputTemplate?: Maybe<OutputTemplate>;
   outputTemplates: Array<OutputTemplate>;
-  previousReportingPeriods: Array<ReportingPeriod>;
   project?: Maybe<Project>;
   projects: Array<Project>;
   /** Fetches the Redwood root schema. */
   redwood?: Maybe<Redwood>;
   reportingPeriod?: Maybe<ReportingPeriod>;
   reportingPeriods: Array<ReportingPeriod>;
-  reportingPeriodsByOrg: Array<ReportingPeriod>;
   role?: Maybe<Role>;
   roles: Array<Role>;
   subrecipient?: Maybe<Subrecipient>;
@@ -509,13 +509,6 @@ export type QueryoutputTemplateArgs = {
 
 
 /** About the Redwood queries. */
-export type QuerypreviousReportingPeriodsArgs = {
-  id: Scalars['Int'];
-  organizationId: Scalars['Int'];
-};
-
-
-/** About the Redwood queries. */
 export type QueryprojectArgs = {
   id: Scalars['Int'];
 };
@@ -524,12 +517,6 @@ export type QueryprojectArgs = {
 /** About the Redwood queries. */
 export type QueryreportingPeriodArgs = {
   id: Scalars['Int'];
-};
-
-
-/** About the Redwood queries. */
-export type QueryreportingPeriodsByOrgArgs = {
-  organizationId: Scalars['Int'];
 };
 
 
@@ -595,10 +582,14 @@ export type ReportingPeriod = {
   inputTemplateId: Scalars['Int'];
   isCurrentPeriod: Scalars['Boolean'];
   name: Scalars['String'];
+  organization: Organization;
+  organizationId: Scalars['Int'];
   outputTemplate: OutputTemplate;
   outputTemplateId: Scalars['Int'];
+  projects: Array<Maybe<Project>>;
   startDate: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
+  uploads: Array<Maybe<Upload>>;
 };
 
 export type ReviewTypeEnum =
@@ -640,6 +631,7 @@ export type UpdateAgencyInput = {
   abbreviation?: InputMaybe<Scalars['String']>;
   code?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
+  organizationId: Scalars['Int'];
 };
 
 export type UpdateExpenditureCategoryInput = {
@@ -682,6 +674,7 @@ export type UpdateReportingPeriodInput = {
   inputTemplateId?: InputMaybe<Scalars['Int']>;
   isCurrentPeriod?: InputMaybe<Scalars['Boolean']>;
   name?: InputMaybe<Scalars['String']>;
+  organizationId?: InputMaybe<Scalars['Int']>;
   outputTemplateId?: InputMaybe<Scalars['Int']>;
   startDate?: InputMaybe<Scalars['DateTime']>;
 };
@@ -821,7 +814,7 @@ export type UpdateAgencyMutationVariables = Exact<{
 }>;
 
 
-export type UpdateAgencyMutation = { __typename?: 'Mutation', updateAgency: { __typename?: 'Agency', id: number, name: string, abbreviation?: string | null, code: string } };
+export type UpdateAgencyMutation = { __typename?: 'Mutation', updateAgency: { __typename?: 'Agency', id: number, name: string, abbreviation?: string | null, code: string, organizationId: number } };
 
 export type CreateAgencyMutationVariables = Exact<{
   input: CreateAgencyInput;
@@ -877,6 +870,47 @@ export type FindOrganizationsVariables = Exact<{ [key: string]: never; }>;
 
 
 export type FindOrganizations = { __typename?: 'Query', organizations: Array<{ __typename?: 'Organization', id: number, name: string }> };
+
+export type EditReportingPeriodByIdVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type EditReportingPeriodById = { __typename?: 'Query', reportingPeriod?: { __typename?: 'ReportingPeriod', id: number, name: string, startDate: string, endDate: string, organizationId: number, certifiedAt?: string | null, certifiedById?: number | null, inputTemplateId: number, outputTemplateId: number, isCurrentPeriod: boolean, createdAt: string, updatedAt: string } | null };
+
+export type UpdateReportingPeriodMutationVariables = Exact<{
+  id: Scalars['Int'];
+  input: UpdateReportingPeriodInput;
+}>;
+
+
+export type UpdateReportingPeriodMutation = { __typename?: 'Mutation', updateReportingPeriod: { __typename?: 'ReportingPeriod', id: number, name: string, startDate: string, endDate: string, organizationId: number, certifiedAt?: string | null, certifiedById?: number | null, inputTemplateId: number, outputTemplateId: number, isCurrentPeriod: boolean, createdAt: string, updatedAt: string } };
+
+export type CreateReportingPeriodMutationVariables = Exact<{
+  input: CreateReportingPeriodInput;
+}>;
+
+
+export type CreateReportingPeriodMutation = { __typename?: 'Mutation', createReportingPeriod: { __typename?: 'ReportingPeriod', id: number } };
+
+export type DeleteReportingPeriodMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type DeleteReportingPeriodMutation = { __typename?: 'Mutation', deleteReportingPeriod: { __typename?: 'ReportingPeriod', id: number } };
+
+export type FindReportingPeriodByIdVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type FindReportingPeriodById = { __typename?: 'Query', reportingPeriod?: { __typename?: 'ReportingPeriod', id: number, name: string, startDate: string, endDate: string, organizationId: number, certifiedAt?: string | null, certifiedById?: number | null, inputTemplateId: number, outputTemplateId: number, isCurrentPeriod: boolean, createdAt: string, updatedAt: string } | null };
+
+export type FindReportingPeriodsVariables = Exact<{ [key: string]: never; }>;
+
+
+export type FindReportingPeriods = { __typename?: 'Query', reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, name: string, startDate: string, endDate: string, organizationId: number, certifiedAt?: string | null, certifiedById?: number | null, inputTemplateId: number, outputTemplateId: number, isCurrentPeriod: boolean, createdAt: string, updatedAt: string }> };
 
 export type FindReportingPeriodQueryVariables = Exact<{
   id: Scalars['Int'];
