@@ -15,11 +15,11 @@ interface Props {
 }
 
 const Upload = ({ upload }: Props) => {
-  console.log('Upload', upload)
-  // After loading the upload, we want to check for the latest validation
-
-  const [isValidating, setIsValidating] = useState(false) // loading state
+  const [isValidating, setIsValidating] = useState(false)
   const [errors, setErrors] = useState([]) // validationErrors
+
+  // TODO: Implement download file function
+  const downloadFile = () => {}
 
   // TODO: Implement invalidate upload function
   const invalidateUpload = async () => {
@@ -122,6 +122,7 @@ const Upload = ({ upload }: Props) => {
               validateUpload={validateUpload}
               invalidateUpload={invalidateUpload}
               isValidating={isValidating}
+              downloadFile={downloadFile}
             />
           </ul>
         </div>

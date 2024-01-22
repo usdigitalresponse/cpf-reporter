@@ -26,8 +26,6 @@ export const QUERY = gql`
       createdAt
       updatedAt
       latestValidation {
-        id
-        uploadId
         agencyId
         organizationId
         inputTemplateId

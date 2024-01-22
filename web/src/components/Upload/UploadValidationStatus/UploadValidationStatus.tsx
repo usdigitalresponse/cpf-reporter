@@ -1,15 +1,9 @@
-import { UploadValidation } from 'types/graphql'
-
 import { timeTag } from 'src/lib/formatters'
-
-interface Props {
-  uploadValidation: UploadValidation
-}
 
 const VALIDATED = 'VALIDATED'
 const INVALIDATED = 'INVALIDATED'
 
-const UploadValidationStatus = ({ uploadValidation }: Props) => {
+const UploadValidationStatus = ({ uploadValidation }) => {
   const renderValidationIcon = (reviewType: string) => {
     return reviewType === INVALIDATED ? (
       <i className="bi bi-x-circle-fill"></i>

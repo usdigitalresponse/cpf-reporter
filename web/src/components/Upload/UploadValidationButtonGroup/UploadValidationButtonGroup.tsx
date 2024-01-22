@@ -1,6 +1,4 @@
 import Button from 'react-bootstrap/Button'
-import { ReviewTypeEnum } from 'types/graphql'
-
 const VALIDATED = 'VALIDATED'
 const INVALIDATED = 'INVALIDATED'
 
@@ -9,11 +7,12 @@ const UploadValidationButtonGroup = ({
   invalidateUpload,
   validateUpload,
   isValidating,
+  downloadFile,
 }) => {
   /*
-    If upload hasn't been validated yet, both Invalidate and Validate buttons are enabled
-    If upload has been validated, the Invalidate button and Re-validate buttons are enabled
-    If upload has been invalidated, the Validate button is enabled and the Invalidate button is disabled
+    If the upload hasn't been validated yet, both the "Invalidate" and "Validate" buttons are enabled.
+    If the upload has been validated, the "Invalidate" button and the "Re-validate" button are enabled.
+    If the upload has been invalidated, the "Validate" button is enabled, and the "Invalidate" button is disabled.
   */
   const renderValidationButtons = () => {
     switch (latestValidation?.reviewType) {
@@ -64,9 +63,6 @@ const UploadValidationButtonGroup = ({
         )
     }
   }
-
-  // TODO: Implement download file function
-  const downloadFile = () => {}
 
   return (
     <li className="list-group-item">
