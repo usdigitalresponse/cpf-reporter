@@ -26,6 +26,8 @@ export const schema = gql`
     users: [User!]! @requireAuth
     usersByOrganization(organizationId: Int!): [User!]! @requireAuth
     user(id: Int!): User @requireAuth
+    agenciesUnderCurrentUserOrganization(organizationId: Int!): [Agency!]
+      @requireAuth
   }
 
   input CreateUserInput {

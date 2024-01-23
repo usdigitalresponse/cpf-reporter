@@ -466,6 +466,7 @@ export type Query = {
   __typename?: 'Query';
   agencies: Array<Agency>;
   agenciesByOrganization: Array<Agency>;
+  agenciesUnderCurrentUserOrganization?: Maybe<Array<Agency>>;
   agency?: Maybe<Agency>;
   expenditureCategories: Array<ExpenditureCategory>;
   expenditureCategory?: Maybe<ExpenditureCategory>;
@@ -497,6 +498,12 @@ export type Query = {
 
 /** About the Redwood queries. */
 export type QueryagenciesByOrganizationArgs = {
+  organizationId: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QueryagenciesUnderCurrentUserOrganizationArgs = {
   organizationId: Scalars['Int'];
 };
 
@@ -1247,6 +1254,7 @@ export type ProjectRelationResolvers<ContextType = RedwoodGraphQLContext, Parent
 export type QueryResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   agencies: OptArgsResolverFn<Array<ResolversTypes['Agency']>, ParentType, ContextType>;
   agenciesByOrganization: Resolver<Array<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagenciesByOrganizationArgs, 'organizationId'>>;
+  agenciesUnderCurrentUserOrganization: Resolver<Maybe<Array<ResolversTypes['Agency']>>, ParentType, ContextType, RequireFields<QueryagenciesUnderCurrentUserOrganizationArgs, 'organizationId'>>;
   agency: Resolver<Maybe<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagencyArgs, 'id'>>;
   expenditureCategories: OptArgsResolverFn<Array<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType>;
   expenditureCategory: Resolver<Maybe<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType, RequireFields<QueryexpenditureCategoryArgs, 'id'>>;
@@ -1277,6 +1285,7 @@ export type QueryResolvers<ContextType = RedwoodGraphQLContext, ParentType exten
 export type QueryRelationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   agencies?: RequiredResolverFn<Array<ResolversTypes['Agency']>, ParentType, ContextType>;
   agenciesByOrganization?: RequiredResolverFn<Array<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagenciesByOrganizationArgs, 'organizationId'>>;
+  agenciesUnderCurrentUserOrganization?: RequiredResolverFn<Maybe<Array<ResolversTypes['Agency']>>, ParentType, ContextType, RequireFields<QueryagenciesUnderCurrentUserOrganizationArgs, 'organizationId'>>;
   agency?: RequiredResolverFn<Maybe<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagencyArgs, 'id'>>;
   expenditureCategories?: RequiredResolverFn<Array<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType>;
   expenditureCategory?: RequiredResolverFn<Maybe<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType, RequireFields<QueryexpenditureCategoryArgs, 'id'>>;

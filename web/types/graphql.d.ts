@@ -447,6 +447,7 @@ export type Query = {
   __typename?: 'Query';
   agencies: Array<Agency>;
   agenciesByOrganization: Array<Agency>;
+  agenciesUnderCurrentUserOrganization?: Maybe<Array<Agency>>;
   agency?: Maybe<Agency>;
   expenditureCategories: Array<ExpenditureCategory>;
   expenditureCategory?: Maybe<ExpenditureCategory>;
@@ -478,6 +479,12 @@ export type Query = {
 
 /** About the Redwood queries. */
 export type QueryagenciesByOrganizationArgs = {
+  organizationId: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QueryagenciesUnderCurrentUserOrganizationArgs = {
   organizationId: Scalars['Int'];
 };
 
@@ -991,6 +998,13 @@ export type CreateUserMutationVariables = Exact<{
 
 
 export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: number } };
+
+export type agenciesUnderCurrentUserOrganizationVariables = Exact<{
+  organizationId: Scalars['Int'];
+}>;
+
+
+export type agenciesUnderCurrentUserOrganization = { __typename?: 'Query', agency?: { __typename?: 'Agency', id: number, name: string, code: string } | null };
 
 export type DeleteUserMutationVariables = Exact<{
   id: Scalars['Int'];

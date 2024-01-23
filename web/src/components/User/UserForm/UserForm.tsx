@@ -8,7 +8,6 @@ import {
   FieldError,
   Label,
   TextField,
-  NumberField,
   SelectField,
   Submit,
 } from '@redwoodjs/forms'
@@ -21,9 +20,12 @@ interface UserFormProps {
   onSave: (data: UpdateUserInput, id?: FormUser['id']) => void
   error: RWGqlError
   loading: boolean
+  agencies?: any
 }
 
 const UserForm = (props: UserFormProps) => {
+  console.log('Agencies', props.agencies)
+
   const { user, onSave, error, loading } = props
   const formMethods: UseFormReturn<FormUser> = useForm<FormUser>()
   const hasErrors = Object.keys(formMethods.formState.errors).length > 0
@@ -34,6 +36,7 @@ const UserForm = (props: UserFormProps) => {
     formMethods.reset()
   }
   const onSubmit = (data: FormUser) => {
+    console.log('submitting this data', data)
     onSave(data, props?.user?.id)
   }
 
@@ -149,18 +152,17 @@ const UserForm = (props: UserFormProps) => {
 
       <div className="row mb-3">
         <Label name="agencyId" className="form-label col-sm-2 col-form-label">
-          Agency id
+          Agency
         </Label>
 
         <div className="col-sm-6">
-          <NumberField
-            name="agencyId"
-            defaultValue={props.user?.agencyId}
-            className="form-control"
-            errorClassName="form-control is-invalid"
-            emptyAs={'undefined'}
-            validation={{ required: 'This field is required' }}
-          />
+          <SelectField name="agencyId" className="form-select">
+            {props.agencies?.map((agency) => (
+              <option key={agency.id} value={parseInt(agency.id, 10)}>
+                {agency.name}
+              </option>
+            ))}
+          </SelectField>
         </div>
 
         <FieldError

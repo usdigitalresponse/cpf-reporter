@@ -49,6 +49,22 @@ export const usersByOrganization: QueryResolvers['usersByOrganization'] =
     }
   }
 
+export const agenciesUnderCurrentUserOrganization: QueryResolvers['agenciesUnderCurrentUserOrganization'] =
+  async ({ organizationId }) => {
+    console.log('organizationId', organizationId)
+    try {
+      const agencies = await db.agency.findMany({
+        where: { organizationId: organizationId },
+      })
+      console.log('agencies under: ', agencies)
+      return agencies || [] // Return an empty array if null is received
+    } catch (error) {
+      console.error(error)
+      // Handle the error appropriately; maybe log it and return an empty array
+      return []
+    }
+  }
+
 export const User: UserRelationResolvers = {
   agency: (_obj, { root }) => {
     return db.user.findUnique({ where: { id: root?.id } }).agency()
