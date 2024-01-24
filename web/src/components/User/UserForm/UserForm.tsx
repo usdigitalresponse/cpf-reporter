@@ -24,7 +24,7 @@ interface UserFormProps {
 }
 
 const UserForm = (props: UserFormProps) => {
-  console.log('Agencies', props.agencies)
+  // console.log('Agencies', props.agencies)
 
   const { user, onSave, error, loading } = props
   const formMethods: UseFormReturn<FormUser> = useForm<FormUser>()
@@ -35,6 +35,7 @@ const UserForm = (props: UserFormProps) => {
   const onReset = () => {
     formMethods.reset()
   }
+
   const onSubmit = (data: FormUser) => {
     console.log('submitting this data', data)
     onSave(data, props?.user?.id)
@@ -156,9 +157,20 @@ const UserForm = (props: UserFormProps) => {
         </Label>
 
         <div className="col-sm-6">
-          <SelectField name="agencyId" className="form-select">
+          <SelectField
+            name="agencyId"
+            className="form-select"
+            validation={{
+              required: 'This field is required',
+              valueAsNumber: true,
+            }}
+            emptyAs={null}
+          >
+            <option value="" hidden>
+              Select an agency
+            </option>
             {props.agencies?.map((agency) => (
-              <option key={agency.id} value={parseInt(agency.id, 10)}>
+              <option key={agency.id} value={parseInt(agency.id)}>
                 {agency.name}
               </option>
             ))}

@@ -34,6 +34,7 @@ export const schema = gql`
     email: String!
     name: String
     agencyId: Int
+    organizationId: Int
     role: String
   }
 
@@ -41,6 +42,7 @@ export const schema = gql`
     email: String
     name: String
     agencyId: Int
+    organizationId: Int
     role: String
   }
 

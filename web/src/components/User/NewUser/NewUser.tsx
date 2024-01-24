@@ -46,7 +46,7 @@ const NewUser = () => {
 
   // Step 2: Fetch the agencies data
   const { data } = useQuery(GET_AGENCIES_UNDER_USER_ORGANIZATION, {
-    variables: { organizationId: organizationIdOfUser }, // Replace with the appropriate organizationId
+    variables: { organizationId: organizationIdOfUser },
     onCompleted: (data) => {
       setAgencies(data.agenciesUnderCurrentUserOrganization)
     },
@@ -57,11 +57,11 @@ const NewUser = () => {
   }
 
   return (
-    <div className="rw-segment">
-      <header className="rw-segment-header">
-        <h2 className="rw-heading rw-heading-secondary">New User</h2>
+    <div>
+      <header>
+        <h2>New User</h2>
       </header>
-      <div className="rw-segment-main">
+      <div>
         <UserForm
           onSave={onSave}
           loading={loading}

@@ -156,6 +156,7 @@ export type CreateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   email: Scalars['String'];
   name?: InputMaybe<Scalars['String']>;
+  organizationId?: InputMaybe<Scalars['Int']>;
   role?: InputMaybe<Scalars['String']>;
 };
 
@@ -746,6 +747,7 @@ export type UpdateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   email?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
+  organizationId?: InputMaybe<Scalars['Int']>;
   role?: InputMaybe<Scalars['String']>;
 };
 
