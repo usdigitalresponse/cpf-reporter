@@ -1,4 +1,9 @@
 export const schema = gql`
+  enum ReviewTypeEnum {
+    VALIDATED
+    INVALIDATED
+  }
+
   type UploadValidation {
     id: Int!
     uploadId: Int!
@@ -10,13 +15,11 @@ export const schema = gql`
     inputTemplateId: Int!
     inputTemplate: InputTemplate!
     validationResults: JSON
-    validatedAt: DateTime
-    validatedById: Int
-    validatedBy: User
     invalidationResults: JSON
-    invalidatedAt: DateTime
-    invalidatedById: Int
-    invalidatedBy: User
+    reviewedAt: DateTime
+    reviewedById: Int
+    reviewedBy: User
+    reviewType: ReviewTypeEnum
     createdAt: DateTime!
     updatedAt: DateTime!
   }
@@ -32,11 +35,7 @@ export const schema = gql`
     organizationId: Int!
     inputTemplateId: Int!
     validationResults: JSON
-    validatedAt: DateTime
-    validatedById: Int
     invalidationResults: JSON
-    invalidatedAt: DateTime
-    invalidatedById: Int
   }
 
   input UpdateUploadValidationInput {
@@ -45,11 +44,7 @@ export const schema = gql`
     organizationId: Int
     inputTemplateId: Int
     validationResults: JSON
-    validatedAt: DateTime
-    validatedById: Int
     invalidationResults: JSON
-    invalidatedAt: DateTime
-    invalidatedById: Int
   }
 
   type Mutation {

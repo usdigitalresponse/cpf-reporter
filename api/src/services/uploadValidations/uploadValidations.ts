@@ -52,19 +52,14 @@ export const UploadValidation: UploadValidationRelationResolvers = {
       .findUnique({ where: { id: root?.id } })
       .organization()
   },
+  reviewedBy: (_obj, { root }) => {
+    return db.uploadValidation
+      .findUnique({ where: { id: root?.id } })
+      .reviewedBy()
+  },
   inputTemplate: (_obj, { root }) => {
     return db.uploadValidation
       .findUnique({ where: { id: root?.id } })
       .inputTemplate()
-  },
-  validatedBy: (_obj, { root }) => {
-    return db.uploadValidation
-      .findUnique({ where: { id: root?.id } })
-      .validatedBy()
-  },
-  invalidatedBy: (_obj, { root }) => {
-    return db.uploadValidation
-      .findUnique({ where: { id: root?.id } })
-      .invalidatedBy()
   },
 }

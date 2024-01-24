@@ -9,13 +9,34 @@ export const QUERY = gql`
     upload: upload(id: $id) {
       id
       filename
-      uploadedById
-      agencyId
+      uploadedBy {
+        name
+      }
+      agency {
+        code
+      }
       organizationId
-      reportingPeriodId
-      expenditureCategoryId
+      reportingPeriod {
+        name
+      }
+      expenditureCategory {
+        code
+      }
+      notes
       createdAt
       updatedAt
+      latestValidation {
+        agencyId
+        organizationId
+        inputTemplateId
+        validationResults
+        invalidationResults
+        reviewedBy {
+          name
+        }
+        reviewType
+        createdAt
+      }
     }
   }
 `
