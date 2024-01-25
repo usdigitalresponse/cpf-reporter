@@ -1,3 +1,5 @@
+import Button from 'react-bootstrap/Button'
+import Table from 'react-bootstrap/Table'
 import type { ReportingPeriodsQuery } from 'types/graphql'
 
 import { Link, routes } from '@redwoodjs/router'
@@ -33,13 +35,14 @@ export const Success = ({
   reportingPeriods,
 }: CellSuccessProps<ReportingPeriodsQuery>) => {
   return (
-    <table border="1">
+    <Table striped borderless>
       <thead>
         <tr>
           <th>Start Date</th>
           <th>End Date</th>
           <th>Template</th>
           <th>Certified At</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -70,10 +73,22 @@ export const Success = ({
                   )
                 )}
               </td>
+              <td className="border border-slate-700">
+                <nav className="rw-table-actions">
+                  <Link
+                    to={routes.editReportingPeriod({ id: item.id })}
+                    title={'Edit reporting period ' + item.id}
+                  >
+                    <Button size="sm" variant="secondary">
+                      Edit
+                    </Button>
+                  </Link>
+                </nav>
+              </td>
             </tr>
           )
         })}
       </tbody>
-    </table>
+    </Table>
   )
 }

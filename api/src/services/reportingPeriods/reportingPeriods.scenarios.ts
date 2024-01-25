@@ -7,51 +7,45 @@ export const standard = defineScenario<Prisma.ReportingPeriodCreateArgs>({
     one: {
       data: {
         name: 'String',
-        startDate: '2023-12-07T18:38:12.356Z',
-        endDate: '2023-12-07T18:38:12.356Z',
-        updatedAt: '2023-12-07T18:38:12.356Z',
+        startDate: '2024-01-12T15:48:11.499Z',
+        endDate: '2024-01-12T15:48:11.499Z',
+        organization: { create: { name: 'String' } },
         inputTemplate: {
           create: {
             name: 'String',
             version: 'String',
-            effectiveDate: '2023-12-07T18:38:12.356Z',
-            updatedAt: '2023-12-07T18:38:12.356Z',
+            effectiveDate: '2024-01-12T15:48:11.499Z',
           },
         },
         outputTemplate: {
           create: {
             name: 'String',
             version: 'String',
-            effectiveDate: '2023-12-07T18:38:12.356Z',
-            updatedAt: '2023-12-07T18:38:12.356Z',
+            effectiveDate: '2024-01-12T15:48:11.499Z',
           },
         },
-        organization: { create: { name: 'String' } },
       },
     },
     two: {
       data: {
         name: 'String',
-        startDate: '2023-12-07T18:38:12.356Z',
-        endDate: '2023-12-07T18:38:12.356Z',
-        updatedAt: '2023-12-07T18:38:12.356Z',
+        startDate: '2024-01-12T15:48:11.499Z',
+        endDate: '2024-01-12T15:48:11.499Z',
+        organization: { create: { name: 'String' } },
         inputTemplate: {
           create: {
             name: 'String',
             version: 'String',
-            effectiveDate: '2023-12-07T18:38:12.356Z',
-            updatedAt: '2023-12-07T18:38:12.356Z',
+            effectiveDate: '2024-01-12T15:48:11.499Z',
           },
         },
         outputTemplate: {
           create: {
             name: 'String',
             version: 'String',
-            effectiveDate: '2023-12-07T18:38:12.356Z',
-            updatedAt: '2023-12-07T18:38:12.356Z',
+            effectiveDate: '2024-01-12T15:48:11.499Z',
           },
         },
-        organization: { create: { name: 'String' } },
       },
     },
   },

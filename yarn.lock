@@ -3953,17 +3953,18 @@ __metadata:
   linkType: hard
 
 "@fastify/reply-from@npm:^9.0.0":
-  version: 9.4.0
-  resolution: "@fastify/reply-from@npm:9.4.0"
+  version: 9.7.0
+  resolution: "@fastify/reply-from@npm:9.7.0"
   dependencies:
     "@fastify/error": ^3.0.0
     end-of-stream: ^1.4.4
+    fast-content-type-parse: ^1.1.0
     fast-querystring: ^1.0.0
     fastify-plugin: ^4.0.0
     pump: ^3.0.0
     tiny-lru: ^11.0.0
     undici: ^5.19.1
-  checksum: a048d55d2b06898aa4b5b399e4b5e31ec1ca0abbbe06168951cca0342e508dfedd79d857d1d34ffe478e1a2c2713edd6a2a7358250e080db11c1b4c6b5196b6f
+  checksum: 2018d4be79500d5c529c2fd7d18a270159d2fa12110bdbbee592db701b00ff4ffc2770bd25cba203dbdc1f8f162a6fd8b0244332d0c7a27395c87b1952dac28a
   languageName: node
   linkType: hard
 
@@ -14609,12 +14610,12 @@ __metadata:
   linkType: hard
 
 "follow-redirects@npm:^1.0.0":
-  version: 1.15.3
-  resolution: "follow-redirects@npm:1.15.3"
+  version: 1.15.4
+  resolution: "follow-redirects@npm:1.15.4"
   peerDependenciesMeta:
     debug:
       optional: true
-  checksum: 584da22ec5420c837bd096559ebfb8fe69d82512d5585004e36a3b4a6ef6d5905780e0c74508c7b72f907d1fa2b7bd339e613859e9c304d0dc96af2027fd0231
+  checksum: e178d1deff8b23d5d24ec3f7a94cde6e47d74d0dc649c35fc9857041267c12ec5d44650a0c5597ef83056ada9ea6ca0c30e7c4f97dbf07d035086be9e6a5b7b6
   languageName: node
   linkType: hard
 
