@@ -16,10 +16,24 @@ export const user: QueryResolvers['user'] = ({ id }) => {
   })
 }
 
-export const createUser: MutationResolvers['createUser'] = ({ input }) => {
-  return db.user.create({
-    data: input,
-  })
+export const createUser: MutationResolvers['createUser'] = async ({
+  input,
+}) => {
+  const { agencyId } = input
+
+  try {
+    const organizationId = (
+      await db.agency.findUnique({
+        where: { id: agencyId },
+      })
+    ).organizationId
+
+    return db.user.create({
+      data: { ...input, organizationId: organizationId },
+    })
+  } catch (err) {
+    throw new Error(err)
+  }
 }
 
 export const updateUser: MutationResolvers['updateUser'] = ({ id, input }) => {
@@ -51,12 +65,10 @@ export const usersByOrganization: QueryResolvers['usersByOrganization'] =
 
 export const agenciesUnderCurrentUserOrganization: QueryResolvers['agenciesUnderCurrentUserOrganization'] =
   async ({ organizationId }) => {
-    console.log('organizationId', organizationId)
     try {
       const agencies = await db.agency.findMany({
         where: { organizationId: organizationId },
       })
-      console.log('agencies under: ', agencies)
       return agencies || [] // Return an empty array if null is received
     } catch (error) {
       console.error(error)

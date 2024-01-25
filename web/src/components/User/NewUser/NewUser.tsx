@@ -22,7 +22,6 @@ const GET_AGENCIES_UNDER_USER_ORGANIZATION = gql`
     agenciesUnderCurrentUserOrganization(organizationId: $organizationId) {
       id
       name
-      code
     }
   }
 `

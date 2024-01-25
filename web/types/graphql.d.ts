@@ -1006,7 +1006,7 @@ export type agenciesUnderUserOrganizationVariables = Exact<{
 }>;
 
 
-export type agenciesUnderUserOrganization = { __typename?: 'Query', agenciesUnderCurrentUserOrganization?: Array<{ __typename?: 'Agency', id: number, name: string, code: string }> | null };
+export type agenciesUnderUserOrganization = { __typename?: 'Query', agenciesUnderCurrentUserOrganization?: Array<{ __typename?: 'Agency', id: number, name: string }> | null };
 
 export type DeleteUserMutationVariables = Exact<{
   id: Scalars['Int'];

@@ -20,11 +20,11 @@ interface UserFormProps {
   onSave: (data: UpdateUserInput, id?: FormUser['id']) => void
   error: RWGqlError
   loading: boolean
-  agencies?: any
+  agencies?: Array<{ id: string; name: string }>
 }
 
 const UserForm = (props: UserFormProps) => {
-  // console.log('Agencies', props.agencies)
+  console.log('Agencies', props.agencies)
 
   const { user, onSave, error, loading } = props
   const formMethods: UseFormReturn<FormUser> = useForm<FormUser>()
@@ -138,7 +138,11 @@ const UserForm = (props: UserFormProps) => {
         </Label>
 
         <div className="col-sm-6">
-          <SelectField name="role" className="form-select">
+          <SelectField
+            name="role"
+            defaultValue={user?.role}
+            className="form-select"
+          >
             <option value="USDR_ADMIN">USDR admin</option>
             <option value="ORGANIZATION_ADMIN">Organization admin</option>
             <option value="ORGANIZATION_STAFF">Organization staff</option>
@@ -165,6 +169,7 @@ const UserForm = (props: UserFormProps) => {
               valueAsNumber: true,
             }}
             emptyAs={null}
+            defaultValue={user?.agencyId}
           >
             <option value="" hidden>
               Select an agency
