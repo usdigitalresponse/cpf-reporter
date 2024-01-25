@@ -29,8 +29,7 @@ export const QUERY = gql`
         agencyId
         organizationId
         inputTemplateId
-        validationResults
-        invalidationResults
+        reviewResults
         reviewedBy {
           name
         }

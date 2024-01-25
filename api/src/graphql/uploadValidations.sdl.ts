@@ -14,8 +14,7 @@ export const schema = gql`
     organization: Organization!
     inputTemplateId: Int!
     inputTemplate: InputTemplate!
-    validationResults: JSON
-    invalidationResults: JSON
+    reviewResults: JSON
     reviewedAt: DateTime
     reviewedById: Int
     reviewedBy: User
@@ -34,8 +33,7 @@ export const schema = gql`
     agencyId: Int!
     organizationId: Int!
     inputTemplateId: Int!
-    validationResults: JSON
-    invalidationResults: JSON
+    reviewResults: JSON
   }
 
   input UpdateUploadValidationInput {
@@ -43,8 +41,7 @@ export const schema = gql`
     agencyId: Int
     organizationId: Int
     inputTemplateId: Int
-    validationResults: JSON
-    invalidationResults: JSON
+    reviewResults: JSON
   }
 
   type Mutation {

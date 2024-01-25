@@ -142,10 +142,9 @@ export type CreateUploadInput = {
 export type CreateUploadValidationInput = {
   agencyId: Scalars['Int'];
   inputTemplateId: Scalars['Int'];
-  invalidationResults?: InputMaybe<Scalars['JSON']>;
   organizationId: Scalars['Int'];
+  reviewResults?: InputMaybe<Scalars['JSON']>;
   uploadId: Scalars['Int'];
-  validationResults?: InputMaybe<Scalars['JSON']>;
 };
 
 export type CreateUserInput = {
@@ -725,10 +724,9 @@ export type UpdateUploadInput = {
 export type UpdateUploadValidationInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   inputTemplateId?: InputMaybe<Scalars['Int']>;
-  invalidationResults?: InputMaybe<Scalars['JSON']>;
   organizationId?: InputMaybe<Scalars['Int']>;
+  reviewResults?: InputMaybe<Scalars['JSON']>;
   uploadId?: InputMaybe<Scalars['Int']>;
-  validationResults?: InputMaybe<Scalars['JSON']>;
 };
 
 export type UpdateUserInput = {
@@ -768,9 +766,9 @@ export type UploadValidation = {
   id: Scalars['Int'];
   inputTemplate: InputTemplate;
   inputTemplateId: Scalars['Int'];
-  invalidationResults?: Maybe<Scalars['JSON']>;
   organization: Organization;
   organizationId: Scalars['Int'];
+  reviewResults?: Maybe<Scalars['JSON']>;
   reviewType?: Maybe<ReviewTypeEnum>;
   reviewedAt?: Maybe<Scalars['DateTime']>;
   reviewedBy?: Maybe<User>;
@@ -778,7 +776,6 @@ export type UploadValidation = {
   updatedAt: Scalars['DateTime'];
   upload: Upload;
   uploadId: Scalars['Int'];
-  validationResults?: Maybe<Scalars['JSON']>;
 };
 
 export type User = {
@@ -1464,9 +1461,9 @@ export type UploadValidationResolvers<ContextType = RedwoodGraphQLContext, Paren
   id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   inputTemplate: OptArgsResolverFn<ResolversTypes['InputTemplate'], ParentType, ContextType>;
   inputTemplateId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
-  invalidationResults: OptArgsResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   organization: OptArgsResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
   organizationId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  reviewResults: OptArgsResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   reviewType: OptArgsResolverFn<Maybe<ResolversTypes['ReviewTypeEnum']>, ParentType, ContextType>;
   reviewedAt: OptArgsResolverFn<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   reviewedBy: OptArgsResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
@@ -1474,7 +1471,6 @@ export type UploadValidationResolvers<ContextType = RedwoodGraphQLContext, Paren
   updatedAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   upload: OptArgsResolverFn<ResolversTypes['Upload'], ParentType, ContextType>;
   uploadId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
-  validationResults: OptArgsResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -1485,9 +1481,9 @@ export type UploadValidationRelationResolvers<ContextType = RedwoodGraphQLContex
   id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   inputTemplate?: RequiredResolverFn<ResolversTypes['InputTemplate'], ParentType, ContextType>;
   inputTemplateId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
-  invalidationResults?: RequiredResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   organization?: RequiredResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
   organizationId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  reviewResults?: RequiredResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   reviewType?: RequiredResolverFn<Maybe<ResolversTypes['ReviewTypeEnum']>, ParentType, ContextType>;
   reviewedAt?: RequiredResolverFn<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   reviewedBy?: RequiredResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
@@ -1495,7 +1491,6 @@ export type UploadValidationRelationResolvers<ContextType = RedwoodGraphQLContex
   updatedAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   upload?: RequiredResolverFn<ResolversTypes['Upload'], ParentType, ContextType>;
   uploadId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
-  validationResults?: RequiredResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

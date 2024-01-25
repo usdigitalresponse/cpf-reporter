@@ -123,10 +123,9 @@ export type CreateUploadInput = {
 export type CreateUploadValidationInput = {
   agencyId: Scalars['Int'];
   inputTemplateId: Scalars['Int'];
-  invalidationResults?: InputMaybe<Scalars['JSON']>;
   organizationId: Scalars['Int'];
+  reviewResults?: InputMaybe<Scalars['JSON']>;
   uploadId: Scalars['Int'];
-  validationResults?: InputMaybe<Scalars['JSON']>;
 };
 
 export type CreateUserInput = {
@@ -706,10 +705,9 @@ export type UpdateUploadInput = {
 export type UpdateUploadValidationInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   inputTemplateId?: InputMaybe<Scalars['Int']>;
-  invalidationResults?: InputMaybe<Scalars['JSON']>;
   organizationId?: InputMaybe<Scalars['Int']>;
+  reviewResults?: InputMaybe<Scalars['JSON']>;
   uploadId?: InputMaybe<Scalars['Int']>;
-  validationResults?: InputMaybe<Scalars['JSON']>;
 };
 
 export type UpdateUserInput = {
@@ -749,9 +747,9 @@ export type UploadValidation = {
   id: Scalars['Int'];
   inputTemplate: InputTemplate;
   inputTemplateId: Scalars['Int'];
-  invalidationResults?: Maybe<Scalars['JSON']>;
   organization: Organization;
   organizationId: Scalars['Int'];
+  reviewResults?: Maybe<Scalars['JSON']>;
   reviewType?: Maybe<ReviewTypeEnum>;
   reviewedAt?: Maybe<Scalars['DateTime']>;
   reviewedBy?: Maybe<User>;
@@ -759,7 +757,6 @@ export type UploadValidation = {
   updatedAt: Scalars['DateTime'];
   upload: Upload;
   uploadId: Scalars['Int'];
-  validationResults?: Maybe<Scalars['JSON']>;
 };
 
 export type User = {
@@ -912,17 +909,17 @@ export type FindReportingPeriodsVariables = Exact<{ [key: string]: never; }>;
 
 export type FindReportingPeriods = { __typename?: 'Query', reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, name: string, startDate: string, endDate: string, organizationId: number, certifiedAt?: string | null, certifiedById?: number | null, inputTemplateId: number, outputTemplateId: number, isCurrentPeriod: boolean, createdAt: string, updatedAt: string }> };
 
+export type ReportingPeriodsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ReportingPeriodsQuery = { __typename?: 'Query', reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, startDate: string, endDate: string, isCurrentPeriod: boolean, certifiedAt?: string | null, certifiedBy?: { __typename?: 'User', email: string } | null, inputTemplate: { __typename?: 'InputTemplate', name: string } }> };
+
 export type FindReportingPeriodQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
 
 
 export type FindReportingPeriodQuery = { __typename?: 'Query', reportingPeriod?: { __typename?: 'ReportingPeriod', name: string } | null };
-
-export type ReportingPeriodsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ReportingPeriodsQuery = { __typename?: 'Query', reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, startDate: string, endDate: string, isCurrentPeriod: boolean, certifiedAt?: string | null, certifiedBy?: { __typename?: 'User', email: string } | null, inputTemplate: { __typename?: 'InputTemplate', name: string } }> };
 
 export type EditUploadByIdVariables = Exact<{
   id: Scalars['Int'];
@@ -951,7 +948,7 @@ export type FindUploadByIdVariables = Exact<{
 }>;
 
 
-export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, organizationId: number, notes?: string | null, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', name?: string | null }, agency: { __typename?: 'Agency', code: string }, reportingPeriod: { __typename?: 'ReportingPeriod', name: string }, expenditureCategory: { __typename?: 'ExpenditureCategory', code: string }, latestValidation?: { __typename?: 'UploadValidation', agencyId: number, organizationId: number, inputTemplateId: number, validationResults?: Prisma.JsonValue | null, invalidationResults?: Prisma.JsonValue | null, reviewType?: ReviewTypeEnum | null, createdAt: string, reviewedBy?: { __typename?: 'User', name?: string | null } | null } | null } | null };
+export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, organizationId: number, notes?: string | null, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', name?: string | null }, agency: { __typename?: 'Agency', code: string }, reportingPeriod: { __typename?: 'ReportingPeriod', name: string }, expenditureCategory: { __typename?: 'ExpenditureCategory', code: string }, latestValidation?: { __typename?: 'UploadValidation', agencyId: number, organizationId: number, inputTemplateId: number, reviewResults?: Prisma.JsonValue | null, reviewType?: ReviewTypeEnum | null, createdAt: string, reviewedBy?: { __typename?: 'User', name?: string | null } | null } | null } | null };
 
 export type FindUploadsVariables = Exact<{ [key: string]: never; }>;
 
