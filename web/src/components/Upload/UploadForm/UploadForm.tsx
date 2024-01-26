@@ -5,7 +5,6 @@ import type { EditUploadById } from 'types/graphql'
 import {
   Form,
   FileField,
-  // HiddenField,
   FormError,
   FieldError,
   Label,
@@ -30,6 +29,7 @@ const CREATE_UPLOAD = gql`
 // type FormUpload = NonNullable<EditUploadById['upload']>
 
 interface UploadFormProps {
+  userId: number
   organizationId: number
   upload?: EditUploadById['upload']
   error: RWGqlError
@@ -58,13 +58,12 @@ const UploadForm = (props: UploadFormProps) => {
     data.reportingPeriodId = parseInt(data.reportingPeriodId)
 
     const uploadInput = {
-      uploadedById: 1,
-      agencyId: 1,
+      uploadedById: props.userId,
+      agencyId: data.agencyId,
       notes: data.notes,
       filename: data.file[0].name,
-      organizationId: 1,
+      organizationId: props.organizationId,
       reportingPeriodId: data.reportingPeriodId,
-      expenditureCategoryId: 1,
     }
     const res = await create({ variables: { input: uploadInput } })
     const formData = new FormData()
@@ -103,7 +102,6 @@ const UploadForm = (props: UploadFormProps) => {
         titleClassName="rw-form-error-title"
         listClassName="rw-form-error-list"
       />
-      {/* <HiddenField name="uploadedBy">1</HiddenField> */}
       <OrganizationPickListsCell id={props.organizationId} />
       <FileField name="file" validation={{ required: true }} />
       <FieldError name="file" className="rw-field-error" />

@@ -7,48 +7,29 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
     one: {
       data: {
         filename: 'String',
-        updatedAt: '2023-12-10T04:48:04.896Z',
-        uploadedBy: {
-          create: {
-            email: 'String',
-            updatedAt: '2023-12-10T04:48:04.896Z',
-            organization: { create: { name: 'String' } },
-          },
-        },
+        uploadedBy: { create: { email: 'String' } },
         agency: { create: { name: 'String', code: 'String' } },
         organization: { create: { name: 'String' } },
         reportingPeriod: {
           create: {
             name: 'String',
-            startDate: '2023-12-10T04:48:04.896Z',
-            endDate: '2023-12-10T04:48:04.896Z',
-            updatedAt: '2023-12-10T04:48:04.896Z',
+            startDate: '2024-01-26T15:11:27.688Z',
+            endDate: '2024-01-26T15:11:27.688Z',
+            organization: { create: { name: 'String' } },
             inputTemplate: {
               create: {
                 name: 'String',
                 version: 'String',
-                effectiveDate: '2023-12-10T04:48:04.896Z',
-                updatedAt: '2023-12-10T04:48:04.896Z',
+                effectiveDate: '2024-01-26T15:11:27.688Z',
               },
             },
             outputTemplate: {
               create: {
                 name: 'String',
                 version: 'String',
-                effectiveDate: '2023-12-10T04:48:04.896Z',
-                updatedAt: '2023-12-10T04:48:04.896Z',
+                effectiveDate: '2024-01-26T15:11:27.688Z',
               },
             },
-            organization: {
-              create: { name: 'String' },
-            },
-          },
-        },
-        expenditureCategory: {
-          create: {
-            name: 'String',
-            code: 'String',
-            updatedAt: '2023-12-10T04:48:04.896Z',
           },
         },
       },
@@ -56,48 +37,29 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
     two: {
       data: {
         filename: 'String',
-        updatedAt: '2023-12-10T04:48:04.896Z',
-        uploadedBy: {
-          create: {
-            email: 'String',
-            updatedAt: '2023-12-10T04:48:04.896Z',
-            organization: { create: { name: 'String' } },
-          },
-        },
+        uploadedBy: { create: { email: 'String' } },
         agency: { create: { name: 'String', code: 'String' } },
         organization: { create: { name: 'String' } },
         reportingPeriod: {
           create: {
             name: 'String',
-            startDate: '2023-12-10T04:48:04.896Z',
-            endDate: '2023-12-10T04:48:04.896Z',
-            updatedAt: '2023-12-10T04:48:04.896Z',
+            startDate: '2024-01-26T15:11:27.688Z',
+            endDate: '2024-01-26T15:11:27.688Z',
+            organization: { create: { name: 'String' } },
             inputTemplate: {
               create: {
                 name: 'String',
                 version: 'String',
-                effectiveDate: '2023-12-10T04:48:04.896Z',
-                updatedAt: '2023-12-10T04:48:04.896Z',
+                effectiveDate: '2024-01-26T15:11:27.688Z',
               },
             },
             outputTemplate: {
               create: {
                 name: 'String',
                 version: 'String',
-                effectiveDate: '2023-12-10T04:48:04.896Z',
-                updatedAt: '2023-12-10T04:48:04.896Z',
+                effectiveDate: '2024-01-26T15:11:27.688Z',
               },
             },
-            organization: {
-              create: { name: 'String' },
-            },
-          },
-        },
-        expenditureCategory: {
-          create: {
-            name: 'String',
-            code: 'String',
-            updatedAt: '2023-12-10T04:48:04.896Z',
           },
         },
       },

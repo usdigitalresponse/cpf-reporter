@@ -112,21 +112,21 @@ model ExpenditureCategory {
 }
 
 model Upload {
-  id                    Int                 @id @default(autoincrement())
+  id                    Int                  @id @default(autoincrement())
   filename              String
   notes                 String?
   uploadedById          Int
-  uploadedBy            User                @relation(fields: [uploadedById], references: [id])
+  uploadedBy            User                 @relation(fields: [uploadedById], references: [id])
   agencyId              Int
-  agency                Agency              @relation(fields: [agencyId], references: [id])
+  agency                Agency               @relation(fields: [agencyId], references: [id])
   organizationId        Int
-  organization          Organization        @relation(fields: [organizationId], references: [id])
+  organization          Organization         @relation(fields: [organizationId], references: [id])
   reportingPeriodId     Int
-  reportingPeriod       ReportingPeriod     @relation(fields: [reportingPeriodId], references: [id])
-  expenditureCategoryId Int
-  expenditureCategory   ExpenditureCategory @relation(fields: [expenditureCategoryId], references: [id])
-  createdAt             DateTime            @default(now()) @db.Timestamptz(6)
-  updatedAt             DateTime            @default(now()) @db.Timestamptz(6)
+  reportingPeriod       ReportingPeriod      @relation(fields: [reportingPeriodId], references: [id])
+  expenditureCategoryId Int?
+  expenditureCategory   ExpenditureCategory? @relation(fields: [expenditureCategoryId], references: [id])
+  createdAt             DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime             @default(now()) @db.Timestamptz(6)
   validations           UploadValidation[]
   subrecipients         Subrecipient[]
 }
