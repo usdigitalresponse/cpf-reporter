@@ -47,6 +47,29 @@ export default async () => {
       )
     )
 
+    const expendtitureCategoriesData = [
+      {
+        name: '1A - Broadband Infrastructure',
+        code: '1A',
+      },
+      {
+        name: '1B - Digital Connectivity Technology',
+        code: '1B',
+      },
+      {
+        name: '1C - Multi-Purpose Community Facility',
+        code: '1C',
+      },
+    ]
+    await Promise.all(
+      expendtitureCategoriesData.map(
+        async (data: Prisma.ExpenditureCategoryCreateArgs['data']) => {
+          const record = await db.expenditureCategory.create({ data })
+          console.log(record)
+        }
+      )
+    )
+
     // If using dbAuth and seeding users, you'll need to add a `hashedPassword`
     // and associated `salt` to their record. Here's how to create them using
     // the same algorithm that dbAuth uses internally:
