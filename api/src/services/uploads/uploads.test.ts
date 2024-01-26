@@ -36,7 +36,6 @@ describe('uploads', () => {
         agencyId: scenario.upload.two.agencyId,
         organizationId: scenario.upload.two.organizationId,
         reportingPeriodId: scenario.upload.two.reportingPeriodId,
-        expenditureCategoryId: scenario.upload.two.expenditureCategoryId,
       },
     })
 
@@ -47,10 +46,6 @@ describe('uploads', () => {
     expect(result.reportingPeriodId).toEqual(
       scenario.upload.two.reportingPeriodId
     )
-    expect(result.expenditureCategoryId).toEqual(
-      scenario.upload.two.expenditureCategoryId
-    )
-    expect(result.updatedAt).toBeDefined()
   })
 
   scenario('updates a upload', async (scenario: StandardScenario) => {

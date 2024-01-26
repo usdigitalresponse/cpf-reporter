@@ -11,12 +11,13 @@ export const schema = gql`
     organization: Organization!
     reportingPeriodId: Int!
     reportingPeriod: ReportingPeriod!
-    expenditureCategoryId: Int!
-    expenditureCategory: ExpenditureCategory!
+    expenditureCategoryId: Int
+    expenditureCategory: ExpenditureCategory
     createdAt: DateTime!
     updatedAt: DateTime!
     validations: [UploadValidation]!
     signedUrl: String
+    subrecipients: [Subrecipient]!
   }
 
   type Query {
@@ -31,7 +32,7 @@ export const schema = gql`
     agencyId: Int!
     organizationId: Int!
     reportingPeriodId: Int!
-    expenditureCategoryId: Int!
+    expenditureCategoryId: Int
   }
 
   input UpdateUploadInput {

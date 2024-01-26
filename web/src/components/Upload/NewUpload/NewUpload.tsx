@@ -36,6 +36,7 @@ const NewUpload = () => {
       </header>
       <div className="rw-segment-main">
         <UploadForm
+          userId={currentUser.id}
           organizationId={currentUser.organizationId}
           loading={loading}
           error={error}

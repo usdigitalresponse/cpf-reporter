@@ -131,7 +131,7 @@ export type CreateSubrecipientInput = {
 
 export type CreateUploadInput = {
   agencyId: Scalars['Int'];
-  expenditureCategoryId: Scalars['Int'];
+  expenditureCategoryId?: InputMaybe<Scalars['Int']>;
   filename: Scalars['String'];
   notes?: InputMaybe<Scalars['String']>;
   organizationId: Scalars['Int'];
@@ -747,8 +747,8 @@ export type Upload = {
   agency: Agency;
   agencyId: Scalars['Int'];
   createdAt: Scalars['DateTime'];
-  expenditureCategory: ExpenditureCategory;
-  expenditureCategoryId: Scalars['Int'];
+  expenditureCategory?: Maybe<ExpenditureCategory>;
+  expenditureCategoryId?: Maybe<Scalars['Int']>;
   filename: Scalars['String'];
   id: Scalars['Int'];
   notes?: Maybe<Scalars['String']>;
@@ -757,6 +757,7 @@ export type Upload = {
   reportingPeriod: ReportingPeriod;
   reportingPeriodId: Scalars['Int'];
   signedUrl?: Maybe<Scalars['String']>;
+  subrecipients: Array<Maybe<Subrecipient>>;
   updatedAt: Scalars['DateTime'];
   uploadedBy: User;
   uploadedById: Scalars['Int'];
@@ -1421,8 +1422,8 @@ export type UploadResolvers<ContextType = RedwoodGraphQLContext, ParentType exte
   agency: OptArgsResolverFn<ResolversTypes['Agency'], ParentType, ContextType>;
   agencyId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   createdAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
-  expenditureCategory: OptArgsResolverFn<ResolversTypes['ExpenditureCategory'], ParentType, ContextType>;
-  expenditureCategoryId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  expenditureCategory: OptArgsResolverFn<Maybe<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType>;
+  expenditureCategoryId: OptArgsResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   filename: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   notes: OptArgsResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -1431,6 +1432,7 @@ export type UploadResolvers<ContextType = RedwoodGraphQLContext, ParentType exte
   reportingPeriod: OptArgsResolverFn<ResolversTypes['ReportingPeriod'], ParentType, ContextType>;
   reportingPeriodId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   signedUrl: OptArgsResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  subrecipients: OptArgsResolverFn<Array<Maybe<ResolversTypes['Subrecipient']>>, ParentType, ContextType>;
   updatedAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   uploadedBy: OptArgsResolverFn<ResolversTypes['User'], ParentType, ContextType>;
   uploadedById: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
@@ -1442,8 +1444,8 @@ export type UploadRelationResolvers<ContextType = RedwoodGraphQLContext, ParentT
   agency?: RequiredResolverFn<ResolversTypes['Agency'], ParentType, ContextType>;
   agencyId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   createdAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
-  expenditureCategory?: RequiredResolverFn<ResolversTypes['ExpenditureCategory'], ParentType, ContextType>;
-  expenditureCategoryId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  expenditureCategory?: RequiredResolverFn<Maybe<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType>;
+  expenditureCategoryId?: RequiredResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   filename?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   notes?: RequiredResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -1452,6 +1454,7 @@ export type UploadRelationResolvers<ContextType = RedwoodGraphQLContext, ParentT
   reportingPeriod?: RequiredResolverFn<ResolversTypes['ReportingPeriod'], ParentType, ContextType>;
   reportingPeriodId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   signedUrl?: RequiredResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  subrecipients?: RequiredResolverFn<Array<Maybe<ResolversTypes['Subrecipient']>>, ParentType, ContextType>;
   updatedAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   uploadedBy?: RequiredResolverFn<ResolversTypes['User'], ParentType, ContextType>;
   uploadedById?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
