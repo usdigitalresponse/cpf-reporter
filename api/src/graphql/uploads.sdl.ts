@@ -45,7 +45,12 @@ export const schema = gql`
     expenditureCategoryId: Int
   }
 
+  # TODO: 
   type Mutation {
+    # validateUpload(input: Int!): Upload! @requireAuth
+    # invalidateUpload(input: Int!): Upload! @requireAuth
+    triggerUploadValidation(id: Int!): Upload! @requireAuth
+    forceInvalidateUpload(id: Int!): Upload! @requireAuth
     createUpload(input: CreateUploadInput!): Upload! @requireAuth
     updateUpload(id: Int!, input: UpdateUploadInput!): Upload! @requireAuth
     deleteUpload(id: Int!): Upload! @requireAuth

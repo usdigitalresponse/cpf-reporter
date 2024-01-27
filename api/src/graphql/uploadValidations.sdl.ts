@@ -34,6 +34,7 @@ export const schema = gql`
     organizationId: Int!
     inputTemplateId: Int!
     reviewResults: JSON
+    reviewType: ReviewTypeEnum
   }
 
   input UpdateUploadValidationInput {
@@ -42,6 +43,7 @@ export const schema = gql`
     organizationId: Int
     inputTemplateId: Int
     reviewResults: JSON
+    reviewType: ReviewTypeEnum
   }
 
   type Mutation {

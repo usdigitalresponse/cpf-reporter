@@ -38,6 +38,13 @@ export const deleteReportingPeriod: MutationResolvers['deleteReportingPeriod'] =
     })
   }
 
+export const currentPeriodForOrganization: QueryResolvers['currentPeriodForOrganization'] =
+({ organizationId }) => {
+  return db.reportingPeriod.findFirst({
+    where: { organizationId, isCurrentPeriod: true },
+  })
+}
+
 export const ReportingPeriod: ReportingPeriodRelationResolvers = {
   organization: (_obj, { root }) => {
     return db.reportingPeriod

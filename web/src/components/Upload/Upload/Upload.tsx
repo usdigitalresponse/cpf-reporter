@@ -9,42 +9,70 @@ import UploadValidationResultsTable from '../UploadValidationResultsTable/Upload
 import UploadValidationStatus from '../UploadValidationStatus/UploadValidationStatus'
 
 import * as validationJson from './testjson.json'
+import { useMutation } from '@redwoodjs/web'
+import { set } from '@redwoodjs/forms'
 
 interface Props {
   upload: NonNullable<FindUploadById['upload']>
+  refetch: any
 }
 
-const Upload = ({ upload }: Props) => {
+const FORCE_INVALIDATE_UPLOAD = gql`
+  mutation forceInvalidateUploadMutation($id: Int!) {
+    forceInvalidateUpload(id: $id) {
+      id
+    }
+  }
+`
+
+const Upload = ({ upload, refetch }: Props) => {
   const [isValidating, setIsValidating] = useState(false)
   const [errors, setErrors] = useState([]) // validationErrors
+
+  const [forceInvalidateUpload] = useMutation(FORCE_INVALIDATE_UPLOAD, {
+    onCompleted: () => {
+      console.log('Upload invalidated')
+      refetch()
+    },
+    onError: (error) => {
+     console.log('Couldnt invalidate the upload')
+    },
+  })
+
 
   // TODO: Implement download file function
   const downloadFile = () => {}
 
+  // calls invalidate or validate
+  const invalidateUploadTest = async () => {
+    setIsValidating(true)
+
+    // make a call to the backend to get invalidation results or validation results
+    // backend saves a new upload validation record
+    // this creates a new upload validation record
+
+
+    // const newUploadValidation = {
+    //   uploadId: upload.id,
+    //   organizationId: upload.organizationId,
+    //   reviewType: 'INVALIDATED',
+    //   agencyId: upload.agency.id,
+    //   inputTemplateId: 1, // TODO: Replace with actual input template id
+    //   reviewResults: '{}',
+    // }
+    // onSave(newUploadValidation)
+
+    setIsValidating(false)
+  }
+
   // TODO: Implement invalidate upload function
   const invalidateUpload = async () => {
     setIsValidating(true)
-    console.log('Waiting 2 seconds to invalidate upload...')
 
-    setTimeout(() => {
-      setIsValidating(false)
-    }, 2000)
+    console.log('About to invalidate upload:', upload)
+    await forceInvalidateUpload({ variables: { id: upload.id } })
 
-    // try {
-    //   const result = await post(`/api/uploads/${upload.id}/invalidate`)
-    //   await loadUpload()
-
-    //   if (result.errors?.length) {
-    //     setErrors(result.errors)
-    //   } else {
-    //     console.log('Upload successfully invalidated!')
-    //   }
-    // } catch (error) {
-    //   // we got an error from the backend, but the backend didn't send reasons
-    //   console.log('invalidate upload error')
-    // }
-
-    // setIsValidating(false)
+    setIsValidating(false)
   }
 
   // Attempt to validate the upload, and if there are errors, display them
@@ -53,14 +81,33 @@ const Upload = ({ upload }: Props) => {
 
     try {
       // TODO: Implement validate upload function
-      // const validationResult = await post(`/api/uploads/${upload.id}/validate`)
+
+      // Wait for the upload to be validated
+      // validationResults will be a mutation
+      // {
+      // uploadId:
+      // reviewResults: {}
+      // }
       const validationResult = JSON.stringify(validationJson)
       const result = JSON.parse(validationResult)
 
       if (result.errors.length) {
+        // !Cannot validate upload with errors
+        // We got errors, display them but don't save the validation
         console.log('Cannot validate upload', errors)
         setErrors(result.errors)
       } else {
+        // No errors, save the validation
+        const newUploadValidation = {
+          uploadId: upload.id,
+          organizationId: upload.organizationId,
+          reviewType: 'VALIDATED',
+          agencyId: upload.agency.id,
+          inputTemplateId: 1, // TODO: Replace with actual input template id
+          reviewResults: result,
+        }
+
+        onSave(newUploadValidation)
         console.log('Upload successfully validated!')
       }
     } catch (error) {

@@ -28,6 +28,69 @@ export const createUpload: MutationResolvers['createUpload'] = async ({
   return upload
 }
 
+// This runs when user clicks "Validate" button or "Re-Validate" button
+export const triggerUploadValidation: MutationResolvers['triggerUploadValidation'] = async ({ id }) => {
+  // "reviewType" can be invalid or valid
+  // "reviewResults" can be null or have errors
+
+  // const upload = await services.CPFValidationService.validateUpload(input)
+
+   const upload = await db.upload.findUnique({
+      where: { id },
+    })
+
+  // console.log('latestValidation', upload.latestValidation)
+  // console.log('reviewType', upload.latestValidation.reviewType)
+  // console.log('reviewResults', upload.latestValidation.reviewResults)
+
+  return upload;
+}
+
+// Runs when user clicks "Invalidate" and is always of reviewType INVALIDATED
+// You can invalidate a file even if you don't get any erros
+export const forceInvalidateUpload: MutationResolvers['forceInvalidateUpload'] = async ({ id }) => {
+  const upload = await db.upload.findUnique({
+    where: { id },
+  })
+
+  await db.uploadValidation.create({
+    data: {
+      uploadId: id,
+      agencyId: upload.agencyId,
+      organizationId: upload.organizationId,
+      inputTemplateId: upload.expenditureCategoryId,
+      reviewType: 'INVALIDATED',
+    },
+  });
+
+  return upload;
+}
+
+// !DO NOT USE THIS
+// export const validateUpload: MutationResolvers['validateUpload'] = async ({
+//   input,
+// }) => {
+//   // const upload = await db.upload.create({
+//   //   data: input,
+//   // })
+
+//   const uploadValidation = await db.uploadValidation.create({});
+
+//   // const upload = await services.CPFValidationService.validateUpload(input)
+
+//   //  const upload = await db.upload.findUnique({
+//   //     where: { id: input },
+//   //   })
+
+//   // console.log('latestValidation', upload.latestValidation)
+//   // console.log('reviewType', upload.latestValidation.reviewType)
+//   // console.log('reviewResults', upload.latestValidation.reviewResults)
+
+
+//   // upload.signedUrl = await s3PutSignedUrl(upload, upload.id)
+//   return uploadValidation
+// }
+
 export const updateUpload: MutationResolvers['updateUpload'] = ({
   id,
   input,
@@ -72,7 +135,7 @@ export const Upload: UploadRelationResolvers = {
     const latestValidation = await db.uploadValidation.findFirst({
       where: { uploadId: root?.id },
       orderBy: {
-        createdAt: 'desc',
+        reviewedAt: 'desc',
       },
     })
     return latestValidation

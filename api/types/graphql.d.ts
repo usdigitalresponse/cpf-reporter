@@ -144,6 +144,7 @@ export type CreateUploadValidationInput = {
   inputTemplateId: Scalars['Int'];
   organizationId: Scalars['Int'];
   reviewResults?: InputMaybe<Scalars['JSON']>;
+  reviewType?: InputMaybe<ReviewTypeEnum>;
   uploadId: Scalars['Int'];
 };
 
@@ -203,6 +204,8 @@ export type Mutation = {
   deleteUpload: Upload;
   deleteUploadValidation: UploadValidation;
   deleteUser: User;
+  forceInvalidateUpload: Upload;
+  triggerUploadValidation: Upload;
   updateAgency: Agency;
   updateExpenditureCategory: ExpenditureCategory;
   updateInputTemplate: InputTemplate;
@@ -343,6 +346,16 @@ export type MutationdeleteUserArgs = {
 };
 
 
+export type MutationforceInvalidateUploadArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationtriggerUploadValidationArgs = {
+  id: Scalars['Int'];
+};
+
+
 export type MutationupdateAgencyArgs = {
   id: Scalars['Int'];
   input: UpdateAgencyInput;
@@ -462,6 +475,7 @@ export type Query = {
   agencies: Array<Agency>;
   agenciesByOrganization: Array<Agency>;
   agency?: Maybe<Agency>;
+  currentPeriodForOrganization?: Maybe<ReportingPeriod>;
   expenditureCategories: Array<ExpenditureCategory>;
   expenditureCategory?: Maybe<ExpenditureCategory>;
   inputTemplate?: Maybe<InputTemplate>;
@@ -499,6 +513,12 @@ export type QueryagenciesByOrganizationArgs = {
 /** About the Redwood queries. */
 export type QueryagencyArgs = {
   id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QuerycurrentPeriodForOrganizationArgs = {
+  organizationId: Scalars['Int'];
 };
 
 
@@ -726,6 +746,7 @@ export type UpdateUploadValidationInput = {
   inputTemplateId?: InputMaybe<Scalars['Int']>;
   organizationId?: InputMaybe<Scalars['Int']>;
   reviewResults?: InputMaybe<Scalars['JSON']>;
+  reviewType?: InputMaybe<ReviewTypeEnum>;
   uploadId?: InputMaybe<Scalars['Int']>;
 };
 
@@ -1098,6 +1119,8 @@ export type MutationResolvers<ContextType = RedwoodGraphQLContext, ParentType ex
   deleteUpload: Resolver<ResolversTypes['Upload'], ParentType, ContextType, RequireFields<MutationdeleteUploadArgs, 'id'>>;
   deleteUploadValidation: Resolver<ResolversTypes['UploadValidation'], ParentType, ContextType, RequireFields<MutationdeleteUploadValidationArgs, 'id'>>;
   deleteUser: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationdeleteUserArgs, 'id'>>;
+  forceInvalidateUpload: Resolver<ResolversTypes['Upload'], ParentType, ContextType, RequireFields<MutationforceInvalidateUploadArgs, 'id'>>;
+  triggerUploadValidation: Resolver<ResolversTypes['Upload'], ParentType, ContextType, RequireFields<MutationtriggerUploadValidationArgs, 'id'>>;
   updateAgency: Resolver<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationupdateAgencyArgs, 'id' | 'input'>>;
   updateExpenditureCategory: Resolver<ResolversTypes['ExpenditureCategory'], ParentType, ContextType, RequireFields<MutationupdateExpenditureCategoryArgs, 'id' | 'input'>>;
   updateInputTemplate: Resolver<ResolversTypes['InputTemplate'], ParentType, ContextType, RequireFields<MutationupdateInputTemplateArgs, 'id' | 'input'>>;
@@ -1138,6 +1161,8 @@ export type MutationRelationResolvers<ContextType = RedwoodGraphQLContext, Paren
   deleteUpload?: RequiredResolverFn<ResolversTypes['Upload'], ParentType, ContextType, RequireFields<MutationdeleteUploadArgs, 'id'>>;
   deleteUploadValidation?: RequiredResolverFn<ResolversTypes['UploadValidation'], ParentType, ContextType, RequireFields<MutationdeleteUploadValidationArgs, 'id'>>;
   deleteUser?: RequiredResolverFn<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationdeleteUserArgs, 'id'>>;
+  forceInvalidateUpload?: RequiredResolverFn<ResolversTypes['Upload'], ParentType, ContextType, RequireFields<MutationforceInvalidateUploadArgs, 'id'>>;
+  triggerUploadValidation?: RequiredResolverFn<ResolversTypes['Upload'], ParentType, ContextType, RequireFields<MutationtriggerUploadValidationArgs, 'id'>>;
   updateAgency?: RequiredResolverFn<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationupdateAgencyArgs, 'id' | 'input'>>;
   updateExpenditureCategory?: RequiredResolverFn<ResolversTypes['ExpenditureCategory'], ParentType, ContextType, RequireFields<MutationupdateExpenditureCategoryArgs, 'id' | 'input'>>;
   updateInputTemplate?: RequiredResolverFn<ResolversTypes['InputTemplate'], ParentType, ContextType, RequireFields<MutationupdateInputTemplateArgs, 'id' | 'input'>>;
@@ -1240,6 +1265,7 @@ export type QueryResolvers<ContextType = RedwoodGraphQLContext, ParentType exten
   agencies: OptArgsResolverFn<Array<ResolversTypes['Agency']>, ParentType, ContextType>;
   agenciesByOrganization: Resolver<Array<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagenciesByOrganizationArgs, 'organizationId'>>;
   agency: Resolver<Maybe<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagencyArgs, 'id'>>;
+  currentPeriodForOrganization: Resolver<Maybe<ResolversTypes['ReportingPeriod']>, ParentType, ContextType, RequireFields<QuerycurrentPeriodForOrganizationArgs, 'organizationId'>>;
   expenditureCategories: OptArgsResolverFn<Array<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType>;
   expenditureCategory: Resolver<Maybe<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType, RequireFields<QueryexpenditureCategoryArgs, 'id'>>;
   inputTemplate: Resolver<Maybe<ResolversTypes['InputTemplate']>, ParentType, ContextType, RequireFields<QueryinputTemplateArgs, 'id'>>;
@@ -1270,6 +1296,7 @@ export type QueryRelationResolvers<ContextType = RedwoodGraphQLContext, ParentTy
   agencies?: RequiredResolverFn<Array<ResolversTypes['Agency']>, ParentType, ContextType>;
   agenciesByOrganization?: RequiredResolverFn<Array<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagenciesByOrganizationArgs, 'organizationId'>>;
   agency?: RequiredResolverFn<Maybe<ResolversTypes['Agency']>, ParentType, ContextType, RequireFields<QueryagencyArgs, 'id'>>;
+  currentPeriodForOrganization?: RequiredResolverFn<Maybe<ResolversTypes['ReportingPeriod']>, ParentType, ContextType, RequireFields<QuerycurrentPeriodForOrganizationArgs, 'organizationId'>>;
   expenditureCategories?: RequiredResolverFn<Array<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType>;
   expenditureCategory?: RequiredResolverFn<Maybe<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType, RequireFields<QueryexpenditureCategoryArgs, 'id'>>;
   inputTemplate?: RequiredResolverFn<Maybe<ResolversTypes['InputTemplate']>, ParentType, ContextType, RequireFields<QueryinputTemplateArgs, 'id'>>;

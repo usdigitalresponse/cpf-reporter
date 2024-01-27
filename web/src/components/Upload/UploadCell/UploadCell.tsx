@@ -1,4 +1,5 @@
 import type { FindUploadById } from 'types/graphql'
+import { useMutation, useQuery } from '@redwoodjs/web'
 
 import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 
@@ -11,8 +12,10 @@ export const QUERY = gql`
       filename
       uploadedBy {
         name
+        organizationId
       }
       agency {
+        id
         code
       }
       organizationId
@@ -40,6 +43,14 @@ export const QUERY = gql`
   }
 `
 
+const CREATE_UPLOAD_VALIDATION = gql`
+  mutation createUploadValidation($input: CreateUploadValidationInput!) {
+    createUploadValidation(input: $input) {
+      id
+    }
+  }
+`
+
 export const Loading = () => <div>Loading...</div>
 
 export const Empty = () => <div>Upload not found</div>
@@ -49,5 +60,26 @@ export const Failure = ({ error }: CellFailureProps) => (
 )
 
 export const Success = ({ upload }: CellSuccessProps<FindUploadById>) => {
-  return <Upload upload={upload} />
+  const { refetch } = useQuery(QUERY, { variables: { id: upload.id } })
+
+  // const [createUploadValidation, { loading, error }] = useMutation(
+  //   CREATE_UPLOAD_VALIDATION,
+  //   {
+  //     onCompleted: () => {
+  //       console.log('Upload validation created')  
+  //     },
+  //     onError: (error) => {
+  //       // toast.error(error.message)
+  //       console.log('Upload validation error')
+  //     },
+  //   }
+  // )
+
+  // const onSave = (
+  //   input: CreateUploadValidationInput,
+  // ) => {
+  //   createUploadValidation({ variables: { input } })
+  // }
+
+  return <Upload upload={upload} refetch={refetch} />
 }
