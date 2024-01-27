@@ -87,7 +87,7 @@ data "aws_iam_policy_document" "ecs_console_execution" {
     ]
     resources = [
       data.aws_kms_key.ssm.arn,
-      aws_ssm_parameter.ecs_console_secret_database_url,
+      aws_ssm_parameter.ecs_console_secret_database_url.arn,
     ]
   }
   statement {
