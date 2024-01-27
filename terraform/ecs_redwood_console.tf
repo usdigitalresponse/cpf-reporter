@@ -21,26 +21,14 @@ module "ecs_console_container_definition" {
   }
 
   map_environment = {
-    AWS_REGION             = data.aws_region.current.name
-    AWS_DEFAULT_REGION     = data.aws_region.current.name
-    DATABASE_SECRET_SOURCE = "env_PGPASSWORD"
-    DATABASE_URL = format(
-      "postgres://%s@%s:%s/%s?%s",
-      module.postgres.cluster_master_username,
-      module.postgres.cluster_endpoint,
-      module.postgres.cluster_port,
-      module.postgres.cluster_database_name,
-      join("&", [
-        "sslmode=verify",
-        "sslcert=/home/node/app/api/db/rds-combined-ca-bundle.pem"
-      ])
-    )
-    CI       = ""
-    NODE_ENV = "development"
+    AWS_REGION         = data.aws_region.current.name
+    AWS_DEFAULT_REGION = data.aws_region.current.name
+    CI                 = ""
+    NODE_ENV           = "development"
   }
 
   map_secrets = {
-    PGPASSWORD = aws_ssm_parameter.postgres_master_password.arn
+    DATABASE_URL = aws_ssm_parameter.ecs_console_secret_database_url.arn
   }
 
   log_configuration = {
@@ -51,6 +39,25 @@ module "ecs_console_container_definition" {
       awslogs-stream-prefix = "console"
     }
   }
+}
+
+resource "aws_ssm_parameter" "ecs_console_secret_database_url" {
+  name        = "${var.ssm_service_parameters_path_prefix}/postgres/database_url"
+  description = "Prisma database URL for connecting the Postgres cluster"
+  type        = "SecureString"
+  key_id      = data.aws_kms_key.ssm.arn
+  value = format(
+    "postgres://%s:%s@%s:%s/%s?%s",
+    module.postgres.cluster_master_username,
+    module.postgres.cluster_master_password,
+    module.postgres.cluster_endpoint,
+    module.postgres.cluster_port,
+    module.postgres.cluster_database_name,
+    join("&", [
+      "sslmode=verify-full",
+      "sslrootcert=${urlencode("/home/node/app/api/db/rds-combined-ca-bundle.pem")}",
+    ])
+  )
 }
 
 resource "aws_iam_role" "ecs_console_execution" {
@@ -80,7 +87,7 @@ data "aws_iam_policy_document" "ecs_console_execution" {
     ]
     resources = [
       data.aws_kms_key.ssm.arn,
-      aws_ssm_parameter.postgres_master_password.arn,
+      aws_ssm_parameter.ecs_console_secret_database_url.arn,
     ]
   }
   statement {
