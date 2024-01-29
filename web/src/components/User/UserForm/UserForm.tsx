@@ -22,12 +22,11 @@ interface UserFormProps {
   onSave: (data: UpdateUserInput, id?: FormUser['id']) => void
   error: RWGqlError
   loading: boolean
-  // agencies?: Array<{ id: string; name: string }>
 }
 
 const GET_AGENCIES_UNDER_USER_ORGANIZATION = gql`
   query agenciesUnderUserOrganization($organizationId: Int!) {
-    agenciesUnderCurrentUserOrganization(organizationId: $organizationId) {
+    agenciesByOrganization(organizationId: $organizationId) {
       id
       name
     }
@@ -44,7 +43,7 @@ const UserForm = (props: UserFormProps) => {
   const { loading: agenciesLoading, error: agenciesError, data: agenciesData } = useQuery(GET_AGENCIES_UNDER_USER_ORGANIZATION, {
     variables: { organizationId: currentUser.organizationId },
   })
-  const agencies = agenciesData?.agenciesUnderCurrentUserOrganization
+  const agencies = agenciesData?.agenciesByOrganization
 
   // Resets the form to the previous values when editing the existing user
   // Clears out the form when creating a new user
@@ -53,12 +52,11 @@ const UserForm = (props: UserFormProps) => {
   }
 
   const onSubmit = (data: FormUser) => {
-    console.log('submitting this data', data)
     onSave(data, props?.user?.id)
   }
 
-  if(agenciesLoading) return <div>Loading...</div>
-  if(agenciesError) return <div>Something went wrong loading agencies</div>
+  if (agenciesLoading) return <div>Loading...</div>
+  if (agenciesError) return <div>Couldn't load agencies</div>
 
   return (
     <Form<FormUser>

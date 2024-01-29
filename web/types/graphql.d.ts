@@ -448,7 +448,6 @@ export type Query = {
   __typename?: 'Query';
   agencies: Array<Agency>;
   agenciesByOrganization: Array<Agency>;
-  agenciesUnderCurrentUserOrganization?: Maybe<Array<Agency>>;
   agency?: Maybe<Agency>;
   expenditureCategories: Array<ExpenditureCategory>;
   expenditureCategory?: Maybe<ExpenditureCategory>;
@@ -480,12 +479,6 @@ export type Query = {
 
 /** About the Redwood queries. */
 export type QueryagenciesByOrganizationArgs = {
-  organizationId: Scalars['Int'];
-};
-
-
-/** About the Redwood queries. */
-export type QueryagenciesUnderCurrentUserOrganizationArgs = {
   organizationId: Scalars['Int'];
 };
 
@@ -1001,13 +994,6 @@ export type CreateUserMutationVariables = Exact<{
 
 export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: number } };
 
-export type agenciesUnderUserOrganizationVariables = Exact<{
-  organizationId: Scalars['Int'];
-}>;
-
-
-export type agenciesUnderUserOrganization = { __typename?: 'Query', agenciesUnderCurrentUserOrganization?: Array<{ __typename?: 'Agency', id: number, name: string }> | null };
-
 export type DeleteUserMutationVariables = Exact<{
   id: Scalars['Int'];
 }>;
@@ -1021,6 +1007,13 @@ export type FindUserByIdVariables = Exact<{
 
 
 export type FindUserById = { __typename?: 'Query', user?: { __typename?: 'User', id: number, email: string, name?: string | null, agencyId?: number | null, organizationId: number, role?: RoleEnum | null, createdAt: string, updatedAt: string } | null };
+
+export type agenciesUnderUserOrganizationVariables = Exact<{
+  organizationId: Scalars['Int'];
+}>;
+
+
+export type agenciesUnderUserOrganization = { __typename?: 'Query', agenciesByOrganization: Array<{ __typename?: 'Agency', id: number, name: string }> };
 
 export type FindUsersByOrganizationIdVariables = Exact<{
   organizationId: Scalars['Int'];
