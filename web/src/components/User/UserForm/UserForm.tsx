@@ -1,6 +1,7 @@
 import { Button } from 'react-bootstrap'
 import { useForm, UseFormReturn } from 'react-hook-form'
 import type { EditUserById, UpdateUserInput } from 'types/graphql'
+import { useQuery } from '@redwoodjs/web'
 
 import {
   Form,
@@ -12,6 +13,7 @@ import {
   Submit,
 } from '@redwoodjs/forms'
 import type { RWGqlError } from '@redwoodjs/forms'
+import { useAuth } from 'web/src/auth'
 
 type FormUser = NonNullable<EditUserById['user']>
 
@@ -20,15 +22,29 @@ interface UserFormProps {
   onSave: (data: UpdateUserInput, id?: FormUser['id']) => void
   error: RWGqlError
   loading: boolean
-  agencies?: Array<{ id: string; name: string }>
+  // agencies?: Array<{ id: string; name: string }>
 }
 
+const GET_AGENCIES_UNDER_USER_ORGANIZATION = gql`
+  query agenciesUnderUserOrganization($organizationId: Int!) {
+    agenciesUnderCurrentUserOrganization(organizationId: $organizationId) {
+      id
+      name
+    }
+  }
+`
+
 const UserForm = (props: UserFormProps) => {
-  console.log('Agencies', props.agencies)
+  const { currentUser } = useAuth()
 
   const { user, onSave, error, loading } = props
   const formMethods: UseFormReturn<FormUser> = useForm<FormUser>()
   const hasErrors = Object.keys(formMethods.formState.errors).length > 0
+
+  const { loading: agenciesLoading, error: agenciesError, data: agenciesData } = useQuery(GET_AGENCIES_UNDER_USER_ORGANIZATION, {
+    variables: { organizationId: currentUser.organizationId },
+  })
+  const agencies = agenciesData?.agenciesUnderCurrentUserOrganization
 
   // Resets the form to the previous values when editing the existing user
   // Clears out the form when creating a new user
@@ -40,6 +56,9 @@ const UserForm = (props: UserFormProps) => {
     console.log('submitting this data', data)
     onSave(data, props?.user?.id)
   }
+
+  if(agenciesLoading) return <div>Loading...</div>
+  if(agenciesError) return <div>Something went wrong loading agencies</div>
 
   return (
     <Form<FormUser>
@@ -174,7 +193,7 @@ const UserForm = (props: UserFormProps) => {
             <option value="" hidden>
               Select an agency
             </option>
-            {props.agencies?.map((agency) => (
+            {agencies?.map((agency) => (
               <option key={agency.id} value={parseInt(agency.id)}>
                 {agency.name}
               </option>

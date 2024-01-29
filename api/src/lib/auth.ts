@@ -6,6 +6,13 @@ import {
 import { Decoded } from '@redwoodjs/api'
 import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
 
+// import Role from `@prisma/client`;
+// import type { Prisma } from '@prisma/client'
+
+// import role from '@prisma/client';
+// import { Role } from '@prisma/client'
+
+
 /**
  * Represents the user attributes returned by the decoding the
  * Authentication provider's JWT together with an optional list of roles.
@@ -60,6 +67,8 @@ export const isAuthenticated = (): boolean => {
  * You can use Prisma enums too (if you're using them for roles), just import your enum type from `@prisma/client`
  */
 type AllowedRoles = string | string[] | undefined
+// type AllowedRoles = Role | Role[] | undefined
+
 
 /**
  * Checks if the currentUser is authenticated (and assigned one of the given roles)

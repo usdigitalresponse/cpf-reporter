@@ -17,14 +17,14 @@ const CREATE_USER_MUTATION = gql`
   }
 `
 
-const GET_AGENCIES_UNDER_USER_ORGANIZATION = gql`
-  query agenciesUnderUserOrganization($organizationId: Int!) {
-    agenciesUnderCurrentUserOrganization(organizationId: $organizationId) {
-      id
-      name
-    }
-  }
-`
+// const GET_AGENCIES_UNDER_USER_ORGANIZATION = gql`
+//   query agenciesUnderUserOrganization($organizationId: Int!) {
+//     agenciesUnderCurrentUserOrganization(organizationId: $organizationId) {
+//       id
+//       name
+//     }
+//   }
+// `
 
 const NewUser = () => {
   const { currentUser } = useAuth()
@@ -41,15 +41,15 @@ const NewUser = () => {
   })
 
   // Step 1: Define a state variable for agencies
-  const [agencies, setAgencies] = useState([])
+  // const [agencies, setAgencies] = useState([])
 
-  // Step 2: Fetch the agencies data
-  const { data } = useQuery(GET_AGENCIES_UNDER_USER_ORGANIZATION, {
-    variables: { organizationId: organizationIdOfUser },
-    onCompleted: (data) => {
-      setAgencies(data.agenciesUnderCurrentUserOrganization)
-    },
-  })
+  // // Step 2: Fetch the agencies data
+  // const { data } = useQuery(GET_AGENCIES_UNDER_USER_ORGANIZATION, {
+  //   variables: { organizationId: organizationIdOfUser },
+  //   onCompleted: (data) => {
+  //     setAgencies(data.agenciesUnderCurrentUserOrganization)
+  //   },
+  // })
 
   const onSave = (input: CreateUserInput) => {
     createUser({ variables: { input } })
@@ -65,7 +65,7 @@ const NewUser = () => {
           onSave={onSave}
           loading={loading}
           error={error}
-          agencies={agencies}
+          // agencies={agencies}
         />
       </div>
     </div>
