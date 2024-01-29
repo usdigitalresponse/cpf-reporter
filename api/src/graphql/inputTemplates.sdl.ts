@@ -13,6 +13,7 @@ export const schema = gql`
   type Query {
     inputTemplates: [InputTemplate!]! @requireAuth
     inputTemplate(id: Int!): InputTemplate @requireAuth
+    inputTemplateForReportingPeriod(reportingPeriodId: Int!): InputTemplate @requireAuth
   }
 
   input CreateInputTemplateInput {

@@ -10,11 +10,10 @@ import UploadValidationStatus from '../UploadValidationStatus/UploadValidationSt
 
 import * as validationJson from './testjson.json'
 import { useMutation } from '@redwoodjs/web'
-import { set } from '@redwoodjs/forms'
 
 interface Props {
   upload: NonNullable<FindUploadById['upload']>
-  refetch: any
+  refetchUpload: any
 }
 
 const FORCE_INVALIDATE_UPLOAD = gql`
@@ -25,47 +24,57 @@ const FORCE_INVALIDATE_UPLOAD = gql`
   }
 `
 
-const Upload = ({ upload, refetch }: Props) => {
-  const [isValidating, setIsValidating] = useState(false)
-  const [errors, setErrors] = useState([]) // validationErrors
+const TRIGGER_UPLOAD_VALIDATION = gql`
+  mutation triggerUploadValidationMutation($id: Int!) {
+    triggerUploadValidation(id: $id) {
+      id
+    }
+  }
+`
 
+const Upload = ({ upload, refetchUpload }: Props) => {
+  const [isValidating, setIsValidating] = useState(false)
+
+  // TODO: Temporary data until we get the reviewResults from the backend
+  const hasErrors = Object.keys(validationJson).length
+
+  // Runs when the user clicks the "Invalidate" button
   const [forceInvalidateUpload] = useMutation(FORCE_INVALIDATE_UPLOAD, {
     onCompleted: () => {
       console.log('Upload invalidated')
-      refetch()
+      refetchUpload()
     },
     onError: (error) => {
      console.log('Couldnt invalidate the upload')
     },
   })
 
+  // Runs when the user clicks the "Validate" or "Re-Validate" button
+  const [triggerUploadValidation] = useMutation(TRIGGER_UPLOAD_VALIDATION, {
+    onCompleted: () => {
+      console.log('Getting results of your validation')
+      refetchUpload()
+    },
+    onError: (error) => {
+     console.log('Couldn\'t run validation checks on the upload')
+    },
+  })
 
   // TODO: Implement download file function
   const downloadFile = () => {}
 
-  // calls invalidate or validate
-  const invalidateUploadTest = async () => {
+  // !WIP
+  const reviewUpload = async () => {
     setIsValidating(true)
 
-    // make a call to the backend to get invalidation results or validation results
-    // backend saves a new upload validation record
-    // this creates a new upload validation record
-
-
-    // const newUploadValidation = {
-    //   uploadId: upload.id,
-    //   organizationId: upload.organizationId,
-    //   reviewType: 'INVALIDATED',
-    //   agencyId: upload.agency.id,
-    //   inputTemplateId: 1, // TODO: Replace with actual input template id
-    //   reviewResults: '{}',
-    // }
-    // onSave(newUploadValidation)
+    // Make a call to the backend to get invalidation results or validation results
+    // Backend creates a new upload validation record
+    await triggerUploadValidation({ variables: { id: upload.id } })
 
     setIsValidating(false)
   }
 
-  // TODO: Implement invalidate upload function
+  // !WIP
   const invalidateUpload = async () => {
     setIsValidating(true)
 
@@ -75,51 +84,10 @@ const Upload = ({ upload, refetch }: Props) => {
     setIsValidating(false)
   }
 
-  // Attempt to validate the upload, and if there are errors, display them
-  const validateUpload = async () => {
-    setIsValidating(true)
-
-    try {
-      // TODO: Implement validate upload function
-
-      // Wait for the upload to be validated
-      // validationResults will be a mutation
-      // {
-      // uploadId:
-      // reviewResults: {}
-      // }
-      const validationResult = JSON.stringify(validationJson)
-      const result = JSON.parse(validationResult)
-
-      if (result.errors.length) {
-        // !Cannot validate upload with errors
-        // We got errors, display them but don't save the validation
-        console.log('Cannot validate upload', errors)
-        setErrors(result.errors)
-      } else {
-        // No errors, save the validation
-        const newUploadValidation = {
-          uploadId: upload.id,
-          organizationId: upload.organizationId,
-          reviewType: 'VALIDATED',
-          agencyId: upload.agency.id,
-          inputTemplateId: 1, // TODO: Replace with actual input template id
-          reviewResults: result,
-        }
-
-        onSave(newUploadValidation)
-        console.log('Upload successfully validated!')
-      }
-    } catch (error) {
-      console.log('Validate upload error')
-    }
-
-    setIsValidating(false)
-  }
-
   return (
     <>
-      {errors.length > 0 && <UploadValidationResultsTable errors={errors} />}
+      {/* {upload?.reviewResults?.length > 0 && <UploadValidationResultsTable errors={upload?.reviewResults?} />} */}
+      {hasErrors > 0 && <UploadValidationResultsTable errors={validationJson.default.data} />}
 
       <h3>Upload {upload.id} details</h3>
       <div className="row">
@@ -166,7 +134,7 @@ const Upload = ({ upload, refetch }: Props) => {
             />
             <UploadValidationButtonGroup
               latestValidation={upload.latestValidation}
-              validateUpload={validateUpload}
+              validateUpload={reviewUpload}
               invalidateUpload={invalidateUpload}
               isValidating={isValidating}
               downloadFile={downloadFile}

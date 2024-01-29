@@ -1,5 +1,5 @@
 {
-  "errors":[
+  "data": [
     {
       "severity":null,
       "message":"EC Code must be set",

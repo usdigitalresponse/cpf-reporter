@@ -479,6 +479,7 @@ export type Query = {
   expenditureCategories: Array<ExpenditureCategory>;
   expenditureCategory?: Maybe<ExpenditureCategory>;
   inputTemplate?: Maybe<InputTemplate>;
+  inputTemplateForReportingPeriod?: Maybe<InputTemplate>;
   inputTemplates: Array<InputTemplate>;
   organization?: Maybe<Organization>;
   organizations: Array<Organization>;
@@ -531,6 +532,12 @@ export type QueryexpenditureCategoryArgs = {
 /** About the Redwood queries. */
 export type QueryinputTemplateArgs = {
   id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QueryinputTemplateForReportingPeriodArgs = {
+  reportingPeriodId: Scalars['Int'];
 };
 
 
@@ -1269,6 +1276,7 @@ export type QueryResolvers<ContextType = RedwoodGraphQLContext, ParentType exten
   expenditureCategories: OptArgsResolverFn<Array<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType>;
   expenditureCategory: Resolver<Maybe<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType, RequireFields<QueryexpenditureCategoryArgs, 'id'>>;
   inputTemplate: Resolver<Maybe<ResolversTypes['InputTemplate']>, ParentType, ContextType, RequireFields<QueryinputTemplateArgs, 'id'>>;
+  inputTemplateForReportingPeriod: Resolver<Maybe<ResolversTypes['InputTemplate']>, ParentType, ContextType, RequireFields<QueryinputTemplateForReportingPeriodArgs, 'reportingPeriodId'>>;
   inputTemplates: OptArgsResolverFn<Array<ResolversTypes['InputTemplate']>, ParentType, ContextType>;
   organization: Resolver<Maybe<ResolversTypes['Organization']>, ParentType, ContextType, RequireFields<QueryorganizationArgs, 'id'>>;
   organizations: OptArgsResolverFn<Array<ResolversTypes['Organization']>, ParentType, ContextType>;
@@ -1300,6 +1308,7 @@ export type QueryRelationResolvers<ContextType = RedwoodGraphQLContext, ParentTy
   expenditureCategories?: RequiredResolverFn<Array<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType>;
   expenditureCategory?: RequiredResolverFn<Maybe<ResolversTypes['ExpenditureCategory']>, ParentType, ContextType, RequireFields<QueryexpenditureCategoryArgs, 'id'>>;
   inputTemplate?: RequiredResolverFn<Maybe<ResolversTypes['InputTemplate']>, ParentType, ContextType, RequireFields<QueryinputTemplateArgs, 'id'>>;
+  inputTemplateForReportingPeriod?: RequiredResolverFn<Maybe<ResolversTypes['InputTemplate']>, ParentType, ContextType, RequireFields<QueryinputTemplateForReportingPeriodArgs, 'reportingPeriodId'>>;
   inputTemplates?: RequiredResolverFn<Array<ResolversTypes['InputTemplate']>, ParentType, ContextType>;
   organization?: RequiredResolverFn<Maybe<ResolversTypes['Organization']>, ParentType, ContextType, RequireFields<QueryorganizationArgs, 'id'>>;
   organizations?: RequiredResolverFn<Array<ResolversTypes['Organization']>, ParentType, ContextType>;

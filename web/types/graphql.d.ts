@@ -460,6 +460,7 @@ export type Query = {
   expenditureCategories: Array<ExpenditureCategory>;
   expenditureCategory?: Maybe<ExpenditureCategory>;
   inputTemplate?: Maybe<InputTemplate>;
+  inputTemplateForReportingPeriod?: Maybe<InputTemplate>;
   inputTemplates: Array<InputTemplate>;
   organization?: Maybe<Organization>;
   organizations: Array<Organization>;
@@ -512,6 +513,12 @@ export type QueryexpenditureCategoryArgs = {
 /** About the Redwood queries. */
 export type QueryinputTemplateArgs = {
   id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QueryinputTemplateForReportingPeriodArgs = {
+  reportingPeriodId: Scalars['Int'];
 };
 
 
@@ -971,19 +978,26 @@ export type forceInvalidateUploadMutationVariables = Exact<{
 
 export type forceInvalidateUploadMutation = { __typename?: 'Mutation', forceInvalidateUpload: { __typename?: 'Upload', id: number } };
 
+export type triggerUploadValidationMutationVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type triggerUploadValidationMutation = { __typename?: 'Mutation', triggerUploadValidation: { __typename?: 'Upload', id: number } };
+
+export type inputTemplateForReportingPeriodQueryVariables = Exact<{
+  reportingPeriodId: Scalars['Int'];
+}>;
+
+
+export type inputTemplateForReportingPeriodQuery = { __typename?: 'Query', inputTemplateForReportingPeriod?: { __typename?: 'InputTemplate', id: number, name: string } | null };
+
 export type FindUploadByIdVariables = Exact<{
   id: Scalars['Int'];
 }>;
 
 
-export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, organizationId: number, notes?: string | null, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', name?: string | null, organizationId: number }, agency: { __typename?: 'Agency', id: number, code: string }, reportingPeriod: { __typename?: 'ReportingPeriod', name: string }, expenditureCategory: { __typename?: 'ExpenditureCategory', code: string }, latestValidation?: { __typename?: 'UploadValidation', agencyId: number, organizationId: number, inputTemplateId: number, reviewResults?: Prisma.JsonValue | null, reviewType?: ReviewTypeEnum | null, createdAt: string, reviewedBy?: { __typename?: 'User', name?: string | null } | null } | null } | null };
-
-export type createUploadValidationVariables = Exact<{
-  input: CreateUploadValidationInput;
-}>;
-
-
-export type createUploadValidation = { __typename?: 'Mutation', createUploadValidation: { __typename?: 'UploadValidation', id: number } };
+export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, organizationId: number, notes?: string | null, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', name?: string | null, organizationId: number }, agency: { __typename?: 'Agency', id: number, code: string }, reportingPeriod: { __typename?: 'ReportingPeriod', id: number, name: string }, expenditureCategory: { __typename?: 'ExpenditureCategory', code: string }, latestValidation?: { __typename?: 'UploadValidation', agencyId: number, organizationId: number, inputTemplateId: number, reviewResults?: Prisma.JsonValue | null, reviewType?: ReviewTypeEnum | null, createdAt: string, reviewedBy?: { __typename?: 'User', name?: string | null } | null } | null } | null };
 
 export type FindUploadsVariables = Exact<{ [key: string]: never; }>;
 

@@ -42,6 +42,14 @@ export const deleteInputTemplate: MutationResolvers['deleteInputTemplate'] = ({
   })
 }
 
+export const inputTemplateForReportingPeriod: QueryResolvers['inputTemplateForReportingPeriod'] = ({
+  reportingPeriodId
+}) => {
+  return db.reportingPeriod.findUnique({
+    where: { id: reportingPeriodId }
+  }).inputTemplate()
+}
+
 export const InputTemplate: InputTemplateRelationResolvers = {
   reportingPeriods: (_obj, { root }) => {
     return db.inputTemplate
