@@ -43,7 +43,6 @@ export const getCurrentUser = async (
     organizationId: 1,
     email: 'email@example.com',
     roles: ['USDR_ADMIN'],
-    // roles: ['ORGANIZATION_STAFF'],
   }
 }
 

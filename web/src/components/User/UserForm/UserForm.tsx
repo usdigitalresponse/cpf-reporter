@@ -14,6 +14,7 @@ import {
 } from '@redwoodjs/forms'
 import type { RWGqlError } from '@redwoodjs/forms'
 import { useAuth } from 'web/src/auth'
+import { ROLES } from 'api/src/lib/constants'
 
 type FormUser = NonNullable<EditUserById['user']>
 
@@ -34,7 +35,7 @@ const GET_AGENCIES_UNDER_USER_ORGANIZATION = gql`
 `
 
 const UserForm = (props: UserFormProps) => {
-  const { currentUser } = useAuth()
+  const { hasRole, currentUser } = useAuth()
 
   const { user, onSave, error, loading } = props
   const formMethods: UseFormReturn<FormUser> = useForm<FormUser>()
@@ -65,6 +66,12 @@ const UserForm = (props: UserFormProps) => {
       error={error}
       className={hasErrors ? 'was-validated' : ''}
     >
+      <FormError
+        error={error}
+        wrapperClassName="rw-form-error-wrapper"
+        titleClassName="rw-form-error-title"
+        listClassName="rw-form-error-list"
+      />
       {user && (
         <div className="row">
           <Label
@@ -99,13 +106,6 @@ const UserForm = (props: UserFormProps) => {
           </div>
         </div>
       )}
-
-      <FormError
-        error={error}
-        wrapperClassName="rw-form-error-wrapper"
-        titleClassName="rw-form-error-title"
-        listClassName="rw-form-error-list"
-      />
 
       <div className="row mb-3">
         <Label name="email" className="form-label col-sm-2 col-form-label">
@@ -160,7 +160,7 @@ const UserForm = (props: UserFormProps) => {
             defaultValue={user?.role}
             className="form-select"
           >
-            <option value="USDR_ADMIN">USDR admin</option>
+            {hasRole(ROLES.USDR_ADMIN) && <option value="USDR_ADMIN">USDR admin</option>}
             <option value="ORGANIZATION_ADMIN">Organization admin</option>
             <option value="ORGANIZATION_STAFF">Organization staff</option>
           </SelectField>
