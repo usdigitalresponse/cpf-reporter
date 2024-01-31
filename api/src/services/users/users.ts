@@ -29,7 +29,7 @@ export const createUser: MutationResolvers['createUser'] = async ({
     ).organizationId
 
     return db.user.create({
-      data: { ...input, organizationId: organizationId },
+      data: { ...input, organizationId },
     })
   } catch (err) {
     throw new Error(err)

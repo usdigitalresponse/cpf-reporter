@@ -187,6 +187,7 @@ const UserForm = (props: UserFormProps) => {
             }}
             emptyAs={null}
             defaultValue={user?.agencyId}
+            errorClassName="form-select is-invalid"
           >
             <option value="" hidden>
               Select an agency

@@ -11,7 +11,9 @@ export const QUERY = gql`
       id
       email
       name
-      agencyId
+      agency {
+        name
+      }
       organizationId
       role
       createdAt

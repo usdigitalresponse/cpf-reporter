@@ -5,6 +5,7 @@ import { NavLink, routes } from '@redwoodjs/router'
 
 const Navigation = () => {
   const { currentUser } = useAuth()
+  const canViewUsersTab = currentUser?.roles?.includes('USDR_ADMIN') || currentUser?.roles?.includes('ORGANIZATION_ADMIN')
 
   return (
     <div className="tabs-wrapper row">
@@ -40,15 +41,17 @@ const Navigation = () => {
             Subrecipients
           </NavLink>
         </Nav.Item> */}
-        <Nav.Item>
-          <NavLink
-            to={routes.users()}
-            activeClassName="active"
-            className="nav-link"
-          >
-            Users
-          </NavLink>
-        </Nav.Item>
+        {canViewUsersTab && (
+          <Nav.Item>
+            <NavLink
+              to={routes.users()}
+              activeClassName="active"
+              className="nav-link"
+            >
+              Users
+            </NavLink>
+          </Nav.Item>
+          )}
         <Nav.Item>
           <NavLink
             to={routes.reportingPeriods()}
