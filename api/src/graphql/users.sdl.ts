@@ -33,7 +33,7 @@ export const schema = gql`
     name: String
     agencyId: Int
     organizationId: Int
-    role: String
+    role: RoleEnum
   }
 
   input UpdateUserInput {
@@ -41,7 +41,7 @@ export const schema = gql`
     name: String
     agencyId: Int
     organizationId: Int
-    role: String
+    role: RoleEnum
   }
 
   type Mutation {

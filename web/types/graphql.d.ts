@@ -134,7 +134,7 @@ export type CreateUserInput = {
   email: Scalars['String'];
   name?: InputMaybe<Scalars['String']>;
   organizationId?: InputMaybe<Scalars['Int']>;
-  role?: InputMaybe<Scalars['String']>;
+  role?: InputMaybe<RoleEnum>;
 };
 
 export type ExpenditureCategory = {
@@ -678,7 +678,7 @@ export type UpdateUserInput = {
   email?: InputMaybe<Scalars['String']>;
   name?: InputMaybe<Scalars['String']>;
   organizationId?: InputMaybe<Scalars['Int']>;
-  role?: InputMaybe<Scalars['String']>;
+  role?: InputMaybe<RoleEnum>;
 };
 
 export type Upload = {
