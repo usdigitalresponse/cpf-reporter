@@ -42,7 +42,7 @@ const canCreateUser = (currentUser, userRoleToCreate: string) => {
   return false
 }
 
-export const createUser: MutationResolvers['createUser'] = async ({input}, {context}) => {
+export const createUser: MutationResolvers['createUser'] = async ({input}) => {
   if (!canCreateUser(context.currentUser, input.role)) {
     throw new AuthenticationError("You don't have permission to do that.")
   }
@@ -50,15 +50,15 @@ export const createUser: MutationResolvers['createUser'] = async ({input}, {cont
   const { agencyId } = input
 
   try {
-    const organizationId = (
-      await db.agency.findUnique({
-        where: { id: agencyId },
-      })
-    ).organizationId
+    const agency = await db.agency.findUnique({ where: { id: agencyId } });
+
+    if (!agency) {
+      throw new Error('Agency not found.');
+    }
 
     return db.user.create({
-      data: { ...input, organizationId },
-    })
+      data: { ...input, organizationId: agency.organizationId },
+    });
   } catch (err) {
     throw new Error(err)
   }
