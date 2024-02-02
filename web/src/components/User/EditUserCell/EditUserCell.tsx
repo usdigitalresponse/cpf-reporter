@@ -60,9 +60,7 @@ export const Success = ({ user }: CellSuccessProps<EditUserById>) => {
   return (
     <div>
       <header>
-        <h2>
-          Edit User {user?.id}
-        </h2>
+        <h2>Edit User {user?.id}</h2>
       </header>
       <div>
         <UserForm user={user} onSave={onSave} error={error} loading={loading} />

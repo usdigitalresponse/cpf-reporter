@@ -28,7 +28,7 @@ const Routes = () => {
         <Route path="/agencies/new" page={AgencyNewAgencyPage} name="newAgency" />
         <Route path="/agencies" page={AgencyAgenciesPage} name="agencies" />
         {/* Users */}
-        <PrivateSet unauthenticated="forbidden" roles={["USDR_ADMIN", "ORGANIZATION_ADMIN"]}>
+        <PrivateSet unauthenticated="forbidden" roles={['USDR_ADMIN', 'ORGANIZATION_ADMIN']}>
           <Route path="/users/new" page={UserNewUserPage} name="newUser" />
           <Route path="/users/{id:Int}/edit" page={UserEditUserPage} name="editUser" />
           <Route path="/users/{id:Int}" page={UserUserPage} name="user" />

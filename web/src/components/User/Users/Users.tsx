@@ -25,12 +25,8 @@ const UsersList = ({ usersByOrganization }: FindUsersByOrganizationId) => {
             <td>{truncate(user.email)}</td>
             <td>{truncate(user.name)}</td>
             <td>{formatEnum(user.role)}</td>
-            <td>
-              {truncate(user.agency?.name)}
-            </td>
-            <td>
-              {timeTag(user.createdAt)}
-            </td>
+            <td>{truncate(user.agency?.name)}</td>
+            <td>{timeTag(user.createdAt)}</td>
             <td>
               <Link
                 to={routes.editUser({ id: user.id })}

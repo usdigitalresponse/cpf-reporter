@@ -1,8 +1,10 @@
+import { ROLES } from 'api/src/lib/constants'
 import { Button } from 'react-bootstrap'
 import { useForm, UseFormReturn } from 'react-hook-form'
 import type { EditUserById, UpdateUserInput } from 'types/graphql'
-import { useQuery } from '@redwoodjs/web'
+import { useAuth } from 'web/src/auth'
 
+import type { RWGqlError } from '@redwoodjs/forms'
 import {
   Form,
   FormError,
@@ -12,9 +14,7 @@ import {
   SelectField,
   Submit,
 } from '@redwoodjs/forms'
-import type { RWGqlError } from '@redwoodjs/forms'
-import { useAuth } from 'web/src/auth'
-import { ROLES } from 'api/src/lib/constants'
+import { useQuery } from '@redwoodjs/web'
 
 type FormUser = NonNullable<EditUserById['user']>
 
@@ -41,7 +41,11 @@ const UserForm = (props: UserFormProps) => {
   const formMethods: UseFormReturn<FormUser> = useForm<FormUser>()
   const hasErrors = Object.keys(formMethods.formState.errors).length > 0
 
-  const { loading: agenciesLoading, error: agenciesError, data: agenciesData } = useQuery(GET_AGENCIES_UNDER_USER_ORGANIZATION, {
+  const {
+    loading: agenciesLoading,
+    error: agenciesError,
+    data: agenciesData,
+  } = useQuery(GET_AGENCIES_UNDER_USER_ORGANIZATION, {
     variables: { organizationId: currentUser.organizationId },
   })
   const agencies = agenciesData?.agenciesByOrganization
@@ -57,7 +61,7 @@ const UserForm = (props: UserFormProps) => {
   }
 
   if (agenciesLoading) return <div>Loading...</div>
-  if (agenciesError) return <div>Couldn't load agencies</div>
+  if (agenciesError) return <div>Couldn&apos;t load agencies</div>
 
   return (
     <Form<FormUser>
@@ -160,7 +164,9 @@ const UserForm = (props: UserFormProps) => {
             defaultValue={user?.role}
             className="form-select"
           >
-            {hasRole(ROLES.USDR_ADMIN) && <option value="USDR_ADMIN">USDR admin</option>}
+            {hasRole(ROLES.USDR_ADMIN) && (
+              <option value="USDR_ADMIN">USDR admin</option>
+            )}
             <option value="ORGANIZATION_ADMIN">Organization admin</option>
             <option value="ORGANIZATION_STAFF">Organization staff</option>
           </SelectField>

@@ -1,11 +1,13 @@
+import { ROLES } from 'api/src/lib/constants'
 import Nav from 'react-bootstrap/Nav'
 import { useAuth } from 'web/src/auth'
+
 import { NavLink, routes } from '@redwoodjs/router'
-import { ROLES } from 'api/src/lib/constants'
 
 const Navigation = () => {
   const { hasRole } = useAuth()
-  const canViewUsersTab = hasRole(ROLES.USDR_ADMIN) || hasRole(ROLES.ORGANIZATION_ADMIN)
+  const canViewUsersTab =
+    hasRole(ROLES.USDR_ADMIN) || hasRole(ROLES.ORGANIZATION_ADMIN)
 
   return (
     <div className="tabs-wrapper row">
@@ -51,7 +53,7 @@ const Navigation = () => {
               Users
             </NavLink>
           </Nav.Item>
-          )}
+        )}
         <Nav.Item>
           <NavLink
             to={routes.reportingPeriods()}
