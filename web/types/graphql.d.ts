@@ -112,7 +112,7 @@ export type CreateSubrecipientInput = {
 
 export type CreateUploadInput = {
   agencyId: Scalars['Int'];
-  expenditureCategoryId: Scalars['Int'];
+  expenditureCategoryId?: InputMaybe<Scalars['Int']>;
   filename: Scalars['String'];
   notes?: InputMaybe<Scalars['String']>;
   organizationId: Scalars['Int'];
@@ -728,8 +728,8 @@ export type Upload = {
   agency: Agency;
   agencyId: Scalars['Int'];
   createdAt: Scalars['DateTime'];
-  expenditureCategory: ExpenditureCategory;
-  expenditureCategoryId: Scalars['Int'];
+  expenditureCategory?: Maybe<ExpenditureCategory>;
+  expenditureCategoryId?: Maybe<Scalars['Int']>;
   filename: Scalars['String'];
   id: Scalars['Int'];
   notes?: Maybe<Scalars['String']>;
@@ -738,6 +738,7 @@ export type Upload = {
   reportingPeriod: ReportingPeriod;
   reportingPeriodId: Scalars['Int'];
   signedUrl?: Maybe<Scalars['String']>;
+  subrecipients: Array<Maybe<Subrecipient>>;
   updatedAt: Scalars['DateTime'];
   uploadedBy: User;
   uploadedById: Scalars['Int'];
@@ -934,7 +935,7 @@ export type EditUploadByIdVariables = Exact<{
 }>;
 
 
-export type EditUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, uploadedById: number, agencyId: number, organizationId: number, reportingPeriodId: number, expenditureCategoryId: number, createdAt: string, updatedAt: string } | null };
+export type EditUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, uploadedById: number, agencyId: number, organizationId: number, reportingPeriodId: number, expenditureCategoryId?: number | null, createdAt: string, updatedAt: string } | null };
 
 export type UpdateUploadMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -942,7 +943,7 @@ export type UpdateUploadMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUploadMutation = { __typename?: 'Mutation', updateUpload: { __typename?: 'Upload', id: number, filename: string, uploadedById: number, agencyId: number, organizationId: number, reportingPeriodId: number, expenditureCategoryId: number, createdAt: string, updatedAt: string } };
+export type UpdateUploadMutation = { __typename?: 'Mutation', updateUpload: { __typename?: 'Upload', id: number, filename: string, uploadedById: number, agencyId: number, organizationId: number, reportingPeriodId: number, expenditureCategoryId?: number | null, createdAt: string, updatedAt: string } };
 
 export type CreateUploadMutationVariables = Exact<{
   input: CreateUploadInput;
@@ -963,12 +964,12 @@ export type FindUploadByIdVariables = Exact<{
 }>;
 
 
-export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, uploadedById: number, agencyId: number, organizationId: number, reportingPeriodId: number, expenditureCategoryId: number, createdAt: string, updatedAt: string } | null };
+export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, uploadedById: number, agencyId: number, organizationId: number, reportingPeriodId: number, expenditureCategoryId?: number | null, createdAt: string, updatedAt: string } | null };
 
 export type FindUploadsVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, code: string }, expenditureCategory: { __typename?: 'ExpenditureCategory', id: number, code: string }, validations: Array<{ __typename?: 'UploadValidation', invalidatedAt?: string | null, validatedAt?: string | null } | null> }> };
+export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, code: string }, expenditureCategory?: { __typename?: 'ExpenditureCategory', id: number, code: string } | null, validations: Array<{ __typename?: 'UploadValidation', invalidatedAt?: string | null, validatedAt?: string | null } | null> }> };
 
 export type EditUserByIdVariables = Exact<{
   id: Scalars['Int'];
