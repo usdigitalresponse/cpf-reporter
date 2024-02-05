@@ -4,8 +4,8 @@ import type {
   UploadRelationResolvers,
 } from 'types/graphql'
 
-import { db } from 'src/lib/db'
 import { s3PutSignedUrl } from 'src/lib/aws'
+import { db } from 'src/lib/db'
 
 export const uploads: QueryResolvers['uploads'] = () => {
   return db.upload.findMany()
