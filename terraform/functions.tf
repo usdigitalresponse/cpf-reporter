@@ -131,6 +131,30 @@ module "reporting_data_bucket" {
   allow_encrypted_uploads_only = true
   source_policy_documents      = []
 
+  cors_configuration = [
+    {
+      allowed_methods = ["GET", "HEAD", "POST", "PUT"]
+      allowed_origins = [var.website_domain_name]
+      allowed_headers = ["*"]
+      expose_headers = [
+        "Content-Disposition",
+        "Content-Encoding",
+        "Content-Length",
+        "Content-Location",
+        "Content-Range",
+        "Date",
+        "ETag",
+        "Server",
+        "x-amz-delete-marker",
+        "x-amz-id-2",
+        "x-amz-request-id",
+        "x-amz-version-id",
+        "x-amz-server-side-encryption",
+      ]
+      max_age_seconds = 300 // 5 minutes, in seconds
+    },
+  ]
+
   lifecycle_configuration_rules = [
     {
       enabled                                = true
