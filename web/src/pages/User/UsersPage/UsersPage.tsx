@@ -1,12 +1,13 @@
 import Button from 'react-bootstrap/Button'
+import { useAuth } from 'web/src/auth'
 
 import { Link, routes } from '@redwoodjs/router'
 
 import UsersCell from 'src/components/User/UsersCell'
 
 const UsersPage = () => {
-  // temporarily hardcode organizationId to 1
-  const organizationIdOfUser = 1
+  const { currentUser } = useAuth()
+  const organizationIdOfUser = currentUser.organizationId
 
   return (
     <div>

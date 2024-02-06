@@ -1,10 +1,13 @@
+import { ROLES } from 'api/src/lib/constants'
 import Nav from 'react-bootstrap/Nav'
 import { useAuth } from 'web/src/auth'
 
 import { NavLink, routes } from '@redwoodjs/router'
 
 const Navigation = () => {
-  const { currentUser } = useAuth()
+  const { hasRole } = useAuth()
+  const canViewUsersTab =
+    hasRole(ROLES.USDR_ADMIN) || hasRole(ROLES.ORGANIZATION_ADMIN)
 
   return (
     <div className="tabs-wrapper row">
@@ -40,15 +43,17 @@ const Navigation = () => {
             Subrecipients
           </NavLink>
         </Nav.Item> */}
-        <Nav.Item>
-          <NavLink
-            to={routes.users()}
-            activeClassName="active"
-            className="nav-link"
-          >
-            Users
-          </NavLink>
-        </Nav.Item>
+        {canViewUsersTab && (
+          <Nav.Item>
+            <NavLink
+              to={routes.users()}
+              activeClassName="active"
+              className="nav-link"
+            >
+              Users
+            </NavLink>
+          </Nav.Item>
+        )}
         <Nav.Item>
           <NavLink
             to={routes.reportingPeriods()}
@@ -58,7 +63,7 @@ const Navigation = () => {
             Reporting Periods
           </NavLink>
         </Nav.Item>
-        {currentUser?.roles?.includes('USDR_ADMIN') && (
+        {hasRole(ROLES.USDR_ADMIN) && (
           <Nav.Item>
             <NavLink
               to={routes.organizations()}
