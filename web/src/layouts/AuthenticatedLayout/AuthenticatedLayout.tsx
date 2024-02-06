@@ -23,7 +23,7 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
         <div className="col d-flex justify-content-end">
           {isAuthenticated && (
             <>
-              <div className="navbar-text">{currentUser.email}</div>
+              <div className="navbar-text">{currentUser?.email as string}</div>
               <Button
                 size="sm"
                 variant="link"

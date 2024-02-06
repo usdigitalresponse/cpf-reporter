@@ -8,41 +8,34 @@ import { timeTag, truncate, formatEnum } from 'src/lib/formatters'
 
 const UsersList = ({ usersByOrganization }: FindUsersByOrganizationId) => {
   return (
-    <Table striped borderless>
+    <Table striped bordered>
       <thead>
         <tr>
-          <th className="border">Email</th>
-          <th className="border">Name</th>
-          <th className="border">Agency id</th>
-          <th className="border">Role</th>
-          <th className="border">Created at</th>
-          <th className="border">Actions</th>
+          <th>Email</th>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Agency</th>
+          <th>Created at</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         {usersByOrganization.map((user) => (
           <tr key={user.id}>
-            <td className="border border-slate-700">{truncate(user.email)}</td>
-            <td className="border border-slate-700">{truncate(user.name)}</td>
-            <td className="border border-slate-700">
-              {truncate(user.agencyId)}
-            </td>
-            <td className="border border-slate-700">{formatEnum(user.role)}</td>
-            <td className="border border-slate-700">
-              {timeTag(user.createdAt)}
-            </td>
-            <td className="border border-slate-700">
-              <nav className="rw-table-actions">
-                <Link
-                  to={routes.editUser({ id: user.id })}
-                  title={'Edit user ' + user.id}
-                  className="rw-button rw-button-small rw-button-blue"
-                >
-                  <Button size="sm" variant="secondary">
-                    Edit
-                  </Button>
-                </Link>
-              </nav>
+            <td>{truncate(user.email)}</td>
+            <td>{truncate(user.name)}</td>
+            <td>{formatEnum(user.role)}</td>
+            <td>{truncate(user.agency?.name)}</td>
+            <td>{timeTag(user.createdAt)}</td>
+            <td>
+              <Link
+                to={routes.editUser({ id: user.id })}
+                title={'Edit user ' + user.id}
+              >
+                <Button size="sm" variant="secondary">
+                  Edit
+                </Button>
+              </Link>
             </td>
           </tr>
         ))}
