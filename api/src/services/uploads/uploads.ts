@@ -4,6 +4,7 @@ import type {
   UploadRelationResolvers,
 } from 'types/graphql'
 
+import { s3PutSignedUrl } from 'src/lib/aws'
 import { db } from 'src/lib/db'
 
 export const uploads: QueryResolvers['uploads'] = () => {
@@ -16,10 +17,15 @@ export const upload: QueryResolvers['upload'] = ({ id }) => {
   })
 }
 
-export const createUpload: MutationResolvers['createUpload'] = ({ input }) => {
-  return db.upload.create({
+export const createUpload: MutationResolvers['createUpload'] = async ({
+  input,
+}) => {
+  const upload = await db.upload.create({
     data: input,
   })
+  const signedUrl = await s3PutSignedUrl(upload, upload.id)
+
+  return { ...upload, signedUrl }
 }
 
 export const updateUpload: MutationResolvers['updateUpload'] = ({
