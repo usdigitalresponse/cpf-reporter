@@ -110,6 +110,7 @@ export async function s3PutSignedUrl(
     Key: key,
     ContentType:
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ServerSideEncryption: 'AES256',
   }
   const url = await awsGetSignedUrl(s3, new PutObjectCommand(baseParams), {
     expiresIn: 60,

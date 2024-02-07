@@ -134,7 +134,7 @@ module "reporting_data_bucket" {
   cors_configuration = [
     {
       allowed_methods = ["GET", "HEAD", "POST", "PUT"]
-      allowed_origins = [var.website_domain_name]
+      allowed_origins = ["https://${var.website_domain_name}"]
       allowed_headers = ["*"]
       expose_headers = [
         "Content-Disposition",
