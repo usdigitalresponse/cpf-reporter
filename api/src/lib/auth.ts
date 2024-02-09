@@ -6,6 +6,8 @@ import {
 import { Decoded } from '@redwoodjs/api'
 import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
 
+import { db } from 'src/lib/db'
+
 const Passage = require('@passageidentity/passage-node')
 
 let passage
@@ -49,20 +51,41 @@ type RedwoodUser = Record<string, unknown> & { roles?: string[] }
  */
 export const getCurrentUser = async (
   decoded: Decoded,
-  token: any
+  { token, type }: { token: any; type: any },
+  { event, context }: { event: any; context: any }
 ): Promise<RedwoodUser | null> => {
+  if (type !== process.env.AUTH_PROVIDER) {
+    throw new AuthenticationError(
+      `Invalid authentication provider. Recieved ${type} but expected ${process.env.AUTH_PROVIDER}`
+    )
+  }
   console.log('API::getCurrentUser')
   console.log(decoded)
   console.log(token)
+  console.log(type)
+  console.log(event)
+  console.log(context)
 
-  const userId = await passage.validAuthToken(token.token)
-  console.log(userId)
-  return {
-    id: 1,
-    organizationId: 1,
-    email: 'email@example.com',
-    roles: ['USDR_ADMIN'],
-    passageId: userId,
+  if (type === 'passage') {
+    const userId = await passage.validAuthToken(token)
+    console.log(userId)
+    return {
+      id: 1,
+      organizationId: 1,
+      email: 'email@example.com',
+      roles: ['USDR_ADMIN'],
+      passageId: userId,
+    }
+  } else if (type === 'local') {
+    try {
+      const user = await db.user.findFirst({
+        where: { email: token },
+      })
+      return user
+    } catch (e) {
+      console.error(`Error getting user: ${token}`)
+      throw new AuthenticationError('User not found')
+    }
   }
 }
 

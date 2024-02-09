@@ -137,6 +137,7 @@ export type CreateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   email: Scalars['String'];
   name?: InputMaybe<Scalars['String']>;
+  passageId?: InputMaybe<Scalars['String']>;
   role?: InputMaybe<Scalars['String']>;
 };
 
@@ -176,7 +177,7 @@ export type Mutation = {
   createSubrecipient: Subrecipient;
   createUpload: Upload;
   createUploadValidation: UploadValidation;
-  createUser: User;
+  createUser?: Maybe<User>;
   deleteAgency: Agency;
   deleteExpenditureCategory: ExpenditureCategory;
   deleteInputTemplate: InputTemplate;
@@ -779,6 +780,7 @@ export type User = {
   name?: Maybe<Scalars['String']>;
   organization: Organization;
   organizationId: Scalars['Int'];
+  passageId?: Maybe<Scalars['String']>;
   role?: Maybe<RoleEnum>;
   updatedAt: Scalars['DateTime'];
   uploaded: Array<Maybe<Upload>>;
@@ -917,17 +919,17 @@ export type FindReportingPeriodsVariables = Exact<{ [key: string]: never; }>;
 
 export type FindReportingPeriods = { __typename?: 'Query', reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, name: string, startDate: string, endDate: string, organizationId: number, certifiedAt?: string | null, certifiedById?: number | null, inputTemplateId: number, outputTemplateId: number, isCurrentPeriod: boolean, createdAt: string, updatedAt: string }> };
 
+export type ReportingPeriodsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ReportingPeriodsQuery = { __typename?: 'Query', reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, startDate: string, endDate: string, isCurrentPeriod: boolean, certifiedAt?: string | null, certifiedBy?: { __typename?: 'User', email: string } | null, inputTemplate: { __typename?: 'InputTemplate', name: string } }> };
+
 export type FindReportingPeriodQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
 
 
 export type FindReportingPeriodQuery = { __typename?: 'Query', reportingPeriod?: { __typename?: 'ReportingPeriod', name: string } | null };
-
-export type ReportingPeriodsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type ReportingPeriodsQuery = { __typename?: 'Query', reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, startDate: string, endDate: string, isCurrentPeriod: boolean, certifiedAt?: string | null, certifiedBy?: { __typename?: 'User', email: string } | null, inputTemplate: { __typename?: 'InputTemplate', name: string } }> };
 
 export type EditUploadByIdVariables = Exact<{
   id: Scalars['Int'];
@@ -990,7 +992,7 @@ export type CreateUserMutationVariables = Exact<{
 }>;
 
 
-export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: number } };
+export type CreateUserMutation = { __typename?: 'Mutation', createUser?: { __typename?: 'User', id: number } | null };
 
 export type DeleteUserMutationVariables = Exact<{
   id: Scalars['Int'];

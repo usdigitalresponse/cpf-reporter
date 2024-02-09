@@ -156,6 +156,7 @@ export type CreateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   email: Scalars['String'];
   name?: InputMaybe<Scalars['String']>;
+  passageId?: InputMaybe<Scalars['String']>;
   role?: InputMaybe<Scalars['String']>;
 };
 
@@ -195,7 +196,7 @@ export type Mutation = {
   createSubrecipient: Subrecipient;
   createUpload: Upload;
   createUploadValidation: UploadValidation;
-  createUser: User;
+  createUser?: Maybe<User>;
   deleteAgency: Agency;
   deleteExpenditureCategory: ExpenditureCategory;
   deleteInputTemplate: InputTemplate;
@@ -798,6 +799,7 @@ export type User = {
   name?: Maybe<Scalars['String']>;
   organization: Organization;
   organizationId: Scalars['Int'];
+  passageId?: Maybe<Scalars['String']>;
   role?: Maybe<RoleEnum>;
   updatedAt: Scalars['DateTime'];
   uploaded: Array<Maybe<Upload>>;
@@ -1092,7 +1094,7 @@ export type MutationResolvers<ContextType = RedwoodGraphQLContext, ParentType ex
   createSubrecipient: Resolver<ResolversTypes['Subrecipient'], ParentType, ContextType, RequireFields<MutationcreateSubrecipientArgs, 'input'>>;
   createUpload: Resolver<ResolversTypes['Upload'], ParentType, ContextType, RequireFields<MutationcreateUploadArgs, 'input'>>;
   createUploadValidation: Resolver<ResolversTypes['UploadValidation'], ParentType, ContextType, RequireFields<MutationcreateUploadValidationArgs, 'input'>>;
-  createUser: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationcreateUserArgs, 'input'>>;
+  createUser: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationcreateUserArgs, 'input'>>;
   deleteAgency: Resolver<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationdeleteAgencyArgs, 'id'>>;
   deleteExpenditureCategory: Resolver<ResolversTypes['ExpenditureCategory'], ParentType, ContextType, RequireFields<MutationdeleteExpenditureCategoryArgs, 'id'>>;
   deleteInputTemplate: Resolver<ResolversTypes['InputTemplate'], ParentType, ContextType, RequireFields<MutationdeleteInputTemplateArgs, 'id'>>;
@@ -1132,7 +1134,7 @@ export type MutationRelationResolvers<ContextType = RedwoodGraphQLContext, Paren
   createSubrecipient?: RequiredResolverFn<ResolversTypes['Subrecipient'], ParentType, ContextType, RequireFields<MutationcreateSubrecipientArgs, 'input'>>;
   createUpload?: RequiredResolverFn<ResolversTypes['Upload'], ParentType, ContextType, RequireFields<MutationcreateUploadArgs, 'input'>>;
   createUploadValidation?: RequiredResolverFn<ResolversTypes['UploadValidation'], ParentType, ContextType, RequireFields<MutationcreateUploadValidationArgs, 'input'>>;
-  createUser?: RequiredResolverFn<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationcreateUserArgs, 'input'>>;
+  createUser?: RequiredResolverFn<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<MutationcreateUserArgs, 'input'>>;
   deleteAgency?: RequiredResolverFn<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationdeleteAgencyArgs, 'id'>>;
   deleteExpenditureCategory?: RequiredResolverFn<ResolversTypes['ExpenditureCategory'], ParentType, ContextType, RequireFields<MutationdeleteExpenditureCategoryArgs, 'id'>>;
   deleteInputTemplate?: RequiredResolverFn<ResolversTypes['InputTemplate'], ParentType, ContextType, RequireFields<MutationdeleteInputTemplateArgs, 'id'>>;
@@ -1516,6 +1518,7 @@ export type UserResolvers<ContextType = RedwoodGraphQLContext, ParentType extend
   name: OptArgsResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   organization: OptArgsResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
   organizationId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  passageId: OptArgsResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   role: OptArgsResolverFn<Maybe<ResolversTypes['RoleEnum']>, ParentType, ContextType>;
   updatedAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   uploaded: OptArgsResolverFn<Array<Maybe<ResolversTypes['Upload']>>, ParentType, ContextType>;
@@ -1534,6 +1537,7 @@ export type UserRelationResolvers<ContextType = RedwoodGraphQLContext, ParentTyp
   name?: RequiredResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   organization?: RequiredResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
   organizationId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  passageId?: RequiredResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   role?: RequiredResolverFn<Maybe<ResolversTypes['RoleEnum']>, ParentType, ContextType>;
   updatedAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   uploaded?: RequiredResolverFn<Array<Maybe<ResolversTypes['Upload']>>, ParentType, ContextType>;
