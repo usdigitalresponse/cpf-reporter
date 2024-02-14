@@ -82,6 +82,13 @@ variable "log_retention_in_days" {
   default     = 30
 }
 
+// Auth Provider Information
+variable "auth_provider" {
+  description = "The authentication provider to use for the application."
+  type        = string
+  default     = "custom-auth"
+}
+
 // Datadog
 variable "datadog_enabled" {
   description = "Whether to enable datadog instrumentation in the current environment."
