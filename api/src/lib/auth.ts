@@ -2,9 +2,12 @@ import {
   SecretsManagerClient,
   GetSecretValueCommand,
 } from '@aws-sdk/client-secrets-manager'
+import type { APIGatewayEvent, Context } from 'aws-lambda'
 
 import { Decoded } from '@redwoodjs/api'
 import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
+
+import { db } from 'src/lib/db'
 
 /**
  * Represents the user attributes returned by the decoding the
@@ -35,9 +38,22 @@ type RedwoodUser = Record<string, unknown> & { roles?: string[] }
  * @returns RedwoodUser
  */
 export const getCurrentUser = async (
-  decoded: Decoded
+  decoded: Decoded,
+  { token, type }: { token: string; type: string },
+  { event }: { event: APIGatewayEvent }
 ): Promise<RedwoodUser | null> => {
-  console.log(decoded)
+  // Verify that the request is coming from the local development environment
+  // and is only being processed within the local environment
+  if (
+    process.env.AUTH_PROVIDER === 'local' &&
+    type === 'local' &&
+    event.headers.origin === 'http://localhost:8910'
+  ) {
+    const user = await db.user.findFirst({
+      where: { email: token },
+    })
+    return user
+  }
   return {
     id: 1,
     organizationId: 1,
@@ -73,8 +89,7 @@ export const hasRole = (roles: AllowedRoles): boolean => {
   if (!isAuthenticated()) {
     return false
   }
-
-  const currentUserRoles = context.currentUser?.roles
+  const currentUserRoles = context.currentUser?.role
 
   if (typeof roles === 'string') {
     if (typeof currentUserRoles === 'string') {
