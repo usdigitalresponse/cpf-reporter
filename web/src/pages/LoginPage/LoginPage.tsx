@@ -9,15 +9,16 @@ import {
 import { MetaTags } from '@redwoodjs/web'
 
 import { useAuth } from 'src/auth'
-
-interface FormValues {
-  email: string
-}
+import { LoginEventInterface } from 'src/auth/localAuth'
 
 const LoginPage = () => {
   const { logIn } = useAuth()
-  const onSuccess = (event: SubmitHandler<FormValues>) => {
-    logIn(event)
+  const onSuccess = (event: SubmitHandler<LoginEventInterface>) => {
+    if (process.env.AUTH_PROVIDER === 'local') {
+      logIn(event)
+    } else {
+      logIn()
+    }
   }
   const localAuth = (
     <>
