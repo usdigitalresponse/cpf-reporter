@@ -42,59 +42,64 @@ export const localAuthClient = {
     return localStorage.getItem('local_auth_token')
   },
   getUserMetadata: async () => {
-    if (!localStorage.getItem('local_auth_token')) {
-      return null
+    return {
+      id: '1',
+      name: 'Test User',
+      email: 'foo@example.com',
     }
+    // if (!localStorage.getItem('local_auth_token')) {
+    //   return null
+    // }
 
-    console.log('local: getUserMetadata')
-    let user: User | null = null
-    // Explicitly setting the url to ensure these requests are not made outside of the local environment
-    await fetch(`http://localhost:8911/localAuth`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        authMethod: 'getUserMetadata',
-        email: localStorage.getItem('local_auth_token'),
-      }),
-    })
-      .then((response: Response) => {
-        if (response.ok) {
-          return response.json()
-        }
-        return Promise.reject(response)
-      })
-      .then((jsonData: User) => {
-        user = jsonData
-      })
-      .catch((error) => {
-        console.log(error.status)
-        throw new Error('Error getting user metadata')
-      })
-    return user
+    // console.log('local: getUserMetadata')
+    // let user: User | null = null
+    // // Explicitly setting the url to ensure these requests are not made outside of the local environment
+    // await fetch(`http://localhost:8911/localAuth`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     authMethod: 'getUserMetadata',
+    //     email: localStorage.getItem('local_auth_token'),
+    //   }),
+    // })
+    //   .then((response: Response) => {
+    //     if (response.ok) {
+    //       return response.json()
+    //     }
+    //     return Promise.reject(response)
+    //   })
+    //   .then((jsonData: User) => {
+    //     user = jsonData
+    //   })
+    //   .catch((error) => {
+    //     console.log(error.status)
+    //     throw new Error('Error getting user metadata')
+    //   })
+    // return user
   },
   login: async (event) => {
-    await fetch(`http://localhost:8911/localAuth`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        authMethod: 'login',
-        email: event.email,
-      }),
-    })
-      .then((response: Response) => {
-        if (response.ok) {
-          return response.json()
-        }
-        return Promise.reject(response)
-      })
-      .catch((error) => {
-        console.log(error.status)
-        throw new Error('Error getting user metadata')
-      })
+    // await fetch(`http://localhost:8911/localAuth`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     authMethod: 'login',
+    //     email: event.email,
+    //   }),
+    // })
+    //   .then((response: Response) => {
+    //     if (response.ok) {
+    //       return response.json()
+    //     }
+    //     return Promise.reject(response)
+    //   })
+    //   .catch((error) => {
+    //     console.log(error.status)
+    //     throw new Error('Error getting user metadata')
+    //   })
 
     localStorage.setItem('local_auth_token', event.email)
     window.location.href = '/'
