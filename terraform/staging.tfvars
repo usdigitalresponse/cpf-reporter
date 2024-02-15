@@ -6,9 +6,6 @@ ssm_deployment_parameters_path_prefix = "/cpfreporter/deploy-config"
 log_bucket_versioning                 = false
 log_retention_in_days                 = 14
 
-// Auth Provider
-auth_provider = "custom-auth"
-
 // Datadog
 datadog_enabled                       = true
 datadog_draft                         = true

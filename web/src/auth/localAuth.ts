@@ -48,8 +48,7 @@ export const localAuthClient = {
 
     console.log('local: getUserMetadata')
     let user: User | null = null
-    // Explicitly setting the url to ensure these requests are not made outside of the local environment
-    await fetch(`http://localhost:8911/localAuth`, {
+    await fetch(`http://${process.env.API_DOMAIN_NAME}/localAuth`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -75,7 +74,7 @@ export const localAuthClient = {
     return user
   },
   login: async (event) => {
-    await fetch(`http://localhost:8911/localAuth`, {
+    await fetch(`http://${process.env.API_DOMAIN_NAME}/localAuth`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
