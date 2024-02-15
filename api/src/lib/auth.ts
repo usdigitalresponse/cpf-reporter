@@ -44,11 +44,7 @@ export const getCurrentUser = async (
 ): Promise<RedwoodUser | null> => {
   // Verify that the request is coming from the local development environment
   // and is only being processed within the local environment
-  if (
-    process.env.AUTH_PROVIDER === 'local' &&
-    type === 'local' &&
-    event.headers.origin === 'http://localhost:8910'
-  ) {
+  if (process.env.AUTH_PROVIDER === 'local') {
     const user = await db.user.findFirst({
       where: { email: token },
     })
