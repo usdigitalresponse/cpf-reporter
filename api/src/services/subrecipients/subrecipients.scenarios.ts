@@ -18,7 +18,7 @@ export const standard = defineScenario<Prisma.SubrecipientCreateArgs>({
             uploadedBy: {
               create: {
                 name: 'String',
-                email: 'String',
+                email: 'uniqueemail1@test.com',
                 updatedAt: '2023-12-09T14:50:18.317Z',
                 agency: { create: { name: 'String', code: 'String' } },
                 role: 'USDR_ADMIN',
@@ -76,7 +76,7 @@ export const standard = defineScenario<Prisma.SubrecipientCreateArgs>({
             uploadedBy: {
               create: {
                 name: 'String',
-                email: 'String',
+                email: 'uniqueemail2@test.com',
                 updatedAt: '2023-12-09T14:50:18.317Z',
                 agency: { create: { name: 'String', code: 'String' } },
                 role: 'USDR_ADMIN',

@@ -9,7 +9,7 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
         filename: 'String',
         uploadedBy: {
           create: {
-            email: 'String',
+            email: 'uniqueemail1@test.com',
             name: 'String',
             role: 'USDR_ADMIN',
             agency: { create: { name: 'String', code: 'String' } },
@@ -46,7 +46,7 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
         filename: 'String',
         uploadedBy: {
           create: {
-            email: 'String',
+            email: 'uniqueemail2@test.com',
             name: 'String',
             role: 'USDR_ADMIN',
             agency: { create: { name: 'String', code: 'String' } },

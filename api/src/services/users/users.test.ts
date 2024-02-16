@@ -25,20 +25,20 @@ describe('users', () => {
   scenario('creates a user', async (scenario: StandardScenario) => {
     mockCurrentUser({
       id: scenario.user.one.id,
-      email: 'email@example.com',
+      email: scenario.user.one.email,
       roles: ['USDR_ADMIN'],
     })
 
     const result = await createUser({
       input: {
-        name: scenario.user.one.name,
-        email: scenario.user.one.email,
+        email: 'uniqueemail2@test.com',
+        name: 'String',
         agencyId: scenario.agency.one.id,
-        role: 'ORGANIZATION_STAFF',
+        role: 'USDR_ADMIN',
       },
     })
 
-    expect(result.email).toEqual(scenario.user.one.email)
+    expect(result.email).toEqual('uniqueemail2@test.com')
   })
 
   scenario('updates a user', async (scenario: StandardScenario) => {
