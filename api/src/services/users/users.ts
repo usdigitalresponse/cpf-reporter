@@ -101,19 +101,10 @@ export const User: UserRelationResolvers = {
   agency: (_obj, { root }) => {
     return db.user.findUnique({ where: { id: root?.id } }).agency()
   },
-  organization: (_obj, { root }) => {
-    return db.user.findUnique({ where: { id: root?.id } }).organization()
-  },
   certified: (_obj, { root }) => {
     return db.user.findUnique({ where: { id: root?.id } }).certified()
   },
   uploaded: (_obj, { root }) => {
     return db.user.findUnique({ where: { id: root?.id } }).uploaded()
-  },
-  validated: (_obj, { root }) => {
-    return db.user.findUnique({ where: { id: root?.id } }).validated()
-  },
-  invalidated: (_obj, { root }) => {
-    return db.user.findUnique({ where: { id: root?.id } }).invalidated()
   },
 }

@@ -971,4 +971,4 @@ export type FindUsersByOrganizationIdVariables = Exact<{
 }>;
 
 
-export type FindUsersByOrganizationId = { __typename?: 'Query', usersByOrganization: Array<{ __typename?: 'User', id: number, email: string, name?: string | null, role?: RoleEnum | null, createdAt: string, updatedAt: string, agency?: { __typename?: 'Agency', name: string, organizationId: number } | null }> };
+export type FindUsersByOrganizationId = { __typename?: 'Query', usersByOrganization: Array<{ __typename?: 'User', id: number, email: string, name?: string | null, role?: RoleEnum | null, createdAt: string, updatedAt: string, agency?: { __typename?: 'Agency', name: string } | null }> };
