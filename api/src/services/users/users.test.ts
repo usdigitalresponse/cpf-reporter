@@ -25,7 +25,6 @@ describe('users', () => {
   scenario('creates a user', async (scenario: StandardScenario) => {
     mockCurrentUser({
       id: scenario.user.one.id,
-      organizationId: scenario.user.one.organizationId,
       email: 'email@example.com',
       roles: ['USDR_ADMIN'],
     })
@@ -40,7 +39,6 @@ describe('users', () => {
     })
 
     expect(result.email).toEqual(scenario.user.one.email)
-    expect(result.organizationId).toEqual(scenario.organization.one.id)
   })
 
   scenario('updates a user', async (scenario: StandardScenario) => {

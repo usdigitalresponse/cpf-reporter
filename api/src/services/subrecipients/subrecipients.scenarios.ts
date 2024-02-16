@@ -17,9 +17,11 @@ export const standard = defineScenario<Prisma.SubrecipientCreateArgs>({
             updatedAt: '2023-12-09T14:50:18.317Z',
             uploadedBy: {
               create: {
+                name: 'String',
                 email: 'String',
                 updatedAt: '2023-12-09T14:50:18.317Z',
-                organization: { create: { name: 'String' } },
+                agency: { create: { name: 'String', code: 'String' } },
+                role: 'USDR_ADMIN',
               },
             },
             agency: { create: { name: 'String', code: 'String' } },
@@ -73,9 +75,11 @@ export const standard = defineScenario<Prisma.SubrecipientCreateArgs>({
             updatedAt: '2023-12-09T14:50:18.317Z',
             uploadedBy: {
               create: {
+                name: 'String',
                 email: 'String',
                 updatedAt: '2023-12-09T14:50:18.317Z',
-                organization: { create: { name: 'String' } },
+                agency: { create: { name: 'String', code: 'String' } },
+                role: 'USDR_ADMIN',
               },
             },
             agency: { create: { name: 'String', code: 'String' } },
