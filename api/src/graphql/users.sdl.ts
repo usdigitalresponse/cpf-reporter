@@ -29,7 +29,7 @@ export const schema = gql`
     name: String!
     agencyId: Int!
     role: RoleEnum!
-    isActive: Boolean!
+    isActive: Boolean
   }
 
   input UpdateUserInput {
