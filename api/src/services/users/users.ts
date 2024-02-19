@@ -4,6 +4,13 @@ import type {
   UserRelationResolvers,
 } from 'types/graphql'
 
+import {
+  validate,
+  validateWith,
+  validateWithSync,
+  validateUniqueness,
+} from '@redwoodjs/api'
+
 import { AuthenticationError } from '@redwoodjs/graphql-server'
 
 import { ROLES } from 'src/lib/constants'
@@ -49,19 +56,35 @@ const canCreateUser = (currentUser, userRoleToCreate: string) => {
 export const createUser: MutationResolvers['createUser'] = async ({
   input,
 }) => {
-  if (!canCreateUser(context.currentUser, input.role)) {
-    throw new AuthenticationError("You don't have permission to do that.")
-  }
-
   const { agencyId } = input
 
-  try {
-    const agency = await db.agency.findUnique({ where: { id: agencyId } })
+  // Email input must be a valid email address; also takes care of null and undefined
+  validate(input.email, {
+    email: { message: 'Please provide a valid email address' },
+  })
 
-    if (!agency) {
-      throw new Error('Agency not found.')
+  // Email must be unique
+  await validateUniqueness(
+    'user',
+    { email: input.email },
+    {
+      message: 'This email is already in use',
     }
+  )
 
+  // Name input must be present and not an empty string
+  validate(input.name, {
+    presence: { allowEmptyString: false, message: 'Please provide a name' },
+  })
+
+  await validateWith(async () => {
+    const agency = await db.agency.findUnique({ where: { id: agencyId } })
+    if (!agency) {
+      throw 'This agency does not exist.'
+    }
+  })
+
+  try {
     return db.user.create({
       data: input,
     })

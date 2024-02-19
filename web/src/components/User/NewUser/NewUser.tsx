@@ -26,7 +26,8 @@ const NewUser = () => {
   })
 
   const onSave = (input: CreateUserInput) => {
-    createUser({ variables: { input } })
+    // temp fix for the missing isActive field
+    createUser({ variables: { input: { ...input, isActive: true } } })
   }
 
   return (

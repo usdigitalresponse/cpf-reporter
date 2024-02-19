@@ -149,10 +149,11 @@ export type CreateUploadValidationInput = {
 };
 
 export type CreateUserInput = {
-  agencyId?: InputMaybe<Scalars['Int']>;
+  agencyId: Scalars['Int'];
   email: Scalars['String'];
-  name?: InputMaybe<Scalars['String']>;
-  role?: InputMaybe<RoleEnum>;
+  isActive: Scalars['Boolean'];
+  name: Scalars['String'];
+  role: RoleEnum;
 };
 
 export type ExpenditureCategory = {
@@ -745,14 +746,14 @@ export type UploadValidation = {
 
 export type User = {
   __typename?: 'User';
-  agency?: Maybe<Agency>;
-  agencyId?: Maybe<Scalars['Int']>;
+  agency: Agency;
+  agencyId: Scalars['Int'];
   certified: Array<Maybe<ReportingPeriod>>;
   createdAt: Scalars['DateTime'];
   email: Scalars['String'];
   id: Scalars['Int'];
-  name?: Maybe<Scalars['String']>;
-  role?: Maybe<RoleEnum>;
+  name: Scalars['String'];
+  role: RoleEnum;
   updatedAt: Scalars['DateTime'];
   uploaded: Array<Maybe<Upload>>;
 };
@@ -1427,28 +1428,28 @@ export type UploadValidationRelationResolvers<ContextType = RedwoodGraphQLContex
 };
 
 export type UserResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
-  agency: OptArgsResolverFn<Maybe<ResolversTypes['Agency']>, ParentType, ContextType>;
-  agencyId: OptArgsResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  agency: OptArgsResolverFn<ResolversTypes['Agency'], ParentType, ContextType>;
+  agencyId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   certified: OptArgsResolverFn<Array<Maybe<ResolversTypes['ReportingPeriod']>>, ParentType, ContextType>;
   createdAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   email: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
-  name: OptArgsResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  role: OptArgsResolverFn<Maybe<ResolversTypes['RoleEnum']>, ParentType, ContextType>;
+  name: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  role: OptArgsResolverFn<ResolversTypes['RoleEnum'], ParentType, ContextType>;
   updatedAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   uploaded: OptArgsResolverFn<Array<Maybe<ResolversTypes['Upload']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type UserRelationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
-  agency?: RequiredResolverFn<Maybe<ResolversTypes['Agency']>, ParentType, ContextType>;
-  agencyId?: RequiredResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  agency?: RequiredResolverFn<ResolversTypes['Agency'], ParentType, ContextType>;
+  agencyId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   certified?: RequiredResolverFn<Array<Maybe<ResolversTypes['ReportingPeriod']>>, ParentType, ContextType>;
   createdAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   email?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
-  name?: RequiredResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  role?: RequiredResolverFn<Maybe<ResolversTypes['RoleEnum']>, ParentType, ContextType>;
+  name?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  role?: RequiredResolverFn<ResolversTypes['RoleEnum'], ParentType, ContextType>;
   updatedAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   uploaded?: RequiredResolverFn<Array<Maybe<ResolversTypes['Upload']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
