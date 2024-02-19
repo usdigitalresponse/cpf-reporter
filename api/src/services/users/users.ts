@@ -5,10 +5,9 @@ import type {
 } from 'types/graphql'
 
 import { validate, validateWith, validateUniqueness } from '@redwoodjs/api'
-
 import { AuthenticationError } from '@redwoodjs/graphql-server'
-import { ROLES } from 'src/lib/constants'
 
+import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
 
 export const users: QueryResolvers['users'] = () => {
