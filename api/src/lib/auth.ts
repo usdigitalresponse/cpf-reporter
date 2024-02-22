@@ -39,8 +39,7 @@ type RedwoodUser = Record<string, unknown> & { roles?: string[] }
  */
 export const getCurrentUser = async (
   decoded: Decoded,
-  { token, type }: { token: string; type: string },
-  { event }: { event: APIGatewayEvent }
+  { token }: { token: string }
 ): Promise<RedwoodUser | null> => {
   // Verify that the request is coming from the local development environment
   // and is only being processed within the local environment
