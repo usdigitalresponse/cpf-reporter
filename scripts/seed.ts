@@ -25,11 +25,25 @@ export default async () => {
 
     const users: Prisma.UserCreateArgs['data'][] = [
       {
-        email: 'grants-admin@usdigitalresponse.org',
-        name: 'Grants Admin',
+        email: 'usdr-admin@usdr.dev',
+        name: 'USDR Admin',
         agencyId: mainAgencyRecord.id,
         organizationId: organizationRecord.id,
         role: 'USDR_ADMIN',
+      },
+      {
+        email: 'organization-admin@usdr.dev',
+        name: 'Organization Admin',
+        agencyId: mainAgencyRecord.id,
+        organizationId: organizationRecord.id,
+        role: 'ORGANIZATION_ADMIN',
+      },
+      {
+        email: 'organization-staff@usdr.dev',
+        name: 'Organization Staff',
+        agencyId: mainAgencyRecord.id,
+        organizationId: organizationRecord.id,
+        role: 'ORGANIZATION_STAFF',
       },
     ]
     const userRecord = await db.user.create({ data: users[0] })

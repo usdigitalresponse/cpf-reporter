@@ -1,5 +1,7 @@
 import { SubmitHandler } from '@redwoodjs/forms'
 
+import { users } from 'src/lib/seeds'
+
 // If you're integrating with an auth service provider you should delete this interface.
 // Instead you should import the type from their auth client sdk.
 export interface AuthClient {
@@ -23,7 +25,6 @@ export interface LocalAuthClient {
 }
 
 interface User {
-  id: string
   name: string
   email: string
   role: string
@@ -46,56 +47,20 @@ export const localAuthClient = {
       return null
     }
 
-    console.log('local: getUserMetadata')
-    let user: User | null = null
-    await fetch(`http://${process.env.API_DOMAIN_NAME}/localAuth`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        authMethod: 'getUserMetadata',
-        email: localStorage.getItem('local_auth_token'),
-      }),
-    })
-      .then((response: Response) => {
-        if (response.ok) {
-          return response.json()
-        }
-        return Promise.reject(response)
-      })
-      .then((jsonData: User) => {
-        user = jsonData
-      })
-      .catch((error) => {
-        console.log(error.status)
-        throw new Error('Error getting user metadata')
-      })
+    const user: User | null = users.find(
+      (u) => u.email === localStorage.getItem('local_auth_token')
+    )
+
     return user
   },
   login: async (event) => {
-    await fetch(`http://${process.env.API_DOMAIN_NAME}/localAuth`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        authMethod: 'login',
-        email: event.email,
-      }),
-    })
-      .then((response: Response) => {
-        if (response.ok) {
-          return response.json()
-        }
-        return Promise.reject(response)
-      })
-      .catch((error) => {
-        console.log(error.status)
-        throw new Error('Error getting user metadata')
-      })
-
-    localStorage.setItem('local_auth_token', event.email)
+    let token
+    if (event.user === 'manual') {
+      token = event.email
+    } else {
+      token = event.user
+    }
+    localStorage.setItem('local_auth_token', token)
     window.location.href = '/'
   },
   signup: () => {
