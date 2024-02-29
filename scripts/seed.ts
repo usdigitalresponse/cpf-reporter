@@ -8,6 +8,46 @@ export default async () => {
     // Seeds automatically with `yarn rw prisma migrate dev` and `yarn rw prisma migrate reset`
     //
 
+    const organization: Prisma.OrganizationCreateArgs['data'] =
+      await db.organization.create({
+        data: {
+          name: 'Example Organization',
+        },
+      })
+
+    const agency: Prisma.AgencyCreateArgs['data'] = await db.agency.create({
+      data: {
+        name: 'Example Agency',
+        code: 'EA',
+        organizationId: organization.id,
+      },
+    })
+
+    const users: Prisma.UserCreateManyInput[] = [
+      {
+        email: 'ORGANIZATIONSTAFF@testemail.test',
+        name: 'Organization Staff',
+        role: 'ORGANIZATION_STAFF',
+        agencyId: agency.id,
+      },
+      {
+        email: 'ORGANIZATIONADMIN@testemail.test',
+        name: 'Organization Admin',
+        role: 'ORGANIZATION_ADMIN',
+        agencyId: agency.id,
+      },
+      {
+        email: 'USDRADMIN@testemail.test',
+        name: 'USDR Admin',
+        role: 'USDR_ADMIN',
+        agencyId: agency.id,
+      },
+    ]
+
+    await db.user.createMany({
+      data: users,
+    })
+
     const inputTemplates: Prisma.InputTemplateCreateArgs['data'][] = [
       {
         name: 'Input Template 1',
