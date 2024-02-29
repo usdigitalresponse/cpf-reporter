@@ -10,16 +10,12 @@ export const schema = gql`
     email: String!
     name: String
     agencyId: Int
-    organizationId: Int!
     createdAt: DateTime!
     updatedAt: DateTime!
     agency: Agency
-    organization: Organization!
     role: RoleEnum
     certified: [ReportingPeriod]!
     uploaded: [Upload]!
-    validated: [UploadValidation]!
-    invalidated: [UploadValidation]!
   }
 
   type Query {
@@ -32,7 +28,6 @@ export const schema = gql`
     email: String!
     name: String
     agencyId: Int
-    organizationId: Int
     role: RoleEnum
   }
 
@@ -40,7 +35,6 @@ export const schema = gql`
     email: String
     name: String
     agencyId: Int
-    organizationId: Int
     role: RoleEnum
   }
 
