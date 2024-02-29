@@ -1,8 +1,0 @@
-{
-    "diffEditor.ignoreTrimWhitespace": false,
-    "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
-    },
-    "editor.formatOnSaveMode": "modifications",
-    "eslint.debug": true
-}
