@@ -50,7 +50,6 @@ model User {
   @@index(fields: [passageId])
 }
 
-
 enum Role {
   USDR_ADMIN
   ORGANIZATION_ADMIN
