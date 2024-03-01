@@ -48,9 +48,6 @@ export const Subrecipient: SubrecipientRelationResolvers = {
       .findUnique({ where: { id: root?.id } })
       .organization()
   },
-  certifiedBy: (_obj, { root }) => {
-    return db.subrecipient.findUnique({ where: { id: root?.id } }).certifiedBy()
-  },
   originationUpload: (_obj, { root }) => {
     return db.subrecipient
       .findUnique({ where: { id: root?.id } })

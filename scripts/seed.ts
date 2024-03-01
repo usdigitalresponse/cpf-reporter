@@ -47,7 +47,6 @@ export default async () => {
       },
     ]
     const userRecord = await db.user.create({ data: users[0] })
-    console.log(userRecord)
 
     const inputTemplates: Prisma.InputTemplateCreateArgs['data'][] = [
       {

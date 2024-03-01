@@ -14,7 +14,6 @@ export const QUERY = gql`
       agency {
         name
       }
-      organizationId
       role
       createdAt
       updatedAt

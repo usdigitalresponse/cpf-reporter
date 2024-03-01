@@ -26,9 +26,8 @@ export const standard = defineScenario<
   user: {
     one: {
       data: {
-        email: 'String',
+        email: 'uniqueemail1@test.com',
         name: 'String',
-        organization: { create: { name: 'String' } },
         agency: { create: { name: 'String', code: 'String' } },
         role: 'ORGANIZATION_ADMIN',
       },
