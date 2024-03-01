@@ -28,25 +28,29 @@ export default async () => {
         email: 'usdr-admin@usdr.dev',
         name: 'USDR Admin',
         agencyId: mainAgencyRecord.id,
-        organizationId: organizationRecord.id,
         role: 'USDR_ADMIN',
       },
       {
         email: 'organization-admin@usdr.dev',
         name: 'Organization Admin',
         agencyId: mainAgencyRecord.id,
-        organizationId: organizationRecord.id,
         role: 'ORGANIZATION_ADMIN',
       },
       {
         email: 'organization-staff@usdr.dev',
         name: 'Organization Staff',
         agencyId: mainAgencyRecord.id,
-        organizationId: organizationRecord.id,
         role: 'ORGANIZATION_STAFF',
       },
     ]
-    const userRecord = await db.user.create({ data: users[0] })
+    // Note: if using PostgreSQL, using `createMany` to insert multiple records is much faster
+    // @see: https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#createmany
+    await Promise.all(
+      users.map(async (data: Prisma.UserCreateArgs['data']) => {
+        const record = await db.user.create({ data })
+        console.log(record)
+      })
+    )
 
     const inputTemplates: Prisma.InputTemplateCreateArgs['data'][] = [
       {
@@ -63,15 +67,6 @@ export default async () => {
         effectiveDate: new Date(),
       },
     ]
-
-    // Note: if using PostgreSQL, using `createMany` to insert multiple records is much faster
-    // @see: https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#createmany
-    await Promise.all(
-      users.map(async (data: Prisma.UserCreateArgs['data']) => {
-        const record = await db.user.create({ data })
-        console.log(record)
-      })
-    )
 
     await Promise.all(
       //
