@@ -42,10 +42,14 @@ model User {
   updatedAt      DateTime            @default(now()) @db.Timestamptz(6)
   role           Role
   isActive       Boolean             @default(true)
+  passageId      String?
   agency         Agency              @relation(fields: [agencyId], references: [id])
   certified      ReportingPeriod[]
   uploaded       Upload[]
+
+  @@index(fields: [passageId])
 }
+
 
 enum Role {
   USDR_ADMIN
