@@ -1,5 +1,10 @@
 import { createAuthentication } from '@redwoodjs/auth'
 
+import {
+  createLocalAuthImplementation,
+  localAuthClient,
+} from 'src/auth/localAuth'
+
 // If you're integrating with an auth service provider you should delete this interface.
 // Instead you should import the type from their auth client sdk.
 export interface AuthClient {
@@ -53,11 +58,15 @@ const client = {
 }
 
 function createAuth() {
-  const authImplementation = createAuthImplementation(client)
-
-  // You can pass custom provider hooks here if you need to as a second
-  // argument. See the Redwood framework source code for how that's used
-  return createAuthentication(authImplementation)
+  if (process.env.AUTH_PROVIDER == 'local') {
+    const authImplementation = createLocalAuthImplementation(localAuthClient)
+    return createAuthentication(authImplementation)
+  } else {
+    const authImplementation = createAuthImplementation(client)
+    // You can pass custom provider hooks here if you need to as a second
+    // argument. See the Redwood framework source code for how that's used
+    return createAuthentication(authImplementation)
+  }
 }
 
 // This is where most of the integration work will take place. You should keep
