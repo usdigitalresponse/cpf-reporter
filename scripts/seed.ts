@@ -8,45 +8,49 @@ export default async () => {
     // Seeds automatically with `yarn rw prisma migrate dev` and `yarn rw prisma migrate reset`
     //
 
-    const organization: Prisma.OrganizationCreateArgs['data'] =
-      await db.organization.create({
-        data: {
-          name: 'Example Organization',
-        },
-      })
-
-    const agency: Prisma.AgencyCreateArgs['data'] = await db.agency.create({
-      data: {
-        name: 'Example Agency',
-        code: 'EA',
-        organizationId: organization.id,
-      },
+    const organization: Prisma.OrganizationCreateArgs['data'] = {
+      name: 'US Digital Response',
+    }
+    const organizationRecord = await db.organization.create({
+      data: organization,
     })
 
-    const users: Prisma.UserCreateManyInput[] = [
+    const mainAgency: Prisma.AgencyCreateArgs['data'] = {
+      name: 'Main Agency',
+      abbreviation: 'MAUSDR',
+      code: 'MAUSDR',
+      organizationId: organizationRecord.id,
+    }
+    const mainAgencyRecord = await db.agency.create({ data: mainAgency })
+
+    const users: Prisma.UserCreateArgs['data'][] = [
       {
-        email: 'ORGANIZATIONSTAFF@testemail.test',
-        name: 'Organization Staff',
-        role: 'ORGANIZATION_STAFF',
-        agencyId: agency.id,
-      },
-      {
-        email: 'ORGANIZATIONADMIN@testemail.test',
-        name: 'Organization Admin',
-        role: 'ORGANIZATION_ADMIN',
-        agencyId: agency.id,
-      },
-      {
-        email: 'USDRADMIN@testemail.test',
+        email: 'usdr-admin@usdr.dev',
         name: 'USDR Admin',
+        agencyId: mainAgencyRecord.id,
         role: 'USDR_ADMIN',
-        agencyId: agency.id,
+      },
+      {
+        email: 'organization-admin@usdr.dev',
+        name: 'Organization Admin',
+        agencyId: mainAgencyRecord.id,
+        role: 'ORGANIZATION_ADMIN',
+      },
+      {
+        email: 'organization-staff@usdr.dev',
+        name: 'Organization Staff',
+        agencyId: mainAgencyRecord.id,
+        role: 'ORGANIZATION_STAFF',
       },
     ]
-
-    await db.user.createMany({
-      data: users,
-    })
+    // Note: if using PostgreSQL, using `createMany` to insert multiple records is much faster
+    // @see: https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#createmany
+    await Promise.all(
+      users.map(async (data: Prisma.UserCreateArgs['data']) => {
+        const record = await db.user.create({ data })
+        console.log(record)
+      })
+    )
 
     const inputTemplates: Prisma.InputTemplateCreateArgs['data'][] = [
       {
@@ -64,8 +68,6 @@ export default async () => {
       },
     ]
 
-    // Note: if using PostgreSQL, using `createMany` to insert multiple records is much faster
-    // @see: https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#createmany
     await Promise.all(
       //
       // Change to match your data model and seeding needs
