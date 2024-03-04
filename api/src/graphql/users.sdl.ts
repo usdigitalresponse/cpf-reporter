@@ -8,12 +8,12 @@ export const schema = gql`
   type User {
     id: Int!
     email: String!
-    name: String
-    agencyId: Int
+    name: String!
+    agencyId: Int!
     createdAt: DateTime!
     updatedAt: DateTime!
-    agency: Agency
-    role: RoleEnum
+    agency: Agency!
+    role: RoleEnum!
     certified: [ReportingPeriod]!
     uploaded: [Upload]!
   }
@@ -26,9 +26,10 @@ export const schema = gql`
 
   input CreateUserInput {
     email: String!
-    name: String
-    agencyId: Int
-    role: RoleEnum
+    name: String!
+    agencyId: Int!
+    role: RoleEnum!
+    isActive: Boolean
   }
 
   input UpdateUserInput {

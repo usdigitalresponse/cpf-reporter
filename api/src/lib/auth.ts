@@ -50,7 +50,8 @@ export const getCurrentUser = async (
   }
   return {
     id: 1,
-    organizationId: 1,
+    organizationId: 1, // TODO: Organization id should be determined via the agency relationship
+    agencyId: 1,
     email: 'email@example.com',
     roles: ['USDR_ADMIN'],
   }

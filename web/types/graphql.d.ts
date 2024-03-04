@@ -130,10 +130,11 @@ export type CreateUploadValidationInput = {
 };
 
 export type CreateUserInput = {
-  agencyId?: InputMaybe<Scalars['Int']>;
+  agencyId: Scalars['Int'];
   email: Scalars['String'];
-  name?: InputMaybe<Scalars['String']>;
-  role?: InputMaybe<RoleEnum>;
+  isActive: Scalars['Boolean'];
+  name: Scalars['String'];
+  role: RoleEnum;
 };
 
 export type ExpenditureCategory = {
@@ -726,14 +727,14 @@ export type UploadValidation = {
 
 export type User = {
   __typename?: 'User';
-  agency?: Maybe<Agency>;
-  agencyId?: Maybe<Scalars['Int']>;
+  agency: Agency;
+  agencyId: Scalars['Int'];
   certified: Array<Maybe<ReportingPeriod>>;
   createdAt: Scalars['DateTime'];
   email: Scalars['String'];
   id: Scalars['Int'];
-  name?: Maybe<Scalars['String']>;
-  role?: Maybe<RoleEnum>;
+  name: Scalars['String'];
+  role: RoleEnum;
   updatedAt: Scalars['DateTime'];
   uploaded: Array<Maybe<Upload>>;
 };
@@ -928,7 +929,7 @@ export type EditUserByIdVariables = Exact<{
 }>;
 
 
-export type EditUserById = { __typename?: 'Query', user?: { __typename?: 'User', id: number, email: string, name?: string | null, agencyId?: number | null, role?: RoleEnum | null, createdAt: string, updatedAt: string } | null };
+export type EditUserById = { __typename?: 'Query', user?: { __typename?: 'User', id: number, email: string, name: string, agencyId: number, role: RoleEnum, createdAt: string, updatedAt: string } | null };
 
 export type UpdateUserMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -936,7 +937,7 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: number, email: string, name?: string | null, agencyId?: number | null, role?: RoleEnum | null, createdAt: string, updatedAt: string } };
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: number, email: string, name: string, agencyId: number, role: RoleEnum, createdAt: string, updatedAt: string } };
 
 export type CreateUserMutationVariables = Exact<{
   input: CreateUserInput;
@@ -957,7 +958,7 @@ export type FindUserByIdVariables = Exact<{
 }>;
 
 
-export type FindUserById = { __typename?: 'Query', user?: { __typename?: 'User', id: number, email: string, name?: string | null, agencyId?: number | null, role?: RoleEnum | null, createdAt: string, updatedAt: string } | null };
+export type FindUserById = { __typename?: 'Query', user?: { __typename?: 'User', id: number, email: string, name: string, agencyId: number, role: RoleEnum, createdAt: string, updatedAt: string } | null };
 
 export type agenciesUnderUserOrganizationVariables = Exact<{
   organizationId: Scalars['Int'];
@@ -971,4 +972,4 @@ export type FindUsersByOrganizationIdVariables = Exact<{
 }>;
 
 
-export type FindUsersByOrganizationId = { __typename?: 'Query', usersByOrganization: Array<{ __typename?: 'User', id: number, email: string, name?: string | null, role?: RoleEnum | null, createdAt: string, updatedAt: string, agency?: { __typename?: 'Agency', name: string } | null }> };
+export type FindUsersByOrganizationId = { __typename?: 'Query', usersByOrganization: Array<{ __typename?: 'User', id: number, email: string, name: string, role: RoleEnum, createdAt: string, updatedAt: string, agency: { __typename?: 'Agency', name: string } }> };

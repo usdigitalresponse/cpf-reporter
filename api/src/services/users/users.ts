@@ -4,6 +4,7 @@ import type {
   UserRelationResolvers,
 } from 'types/graphql'
 
+import { validate, validateWith, validateUniqueness } from '@redwoodjs/api'
 import { AuthenticationError } from '@redwoodjs/graphql-server'
 
 import { ROLES } from 'src/lib/constants'
@@ -19,55 +20,46 @@ export const user: QueryResolvers['user'] = ({ id }) => {
   })
 }
 
-/**
- * Determines if the current user can create a new user with the specified role.
- * - USDR_ADMIN can create users with any role.
- * - ORGANIZATION_ADMIN can create users with roles ORGANIZATION_STAFF or ORGANIZATION_ADMIN.
- * - ORGANIZATION_STAFF can't create users.
- *
- * @param {Object} currentUser - The current user object.
- * @param {string} userRoleToCreate - The role of the user to be created.
- * @returns {boolean} True if the user can create the new user, false otherwise.
- */
-const canCreateUser = (currentUser, userRoleToCreate: string) => {
-  const { USDR_ADMIN, ORGANIZATION_ADMIN, ORGANIZATION_STAFF } = ROLES
-
-  if (currentUser.roles?.includes(USDR_ADMIN)) {
-    return true
-  }
-
-  if (currentUser.roles?.includes(ORGANIZATION_ADMIN)) {
-    return (
-      userRoleToCreate === ORGANIZATION_STAFF ||
-      userRoleToCreate === ORGANIZATION_ADMIN
-    )
-  }
-
-  return false
-}
-
 export const createUser: MutationResolvers['createUser'] = async ({
   input,
 }) => {
-  if (!canCreateUser(context.currentUser, input.role)) {
-    throw new AuthenticationError("You don't have permission to do that.")
-  }
+  const { email, name, agencyId } = input
+  const { currentUser } = context
+  const { USDR_ADMIN } = ROLES
 
-  const { agencyId } = input
+  validate(email, {
+    email: { message: 'Please provide a valid email address' },
+  })
 
-  try {
-    const agency = await db.agency.findUnique({ where: { id: agencyId } })
+  validate(name, {
+    presence: { allowEmptyString: false, message: 'Please provide a name' },
+  })
 
-    if (!agency) {
-      throw new Error('Agency not found.')
+  validateWith(async () => {
+    if (currentUser.roles?.includes(USDR_ADMIN)) {
+      return true
     }
 
-    return db.user.create({
-      data: input,
+    const newUserAgency = await db.agency.findUniqueOrThrow({
+      where: { id: agencyId },
+      select: { organizationId: true },
     })
-  } catch (err) {
-    throw new Error(err)
-  }
+    const loggedInUserAgency = await db.agency.findUniqueOrThrow({
+      where: { id: currentUser.agencyId as number },
+      select: { organizationId: true },
+    })
+
+    if (newUserAgency.organizationId !== loggedInUserAgency.organizationId) {
+      throw new AuthenticationError("You don't have permission to do that")
+    }
+  })
+
+  return validateUniqueness(
+    'user',
+    { email },
+    { message: 'This email is already in use' },
+    (db) => db.user.create({ data: input })
+  )
 }
 
 export const updateUser: MutationResolvers['updateUser'] = ({ id, input }) => {
