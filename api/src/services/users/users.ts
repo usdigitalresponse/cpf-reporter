@@ -2,6 +2,7 @@ import type {
   QueryResolvers,
   MutationResolvers,
   UserRelationResolvers,
+  Agency,
 } from 'types/graphql'
 
 import { validate, validateWith, validateUniqueness } from '@redwoodjs/api'
@@ -10,13 +11,53 @@ import { AuthenticationError } from '@redwoodjs/graphql-server'
 import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
 
+export const currentUserIsUSDRAdmin = (): boolean => {
+  return context.currentUser?.roles?.includes(ROLES.USDR_ADMIN)
+}
+
 export const users: QueryResolvers['users'] = () => {
-  return db.user.findMany()
+  if (currentUserIsUSDRAdmin()) {
+    return db.user.findMany()
+  }
+
+  const userAgency = context.currentUser.agency as Agency
+  validate(userAgency.organizationId, {
+    presence: {
+      message: 'User is not registered to an organization',
+    },
+  })
+
+  return db.user.findMany({
+    where: {
+      agency: {
+        organizationId: userAgency.organizationId,
+      },
+    },
+  })
 }
 
 export const user: QueryResolvers['user'] = ({ id }) => {
+  if (currentUserIsUSDRAdmin()) {
+    return db.user.findUnique({
+      where: { id },
+    })
+  }
+
+  const userAgency = context.currentUser.agency as Agency
+  validate(userAgency.organizationId, {
+    presence: {
+      message: 'User is not registered to an organization',
+    },
+  })
   return db.user.findUnique({
-    where: { id },
+    where: {
+      id,
+      AND: {
+        agency: {
+          organizationId: userAgency.organizationId,
+        },
+      },
+    },
   })
 }
 
@@ -25,7 +66,6 @@ export const createUser: MutationResolvers['createUser'] = async ({
 }) => {
   const { email, name, agencyId } = input
   const { currentUser } = context
-  const { USDR_ADMIN } = ROLES
 
   validate(email, {
     email: { message: 'Please provide a valid email address' },
@@ -36,7 +76,7 @@ export const createUser: MutationResolvers['createUser'] = async ({
   })
 
   validateWith(async () => {
-    if (currentUser.roles?.includes(USDR_ADMIN)) {
+    if (currentUserIsUSDRAdmin()) {
       return true
     }
 
@@ -77,10 +117,15 @@ export const deleteUser: MutationResolvers['deleteUser'] = ({ id }) => {
 
 export const usersByOrganization: QueryResolvers['usersByOrganization'] =
   async ({ organizationId }) => {
+    let users = []
     try {
-      const users = await db.user.findMany({
-        where: { organizationId },
-      })
+      if (
+        currentUserIsUSDRAdmin() ||
+        organizationId === (context.currentUser.agency as Agency).organizationId
+      )
+        users = await db.user.findMany({
+          where: { agency: { organizationId } },
+        })
       return users || [] // Return an empty array if null is received
     } catch (error) {
       console.error(error)
