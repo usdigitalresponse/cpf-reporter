@@ -132,7 +132,7 @@ export type CreateUploadValidationInput = {
 export type CreateUserInput = {
   agencyId: Scalars['Int'];
   email: Scalars['String'];
-  isActive: Scalars['Boolean'];
+  isActive?: InputMaybe<Scalars['Boolean']>;
   name: Scalars['String'];
   role: RoleEnum;
 };
