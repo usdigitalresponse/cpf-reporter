@@ -1,15 +1,25 @@
-import * as passageModule from '@passageidentity/passage-node'
-
 import { logger } from 'src/lib/logger'
 
 import { createPassageUser, deletePassageUser } from './passage'
 
-jest.mock('@passageidentity/passage-node')
-jest.mock('src/lib/logger')
+const mockPassageUser = {
+  create: jest.fn(),
+  activate: jest.fn(),
+  delete: jest.fn(),
+}
 
-const mockedPassage = passageModule.default as jest.Mocked<
-  typeof passageModule.default
->
+jest.mock('@passageidentity/passage-node', () => {
+  return jest.fn().mockImplementation(() => ({
+    user: mockPassageUser,
+  }))
+})
+
+jest.mock('src/lib/logger', () => ({
+  logger: {
+    error: jest.fn(),
+  },
+}))
+
 const mockedLogger = logger as jest.Mocked<typeof logger>
 
 describe('Passage User Management', () => {
@@ -23,19 +33,13 @@ describe('Passage User Management', () => {
       const newUser = { id: '123', email }
       const activatedUser = { ...newUser, activated: true }
 
-      const passageInstance = {
-        user: {
-          create: jest.fn().mockResolvedValue(newUser),
-          activate: jest.fn().mockResolvedValue(activatedUser),
-        },
-      }
-
-      mockedPassage.mockImplementation(() => passageInstance)
+      mockPassageUser.create.mockResolvedValue(newUser)
+      mockPassageUser.activate.mockResolvedValue(activatedUser)
 
       const result = await createPassageUser(email)
 
-      expect(passageInstance.user.create).toHaveBeenCalledWith({ email })
-      expect(passageInstance.user.activate).toHaveBeenCalledWith(newUser.id)
+      expect(mockPassageUser.create).toHaveBeenCalledWith({ email })
+      expect(mockPassageUser.activate).toHaveBeenCalledWith(newUser.id)
       expect(result).toEqual(activatedUser)
     })
 
@@ -43,13 +47,7 @@ describe('Passage User Management', () => {
       const email = 'test@example.com'
       const error = new Error('User creation failed')
 
-      const passageInstance = {
-        user: {
-          create: jest.fn().mockRejectedValue(error),
-        },
-      }
-
-      mockedPassage.mockImplementation(() => passageInstance)
+      mockPassageUser.create.mockRejectedValue(error)
 
       await expect(createPassageUser(email)).rejects.toThrow(
         'Failed to create Passage user'
@@ -66,17 +64,11 @@ describe('Passage User Management', () => {
     it('should delete a Passage user with the given user ID', async () => {
       const userId = '123'
 
-      const passageInstance = {
-        user: {
-          delete: jest.fn().mockResolvedValue(true),
-        },
-      }
-
-      mockedPassage.mockImplementation(() => passageInstance)
+      mockPassageUser.delete.mockResolvedValue(true)
 
       const result = await deletePassageUser(userId)
 
-      expect(passageInstance.user.delete).toHaveBeenCalledWith(userId)
+      expect(mockPassageUser.delete).toHaveBeenCalledWith(userId)
       expect(result).toBe(true)
     })
 
@@ -84,13 +76,7 @@ describe('Passage User Management', () => {
       const userId = '123'
       const error = new Error('User deletion failed')
 
-      const passageInstance = {
-        user: {
-          delete: jest.fn().mockRejectedValue(error),
-        },
-      }
-
-      mockedPassage.mockImplementation(() => passageInstance)
+      mockPassageUser.delete.mockRejectedValue(error)
 
       await expect(deletePassageUser(userId)).rejects.toThrow(
         'Failed to delete Passage user'
