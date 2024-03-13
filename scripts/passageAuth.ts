@@ -15,7 +15,6 @@ import {
 export default async ({ args }) => {
   const { action, email, id } = args
 
-  // try {
   switch (action) {
     case 'create':
       const newUser = await createPassageUser(email)
@@ -29,8 +28,4 @@ export default async ({ args }) => {
     default:
       console.log(`Unknown action: ${action}. Please use 'create' or 'delete'.`)
   }
-  // }
-  // catch (error) {
-  //   console.error(`Error executing ${action} for Passage user:`, error)
-  // }
 }

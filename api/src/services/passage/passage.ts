@@ -2,11 +2,11 @@ import {
   SecretsManagerClient,
   GetSecretValueCommand,
 } from '@aws-sdk/client-secrets-manager'
-
 import Passage from '@passageidentity/passage-node'
+
 import { logger } from 'src/lib/logger'
 
-export const getPassageClient = async () => {
+const getPassageClient = async () => {
   try {
     const passageConfig = {
       appID: process.env.PASSAGE_APP_ID,
@@ -22,10 +22,9 @@ export const getPassageClient = async () => {
 
 export const createPassageUser = async (email: string) => {
   try {
-    let passage = await getPassageClient()
+    const passage = await getPassageClient()
     const newUser = await passage.user.create({ email: email })
     const activatedUser = await passage.user.activate(newUser.id)
-    console.log('activatedUser', activatedUser)
     return activatedUser
   } catch (error) {
     logger.error('Failed to create Passage user', error)
@@ -35,7 +34,7 @@ export const createPassageUser = async (email: string) => {
 
 export const deletePassageUser = async (userId: string) => {
   try {
-    let passage = await getPassageClient()
+    const passage = await getPassageClient()
     return await passage.user.delete(userId)
   } catch (error) {
     logger.error('Failed to delete Passage user', error)
