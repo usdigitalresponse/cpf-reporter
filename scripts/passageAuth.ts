@@ -1,4 +1,7 @@
-import { createPassageUser, deletePassageUser } from 'api/src/lib/auth'
+import {
+  createPassageUser,
+  deletePassageUser,
+} from 'api/src/services/passage/passage'
 
 /**
   * This script allows you to create or delete a user in the Passage API.
@@ -12,23 +15,22 @@ import { createPassageUser, deletePassageUser } from 'api/src/lib/auth'
 export default async ({ args }) => {
   const { action, email, id } = args
 
-  try {
-    switch (action) {
-      case 'create':
-        const newUser = await createPassageUser(email)
-        console.log('User successfully created:')
-        console.log(newUser)
-        break
-      case 'delete':
-        await deletePassageUser(id)
-        console.log('User successfully deleted.')
-        break
-      default:
-        console.log(
-          `Unknown action: ${action}. Please use 'create' or 'delete'.`
-        )
-    }
-  } catch (error) {
-    console.error(`Error executing ${action} for Passage user:`, error)
+  // try {
+  switch (action) {
+    case 'create':
+      const newUser = await createPassageUser(email)
+      console.log('User successfully created:')
+      console.log(newUser)
+      break
+    case 'delete':
+      await deletePassageUser(id)
+      console.log('User successfully deleted.')
+      break
+    default:
+      console.log(`Unknown action: ${action}. Please use 'create' or 'delete'.`)
   }
+  // }
+  // catch (error) {
+  //   console.error(`Error executing ${action} for Passage user:`, error)
+  // }
 }
