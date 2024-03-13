@@ -37,12 +37,12 @@ export const getCurrentUser = async (
 ): Promise<RedwoodUser | null> => {
   // Verify that the request is coming from the local development environment
   // and is only being processed within the local environment
-  if (process.env.AUTH_PROVIDER === 'local') {
-    const user = await db.user.findFirst({
-      where: { email: token },
-    })
-    return user
-  }
+  // if (process.env.AUTH_PROVIDER === 'local') {
+  //   const user = await db.user.findFirst({
+  //     where: { email: token },
+  //   })
+  //   return user
+  // }
 
   return {
     id: 1,
@@ -77,12 +77,10 @@ type AllowedRoles = string | string[] | undefined
  * or when no roles are provided to check against. Otherwise returns false.
  */
 export const hasRole = (roles: AllowedRoles): boolean => {
-  console.log('isAuthenticated', isAuthenticated())
   if (!isAuthenticated()) {
     return false
   }
   const currentUserRoles = context.currentUser?.role
-  console.log('currentUserRoles', currentUserRoles)
 
   if (typeof roles === 'string') {
     if (typeof currentUserRoles === 'string') {
@@ -130,8 +128,6 @@ export const requireAuth = ({ roles }: { roles?: AllowedRoles } = {}) => {
   }
 
   if (roles && !hasRole(roles)) {
-    console.log('has role: ', hasRole(roles))
-    console.log('roles: ', roles)
     throw new ForbiddenError("You don't have access to do that.")
   }
 }
