@@ -23,6 +23,11 @@ jest.mock('src/lib/logger', () => ({
 const mockedLogger = logger as jest.Mocked<typeof logger>
 
 describe('Passage User Management', () => {
+  beforeAll(() => {
+    process.env.PASSAGE_API_KEY = 'fake_api_key'
+    process.env.PASSAGE_APP_ID = 'fake_app_id'
+  })
+
   beforeEach(() => {
     jest.clearAllMocks()
   })
