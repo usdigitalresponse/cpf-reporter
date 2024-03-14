@@ -28,10 +28,32 @@ export const standard = defineScenario<
       data: {
         email: 'uniqueemail1@test.com',
         name: 'String',
-        agency: { create: { name: 'String', code: 'String' } },
         role: 'ORGANIZATION_ADMIN',
+        agency: { create: { name: 'String', code: 'String' } },
       },
     },
+    two: (scenario) => ({
+      data: {
+        email: 'uniqueemail25@test.com',
+        name: 'String',
+        role: 'ORGANIZATION_STAFF',
+        agency: { connect: { id: scenario.agency.one.id } },
+      },
+      include: {
+        agency: true,
+      },
+    }),
+    three: (scenario) => ({
+      data: {
+        email: 'uniqueemail350@test.com',
+        name: 'String',
+        role: 'ORGANIZATION_STAFF',
+        agency: { connect: { id: scenario.agency.one.id } },
+      },
+      include: {
+        agency: true,
+      },
+    }),
   },
 })
 
