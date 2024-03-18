@@ -5732,6 +5732,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@passageidentity/passage-node@npm:2.9.0":
+  version: 2.9.0
+  resolution: "@passageidentity/passage-node@npm:2.9.0"
+  dependencies:
+    jose: ^4.14.4
+    node-fetch: ^2.6.12
+  checksum: 589b7043fc08afdfb0b5c0ab9784feca19bf26f1db89973f6106827be9d999e4ac3377b57842ac9a8d87f175c8576a14f16446eab4cd1c142b59df9c7319ec49
+  languageName: node
+  linkType: hard
+
 "@passageidentity/webauthnutils@npm:1.1.2":
   version: 1.1.2
   resolution: "@passageidentity/webauthnutils@npm:1.1.2"
@@ -9436,6 +9446,7 @@ __metadata:
     "@aws-sdk/rds-signer": ^3.462.0
     "@aws-sdk/s3-request-presigner": ^3.472.0
     "@opentelemetry/instrumentation": ^0.45.1
+    "@passageidentity/passage-node": 2.9.0
     "@prisma/instrumentation": ^5.7.0
     "@redwoodjs/api": 6.4.2
     "@redwoodjs/graphql-server": 6.4.2
@@ -17229,7 +17240,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:^4.11.4":
+"jose@npm:^4.11.4, jose@npm:^4.14.4":
   version: 4.15.5
   resolution: "jose@npm:4.15.5"
   checksum: 7dde76447c7707bd4b448f914b216f3858e701aa83f00447434252461af5b9e159dcbffb88badea3f9616739526763581267c9560622f0a058df8d68c86d7f79
