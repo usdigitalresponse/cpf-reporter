@@ -318,7 +318,7 @@ describe('permissions write validations', () => {
         async () =>
           await runPermissionsCreateOrUpdateValidations({
             role: ROLES.ORGANIZATION_STAFF,
-            agencyId: scenario.agency.one.id,
+            agencyId: scenario.agency.three.id,
           })
       ).rejects.toThrow("You don't have permission to do that")
     }
