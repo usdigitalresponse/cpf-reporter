@@ -1,6 +1,6 @@
 import type { User } from '@prisma/client'
 
-import { EmailValidationError, ServiceValidationError } from '@redwoodjs/api'
+import { EmailValidationError } from '@redwoodjs/api'
 
 import { ROLES } from 'src/lib/constants'
 
