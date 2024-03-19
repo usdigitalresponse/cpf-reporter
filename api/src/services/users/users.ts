@@ -108,12 +108,6 @@ export const runUpdateSpecificValidations = async (input, id) => {
           },
         })
       ).agency
-      console.log('current agency ' + currentAgency.id)
-      console.log(currentAgency)
-      console.log(
-        'current agency organization id ' + currentAgency.organizationId
-      )
-      console.log('input agency ' + input.agencyId)
 
       if (input.agencyId === currentAgency.id) {
         return
