@@ -277,13 +277,13 @@ variable "website_feature_flags" {
 
 variable "website_config_params" {
   description = "Configurations for the  website that are not feature-specific."
-  type = any
-  default = {}
-    validation {
+  type        = any
+  default     = {}
+  validation {
     condition     = can(lookup(var.website_config_params, uuid(), "default"))
     error_message = "Value must be an object."
   }
-    validation {
+  validation {
     condition     = can(jsonencode(var.website_config_params))
     error_message = "Value must be JSON-serializable."
   }
