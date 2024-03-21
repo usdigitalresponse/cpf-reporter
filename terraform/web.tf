@@ -134,8 +134,9 @@ locals {
   website_content_origin_path = "dist"
   website_config_origin_path  = "config"
   website_config_object_key   = "${local.website_config_origin_path}/deploy-config.js"
-  website_config_object_contents = templatefile("${path.module}/tpl/deploy-config.js.tftpl", {
-    feature_flags = jsonencode(var.website_feature_flags),
+  website_config_object_contents = templatefile("${path.module}/tpl/deploy-config.js", {
+    feature_flags     = jsonencode(var.website_feature_flags),
+    web_config_params = jsonencode(var.website_config_params),
   })
   website_origin_artifacts_dist_path = coalesce(
     var.website_origin_artifacts_dist_path,

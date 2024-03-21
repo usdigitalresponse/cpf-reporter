@@ -32,6 +32,10 @@ lambda_arch      = "x86_64"
 // Website
 website_domain_name   = "staging.cpf.usdr.dev"
 website_feature_flags = {}
+website_config_params = {
+  passage_app_id = "TBD"
+  auth_provider  = "TBD"
+}
 
 // API
 api_domain_name = "api.staging.cpf.usdr.dev"

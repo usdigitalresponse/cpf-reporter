@@ -1,5 +1,6 @@
 window.APP_CONFIG = window.APP_CONFIG || {};
 window.APP_CONFIG.featureFlags = ${feature_flags};
+window.APP_CONFIG.webConfigParams = ${web_config_params};
 
 window.APP_CONFIG.overrideFeatureFlag = (flagName, overrideValue) => {
   const storageKey = 'featureFlags';
