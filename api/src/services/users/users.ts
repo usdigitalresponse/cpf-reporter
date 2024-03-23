@@ -84,10 +84,7 @@ export const createUser: MutationResolvers['createUser'] = async ({
       where: { id: agencyId },
       select: { organizationId: true },
     })
-    const loggedInUserAgency = await db.agency.findUniqueOrThrow({
-      where: { id: currentUser.agencyId as number },
-      select: { organizationId: true },
-    })
+    const loggedInUserAgency = currentUser.agency as Agency
 
     if (newUserAgency.organizationId !== loggedInUserAgency.organizationId) {
       throw new AuthenticationError("You don't have permission to do that")

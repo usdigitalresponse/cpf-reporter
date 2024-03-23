@@ -38,18 +38,30 @@ export const getCurrentUser = async (
   // Verify that the request is coming from the local development environment
   // and is only being processed within the local environment
   if (process.env.AUTH_PROVIDER === 'local') {
-    const user = await db.user.findFirst({
+    const user: RedwoodUser = await db.user.findFirst({
       where: { email: token },
+      include: { agency: true },
     })
+    // Redwood <PrivateSet> and hasRole checks require the roles to be an array
+    user.roles = [`${user.role}`]
     return user
   }
 
   return {
-    id: 1,
-    organizationId: 1, // TODO: Organization id should be determined via the agency relationship
-    agencyId: 1,
-    email: 'email@example.com',
+    email: 'usdr-admin@usdr.dev',
+    name: 'USDR Admin',
+    role: 'USDR_ADMIN',
     roles: ['USDR_ADMIN'],
+    agency: {
+      name: 'Main Agency',
+      abbreviation: 'MAUSDR',
+      code: 'MAUSDR',
+      organizationId: 1,
+    },
+    agencyId: 1, // TO_DEPRECATE
+    organizationId: 1, // TO_DEPRECATE
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   }
 }
 
@@ -80,7 +92,7 @@ export const hasRole = (roles: AllowedRoles): boolean => {
   if (!isAuthenticated()) {
     return false
   }
-  const currentUserRoles = context.currentUser?.role
+  const currentUserRoles = context.currentUser?.roles
 
   if (typeof roles === 'string') {
     if (typeof currentUserRoles === 'string') {
