@@ -5,14 +5,127 @@ import type {
   Agency,
 } from 'types/graphql'
 
-import { validate, validateWith, validateUniqueness } from '@redwoodjs/api'
+import {
+  validate,
+  validateWith,
+  validateUniqueness,
+  validateWithSync,
+} from '@redwoodjs/api'
 import { AuthenticationError } from '@redwoodjs/graphql-server'
 
 import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
+import { logger } from 'src/lib/logger'
 
 export const currentUserIsUSDRAdmin = (): boolean => {
   return context.currentUser?.roles?.includes(ROLES.USDR_ADMIN)
+}
+
+/***
+ * Validations for create and update actions that are based on user input (e.g. field presence, email validation, etc)
+ */
+export const runGeneralCreateOrUpdateValidations = async (input) => {
+  const { email, name, role, agencyId } = input
+
+  validate(email, {
+    email: { message: 'Please provide a valid email address' },
+  })
+
+  validate(name, {
+    presence: { allowEmptyString: false, message: 'Please provide a name' },
+  })
+
+  validate(role, {
+    presence: { allowEmptyString: false, message: 'Please provide a role' },
+    inclusion: {
+      in: Object.values(ROLES),
+      message: 'Please select a recognized role',
+    },
+  })
+
+  await validateWith(async () => {
+    await db.agency.findUniqueOrThrow({
+      where: { id: agencyId },
+      select: { organizationId: true },
+    })
+  })
+}
+
+/**
+ *
+ * @param input Validations for create and update actions that are based on user permissions (eg logged in user role, agency, etc.)
+ */
+export const runPermissionsCreateOrUpdateValidations = async (input) => {
+  // If current user is a USDR admin, we don't care about any other permissions checks
+  if (currentUserIsUSDRAdmin()) {
+    return
+  }
+
+  const { agencyId, role } = input
+  const { currentUser } = context
+
+  validateWithSync(() => {
+    if (!currentUser?.roles?.includes(ROLES.ORGANIZATION_ADMIN))
+      throw new AuthenticationError("You don't have permission to do that")
+  })
+
+  validate(role, {
+    exclusion: {
+      in: [ROLES.USDR_ADMIN],
+      message: "You don't have permission to update that role",
+    },
+  })
+
+  // User can only create or update a user in the same organization
+  await validateWith(async () => {
+    const targetUserOrgId = (
+      await db.agency.findUniqueOrThrow({
+        where: { id: agencyId },
+        select: { organizationId: true },
+      })
+    ).organizationId
+    if (targetUserOrgId !== (currentUser.agency as Agency)?.organizationId) {
+      throw new AuthenticationError("You don't have permission to do that")
+    }
+  })
+}
+
+/**
+ * Validations specific to updating a user
+ */
+export const runUpdateSpecificValidations = async (input, id) => {
+  // If not USDR admin, changes to agencyId are only allowed if the new agency ID is in the same organization
+  // as the user's current agency (e.g., you can't swap a user between organizations)
+  await validateWith(async () => {
+    if (!currentUserIsUSDRAdmin()) {
+      const currentAgency = (
+        await db.user.findUniqueOrThrow({
+          where: { id },
+          select: {
+            agency: {
+              select: { id: true, organizationId: true },
+            },
+          },
+        })
+      ).agency
+
+      if (input.agencyId === currentAgency.id) {
+        return
+      }
+
+      try {
+        await db.agency.findUniqueOrThrow({
+          where: {
+            id: input.agencyId,
+            organizationId: currentAgency.organizationId,
+          },
+        })
+      } catch (err) {
+        logger.error({ err }, 'change to user.agencyId is not allowed')
+        throw new Error('agencyId is invalid or unavailable to this user')
+      }
+    }
+  })
 }
 
 export const users: QueryResolvers['users'] = () => {
@@ -64,32 +177,10 @@ export const user: QueryResolvers['user'] = ({ id }) => {
 export const createUser: MutationResolvers['createUser'] = async ({
   input,
 }) => {
-  const { email, name, agencyId } = input
-  const { currentUser } = context
+  const { email } = input
 
-  validate(email, {
-    email: { message: 'Please provide a valid email address' },
-  })
-
-  validate(name, {
-    presence: { allowEmptyString: false, message: 'Please provide a name' },
-  })
-
-  validateWith(async () => {
-    if (currentUserIsUSDRAdmin()) {
-      return true
-    }
-
-    const newUserAgency = await db.agency.findUniqueOrThrow({
-      where: { id: agencyId },
-      select: { organizationId: true },
-    })
-    const loggedInUserAgency = currentUser.agency as Agency
-
-    if (newUserAgency.organizationId !== loggedInUserAgency.organizationId) {
-      throw new AuthenticationError("You don't have permission to do that")
-    }
-  })
+  await runGeneralCreateOrUpdateValidations(input)
+  await runPermissionsCreateOrUpdateValidations(input)
 
   return validateUniqueness(
     'user',
@@ -99,7 +190,14 @@ export const createUser: MutationResolvers['createUser'] = async ({
   )
 }
 
-export const updateUser: MutationResolvers['updateUser'] = ({ id, input }) => {
+export const updateUser: MutationResolvers['updateUser'] = async ({
+  id,
+  input,
+}) => {
+  await runGeneralCreateOrUpdateValidations(input)
+  await runPermissionsCreateOrUpdateValidations(input)
+  await runUpdateSpecificValidations(input, id)
+
   return db.user.update({
     data: input,
     where: { id },

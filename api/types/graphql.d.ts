@@ -695,6 +695,7 @@ export type UpdateUploadValidationInput = {
 export type UpdateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   email?: InputMaybe<Scalars['String']>;
+  isActive?: InputMaybe<Scalars['Boolean']>;
   name?: InputMaybe<Scalars['String']>;
   role?: InputMaybe<RoleEnum>;
 };

@@ -37,6 +37,7 @@ export const schema = gql`
     name: String
     agencyId: Int
     role: RoleEnum
+    isActive: Boolean
   }
 
   type Mutation {

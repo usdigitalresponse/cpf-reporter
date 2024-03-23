@@ -1,5 +1,9 @@
 import type { User } from '@prisma/client'
 
+import { EmailValidationError } from '@redwoodjs/api'
+
+import { ROLES } from 'src/lib/constants'
+
 import {
   users,
   user,
@@ -8,6 +12,9 @@ import {
   deleteUser,
   currentUserIsUSDRAdmin,
   usersByOrganization,
+  runGeneralCreateOrUpdateValidations,
+  runPermissionsCreateOrUpdateValidations,
+  runUpdateSpecificValidations,
 } from './users'
 import type { StandardScenario } from './users.scenarios'
 
@@ -17,7 +24,7 @@ import type { StandardScenario } from './users.scenarios'
 //       https://redwoodjs.com/docs/testing#testing-services
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
-describe('users', () => {
+describe('user queries', () => {
   scenario(
     'users query returns all users for USDR admin',
     async (scenario: StandardScenario) => {
@@ -92,52 +99,6 @@ describe('users', () => {
     }
   )
 
-  scenario('creates a user', async (scenario: StandardScenario) => {
-    mockCurrentUser({
-      id: scenario.user.one.id,
-      email: scenario.user.one.email,
-      roles: ['USDR_ADMIN'],
-    })
-
-    const result = await createUser({
-      input: {
-        email: 'uniqueemail2@test.com',
-        name: 'String',
-        agencyId: scenario.agency.one.id,
-        role: 'USDR_ADMIN',
-      },
-    })
-
-    expect(result.email).toEqual('uniqueemail2@test.com')
-  })
-
-  scenario('updates a user', async (scenario: StandardScenario) => {
-    mockCurrentUser({
-      id: scenario.user.one.id,
-      email: scenario.user.one.email,
-      roles: ['USDR_ADMIN'],
-    })
-    const original = (await user({ id: scenario.user.one.id })) as User
-    const result = await updateUser({
-      id: original.id,
-      input: { email: 'String2' },
-    })
-
-    expect(result.email).toEqual('String2')
-  })
-
-  scenario('deletes a user', async (scenario: StandardScenario) => {
-    mockCurrentUser({
-      id: scenario.user.one.id,
-      email: scenario.user.one.email,
-      roles: ['USDR_ADMIN'],
-    })
-    const original = (await deleteUser({ id: scenario.user.one.id })) as User
-    const result = await user({ id: original.id })
-
-    expect(result).toEqual(null)
-  })
-
   scenario(
     'users by organization, usdr admin',
     async (scenario: StandardScenario) => {
@@ -187,7 +148,267 @@ describe('users', () => {
       expect(result.length).toBe(0)
     }
   )
+})
 
+describe('user writes', () => {
+  scenario('creates a user', async (scenario: StandardScenario) => {
+    mockCurrentUser({
+      id: scenario.user.one.id,
+      email: scenario.user.one.email,
+      roles: ['USDR_ADMIN'],
+    })
+
+    const result = await createUser({
+      input: {
+        email: 'uniqueemail2@test.com',
+        name: 'String',
+        agencyId: scenario.agency.one.id,
+        role: 'USDR_ADMIN',
+      },
+    })
+
+    expect(result.email).toEqual('uniqueemail2@test.com')
+  })
+
+  scenario('updates a user', async (scenario: StandardScenario) => {
+    mockCurrentUser({
+      id: scenario.user.one.id,
+      email: scenario.user.one.email,
+      roles: ['USDR_ADMIN'],
+    })
+    const email = 'String2@gmail.com'
+    const name = 'FDR'
+    const role = 'ORGANIZATION_STAFF'
+    const original = (await user({ id: scenario.user.one.id })) as User
+    const result = await updateUser({
+      id: original.id,
+      input: { email, name, role, agencyId: scenario.agency.one.id },
+    })
+
+    expect(result.email).toEqual(email)
+    expect(result.name).toEqual(name)
+    expect(result.role).toEqual(ROLES.ORGANIZATION_STAFF)
+    expect(result.agencyId).toEqual(scenario.agency.one.id)
+  })
+
+  scenario('deletes a user', async (scenario: StandardScenario) => {
+    mockCurrentUser({
+      id: scenario.user.one.id,
+      email: scenario.user.one.email,
+      roles: ['USDR_ADMIN'],
+    })
+    const original = (await deleteUser({
+      id: scenario.user.one.id,
+    })) as User
+    const result = await user({ id: original.id })
+
+    expect(result).toEqual(null)
+  })
+})
+
+describe('general write validations', () => {
+  scenario('general validations, fails on invalid email', async () => {
+    expect(
+      async () =>
+        await runGeneralCreateOrUpdateValidations({
+          email: 'iamnotarealemail',
+        })
+    ).rejects.toThrow(EmailValidationError)
+  })
+
+  scenario('general validations, fails on missing name', async () => {
+    expect(
+      async () =>
+        await runGeneralCreateOrUpdateValidations({
+          email: 'iamreal@gmail.com',
+        })
+    ).rejects.toThrow('Please provide a name')
+  })
+
+  scenario('general validations, fails on missing role', async () => {
+    expect(
+      async () =>
+        await runGeneralCreateOrUpdateValidations({
+          email: 'iamreal@gmail.com',
+          name: 'FDR',
+        })
+    ).rejects.toThrow('Please provide a role')
+  })
+
+  scenario(
+    'permissions validations, USDR admin should throw no exceptions',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.user.one.id,
+        email: scenario.user.one.email,
+        roles: ['USDR_ADMIN'],
+      })
+      expect(
+        async () => await runPermissionsCreateOrUpdateValidations({})
+      ).not.toThrowError()
+    }
+  )
+
+  scenario(
+    'permissions validations, user w/o admin privileges should throw auth error',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.user.one.id,
+        email: scenario.user.one.email,
+        roles: ['ORGANIZATION_STAFF'],
+      })
+      expect(
+        async () => await runPermissionsCreateOrUpdateValidations({})
+      ).rejects.toThrow("You don't have permission to do that")
+    }
+  )
+
+  scenario('general validations, fails on bad role', async () => {
+    expect(
+      async () =>
+        await runGeneralCreateOrUpdateValidations({
+          email: 'iamreal@gmail.com',
+          name: 'FDR',
+          role: 'FAKE_ROLE',
+        })
+    ).rejects.toThrow('Please select a recognized role')
+  })
+
+  scenario('general validations, fails on bad agency id', async () => {
+    expect(
+      async () =>
+        await runGeneralCreateOrUpdateValidations({
+          email: 'iamreal@gmail.com',
+          name: 'FDR',
+          role: 'ORGANIZATION_STAFF',
+          agencyId: 4598,
+        })
+    ).rejects.toThrowError('No Agency found')
+  })
+})
+
+describe('permissions write validations', () => {
+  scenario(
+    'permissions validations, organization admin cannot update a USDR admin',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.user.one.id,
+        email: scenario.user.one.email,
+        roles: ['ORGANIZATION_ADMIN'],
+      })
+      expect(
+        async () =>
+          await runPermissionsCreateOrUpdateValidations({
+            role: ROLES.USDR_ADMIN,
+          })
+      ).rejects.toThrow("You don't have permission to update that role")
+    }
+  )
+
+  scenario(
+    'permissions validations, organization admin cannot update a user in a different organization',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.user.one.id,
+        email: scenario.user.one.email,
+        roles: ['ORGANIZATION_ADMIN'],
+        agency: scenario.agency.one,
+      })
+      expect(
+        async () =>
+          await runPermissionsCreateOrUpdateValidations({
+            role: ROLES.ORGANIZATION_STAFF,
+            agencyId: scenario.agency.three.id,
+          })
+      ).rejects.toThrow("You don't have permission to do that")
+    }
+  )
+
+  scenario(
+    'permissions validations, passes when expected',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.user.two.id,
+        email: scenario.user.two.email,
+        roles: ['ORGANIZATION_ADMIN'],
+      })
+      expect(
+        async () =>
+          await runPermissionsCreateOrUpdateValidations({
+            role: ROLES.ORGANIZATION_STAFF,
+            agencyId: scenario.agency.one.id,
+          })
+      ).rejects.toThrow("You don't have permission to do that")
+    }
+  )
+})
+
+describe('update specific validations', () => {
+  scenario(
+    'update specific validations, passes when USDR admin',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.user.two.id,
+        email: scenario.user.two.email,
+        roles: ['USDR_ADMIN'],
+      })
+      await expect(
+        async () =>
+          await runUpdateSpecificValidations(
+            {
+              role: ROLES.ORGANIZATION_STAFF,
+              agencyId: scenario.agency.one.id,
+            },
+            scenario.user.one.id
+          )
+      ).not.toThrowError()
+    }
+  )
+
+  scenario(
+    'update specific validations, passes when agency is the same',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.user.two.id,
+        email: scenario.user.two.email,
+        roles: ['ORGANIZATION_ADMIN'],
+      })
+      await expect(
+        async () =>
+          await runUpdateSpecificValidations(
+            {
+              role: ROLES.ORGANIZATION_STAFF,
+              agencyId: scenario.agency.one.id,
+            },
+            scenario.user.three.id
+          )
+      ).not.toThrowError()
+    }
+  )
+
+  scenario(
+    'update specific validations, fails when agency is the different',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: scenario.user.two.id,
+        email: scenario.user.two.email,
+        roles: ['ORGANIZATION_ADMIN'],
+      })
+      await expect(
+        async () =>
+          await runUpdateSpecificValidations(
+            {
+              role: ROLES.ORGANIZATION_STAFF,
+              agencyId: scenario.agency.one.id,
+            },
+            scenario.user.four.id
+          )
+      ).rejects.toThrow('agencyId is invalid or unavailable to this user')
+    }
+  )
+})
+
+describe('identifies user role', () => {
   scenario(
     'identifies current user as USDR admin',
     async (scenario: StandardScenario) => {
