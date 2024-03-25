@@ -16,7 +16,7 @@ def map_values_to_headers(headers, values):
     return dict(zip(headers, values))
 
 
-def is_empty_row(row_values: typing.Iterable[typing.Any]):
+def is_empty_row(row_values):
     return all(value in (None, "") for value in row_values)
 
 
