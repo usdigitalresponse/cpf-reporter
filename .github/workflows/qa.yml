@@ -11,10 +11,16 @@ on:
         value: ${{ jobs.test-api.result }}
       api-test-coverage-markdown-report:
         value: ${{ jobs.test-api.outputs.coverage-markdown-report }}
+      python-test-outcome:
+        value: ${{ jobs.test-python.result }}
+      python-test-coverage-markdown-report:
+        value: ${{ jobs.test-python.outputs.coverage-markdown-report }}
       web-test-outcome:
         value: ${{ jobs.test-client.result }}
       web-test-coverage-markdown-report:
         value: ${{ jobs.test-client.outputs.coverage-markdown-report }}
+      black-outcome:
+        value: ${{ jobs.black.result }}
       eslint-outcome:
         value: ${{ jobs.eslint.result }}
       tflint-outcome:
@@ -148,6 +154,8 @@ jobs:
     defaults:
       run:
         working-directory: python
+    outputs:
+      coverage-markdown-report: ${{ steps.coverage-markdown.outputs.stdout }}
     steps:
       - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
         with:
@@ -168,6 +176,9 @@ jobs:
         run: poetry install
       - name: Run tests
         run: poetry run pytest
+      - name: Generate coverage markdown report
+        id: coverage-markdown
+        run: poetry run coverage report --format markdown
 
   black:
     name: Lint python code

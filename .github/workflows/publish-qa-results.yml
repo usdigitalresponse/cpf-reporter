@@ -9,10 +9,19 @@ on:
       api-test-coverage-markdown-report:
         type: string
         required: true
+      python-test-outcome:
+        type: string
+        required: true
+      python-test-coverage-markdown-report:
+        type: string
+        required: true
       web-test-outcome:
         type: string
         required: true
       web-test-coverage-markdown-report:
+        type: string
+        required: true
+      black-outcome:
         type: string
         required: true
       eslint-outcome:
@@ -60,6 +69,8 @@ jobs:
           |:----------------|:-------:|
           | 🌐 Web Tests | ${{ (env.WEB_TEST_OUTCOME == 'success' && '✅') || (env.WEB_TEST_OUTCOME == 'skipped' && '➖') || '❌' }} |
           | 🔗 API Tests | ${{ (env.API_TEST_OUTCOME == 'success' && '✅') || (env.API_TEST_OUTCOME == 'skipped' && '➖') || '❌' }} |
+          | 🐍 Python Tests | ${{ (env.PYTHON_TEST_OUTCOME == 'success' && '✅') || (env.PYTHON_TEST_OUTCOME == 'skipped' && '➖') || '❌' }} |
+          | 🧼 Black     | ${{ (env.BLACK_OUTCOME == 'success' && '✅')  || (env.BLACK_OUTCOME == 'skipped' && '➖') || '❌' }} |
           | 📏 ESLint    | ${{ (env.ESLINT_OUTCOME == 'success' && '✅') || (env.ESLINT_OUTCOME == 'skipped' && '➖') || '❌' }} |
           | 🧹 TFLint    | ${{ (env.TFLINT_OUTCOME == 'success' && '✅') || (env.TFLINT_OUTCOME == 'skipped' && '➖') || '❌' }} |
 
@@ -78,6 +89,13 @@ jobs:
 
           </details>
 
+          <details>
+          <summary>Coverage report for <code>python</code> suite</summary>
+
+          ${{ env.PYTHON_COVERAGE_REPORT }}
+
+          </details>
+
           *Pusher: @${{ env.GH_ACTOR }}, Action: `${{ env.GH_ACTION }}`, Workflow: [`${{ env.GH_WORKFLOW }}`](${{ env.GH_SERVER}}/${{ env.GH_REPO }}/actions/runs/${{ env.GH_RUN_ID }})*
           ENDOFREPORT
         env:
@@ -85,6 +103,9 @@ jobs:
           API_COVERAGE_REPORT: ${{ inputs.api-test-coverage-markdown-report }}
           WEB_TEST_OUTCOME: ${{ inputs.web-test-outcome }}
           WEB_COVERAGE_REPORT: ${{ inputs.web-test-coverage-markdown-report }}
+          PYTHON_TEST_OUTCOME: ${{ inputs.python-test-outcome }}
+          PYTHON_COVERAGE_REPORT: ${{ inputs.python-test-coverage-markdown-report }}
+          BLACK_OUTCOME: ${{ inputs.black-outcome }}
           ESLINT_OUTCOME: ${{ inputs.eslint-outcome }}
           TFLINT_OUTCOME: ${{ inputs.tflint-outcome }}
           GH_ACTOR: ${{ github.actor }}

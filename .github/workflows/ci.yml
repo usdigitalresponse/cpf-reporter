@@ -27,8 +27,11 @@ jobs:
     with:
       api-test-outcome: ${{ needs.qa.outputs.api-test-outcome }}
       api-test-coverage-markdown-report: ${{ needs.qa.outputs.api-test-coverage-markdown-report }}
+      python-test-outcome: ${{ needs.qa.outputs.python-test-outcome }}
+      python-test-coverage-markdown-report: ${{ needs.qa.outputs.python-test-coverage-markdown-report }}
       web-test-outcome: ${{ needs.qa.outputs.web-test-outcome }}
       web-test-coverage-markdown-report: ${{ needs.qa.outputs.web-test-coverage-markdown-report }}
+      black-outcome: ${{ needs.qa.outputs.black-outcome }}
       eslint-outcome: ${{ needs.qa.outputs.eslint-outcome }}
       tflint-outcome: ${{ needs.qa.outputs.tflint-outcome }}
       pr-number: ${{ github.event.pull_request.number }}
