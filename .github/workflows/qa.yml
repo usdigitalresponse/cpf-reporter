@@ -142,6 +142,33 @@ jobs:
           textReportPath: 'coverage/coverage.txt'
           srcBasePath: 'web/src'
 
+  test-python:
+    name: Test python code
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          disable-sudo: true
+          egress-policy: audit
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          ref: ${{ inputs.ref }}
+          show-progress: 'false'
+          persist-credentials: 'false'
+      - name: Install poetry
+        run: pipx install poetry
+      - uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
+        with:
+          python-version-file: 'python/pyproject.toml'
+          cache: poetry
+      - name: Install dependencies
+        run: poetry install
+      - name: Run tests
+        run: poetry run pytest
+
   eslint:
     name: Lint JavaScript
     runs-on: ubuntu-latest
@@ -205,3 +232,12 @@ jobs:
       - name: Run TFLint
         working-directory: terraform
         run: tflint --format compact --recursive --minimum-failure-severity=error
+
+  black:
+    name: Lint python code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: psf/black@552baf822992936134cbd31a38f69c8cfe7c0f05 # v24.3.0
+        with:
+          src: python
