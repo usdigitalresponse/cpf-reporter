@@ -246,4 +246,4 @@ jobs:
           summary: false
       - uses: reviewdog/action-black@8f4e0f9987e1a7cc47bad1a041a0815ea9fc47d9 # v3.13.0
         with:
-          black_args: "python"
+          workdir: "python"
