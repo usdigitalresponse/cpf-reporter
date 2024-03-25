@@ -241,3 +241,6 @@ jobs:
       - uses: psf/black@552baf822992936134cbd31a38f69c8cfe7c0f05 # v24.3.0
         with:
           src: python
+          options: "--check --diff"
+          summary: false
+      - uses: reviewdog/action-suggester@3d7fde6859623ad6174df5fd662677a0eb63310a # v1.11.0
