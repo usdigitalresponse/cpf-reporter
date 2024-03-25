@@ -169,6 +169,22 @@ jobs:
       - name: Run tests
         run: poetry run pytest
 
+  black:
+    name: Lint python code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          ref: ${{ inputs.ref }}
+          show-progress: 'false'
+          persist-credentials: 'false'
+      - uses: psf/black@552baf822992936134cbd31a38f69c8cfe7c0f05 # v24.3.0
+        continue-on-error: true
+        with:
+          src: python
+          options: "--check --diff"
+          summary: false
+
   eslint:
     name: Lint JavaScript
     runs-on: ubuntu-latest
@@ -232,18 +248,3 @@ jobs:
       - name: Run TFLint
         working-directory: terraform
         run: tflint --format compact --recursive --minimum-failure-severity=error
-
-  black:
-    name: Lint python code
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: psf/black@552baf822992936134cbd31a38f69c8cfe7c0f05 # v24.3.0
-        continue-on-error: true
-        with:
-          src: python
-          options: "--version"
-          summary: false
-      - uses: reviewdog/action-black@8f4e0f9987e1a7cc47bad1a041a0815ea9fc47d9 # v3.13.0
-        with:
-          workdir: "python"
