@@ -147,5 +147,9 @@ terraform/.terraform
 
 localstack/volume/
 
-# Python
+# Python cache
 __pycache__/
+
+# Python test and coverage output
+python/.coverage
+python/htmlcov/
