@@ -1,10 +1,14 @@
+import typing
+
 from openpyxl import load_workbook
+from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import ValidationError
+
 from src.schemas.latest.schema import (
-    CoverSheetRow,
     SCHEMA_BY_PROJECT,
-    SubrecipientRow,
+    CoverSheetRow,
     LogicSheetVersion,
+    SubrecipientRow,
 )
 
 
@@ -12,11 +16,11 @@ def map_values_to_headers(headers, values):
     return dict(zip(headers, values))
 
 
-def is_empty_row(row_values):
+def is_empty_row(row_values: typing.Iterable[typing.Any]):
     return all(value in (None, "") for value in row_values)
 
 
-def get_headers(sheet, cell_range: str) -> tuple:
+def get_headers(sheet: Worksheet, cell_range: str) -> tuple:
     return tuple(header_cell.value for header_cell in sheet[cell_range][0])
 
 
