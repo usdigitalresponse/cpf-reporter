@@ -242,9 +242,6 @@ jobs:
         continue-on-error: true
         with:
           src: python
-          options: "--verbose"
+          options: "--version"
           summary: false
-      - uses: reviewdog/action-suggester@3d7fde6859623ad6174df5fd662677a0eb63310a # v1.11.0
-        with:
-          reviewdog_flags: "-reporter github-pr-check"
-          tool_name: blackfmt
+      - uses: reviewdog/action-black@8f4e0f9987e1a7cc47bad1a041a0815ea9fc47d9 # v3.13.0
