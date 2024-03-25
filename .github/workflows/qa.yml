@@ -245,3 +245,6 @@ jobs:
           options: "--check --diff"
           summary: false
       - uses: reviewdog/action-suggester@3d7fde6859623ad6174df5fd662677a0eb63310a # v1.11.0
+        with:
+          # reviewdog_flags: "-reporter github-pr-check"
+          tool_name: blackfmt
