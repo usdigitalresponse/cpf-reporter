@@ -6,6 +6,7 @@ import {
   createUpload,
   updateUpload,
   deleteUpload,
+  Upload as UploadRelationResolver,
 } from './uploads'
 import type { StandardScenario } from './uploads.scenarios'
 
@@ -67,17 +68,55 @@ describe('uploads', () => {
     expect(result).toEqual(null)
   })
 
-  // WIP
-  // scenario(
-  //   'returns the latest validation for an upload',
-  //   async (scenario: StandardScenario) => {
-  //     const uploadId = scenario.upload.one.id
-  //     const uploadResult = await upload({ id: uploadId })
+  scenario(
+    'returns the latest validation for an upload when there are multiple validations',
+    async (scenario: StandardScenario) => {
+      const uploadIdOne = scenario.upload.one.id
+      const latestValidationOfScenarioOne =
+        await UploadRelationResolver.latestValidation(
+          {},
+          {
+            root: {
+              id: uploadIdOne,
+              agencyId: scenario.upload.one.agencyId,
+              createdAt: scenario.upload.one.createdAt,
+              filename: scenario.upload.one.filename,
+              organizationId: scenario.upload.one.agencyId,
+              reportingPeriodId: scenario.upload.one.reportingPeriodId,
+              updatedAt: scenario.upload.one.updatedAt,
+              uploadedById: scenario.upload.one.uploadedById,
+            },
+            context: undefined,
+            info: undefined,
+          }
+        )
 
-  //     // Access the latestValidation field directly on the uploadResult
-  //     const latestValidation = uploadResult.latestValidation
+      const uploadIdTwo = scenario.upload.two.id
+      const latestValidationOfScenarioTwo =
+        await UploadRelationResolver.latestValidation(
+          {},
+          {
+            root: {
+              id: uploadIdTwo,
+              agencyId: scenario.upload.two.agencyId,
+              createdAt: scenario.upload.two.createdAt,
+              filename: scenario.upload.two.filename,
+              organizationId: scenario.upload.two.agencyId,
+              reportingPeriodId: scenario.upload.two.reportingPeriodId,
+              updatedAt: scenario.upload.two.updatedAt,
+              uploadedById: scenario.upload.two.uploadedById,
+            },
+            context: undefined,
+            info: undefined,
+          }
+        )
 
-  //     // expect(latestValidation.createdAt).toEqual(new Date('2024-01-27T10:30:00.000Z'));
-  //   }
-  // )
+      expect(latestValidationOfScenarioOne?.createdAt).toEqual(
+        new Date('2024-01-27T10:32:00.000Z')
+      )
+      expect(latestValidationOfScenarioTwo?.createdAt).toEqual(
+        new Date('2024-01-29T18:13:25.000Z')
+      )
+    }
+  )
 })
