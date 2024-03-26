@@ -31,8 +31,8 @@ jobs:
       python-test-coverage-markdown-report: ${{ needs.qa.outputs.python-test-coverage-markdown-report }}
       web-test-outcome: ${{ needs.qa.outputs.web-test-outcome }}
       web-test-coverage-markdown-report: ${{ needs.qa.outputs.web-test-coverage-markdown-report }}
-      black-outcome: ${{ needs.qa.outputs.black-outcome }}
       eslint-outcome: ${{ needs.qa.outputs.eslint-outcome }}
+      ruff-outcome: ${{ needs.qa.outputs.ruff-outcome }}
       tflint-outcome: ${{ needs.qa.outputs.tflint-outcome }}
       pr-number: ${{ github.event.pull_request.number }}
       write-summary: true

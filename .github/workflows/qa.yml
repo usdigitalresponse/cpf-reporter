@@ -19,10 +19,10 @@ on:
         value: ${{ jobs.test-client.result }}
       web-test-coverage-markdown-report:
         value: ${{ jobs.test-client.outputs.coverage-markdown-report }}
-      black-outcome:
-        value: ${{ jobs.black.result }}
       eslint-outcome:
         value: ${{ jobs.eslint.result }}
+      ruff-outcome:
+        value: ${{ jobs.ruff.result }}
       tflint-outcome:
         value: ${{ jobs.tflint.result }}
 
@@ -180,22 +180,6 @@ jobs:
         id: coverage-markdown
         run: poetry run coverage report --format markdown
 
-  black:
-    name: Lint python code
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-        with:
-          ref: ${{ inputs.ref }}
-          show-progress: 'false'
-          persist-credentials: 'false'
-      - uses: psf/black@552baf822992936134cbd31a38f69c8cfe7c0f05 # v24.3.0
-        continue-on-error: true
-        with:
-          src: python
-          options: "--check --diff"
-          summary: false
-
   eslint:
     name: Lint JavaScript
     runs-on: ubuntu-latest
@@ -225,6 +209,24 @@ jobs:
       - name: Run linter for web side
         if: ${{ !cancelled() }}
         run: yarn eslint web/src
+
+  ruff:
+    name: Lint python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          disable-sudo: true
+          egress-policy: audit
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          ref: ${{ inputs.ref }}
+          show-progress: 'false'
+          persist-credentials: 'false'
+      - uses: chartboost/ruff-action@e18ae971ccee1b2d7bbef113930f00c670b78da4 # v1
+        continue-on-error: true
+        with:
+          src: python
 
   tflint:
     name: Lint terraform
