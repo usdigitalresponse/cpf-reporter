@@ -51,7 +51,7 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
                   effectiveDate: '2024-01-26T00:00:00.000Z',
                 },
               },
-              createdAt: '2024-01-26T15:11:27.688Z',
+              createdAt: '2024-01-26T15:11:27.000Z',
             },
             {
               agency: { create: { name: 'String', code: 'String' } },
@@ -63,7 +63,7 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
                   effectiveDate: '2024-01-26T15:11:27.688Z',
                 },
               },
-              createdAt: '2024-01-26T15:11:27.688Z',
+              createdAt: '2024-01-27T10:32:00.000Z',
             },
           ],
         },

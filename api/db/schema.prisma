@@ -132,7 +132,7 @@ model Upload {
 model UploadValidation {
   id                  Int            @id @default(autoincrement())
   uploadId            Int
-  upload              Upload         @relation(fields: [uploadId], references: [id])
+  upload              Upload         @relation(fields: [uploadId], references: [id], onDelete: Cascade)
   agencyId            Int
   agency              Agency         @relation(fields: [agencyId], references: [id])
   organizationId      Int

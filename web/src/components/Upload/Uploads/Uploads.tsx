@@ -7,8 +7,6 @@ import TableBuilder from 'src/components/TableBuilder/TableBuilder'
 import { columnDefs } from './columns'
 
 const UploadsList = ({ uploads }: FindUploads) => {
-  console.log(uploads)
-
   const filterableInputs = [
     'agency_code',
     'expenditureCategory_code',

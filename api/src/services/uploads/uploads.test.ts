@@ -67,22 +67,17 @@ describe('uploads', () => {
     expect(result).toEqual(null)
   })
 
+  // WIP
   // scenario(
   //   'returns the latest validation for an upload',
   //   async (scenario: StandardScenario) => {
-  //     const uploadOne = await upload({ id: scenario.upload.one.id })
-  //     const latestValidationOne = await uploadOne.latestValidation
+  //     const uploadId = scenario.upload.one.id
+  //     const uploadResult = await upload({ id: uploadId })
 
-  //     expect(latestValidationOne.createdAt).toEqual(
-  //       new Date('2024-01-27T10:30:00.000Z')
-  //     )
+  //     // Access the latestValidation field directly on the uploadResult
+  //     const latestValidation = uploadResult.latestValidation
 
-  //     const uploadTwo = await upload({ id: scenario.upload.two.id })
-  //     const latestValidationTwo = await uploadTwo.latestValidation
-
-  //     expect(latestValidationTwo.createdAt).toEqual(
-  //       new Date('2024-01-28T08:45:00.000Z')
-  //     )
+  //     // expect(latestValidation.createdAt).toEqual(new Date('2024-01-27T10:30:00.000Z'));
   //   }
   // )
 })
