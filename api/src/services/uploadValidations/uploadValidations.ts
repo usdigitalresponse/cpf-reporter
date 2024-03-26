@@ -44,27 +44,9 @@ export const UploadValidation: UploadValidationRelationResolvers = {
   upload: (_obj, { root }) => {
     return db.uploadValidation.findUnique({ where: { id: root?.id } }).upload()
   },
-  agency: (_obj, { root }) => {
-    return db.uploadValidation.findUnique({ where: { id: root?.id } }).agency()
-  },
-  organization: (_obj, { root }) => {
+  initiatedBy: (_obj, { root }) => {
     return db.uploadValidation
       .findUnique({ where: { id: root?.id } })
-      .organization()
-  },
-  inputTemplate: (_obj, { root }) => {
-    return db.uploadValidation
-      .findUnique({ where: { id: root?.id } })
-      .inputTemplate()
-  },
-  validatedBy: (_obj, { root }) => {
-    return db.uploadValidation
-      .findUnique({ where: { id: root?.id } })
-      .validatedBy()
-  },
-  invalidatedBy: (_obj, { root }) => {
-    return db.uploadValidation
-      .findUnique({ where: { id: root?.id } })
-      .invalidatedBy()
+      .initiatedBy()
   },
 }
