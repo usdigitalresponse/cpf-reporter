@@ -520,6 +520,7 @@ jobs:
           POETRY_VIRTUALENVS_OPTIONS_NO_SETUPTOOLS: "true"
       - name: Clean Python bytecode
         run: find python/src $INSTALLED_PACKAGE_DIR | grep -E "(/__pycache__$|\.pyc$|\.pyo$)" | xargs rm -rf
+      - run: mkdir -p $ARTIFACTS_PATH
       - name: Zip third-party packages
         run: |
           pushd $INSTALLED_PACKAGE_DIR
