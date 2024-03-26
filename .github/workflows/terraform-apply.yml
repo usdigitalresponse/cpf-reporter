@@ -12,6 +12,12 @@ on:
       api-functions-artifacts-path:
         type: string
         required: true
+      python-functions-artifacts-key:
+        type: string
+        required: true
+      python-functions-artifacts-path:
+        type: string
+        required: true
       web-artifacts-key:
         type: string
         required: true
@@ -104,6 +110,11 @@ jobs:
         with:
           name: ${{ inputs.api-functions-artifacts-key }}
           path: ${{ inputs.api-functions-artifacts-path }}
+      - name: Download python functions artifacts
+        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
+        with:
+          name: ${{ inputs.python-functions-artifacts-key }}
+          path: ${{ inputs.python-functions-artifacts-path }}
       - name: Download website artifacts
         uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
         with:

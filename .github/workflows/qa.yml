@@ -173,7 +173,7 @@ jobs:
           python-version-file: 'python/pyproject.toml'
           cache: poetry
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-interaction --no-ansi
       - name: Run tests
         run: poetry run pytest
       - name: Generate coverage markdown report
