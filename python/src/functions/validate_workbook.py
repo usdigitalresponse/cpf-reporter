@@ -1,4 +1,5 @@
-from aws_lambda_typing import context as context_, events
+from aws_lambda_typing import context as context_
+from aws_lambda_typing import events
 from pydantic import ValidationError
 
 from src.lib.workbook_validator import validate
