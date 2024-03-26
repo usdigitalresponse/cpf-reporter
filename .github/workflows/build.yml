@@ -480,7 +480,7 @@ jobs:
 
   python-function-zips:
     name: Build Python Lambda function zip artifacts
-    if: inputs.build-p
+    if: inputs.build-python-functions
     runs-on: ubunt-latest
     permissions:
       contents: read
