@@ -481,7 +481,7 @@ jobs:
   python-function-zips:
     name: Build Python Lambda function zip artifacts
     if: inputs.build-python-functions
-    runs-on: ubunt-latest
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: none
