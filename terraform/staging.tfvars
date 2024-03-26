@@ -12,8 +12,9 @@ datadog_draft                         = true
 datadog_dashboards_enabled            = true
 datadog_monitors_enabled              = true
 datadog_monitor_notification_handles  = []
-datadog_lambda_extension_version      = "51"
-datadog_lambda_tracer_version         = "101"
+datadog_lambda_extension_version      = "55"
+datadog_lambda_js_tracer_version      = "108"
+datadog_lambda_py_tracer_version      = "91"
 datadog_default_environment_variables = { DD_CAPTURE_LAMBDA_PAYLOAD = "true" }
 // Only defined in staging:
 datadog_metrics_metadata = {}
@@ -25,9 +26,10 @@ postgres_apply_changes_immediately = true
 postgres_query_logging_enabled     = true
 
 // General Lambda options
-lambda_log_level = "debug"
-lambda_runtime   = "nodejs18.x"
-lambda_arch      = "x86_64"
+lambda_log_level  = "debug"
+lambda_js_runtime = "nodejs18.x"
+lambda_py_runtime = "python3.12"
+lambda_arch       = "x86_64"
 
 // Website
 website_domain_name   = "staging.cpf.usdr.dev"
