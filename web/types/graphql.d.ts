@@ -676,6 +676,7 @@ export type UpdateUploadValidationInput = {
 export type UpdateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   email?: InputMaybe<Scalars['String']>;
+  isActive?: InputMaybe<Scalars['Boolean']>;
   name?: InputMaybe<Scalars['String']>;
   role?: InputMaybe<RoleEnum>;
 };
@@ -689,6 +690,7 @@ export type Upload = {
   expenditureCategoryId?: Maybe<Scalars['Int']>;
   filename: Scalars['String'];
   id: Scalars['Int'];
+  latestValidation?: Maybe<UploadValidation>;
   notes?: Maybe<Scalars['String']>;
   organization: Organization;
   organizationId: Scalars['Int'];

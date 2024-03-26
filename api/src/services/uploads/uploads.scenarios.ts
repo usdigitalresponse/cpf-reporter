@@ -27,17 +27,45 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
               create: {
                 name: 'String',
                 version: 'String',
-                effectiveDate: '2024-01-26T15:11:27.688Z',
+                effectiveDate: '2024-01-26T00:00:00.000Z',
               },
             },
             outputTemplate: {
               create: {
                 name: 'String',
                 version: 'String',
-                effectiveDate: '2024-01-26T15:11:27.688Z',
+                effectiveDate: '2024-01-26T00:00:00.000Z',
               },
             },
           },
+        },
+        validations: {
+          create: [
+            {
+              agency: { create: { name: 'String', code: 'String' } },
+              organization: { create: { name: 'String' } },
+              inputTemplate: {
+                create: {
+                  name: 'String',
+                  version: 'String',
+                  effectiveDate: '2024-01-26T00:00:00.000Z',
+                },
+              },
+              createdAt: '2024-01-26T15:11:27.688Z',
+            },
+            {
+              agency: { create: { name: 'String', code: 'String' } },
+              organization: { create: { name: 'String' } },
+              inputTemplate: {
+                create: {
+                  name: 'String',
+                  version: 'String',
+                  effectiveDate: '2024-01-26T15:11:27.688Z',
+                },
+              },
+              createdAt: '2024-01-26T15:11:27.688Z',
+            },
+          ],
         },
       },
     },
@@ -75,6 +103,22 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
               },
             },
           },
+        },
+        validations: {
+          create: [
+            {
+              agency: { create: { name: 'String', code: 'String' } },
+              organization: { create: { name: 'String' } },
+              inputTemplate: {
+                create: {
+                  name: 'String',
+                  version: 'String',
+                  effectiveDate: '2023-12-07T18:17:24.389Z',
+                },
+              },
+              createdAt: '2024-01-26T15:11:27.688Z',
+            },
+          ],
         },
       },
     },

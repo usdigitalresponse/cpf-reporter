@@ -695,6 +695,7 @@ export type UpdateUploadValidationInput = {
 export type UpdateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   email?: InputMaybe<Scalars['String']>;
+  isActive?: InputMaybe<Scalars['Boolean']>;
   name?: InputMaybe<Scalars['String']>;
   role?: InputMaybe<RoleEnum>;
 };
@@ -708,6 +709,7 @@ export type Upload = {
   expenditureCategoryId?: Maybe<Scalars['Int']>;
   filename: Scalars['String'];
   id: Scalars['Int'];
+  latestValidation?: Maybe<UploadValidation>;
   notes?: Maybe<Scalars['String']>;
   organization: Organization;
   organizationId: Scalars['Int'];
@@ -1345,6 +1347,7 @@ export type UploadResolvers<ContextType = RedwoodGraphQLContext, ParentType exte
   expenditureCategoryId: OptArgsResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   filename: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  latestValidation: OptArgsResolverFn<Maybe<ResolversTypes['UploadValidation']>, ParentType, ContextType>;
   notes: OptArgsResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   organization: OptArgsResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
   organizationId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
@@ -1367,6 +1370,7 @@ export type UploadRelationResolvers<ContextType = RedwoodGraphQLContext, ParentT
   expenditureCategoryId?: RequiredResolverFn<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   filename?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
+  latestValidation?: RequiredResolverFn<Maybe<ResolversTypes['UploadValidation']>, ParentType, ContextType>;
   notes?: RequiredResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   organization?: RequiredResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
   organizationId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
