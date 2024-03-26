@@ -1,5 +1,3 @@
-import typing
-
 from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import ValidationError
@@ -29,13 +27,13 @@ TODO: Break this function apart into smaller chunks for easier testing
 """
 
 
-def validate():
+def validate(path_to_workbook):
     errors = []
     """
     1. Load workbook in read-only mode
     See: https://openpyxl.readthedocs.io/en/stable/optimized.html
     """
-    wb = load_workbook(filename="CPF Template Approved.xlsm", read_only=True)
+    wb = load_workbook(filename=path_to_workbook, read_only=True)
 
     """
     2. Validate logic sheet to make sure the sheet has an appropriate version

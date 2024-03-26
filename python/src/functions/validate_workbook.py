@@ -1,18 +1,24 @@
+from aws_lambda_typing import context as context_, events
 from pydantic import ValidationError
 
 from src.lib.workbook_validator import validate
 
 
-def handle(event, context):
+def handle(event: events.S3Event, context: context_):
     """Lambda handler for validating workbooks uploaded to S3
 
     Args:
-        event (dict): S3 Lambda event of type `s3:ObjectCreated:*`
-        context (any): Lambda context
+        event: S3 Lambda event of type `s3:ObjectCreated:*`
+        context: Lambda context
     """
-    # download the workbook from s3 to /tmp and pass it to the validate() function
-    results = validate()
-    # save results to s3
+    # Download workbook from s3 to a temporary file
+    workbook_path = download_workbook(
+        event["Records"][0]["s3"]["bucket"], event["Records"][0]["s3"]["object"]["key"]
+    )
+    # Validate contents of the downloaded workbook
+    results = validate(workbook_path)
+    # Save results to s3
+    save_validation_results(results)
 
 
 def download_workbook(bucket: str, key: str) -> str:
