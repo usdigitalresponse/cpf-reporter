@@ -130,7 +130,7 @@ model Upload {
 model UploadValidation {
   id                  Int            @id @default(autoincrement())
   uploadId            Int
-  upload              Upload         @relation(fields: [uploadId], references: [id])
+  upload              Upload         @relation(fields: [uploadId], references: [id], onDelete: Cascade)
   results             Json?         @db.JsonB
   passed              Boolean
   initiatedById       Int
