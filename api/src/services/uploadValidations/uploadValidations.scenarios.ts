@@ -124,7 +124,7 @@ export const standard = defineScenario<Prisma.UploadValidationCreateArgs>({
         initiatedBy: {
           create: {
             name: 'String',
-            email: 'String2',
+            email: 'String4',
             role: 'USDR_ADMIN',
             updatedAt: '2023-12-08T21:03:20.706Z',
             agency: { create: { name: 'String', code: 'String' } },
