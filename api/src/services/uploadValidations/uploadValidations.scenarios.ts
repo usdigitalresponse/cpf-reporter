@@ -1,8 +1,10 @@
-import type { Prisma, UploadValidation } from '@prisma/client'
+import type { Prisma, UploadValidation, Upload } from '@prisma/client'
 
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
-export const standard = defineScenario<Prisma.UploadValidationCreateArgs>({
+export const standard = defineScenario<
+  Prisma.UploadValidationCreateArgs | Prisma.UploadCreateArgs
+>({
   uploadValidation: {
     one: {
       data: {
@@ -133,9 +135,61 @@ export const standard = defineScenario<Prisma.UploadValidationCreateArgs>({
       },
     },
   },
+  upload: {
+    one: {
+      data: {
+        filename: 'String',
+        updatedAt: '2023-12-08T21:03:20.706Z',
+        uploadedBy: {
+          create: {
+            name: 'String',
+            email: 'String5',
+            role: 'USDR_ADMIN',
+            updatedAt: '2023-12-08T21:03:20.706Z',
+            agency: { create: { name: 'String', code: 'String' } },
+          },
+        },
+        agency: { create: { name: 'String', code: 'String' } },
+        organization: { create: { name: 'String' } },
+        reportingPeriod: {
+          create: {
+            name: 'String',
+            startDate: '2023-12-08T21:03:20.706Z',
+            endDate: '2023-12-08T21:03:20.706Z',
+            updatedAt: '2023-12-08T21:03:20.706Z',
+            inputTemplate: {
+              create: {
+                name: 'String',
+                version: 'String',
+                effectiveDate: '2023-12-08T21:03:20.706Z',
+                updatedAt: '2023-12-08T21:03:20.706Z',
+              },
+            },
+            outputTemplate: {
+              create: {
+                name: 'String',
+                version: 'String',
+                effectiveDate: '2023-12-08T21:03:20.706Z',
+                updatedAt: '2023-12-08T21:03:20.706Z',
+              },
+            },
+            organization: { create: { name: 'String' } },
+          },
+        },
+        expenditureCategory: {
+          create: {
+            name: 'String',
+            code: 'String',
+            updatedAt: '2023-12-08T21:03:20.706Z',
+          },
+        },
+      },
+    },
+  },
 })
 
 export type StandardScenario = ScenarioData<
   UploadValidation,
   'uploadValidation'
->
+> &
+  ScenarioData<Upload, 'upload'>
