@@ -3,20 +3,13 @@ export const schema = gql`
     id: Int!
     uploadId: Int!
     upload: Upload!
-    agencyId: Int!
-    agency: Agency!
-    organizationId: Int!
-    organization: Organization!
-    inputTemplateId: Int!
-    inputTemplate: InputTemplate!
-    validationResults: JSON
+    results: JSON
+    passed: Boolean!
+    initiatedById: Int!
+    initiatedBy: User!
     validatedAt: DateTime
-    validatedById: Int
-    validatedBy: User
     invalidationResults: JSON
     invalidatedAt: DateTime
-    invalidatedById: Int
-    invalidatedBy: User
     createdAt: DateTime!
     updatedAt: DateTime!
   }
@@ -28,28 +21,22 @@ export const schema = gql`
 
   input CreateUploadValidationInput {
     uploadId: Int!
-    agencyId: Int!
-    organizationId: Int!
-    inputTemplateId: Int!
-    validationResults: JSON
+    results: JSON
+    passed: Boolean!
+    initiatedById: Int!
     validatedAt: DateTime
-    validatedById: Int
     invalidationResults: JSON
     invalidatedAt: DateTime
-    invalidatedById: Int
   }
 
   input UpdateUploadValidationInput {
     uploadId: Int
-    agencyId: Int
-    organizationId: Int
-    inputTemplateId: Int
-    validationResults: JSON
+    results: JSON
+    passed: Boolean
+    initiatedById: Int
     validatedAt: DateTime
-    validatedById: Int
     invalidationResults: JSON
     invalidatedAt: DateTime
-    invalidatedById: Int
   }
 
   type Mutation {

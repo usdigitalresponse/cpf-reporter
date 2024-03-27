@@ -117,16 +117,13 @@ export type CreateUploadInput = {
 };
 
 export type CreateUploadValidationInput = {
-  agencyId: Scalars['Int'];
-  inputTemplateId: Scalars['Int'];
+  initiatedById: Scalars['Int'];
   invalidatedAt?: InputMaybe<Scalars['DateTime']>;
-  invalidatedById?: InputMaybe<Scalars['Int']>;
   invalidationResults?: InputMaybe<Scalars['JSON']>;
-  organizationId: Scalars['Int'];
+  passed: Scalars['Boolean'];
+  results?: InputMaybe<Scalars['JSON']>;
   uploadId: Scalars['Int'];
   validatedAt?: InputMaybe<Scalars['DateTime']>;
-  validatedById?: InputMaybe<Scalars['Int']>;
-  validationResults?: InputMaybe<Scalars['JSON']>;
 };
 
 export type CreateUserInput = {
@@ -661,16 +658,13 @@ export type UpdateUploadInput = {
 };
 
 export type UpdateUploadValidationInput = {
-  agencyId?: InputMaybe<Scalars['Int']>;
-  inputTemplateId?: InputMaybe<Scalars['Int']>;
+  initiatedById?: InputMaybe<Scalars['Int']>;
   invalidatedAt?: InputMaybe<Scalars['DateTime']>;
-  invalidatedById?: InputMaybe<Scalars['Int']>;
   invalidationResults?: InputMaybe<Scalars['JSON']>;
-  organizationId?: InputMaybe<Scalars['Int']>;
+  passed?: InputMaybe<Scalars['Boolean']>;
+  results?: InputMaybe<Scalars['JSON']>;
   uploadId?: InputMaybe<Scalars['Int']>;
   validatedAt?: InputMaybe<Scalars['DateTime']>;
-  validatedById?: InputMaybe<Scalars['Int']>;
-  validationResults?: InputMaybe<Scalars['JSON']>;
 };
 
 export type UpdateUserInput = {
@@ -706,25 +700,18 @@ export type Upload = {
 
 export type UploadValidation = {
   __typename?: 'UploadValidation';
-  agency: Agency;
-  agencyId: Scalars['Int'];
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
-  inputTemplate: InputTemplate;
-  inputTemplateId: Scalars['Int'];
+  initiatedBy: User;
+  initiatedById: Scalars['Int'];
   invalidatedAt?: Maybe<Scalars['DateTime']>;
-  invalidatedBy?: Maybe<User>;
-  invalidatedById?: Maybe<Scalars['Int']>;
   invalidationResults?: Maybe<Scalars['JSON']>;
-  organization: Organization;
-  organizationId: Scalars['Int'];
+  passed: Scalars['Boolean'];
+  results?: Maybe<Scalars['JSON']>;
   updatedAt: Scalars['DateTime'];
   upload: Upload;
   uploadId: Scalars['Int'];
   validatedAt?: Maybe<Scalars['DateTime']>;
-  validatedBy?: Maybe<User>;
-  validatedById?: Maybe<Scalars['Int']>;
-  validationResults?: Maybe<Scalars['JSON']>;
 };
 
 export type User = {

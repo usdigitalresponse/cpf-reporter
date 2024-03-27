@@ -42,28 +42,28 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
         validations: {
           create: [
             {
-              agency: { create: { name: 'String', code: 'String' } },
-              organization: { create: { name: 'String' } },
-              inputTemplate: {
+              passed: true,
+              createdAt: '2024-01-26T15:11:27.000Z',
+              initiatedBy: {
                 create: {
+                  email: 'uniqueemail2@test.com',
                   name: 'String',
-                  version: 'String',
-                  effectiveDate: '2024-01-26T00:00:00.000Z',
+                  role: 'USDR_ADMIN',
+                  agency: { create: { name: 'String', code: 'String' } },
                 },
               },
-              createdAt: '2024-01-26T15:11:27.000Z',
             },
             {
-              agency: { create: { name: 'String', code: 'String' } },
-              organization: { create: { name: 'String' } },
-              inputTemplate: {
+              passed: true,
+              createdAt: '2024-01-27T10:32:00.000Z',
+              initiatedBy: {
                 create: {
+                  email: 'uniqueemail3@test.com',
                   name: 'String',
-                  version: 'String',
-                  effectiveDate: '2024-01-26T15:11:27.688Z',
+                  role: 'USDR_ADMIN',
+                  agency: { create: { name: 'String', code: 'String' } },
                 },
               },
-              createdAt: '2024-01-27T10:32:00.000Z',
             },
           ],
         },
@@ -76,7 +76,7 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
         filename: 'String',
         uploadedBy: {
           create: {
-            email: 'uniqueemail2@test.com',
+            email: 'uniqueemail4@test.com',
             name: 'String',
             role: 'USDR_ADMIN',
             agency: { create: { name: 'String', code: 'String' } },
@@ -109,25 +109,25 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
         validations: {
           create: [
             {
-              agency: { create: { name: 'String', code: 'String' } },
-              organization: { create: { name: 'String' } },
-              inputTemplate: {
+              passed: true,
+              initiatedBy: {
                 create: {
+                  email: 'uniqueemail5@test.com',
                   name: 'String',
-                  version: 'String',
-                  effectiveDate: '2023-12-07T18:17:24.389Z',
+                  role: 'USDR_ADMIN',
+                  agency: { create: { name: 'String', code: 'String' } },
                 },
               },
               createdAt: '2024-01-29T18:13:25.000Z',
             },
             {
-              agency: { create: { name: 'String', code: 'String' } },
-              organization: { create: { name: 'String' } },
-              inputTemplate: {
+              passed: true,
+              initiatedBy: {
                 create: {
+                  email: 'uniqueemail6@test.com',
                   name: 'String',
-                  version: 'String',
-                  effectiveDate: '2023-12-07T18:17:24.389Z',
+                  role: 'USDR_ADMIN',
+                  agency: { create: { name: 'String', code: 'String' } },
                 },
               },
               createdAt: '2024-01-29T17:10:22.000Z',

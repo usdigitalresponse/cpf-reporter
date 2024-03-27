@@ -1,21 +1,26 @@
-import type { Prisma, UploadValidation } from '@prisma/client'
+import type { Prisma, UploadValidation, Upload } from '@prisma/client'
 
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
-export const standard = defineScenario<Prisma.UploadValidationCreateArgs>({
+export const standard = defineScenario<
+  Prisma.UploadValidationCreateArgs | Prisma.UploadCreateArgs
+>({
   uploadValidation: {
     one: {
       data: {
         updatedAt: '2023-12-08T21:03:20.706Z',
+        passed: true,
         upload: {
           create: {
             filename: 'String',
             updatedAt: '2023-12-08T21:03:20.706Z',
             uploadedBy: {
               create: {
-                email: 'String',
+                name: 'String',
+                email: 'String1',
+                role: 'USDR_ADMIN',
                 updatedAt: '2023-12-08T21:03:20.706Z',
-                organization: { create: { name: 'String' } },
+                agency: { create: { name: 'String', code: 'String' } },
               },
             },
             agency: { create: { name: 'String', code: 'String' } },
@@ -42,6 +47,7 @@ export const standard = defineScenario<Prisma.UploadValidationCreateArgs>({
                     updatedAt: '2023-12-08T21:03:20.706Z',
                   },
                 },
+                organization: { create: { name: 'String' } },
               },
             },
             expenditureCategory: {
@@ -53,14 +59,13 @@ export const standard = defineScenario<Prisma.UploadValidationCreateArgs>({
             },
           },
         },
-        agency: { create: { name: 'String', code: 'String' } },
-        organization: { create: { name: 'String' } },
-        inputTemplate: {
+        initiatedBy: {
           create: {
             name: 'String',
-            version: 'String',
-            effectiveDate: '2023-12-08T21:03:20.706Z',
+            email: 'String2',
+            role: 'USDR_ADMIN',
             updatedAt: '2023-12-08T21:03:20.706Z',
+            agency: { create: { name: 'String', code: 'String' } },
           },
         },
       },
@@ -68,15 +73,18 @@ export const standard = defineScenario<Prisma.UploadValidationCreateArgs>({
     two: {
       data: {
         updatedAt: '2023-12-08T21:03:20.706Z',
+        passed: true,
         upload: {
           create: {
             filename: 'String',
             updatedAt: '2023-12-08T21:03:20.706Z',
             uploadedBy: {
               create: {
-                email: 'String',
+                name: 'String',
+                email: 'String3',
+                role: 'USDR_ADMIN',
                 updatedAt: '2023-12-08T21:03:20.706Z',
-                organization: { create: { name: 'String' } },
+                agency: { create: { name: 'String', code: 'String' } },
               },
             },
             agency: { create: { name: 'String', code: 'String' } },
@@ -103,6 +111,7 @@ export const standard = defineScenario<Prisma.UploadValidationCreateArgs>({
                     updatedAt: '2023-12-08T21:03:20.706Z',
                   },
                 },
+                organization: { create: { name: 'String' } },
               },
             },
             expenditureCategory: {
@@ -114,13 +123,63 @@ export const standard = defineScenario<Prisma.UploadValidationCreateArgs>({
             },
           },
         },
-        agency: { create: { name: 'String', code: 'String' } },
-        organization: { create: { name: 'String' } },
-        inputTemplate: {
+        initiatedBy: {
           create: {
             name: 'String',
-            version: 'String',
-            effectiveDate: '2023-12-08T21:03:20.706Z',
+            email: 'String4',
+            role: 'USDR_ADMIN',
+            updatedAt: '2023-12-08T21:03:20.706Z',
+            agency: { create: { name: 'String', code: 'String' } },
+          },
+        },
+      },
+    },
+  },
+  upload: {
+    one: {
+      data: {
+        filename: 'String',
+        updatedAt: '2023-12-08T21:03:20.706Z',
+        uploadedBy: {
+          create: {
+            name: 'String',
+            email: 'String5',
+            role: 'USDR_ADMIN',
+            updatedAt: '2023-12-08T21:03:20.706Z',
+            agency: { create: { name: 'String', code: 'String' } },
+          },
+        },
+        agency: { create: { name: 'String', code: 'String' } },
+        organization: { create: { name: 'String' } },
+        reportingPeriod: {
+          create: {
+            name: 'String',
+            startDate: '2023-12-08T21:03:20.706Z',
+            endDate: '2023-12-08T21:03:20.706Z',
+            updatedAt: '2023-12-08T21:03:20.706Z',
+            inputTemplate: {
+              create: {
+                name: 'String',
+                version: 'String',
+                effectiveDate: '2023-12-08T21:03:20.706Z',
+                updatedAt: '2023-12-08T21:03:20.706Z',
+              },
+            },
+            outputTemplate: {
+              create: {
+                name: 'String',
+                version: 'String',
+                effectiveDate: '2023-12-08T21:03:20.706Z',
+                updatedAt: '2023-12-08T21:03:20.706Z',
+              },
+            },
+            organization: { create: { name: 'String' } },
+          },
+        },
+        expenditureCategory: {
+          create: {
+            name: 'String',
+            code: 'String',
             updatedAt: '2023-12-08T21:03:20.706Z',
           },
         },
@@ -132,4 +191,5 @@ export const standard = defineScenario<Prisma.UploadValidationCreateArgs>({
 export type StandardScenario = ScenarioData<
   UploadValidation,
   'uploadValidation'
->
+> &
+  ScenarioData<Upload, 'upload'>
