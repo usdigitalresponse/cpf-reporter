@@ -470,6 +470,7 @@ module "lambda_function-cpfValidation" {
   memory_size   = 512
   environment_variables = merge(local.lambda_default_environment_variables, {
     DD_LAMBDA_HANDLER = "src.functions.validate_workbook.handle"
+    DD_LOGS_INJECTION = "true"
   })
 
   // Triggers
