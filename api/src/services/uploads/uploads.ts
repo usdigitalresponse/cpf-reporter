@@ -65,6 +65,15 @@ export const Upload: UploadRelationResolvers = {
   validations: (_obj, { root }) => {
     return db.upload.findUnique({ where: { id: root?.id } }).validations()
   },
+  latestValidation: async (_obj, { root }) => {
+    const latestValidation = await db.uploadValidation.findFirst({
+      where: { uploadId: root?.id },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+    return latestValidation
+  },
   subrecipients: (_obj, { root }) => {
     return db.upload.findUnique({ where: { id: root?.id } }).subrecipients()
   },

@@ -13,13 +13,70 @@ export const standard = defineScenario<
         name: 'String',
       },
     },
+    two: {
+      data: {
+        name: 'String',
+      },
+    },
+    three: {
+      data: {
+        name: 'String',
+      },
+    },
   },
   agency: {
     one: (scenario) => ({
       data: {
         name: 'String',
-        organizationId: scenario.organization.one.id,
+        organization: {
+          connect: {
+            id: scenario.organization.one.id,
+          },
+        },
         code: 'String',
+      },
+      include: {
+        organization: true,
+      },
+    }),
+    two: (scenario) => ({
+      data: {
+        name: 'String',
+        organization: {
+          connect: { id: scenario.organization.one.id },
+        },
+        code: 'String',
+      },
+      include: {
+        organization: true,
+      },
+    }),
+    three: (scenario) => ({
+      data: {
+        name: 'String',
+        code: 'String',
+        organization: {
+          connect: {
+            id: scenario.organization.two.id,
+          },
+        },
+      },
+      include: {
+        organization: true,
+      },
+    }),
+    four: (scenario) => ({
+      data: {
+        name: 'String',
+        code: 'String',
+        organization: {
+          connect: {
+            id: scenario.organization.three.id,
+          },
+        },
+      },
+      include: {
+        organization: true,
       },
     }),
   },
@@ -49,6 +106,17 @@ export const standard = defineScenario<
         name: 'String',
         role: 'ORGANIZATION_STAFF',
         agency: { connect: { id: scenario.agency.one.id } },
+      },
+      include: {
+        agency: true,
+      },
+    }),
+    four: (scenario) => ({
+      data: {
+        email: 'uniqueemail450@test.com',
+        name: 'String',
+        role: 'ORGANIZATION_STAFF',
+        agency: { connect: { id: scenario.agency.three.id } },
       },
       include: {
         agency: true,

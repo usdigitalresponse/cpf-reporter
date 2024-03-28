@@ -117,16 +117,13 @@ export type CreateUploadInput = {
 };
 
 export type CreateUploadValidationInput = {
-  agencyId: Scalars['Int'];
-  inputTemplateId: Scalars['Int'];
+  initiatedById: Scalars['Int'];
   invalidatedAt?: InputMaybe<Scalars['DateTime']>;
-  invalidatedById?: InputMaybe<Scalars['Int']>;
   invalidationResults?: InputMaybe<Scalars['JSON']>;
-  organizationId: Scalars['Int'];
+  passed: Scalars['Boolean'];
+  results?: InputMaybe<Scalars['JSON']>;
   uploadId: Scalars['Int'];
   validatedAt?: InputMaybe<Scalars['DateTime']>;
-  validatedById?: InputMaybe<Scalars['Int']>;
-  validationResults?: InputMaybe<Scalars['JSON']>;
 };
 
 export type CreateUserInput = {
@@ -661,21 +658,19 @@ export type UpdateUploadInput = {
 };
 
 export type UpdateUploadValidationInput = {
-  agencyId?: InputMaybe<Scalars['Int']>;
-  inputTemplateId?: InputMaybe<Scalars['Int']>;
+  initiatedById?: InputMaybe<Scalars['Int']>;
   invalidatedAt?: InputMaybe<Scalars['DateTime']>;
-  invalidatedById?: InputMaybe<Scalars['Int']>;
   invalidationResults?: InputMaybe<Scalars['JSON']>;
-  organizationId?: InputMaybe<Scalars['Int']>;
+  passed?: InputMaybe<Scalars['Boolean']>;
+  results?: InputMaybe<Scalars['JSON']>;
   uploadId?: InputMaybe<Scalars['Int']>;
   validatedAt?: InputMaybe<Scalars['DateTime']>;
-  validatedById?: InputMaybe<Scalars['Int']>;
-  validationResults?: InputMaybe<Scalars['JSON']>;
 };
 
 export type UpdateUserInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   email?: InputMaybe<Scalars['String']>;
+  isActive?: InputMaybe<Scalars['Boolean']>;
   name?: InputMaybe<Scalars['String']>;
   role?: InputMaybe<RoleEnum>;
 };
@@ -689,6 +684,7 @@ export type Upload = {
   expenditureCategoryId?: Maybe<Scalars['Int']>;
   filename: Scalars['String'];
   id: Scalars['Int'];
+  latestValidation?: Maybe<UploadValidation>;
   notes?: Maybe<Scalars['String']>;
   organization: Organization;
   organizationId: Scalars['Int'];
@@ -704,25 +700,18 @@ export type Upload = {
 
 export type UploadValidation = {
   __typename?: 'UploadValidation';
-  agency: Agency;
-  agencyId: Scalars['Int'];
   createdAt: Scalars['DateTime'];
   id: Scalars['Int'];
-  inputTemplate: InputTemplate;
-  inputTemplateId: Scalars['Int'];
+  initiatedBy: User;
+  initiatedById: Scalars['Int'];
   invalidatedAt?: Maybe<Scalars['DateTime']>;
-  invalidatedBy?: Maybe<User>;
-  invalidatedById?: Maybe<Scalars['Int']>;
   invalidationResults?: Maybe<Scalars['JSON']>;
-  organization: Organization;
-  organizationId: Scalars['Int'];
+  passed: Scalars['Boolean'];
+  results?: Maybe<Scalars['JSON']>;
   updatedAt: Scalars['DateTime'];
   upload: Upload;
   uploadId: Scalars['Int'];
   validatedAt?: Maybe<Scalars['DateTime']>;
-  validatedBy?: Maybe<User>;
-  validatedById?: Maybe<Scalars['Int']>;
-  validationResults?: Maybe<Scalars['JSON']>;
 };
 
 export type User = {
@@ -922,7 +911,7 @@ export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Up
 export type FindUploadsVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, code: string }, expenditureCategory?: { __typename?: 'ExpenditureCategory', id: number, code: string } | null, validations: Array<{ __typename?: 'UploadValidation', invalidatedAt?: string | null, validatedAt?: string | null } | null> }> };
+export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, code: string }, expenditureCategory?: { __typename?: 'ExpenditureCategory', id: number, code: string } | null, latestValidation?: { __typename?: 'UploadValidation', createdAt: string, invalidatedAt?: string | null, validatedAt?: string | null } | null }> };
 
 export type EditUserByIdVariables = Exact<{
   id: Scalars['Int'];

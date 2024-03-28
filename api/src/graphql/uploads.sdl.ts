@@ -18,6 +18,7 @@ export const schema = gql`
     validations: [UploadValidation]!
     signedUrl: String
     subrecipients: [Subrecipient]!
+    latestValidation: UploadValidation
   }
 
   type Query {

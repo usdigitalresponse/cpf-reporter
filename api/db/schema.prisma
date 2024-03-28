@@ -18,7 +18,6 @@ model Agency {
   organizationId    Int?
   users             User[]
   uploads           Upload[]
-  uploadValidations UploadValidation[]
   projects          Project[]
 }
 
@@ -28,7 +27,6 @@ model Organization {
   name              String
   reportingPeriods  ReportingPeriod[]
   uploads           Upload[]
-  uploadValidations UploadValidation[]
   subrecipients     Subrecipient[]
   projects          Project[]
 }
@@ -46,6 +44,7 @@ model User {
   agency         Agency              @relation(fields: [agencyId], references: [id])
   certified      ReportingPeriod[]
   uploaded       Upload[]
+  initiated      UploadValidation[]
 
   @@index(fields: [passageId])
 }
@@ -65,7 +64,6 @@ model InputTemplate {
   createdAt           DateTime           @default(now()) @db.Timestamptz(6)
   updatedAt           DateTime           @default(now()) @db.Timestamptz(6)
   reportingPeriods    ReportingPeriod[]
-  uploadValidations   UploadValidation[]
 }
 
 model OutputTemplate {
@@ -132,14 +130,11 @@ model Upload {
 model UploadValidation {
   id                  Int            @id @default(autoincrement())
   uploadId            Int
-  upload              Upload         @relation(fields: [uploadId], references: [id])
-  agencyId            Int
-  agency              Agency         @relation(fields: [agencyId], references: [id])
-  organizationId      Int
-  organization        Organization   @relation(fields: [organizationId], references: [id])
-  inputTemplateId     Int
-  inputTemplate       InputTemplate @relation(fields: [inputTemplateId], references: [id])
-  validationResults   Json?         @db.JsonB
+  upload              Upload         @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  results             Json?         @db.JsonB
+  passed              Boolean
+  initiatedById       Int
+  initiatedBy         User          @relation(fields: [initiatedById], references: [id])
   validatedAt         DateTime?     @db.Timestamptz(6)
   invalidationResults Json?         @db.JsonB
   invalidatedAt       DateTime?     @db.Timestamptz(6)
