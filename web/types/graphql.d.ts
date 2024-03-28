@@ -911,7 +911,7 @@ export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Up
 export type FindUploadsVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, code: string }, expenditureCategory?: { __typename?: 'ExpenditureCategory', id: number, code: string } | null, latestValidation?: { __typename?: 'UploadValidation', createdAt: string, invalidatedAt?: string | null, validatedAt?: string | null } | null }> };
+export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, code: string }, expenditureCategory?: { __typename?: 'ExpenditureCategory', id: number, code: string } | null, latestValidation?: { __typename?: 'UploadValidation', createdAt: string, passed: boolean } | null }> };
 
 export type EditUserByIdVariables = Exact<{
   id: Scalars['Int'];
