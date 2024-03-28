@@ -43,6 +43,8 @@ jobs:
       build-console-image: true
       build-api-functions: true
       api-function-artifact-retention-days: 14
+      build-python-functions: true
+      python-function-artifact-retention-days: 14
       build-web: true
       web-artifact-retention-days: 14
       web-dotenv: |
@@ -82,6 +84,8 @@ jobs:
       api-functions-artifacts-key: ${{ needs.build.outputs.api-functions-artifacts-key }}
       api-functions-artifacts-path: ${{ needs.build.outputs.api-functions-artifacts-path }}
       console-image: ${{ needs.build.outputs.console-image-full-name }}
+      python-functions-artifacts-key: ${{ needs.build.outputs.python-functions-artifacts-key }}
+      python-functions-artifacts-path: ${{ needs.build.outputs.python-functions-artifacts-path }}
       web-artifacts-key: ${{ needs.build.outputs.web-artifacts-key }}
       web-artifacts-path: ${{ needs.build.outputs.web-artifacts-path }}
       aws-region: us-west-2
@@ -128,6 +132,8 @@ jobs:
     with:
       api-functions-artifacts-key: ${{ needs.build.outputs.api-functions-artifacts-key }}
       api-functions-artifacts-path: ${{ needs.build.outputs.api-functions-artifacts-path }}
+      python-functions-artifacts-key: ${{ needs.build.outputs.python-functions-artifacts-key }}
+      python-functions-artifacts-path: ${{ needs.build.outputs.python-functions-artifacts-path }}
       web-artifacts-key: ${{ needs.build.outputs.web-artifacts-key }}
       web-artifacts-path: ${{ needs.build.outputs.web-artifacts-path }}
       tf-plan-artifacts-key: ${{ needs.tf-plan.outputs.artifacts-key }}

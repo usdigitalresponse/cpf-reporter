@@ -11,12 +11,18 @@ on:
         value: ${{ jobs.test-api.result }}
       api-test-coverage-markdown-report:
         value: ${{ jobs.test-api.outputs.coverage-markdown-report }}
+      python-test-outcome:
+        value: ${{ jobs.test-python.result }}
+      python-test-coverage-markdown-report:
+        value: ${{ jobs.test-python.outputs.coverage-markdown-report }}
       web-test-outcome:
         value: ${{ jobs.test-client.result }}
       web-test-coverage-markdown-report:
         value: ${{ jobs.test-client.outputs.coverage-markdown-report }}
       eslint-outcome:
         value: ${{ jobs.eslint.result }}
+      ruff-outcome:
+        value: ${{ jobs.ruff.result }}
       tflint-outcome:
         value: ${{ jobs.tflint.result }}
 
@@ -142,6 +148,38 @@ jobs:
           textReportPath: 'coverage/coverage.txt'
           srcBasePath: 'web/src'
 
+  test-python:
+    name: Test python code
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: python
+    outputs:
+      coverage-markdown-report: ${{ steps.coverage-markdown.outputs.stdout }}
+    steps:
+      - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          disable-sudo: true
+          egress-policy: audit
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          ref: ${{ inputs.ref }}
+          show-progress: 'false'
+          persist-credentials: 'false'
+      - name: Install poetry
+        run: pipx install poetry
+      - uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
+        with:
+          python-version-file: 'python/pyproject.toml'
+          cache: poetry
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-ansi
+      - name: Run tests
+        run: poetry run pytest
+      - name: Generate coverage markdown report
+        id: coverage-markdown
+        run: poetry run coverage report --format markdown
+
   eslint:
     name: Lint JavaScript
     runs-on: ubuntu-latest
@@ -171,6 +209,24 @@ jobs:
       - name: Run linter for web side
         if: ${{ !cancelled() }}
         run: yarn eslint web/src
+
+  ruff:
+    name: Lint python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          disable-sudo: true
+          egress-policy: audit
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          ref: ${{ inputs.ref }}
+          show-progress: 'false'
+          persist-credentials: 'false'
+      - uses: chartboost/ruff-action@e18ae971ccee1b2d7bbef113930f00c670b78da4 # v1
+        continue-on-error: true
+        with:
+          src: python
 
   tflint:
     name: Lint terraform

@@ -5,8 +5,10 @@
 	// List of extensions which should be recommended for users of this workspace.
 	"recommendations": [
 		"dbaeumer.vscode-eslint",
+		"charliermarsh.ruff",
 		"hashicorp.terraform",
 		"ms-azuretools.vscode-docker",
+		"ms-python.python",
 		"tamasfe.even-better-toml",
 	],
 }
