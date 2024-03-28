@@ -15,7 +15,6 @@ shared_processors = [
             structlog.processors.CallsiteParameter.LINENO,
         ]
     ),
-    structlog.processors.EventRenamer("msg"),
 ]
 
 processors = shared_processors + []
@@ -26,12 +25,14 @@ if sys.stderr.isatty():
 else:
     processors += [
         structlog.processors.dict_tracebacks,
+        structlog.processors.EventRenamer("msg"),
         structlog.processors.JSONRenderer(),
     ]
 
 structlog.configure(
     processors=processors,
     wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
+    cache_logger_on_first_use=True,
 )
 
 
