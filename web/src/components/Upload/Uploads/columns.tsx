@@ -21,18 +21,17 @@ function valueAsLink(cell): JSX.Element {
 }
 
 function validationDisplay(row) {
-  const validations = row.latestValidation
+  const latestValidation = row.latestValidation
 
-  if (validations.invalidatedAt) {
-    const formattedDate = formatDateString(validations.invalidatedAt)
+  if (latestValidation.invalidatedAt) {
+    const formattedDate = formatDateString(latestValidation.createdAt)
     return <span className="text-danger">Invalidated at {formattedDate}</span>
   }
 
-  if (validations.validatedAt) {
-    return formatDateString(validations.validatedAt)
+  if (latestValidation.validatedAt) {
+    return formatDateString(latestValidation.createdAt)
   }
 
-  // If neither date is available, display nothing or a default message
   return 'Not set'
 }
 
@@ -60,7 +59,7 @@ export const columnDefs = [
   {
     accessorFn: validationDisplay,
     cell: (info) => info.getValue(),
-    id: 'validatedAt',
+    id: 'createdAt',
     header: 'Validated?',
     enableSorting: false,
   },

@@ -22,7 +22,8 @@ export const QUERY = gql`
         id
         code
       }
-      validations {
+      latestValidation {
+        createdAt
         invalidatedAt
         validatedAt
       }
