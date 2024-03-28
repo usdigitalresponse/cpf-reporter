@@ -50,10 +50,20 @@ const client = {
   logout: () => {},
   getToken: () => 'super-secret-short-lived-token',
   getUserMetadata: () => ({
-    id: 1,
-    email: 'email@example.com',
-    organizationId: 1,
-    roles: [],
+    email: 'usdr-admin@usdr.dev',
+    name: 'USDR Admin',
+    role: 'USDR_ADMIN',
+    roles: ['USDR_ADMIN'],
+    agency: {
+      name: 'Main Agency',
+      abbreviation: 'MAUSDR',
+      code: 'MAUSDR',
+      organizationId: 1,
+    },
+    agencyId: 1, // TO_DEPRECATE
+    organizationId: 1, // TO_DEPRECATE
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   }),
 }
 
