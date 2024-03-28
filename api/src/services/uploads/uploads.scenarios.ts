@@ -43,6 +43,7 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
           create: [
             {
               passed: true,
+              results: '{error:false}',
               createdAt: '2024-01-26T15:11:27.000Z',
               initiatedBy: {
                 create: {
@@ -55,6 +56,7 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
             },
             {
               passed: true,
+              results: '{error:false}',
               createdAt: '2024-01-27T10:32:00.000Z',
               initiatedBy: {
                 create: {
@@ -110,6 +112,7 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
           create: [
             {
               passed: true,
+              results: '{error:false}',
               initiatedBy: {
                 create: {
                   email: 'uniqueemail5@test.com',
@@ -122,6 +125,7 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
             },
             {
               passed: true,
+              results: '{error:false}',
               initiatedBy: {
                 create: {
                   email: 'uniqueemail6@test.com',
