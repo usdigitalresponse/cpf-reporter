@@ -304,7 +304,7 @@ module "lambda_function-graphql" {
 
   // Runtime
   handler       = var.datadog_enabled ? local.datadog_lambda_js_handler : "graphql.handler"
-  runtime       = var.lambda_py_runtime
+  runtime       = var.lambda_js_runtime
   architectures = [var.lambda_arch]
   layers        = local.lambda_js_layer_arns
   timeout       = 25  # seconds (API Gateway limit is 30 seconds)
