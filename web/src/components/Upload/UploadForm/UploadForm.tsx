@@ -7,9 +7,7 @@ import {
   FileField,
   FormError,
   FieldError,
-  Label,
   Submit,
-  TextAreaField,
 } from '@redwoodjs/forms'
 import type { RWGqlError } from '@redwoodjs/forms'
 import { navigate, routes } from '@redwoodjs/router'
