@@ -110,7 +110,6 @@ export type CreateUploadInput = {
   agencyId: Scalars['Int'];
   expenditureCategoryId?: InputMaybe<Scalars['Int']>;
   filename: Scalars['String'];
-  notes?: InputMaybe<Scalars['String']>;
   organizationId: Scalars['Int'];
   reportingPeriodId: Scalars['Int'];
   uploadedById: Scalars['Int'];
@@ -118,12 +117,9 @@ export type CreateUploadInput = {
 
 export type CreateUploadValidationInput = {
   initiatedById: Scalars['Int'];
-  invalidatedAt?: InputMaybe<Scalars['DateTime']>;
-  invalidationResults?: InputMaybe<Scalars['JSON']>;
   passed: Scalars['Boolean'];
   results?: InputMaybe<Scalars['JSON']>;
   uploadId: Scalars['Int'];
-  validatedAt?: InputMaybe<Scalars['DateTime']>;
 };
 
 export type CreateUserInput = {
@@ -651,7 +647,6 @@ export type UpdateUploadInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   expenditureCategoryId?: InputMaybe<Scalars['Int']>;
   filename?: InputMaybe<Scalars['String']>;
-  notes?: InputMaybe<Scalars['String']>;
   organizationId?: InputMaybe<Scalars['Int']>;
   reportingPeriodId?: InputMaybe<Scalars['Int']>;
   uploadedById?: InputMaybe<Scalars['Int']>;
@@ -659,12 +654,9 @@ export type UpdateUploadInput = {
 
 export type UpdateUploadValidationInput = {
   initiatedById?: InputMaybe<Scalars['Int']>;
-  invalidatedAt?: InputMaybe<Scalars['DateTime']>;
-  invalidationResults?: InputMaybe<Scalars['JSON']>;
   passed?: InputMaybe<Scalars['Boolean']>;
   results?: InputMaybe<Scalars['JSON']>;
   uploadId?: InputMaybe<Scalars['Int']>;
-  validatedAt?: InputMaybe<Scalars['DateTime']>;
 };
 
 export type UpdateUserInput = {
@@ -685,7 +677,6 @@ export type Upload = {
   filename: Scalars['String'];
   id: Scalars['Int'];
   latestValidation?: Maybe<UploadValidation>;
-  notes?: Maybe<Scalars['String']>;
   organization: Organization;
   organizationId: Scalars['Int'];
   reportingPeriod: ReportingPeriod;
@@ -704,14 +695,11 @@ export type UploadValidation = {
   id: Scalars['Int'];
   initiatedBy: User;
   initiatedById: Scalars['Int'];
-  invalidatedAt?: Maybe<Scalars['DateTime']>;
-  invalidationResults?: Maybe<Scalars['JSON']>;
   passed: Scalars['Boolean'];
   results?: Maybe<Scalars['JSON']>;
   updatedAt: Scalars['DateTime'];
   upload: Upload;
   uploadId: Scalars['Int'];
-  validatedAt?: Maybe<Scalars['DateTime']>;
 };
 
 export type User = {

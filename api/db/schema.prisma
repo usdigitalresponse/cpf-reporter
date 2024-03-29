@@ -110,7 +110,6 @@ model ExpenditureCategory {
 model Upload {
   id                    Int                  @id @default(autoincrement())
   filename              String
-  notes                 String?
   uploadedById          Int
   uploadedBy            User                 @relation(fields: [uploadedById], references: [id])
   agencyId              Int
@@ -135,9 +134,6 @@ model UploadValidation {
   passed              Boolean
   initiatedById       Int
   initiatedBy         User          @relation(fields: [initiatedById], references: [id])
-  validatedAt         DateTime?     @db.Timestamptz(6)
-  invalidationResults Json?         @db.JsonB
-  invalidatedAt       DateTime?     @db.Timestamptz(6)
   createdAt           DateTime      @default(now()) @db.Timestamptz(6)
   updatedAt           DateTime      @default(now()) @db.Timestamptz(6)
 }
