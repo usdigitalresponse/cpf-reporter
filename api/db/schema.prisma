@@ -110,7 +110,6 @@ model ExpenditureCategory {
 model Upload {
   id                    Int                  @id @default(autoincrement())
   filename              String
-  notes                 String?
   uploadedById          Int
   uploadedBy            User                 @relation(fields: [uploadedById], references: [id])
   agencyId              Int

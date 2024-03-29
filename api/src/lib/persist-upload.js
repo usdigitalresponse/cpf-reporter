@@ -157,7 +157,7 @@ async function ensureValidReportingPeriodId(reportingPeriodId) {
  */
 async function persistUpload({ filename, user, buffer, body }) {
   return tracer.trace('persistUpload', async () => {
-    // Fetch reportingPeriodId, agencyId, and notes from the body
+    // Fetch reportingPeriodId and agencyId from the body
     // and rename with 'supplied' prefix. These may be null.
     const {
       reportingPeriodId: suppliedReportingPeriodId,
