@@ -1,10 +1,15 @@
-import { https } from 'https'
-
+import {
+  S3Client,
+  GetObjectCommand,
+  DeleteObjectCommand,
+} from '@aws-sdk/client-s3'
+import { NodeJsClient } from '@smithy/types'
 import { S3Event, S3Handler } from 'aws-lambda'
 
+import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 
-const apiEndpoint = 'https://example.com'
+const s3 = new S3Client({}) as NodeJsClient<S3Client>
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export const handler: S3Handler = async (event: S3Event): Promise<void> => {
@@ -12,17 +17,58 @@ export const handler: S3Handler = async (event: S3Event): Promise<void> => {
     const bucket = event.Records[0].s3.bucket.name
     const key = event.Records[0].s3.object.key
 
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
+    // Download the JSON errors file from S3
+    const getObjectResponse = await s3.send(
+      new GetObjectCommand({ Bucket: bucket, Key: key })
+    )
 
-    // call API endpoint with S3 key
-    https.request(apiEndpoint, options, (res) => {})
+    // Add the contents of the JSON to the database
+    if (getObjectResponse.Body) {
+      /* example file path/key
+         /uploads/organization_id/agency_id/reporting_period_id/expenditure_category_code/upload_id/{filename}
+      */
+      const result = JSON.parse(getObjectResponse.Body.toString())
+
+      // when the results array is empty then we know the file has passed validations
+      const passed = result.length === 0
+
+      const uploadId = await extractUploadIdFromKey(key)
+      const input = {
+        results: result,
+        uploadId: uploadId,
+        passed: passed,
+      }
+
+      // There should be an existing validation Record in the DB that will need to be updated
+      const validationRecord = db.uploadValidation.update({
+        data: input,
+        where: { id: uploadId, results: null },
+      })
+      if (!validationRecord) {
+        throw new Error('Validation record not found')
+      }
+
+      // Delete the errors.json file from S3
+      s3.send(
+        new DeleteObjectCommand({
+          Bucket: bucket,
+          Key: key,
+        })
+      )
+    }
   } catch (error) {
     logger.error('Error processing S3 event:', error)
     throw error
   }
+}
+function extractUploadIdFromKey(key: string): number {
+  logger.debug(`Extracting upload_id from key: ${key}`)
+  const regex =
+    /\/uploads\/(?<organization_id>\w+)\/(?<agency_id>\w+)\/(?<reporting_period_id>\w+)\/(?<expenditure_category_code>\w+)\/(?<upload_id>\w+)\/(?<filename>.+)/
+  const match = key.match(regex)
+  if (!match) {
+    throw new Error('Invalid key format')
+  }
+  logger.info(`Extracted upload_id: ${match.groups.upload_id}`)
+  return parseInt(match.groups.upload_id)
 }
