@@ -16,6 +16,10 @@ export const QUERY = gql`
       expenditureCategoryId
       createdAt
       updatedAt
+      latestValidation {
+        passed
+        results
+      }
     }
   }
 `

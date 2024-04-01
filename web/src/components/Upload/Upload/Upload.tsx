@@ -2,6 +2,7 @@ import type {
   DeleteUploadMutationVariables,
   FindUploadById,
 } from 'types/graphql'
+import UploadValidationButtonGroup from '../UploadValidationButtonGroup/UploadValidationButtonGroup'
 
 import { Link, routes, navigate } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
@@ -40,6 +41,12 @@ const Upload = ({ upload }: Props) => {
 
   return (
     <>
+      <UploadValidationButtonGroup
+        latestValidation={upload.latestValidation}
+        invalidateUpload={() => { }}
+        validateUpload={() => { }}
+        downloadFile={() => { }}
+      />
       <div className="rw-segment">
         <header className="rw-segment-header">
           <h2 className="rw-heading rw-heading-secondary">
