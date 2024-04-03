@@ -1,4 +1,4 @@
-import { db } from 'src/lib/db'
+import { uploadValidation } from 'src/services/uploadValidations/uploadValidations'
 
 import { processRecord } from './cpfValidation'
 
@@ -37,62 +37,62 @@ function buildRecord(uploadValidationId: string) {
 }
 
 describe('cpfValidation function', () => {
-  scenario('cpfValidation function - no errors', async (scenario) => {
+  scenario('no validation errors', async (scenario) => {
     const expectedBody = JSON.stringify([])
     const mocks3 = new MockS3Client(expectedBody)
     const record = buildRecord(scenario.uploadValidation.one.id)
 
     await processRecord(record, mocks3)
 
-    const updatedRecord = await db.uploadValidation.findUnique({
-      where: { id: scenario.uploadValidation.one.id },
+    const updatedRecord = await uploadValidation({
+      id: scenario.uploadValidation.one.id,
     })
     expect(mocks3.commands.length).toEqual(2)
     expect(updatedRecord.results).toEqual([])
     expect(updatedRecord.passed).toEqual(true)
   })
 
-  scenario('cpfValidation function - error', async (scenario) => {
+  scenario('validation error', async (scenario) => {
     const expectedBody = { error: 'error' }
     const mocks3 = new MockS3Client(JSON.stringify(expectedBody))
     const record = buildRecord(scenario.uploadValidation.one.id)
 
     await processRecord(record, mocks3)
     expect(mocks3.commands.length).toEqual(2)
-    const updatedRecord = await db.uploadValidation.findUnique({
-      where: { id: scenario.uploadValidation.one.id },
+    const updatedRecord = await uploadValidation({
+      id: scenario.uploadValidation.one.id,
     })
     expect(updatedRecord.results).toEqual(expectedBody)
     expect(updatedRecord.passed).toEqual(false)
   })
 
-  scenario('cpfValidation function - no body', async (scenario) => {
+  scenario('no body in s3 object', async (scenario) => {
     const mocks3 = new MockS3Client(null)
     const record = buildRecord(scenario.uploadValidation.one.id)
 
     await processRecord(record, mocks3)
     expect(mocks3.commands.length).toEqual(1) // No DeleteObjectCommand
-    const existingRecord = await db.uploadValidation.findUnique({
-      where: { id: scenario.uploadValidation.one.id },
+    const existingRecord = await await uploadValidation({
+      id: scenario.uploadValidation.one.id,
     })
     expect(existingRecord.results).toEqual(null)
     expect(existingRecord.passed).toEqual(false)
   })
 
-  scenario('cpfValidation function - no matching record', async (scenario) => {
+  scenario('no matching upload record', async (scenario) => {
     const mocks3 = new MockS3Client(null)
     const record = buildRecord(scenario.uploadValidation.one.id + 1)
 
     await processRecord(record, mocks3)
     expect(mocks3.commands.length).toEqual(1)
-    const existingRecord = await db.uploadValidation.findUnique({
-      where: { id: scenario.uploadValidation.one.id },
+    const existingRecord = await uploadValidation({
+      id: scenario.uploadValidation.one.id,
     })
     expect(existingRecord.results).toEqual(null)
     expect(existingRecord.passed).toEqual(false)
   })
 
-  scenario('cpfValidation function - no key', async (scenario) => {
+  scenario('no key found in path', async (scenario) => {
     const mocks3 = new MockS3Client(null)
     const record = buildRecord(scenario.uploadValidation.one.id)
 
@@ -100,8 +100,8 @@ describe('cpfValidation function', () => {
 
     await processRecord(record, mocks3)
     expect(mocks3.commands.length).toEqual(1)
-    const existingRecord = await db.uploadValidation.findUnique({
-      where: { id: scenario.uploadValidation.one.id },
+    const existingRecord = await uploadValidation({
+      id: scenario.uploadValidation.one.id,
     })
     expect(existingRecord.results).toEqual(null)
     expect(existingRecord.passed).toEqual(false)
