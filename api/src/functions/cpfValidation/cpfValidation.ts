@@ -76,6 +76,8 @@ export const processRecord = async (
       'Total validation records',
       await database.uploadValidation.count()
     )
+    const firstRecord = await database.uploadValidation.findFirst()
+    console.log('first record in the db', firstRecord)
     const validationRecord = await database.uploadValidation.updateMany({
       data: input,
       where: { uploadId },
