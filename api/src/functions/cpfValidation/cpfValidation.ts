@@ -64,7 +64,7 @@ export const processRecord = async (
 
     const uploadId = extractUploadIdFromKey(key)
     const input = {
-      results: result,
+      results: { result },
       uploadId: uploadId,
       passed: passed,
     }
