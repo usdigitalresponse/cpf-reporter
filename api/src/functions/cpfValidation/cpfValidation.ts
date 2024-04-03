@@ -31,7 +31,7 @@ export const handler: S3Handler = async (event: S3Event): Promise<void> => {
   await Promise.all(
     event.Records.map(async (record) => {
       try {
-        await processRecord(record, s3)
+        await processRecord(record, s3, db)
       } catch (err) {
         logger.error(`Handler error: ${err}`)
       }
@@ -42,7 +42,8 @@ export const handler: S3Handler = async (event: S3Event): Promise<void> => {
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export const processRecord = async (
   record: UploadValidationRecord,
-  s3Client: UploadValidationS3Client
+  s3Client: UploadValidationS3Client,
+  database: any
 ): Promise<void> => {
   const bucket = record.s3.bucket.name
   const key = record.s3.object.key
@@ -71,7 +72,7 @@ export const processRecord = async (
     console.log('Updating upload id', uploadId)
     console.log('Setting results to ', result)
     // There should be an existing validation Record in the DB that will need to be updated
-    const validationRecord = await db.uploadValidation.updateMany({
+    const validationRecord = await database.uploadValidation.updateMany({
       data: input,
       where: { uploadId },
     })

@@ -43,7 +43,7 @@ describe('cpfValidation function', () => {
     const mocks3 = new MockS3Client(expectedBody)
     const record = buildRecord(scenario.uploadValidation.one.id)
 
-    await processRecord(record, mocks3)
+    await processRecord(record, mocks3, db)
 
     const updatedRecord = await db.uploadValidation.findUnique({
       where: { id: scenario.uploadValidation.one.id },
@@ -59,7 +59,7 @@ describe('cpfValidation function', () => {
     const mocks3 = new MockS3Client(JSON.stringify(expectedBody))
     const record = buildRecord(scenario.uploadValidation.one.id)
 
-    await processRecord(record, mocks3)
+    await processRecord(record, mocks3, db)
     expect(mocks3.commands.length).toEqual(2)
     const updatedRecord = await db.uploadValidation.findUnique({
       where: { id: scenario.uploadValidation.one.id },
@@ -73,7 +73,7 @@ describe('cpfValidation function', () => {
     const mocks3 = new MockS3Client(null)
     const record = buildRecord(scenario.uploadValidation.one.id)
 
-    await processRecord(record, mocks3)
+    await processRecord(record, mocks3, db)
     expect(mocks3.commands.length).toEqual(1) // No DeleteObjectCommand
     const existingRecord = await db.uploadValidation.findUnique({
       where: { id: scenario.uploadValidation.one.id },
@@ -86,7 +86,7 @@ describe('cpfValidation function', () => {
     const mocks3 = new MockS3Client(null)
     const record = buildRecord(scenario.uploadValidation.one.id + 1)
 
-    await processRecord(record, mocks3)
+    await processRecord(record, mocks3, db)
     expect(mocks3.commands.length).toEqual(1)
     const existingRecord = await db.uploadValidation.findUnique({
       where: { id: scenario.uploadValidation.one.id },
@@ -101,7 +101,7 @@ describe('cpfValidation function', () => {
 
     record.s3.object.key = 'bad-key'
 
-    await processRecord(record, mocks3)
+    await processRecord(record, mocks3, db)
     expect(mocks3.commands.length).toEqual(1)
     const existingRecord = await uploadValidation({
       id: scenario.uploadValidation.one.id,
