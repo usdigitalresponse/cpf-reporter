@@ -80,7 +80,7 @@ export const processRecord = async (
     }
 
     // Delete the errors.json file from S3
-    s3Client.send(
+    await s3Client.send(
       new DeleteObjectCommand({
         Bucket: bucket,
         Key: key,
