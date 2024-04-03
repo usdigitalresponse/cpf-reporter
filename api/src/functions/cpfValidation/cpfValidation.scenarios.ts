@@ -1,7 +1,6 @@
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
-export const standard = defineScenario({
-  // TODO this is copied from uploadValidation.scenarios.ts - gross
+const standardSpec = {
   uploadValidation: {
     one: {
       data: {
@@ -69,6 +68,8 @@ export const standard = defineScenario({
       },
     },
   },
-})
+}
+
+export const standard = defineScenario(standardSpec)
 
 export type StandardScenario = ScenarioData<unknown>
