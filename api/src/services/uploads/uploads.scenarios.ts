@@ -16,7 +16,6 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
           },
         },
         agency: { create: { name: 'String', code: 'String' } },
-        organization: { create: { name: 'String' } },
         reportingPeriod: {
           create: {
             name: 'String',
@@ -85,7 +84,6 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
           },
         },
         agency: { create: { name: 'String', code: 'String' } },
-        organization: { create: { name: 'String' } },
         reportingPeriod: {
           create: {
             name: 'String',

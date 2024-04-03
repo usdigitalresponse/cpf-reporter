@@ -35,7 +35,6 @@ describe('uploads', () => {
         filename: 'String',
         uploadedById: scenario.upload.two.uploadedById,
         agencyId: scenario.upload.two.agencyId,
-        organizationId: scenario.upload.two.organizationId,
         reportingPeriodId: scenario.upload.two.reportingPeriodId,
       },
     })
@@ -43,7 +42,6 @@ describe('uploads', () => {
     expect(result.filename).toEqual('String')
     expect(result.uploadedById).toEqual(scenario.upload.two.uploadedById)
     expect(result.agencyId).toEqual(scenario.upload.two.agencyId)
-    expect(result.organizationId).toEqual(scenario.upload.two.organizationId)
     expect(result.reportingPeriodId).toEqual(
       scenario.upload.two.reportingPeriodId
     )
