@@ -1,6 +1,10 @@
+import type { Prisma, UploadValidation, Upload } from '@prisma/client'
+
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
-export const standard = defineScenario({
+export const standard = defineScenario<
+  Prisma.UploadValidationCreateArgs | Prisma.UploadCreateArgs
+>({
   uploadValidation: {
     one: {
       data: {
@@ -17,10 +21,10 @@ export const standard = defineScenario({
                 email: 'String1',
                 role: 'USDR_ADMIN',
                 updatedAt: '2023-12-08T21:03:20.706Z',
-                agency: { create: { name: 'String', code: 'String' } },
+                agency: { create: { name: 'ABC123-1', code: 'ABC123-1' } },
               },
             },
-            agency: { create: { name: 'String', code: 'String' } },
+            agency: { create: { name: 'ABC123-1', code: 'ABC123-1' } },
             organization: { create: { name: 'String' } },
             reportingPeriod: {
               create: {
@@ -64,8 +68,8 @@ export const standard = defineScenario({
             updatedAt: '2023-12-08T21:03:20.706Z',
             agency: {
               create: {
-                name: 'USDR-CPFVALIDATION',
-                code: 'USDR-CPFVALIDATION',
+                name: 'ABC123-1',
+                code: 'ABC123-1',
               },
             },
           },
@@ -75,4 +79,8 @@ export const standard = defineScenario({
   },
 })
 
-export type StandardScenario = ScenarioData<unknown>
+export type StandardScenario = ScenarioData<
+  UploadValidation,
+  'uploadValidation'
+> &
+  ScenarioData<Upload, 'upload'>
