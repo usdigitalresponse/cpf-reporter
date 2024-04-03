@@ -84,7 +84,9 @@ export const processRecord = async (
         passed: false,
       },
     })
-    console.log(secondaryRecords, `Secondary for: ${uploadId}`)
+    logger.info(
+      `Secondary for: ${uploadId}, ${JSON.stringify(secondaryRecords)}`
+    )
 
     if (!validationRecord) {
       logger.error(`Validation record not found for uploadId: ${uploadId}`)
