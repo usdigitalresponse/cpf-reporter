@@ -47,6 +47,7 @@ describe('cpfValidation function', () => {
     const updatedRecord = await uploadValidation({
       id: scenario.uploadValidation.one.id,
     })
+    console.log(updatedRecord, [])
     expect(mocks3.commands.length).toEqual(2)
     expect(updatedRecord.results).toEqual({ result: [] })
     expect(updatedRecord.passed).toEqual(true)
@@ -62,6 +63,7 @@ describe('cpfValidation function', () => {
     const updatedRecord = await uploadValidation({
       id: scenario.uploadValidation.one.id,
     })
+    console.log(updatedRecord, expectedBody)
     expect(updatedRecord.results).toEqual({ result: expectedBody })
     expect(updatedRecord.passed).toEqual(false)
   })
@@ -75,6 +77,7 @@ describe('cpfValidation function', () => {
     const existingRecord = await await uploadValidation({
       id: scenario.uploadValidation.one.id,
     })
+    console.log(existingRecord, null)
     expect(existingRecord.results).toEqual(null)
     expect(existingRecord.passed).toEqual(false)
   })
@@ -88,6 +91,7 @@ describe('cpfValidation function', () => {
     const existingRecord = await uploadValidation({
       id: scenario.uploadValidation.one.id,
     })
+    console.log(existingRecord, null)
     expect(existingRecord.results).toEqual(null)
     expect(existingRecord.passed).toEqual(false)
   })
@@ -103,6 +107,7 @@ describe('cpfValidation function', () => {
     const existingRecord = await uploadValidation({
       id: scenario.uploadValidation.one.id,
     })
+    console.log(existingRecord, null)
     expect(existingRecord.results).toEqual(null)
     expect(existingRecord.passed).toEqual(false)
   })
