@@ -1,3 +1,4 @@
+import { db } from 'src/lib/db'
 import { uploadValidation } from 'src/services/uploadValidations/uploadValidations'
 
 import { processRecord } from './cpfValidation'
@@ -44,8 +45,8 @@ describe('cpfValidation function', () => {
 
     await processRecord(record, mocks3)
 
-    const updatedRecord = await uploadValidation({
-      id: scenario.uploadValidation.one.id,
+    const updatedRecord = await db.uploadValidation.findUnique({
+      where: { id: scenario.uploadValidation.one.id },
     })
     console.log('updatedRecord', updatedRecord)
     expect(mocks3.commands.length).toEqual(2)
@@ -60,8 +61,8 @@ describe('cpfValidation function', () => {
 
     await processRecord(record, mocks3)
     expect(mocks3.commands.length).toEqual(2)
-    const updatedRecord = await uploadValidation({
-      id: scenario.uploadValidation.one.id,
+    const updatedRecord = await db.uploadValidation.findUnique({
+      where: { id: scenario.uploadValidation.one.id },
     })
     console.log('updatedRecord', updatedRecord)
     expect(updatedRecord.results).toEqual(expectedBody)
@@ -74,8 +75,8 @@ describe('cpfValidation function', () => {
 
     await processRecord(record, mocks3)
     expect(mocks3.commands.length).toEqual(1) // No DeleteObjectCommand
-    const existingRecord = await await uploadValidation({
-      id: scenario.uploadValidation.one.id,
+    const existingRecord = await db.uploadValidation.findUnique({
+      where: { id: scenario.uploadValidation.one.id },
     })
     expect(existingRecord.results).toEqual(null)
     expect(existingRecord.passed).toEqual(false)
@@ -87,8 +88,8 @@ describe('cpfValidation function', () => {
 
     await processRecord(record, mocks3)
     expect(mocks3.commands.length).toEqual(1)
-    const existingRecord = await uploadValidation({
-      id: scenario.uploadValidation.one.id,
+    const existingRecord = await db.uploadValidation.findUnique({
+      where: { id: scenario.uploadValidation.one.id },
     })
     expect(existingRecord.results).toEqual(null)
     expect(existingRecord.passed).toEqual(false)
