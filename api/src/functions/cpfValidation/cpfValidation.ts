@@ -3,6 +3,7 @@ import {
   GetObjectCommand,
   DeleteObjectCommand,
 } from '@aws-sdk/client-s3'
+import { Prisma } from '@prisma/client'
 import { NodeJsClient } from '@smithy/types'
 import { S3Event, S3Handler } from 'aws-lambda'
 
@@ -71,7 +72,7 @@ export const processRecord = async (
     // There should be an existing validation Record in the DB that will need to be updated
     const validationRecord = await db.uploadValidation.updateMany({
       data: input,
-      where: { uploadId, passed: false },
+      where: { uploadId, passed: false, results: { equals: Prisma.JsonNull } },
     })
     logger.info(`Records updated: ${validationRecord.count}`)
     if (!validationRecord) {
