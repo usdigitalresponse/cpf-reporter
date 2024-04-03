@@ -3,6 +3,7 @@ import {
   GetObjectCommand,
   DeleteObjectCommand,
 } from '@aws-sdk/client-s3'
+import { Prisma } from '@prisma/client'
 import { NodeJsClient } from '@smithy/types'
 import { S3Event, S3Handler } from 'aws-lambda'
 
@@ -69,14 +70,24 @@ export const processRecord = async (
       passed: passed,
     }
     // There should be an existing validation Record in the DB that will need to be updated
-    const validationRecord = await db.uploadValidation.updateMany({
-      data: input,
-      where: { uploadId, passed: false },
+
+    const validationRecord = await db.uploadValidation.findFirst({
+      where: {
+        uploadId,
+        passed: false,
+        results: { equals: Prisma.JsonNull },
+      },
     })
-    logger.info(`Records updated: ${validationRecord.count}`)
+
     if (!validationRecord) {
       logger.error('Validation record not found')
       throw new Error('Validation record not found')
+    } else {
+      const updatedRecord = await db.uploadValidation.update({
+        where: { id: validationRecord.id },
+        data: input,
+      })
+      logger.info(`Updated record: ${updatedRecord}`)
     }
 
     // Delete the errors.json file from S3
