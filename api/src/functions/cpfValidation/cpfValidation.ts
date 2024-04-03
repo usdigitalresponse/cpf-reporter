@@ -31,7 +31,7 @@ export const handler: S3Handler = async (event: S3Event): Promise<void> => {
   await Promise.all(
     event.Records.map(async (record) => {
       try {
-        await processRecord(record, s3, db)
+        await processRecord(record, s3)
       } catch (err) {
         logger.error(`Handler error: ${err}`)
       }
@@ -42,8 +42,7 @@ export const handler: S3Handler = async (event: S3Event): Promise<void> => {
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export const processRecord = async (
   record: UploadValidationRecord,
-  s3Client: UploadValidationS3Client,
-  database: any
+  s3Client: UploadValidationS3Client
 ): Promise<void> => {
   const bucket = record.s3.bucket.name
   const key = record.s3.object.key
@@ -69,21 +68,13 @@ export const processRecord = async (
       uploadId: uploadId,
       passed: passed,
     }
-    console.log('Updating upload id', uploadId)
-    console.log('Setting results to ', result)
     // There should be an existing validation Record in the DB that will need to be updated
-    console.log(
-      'Total validation records',
-      await database.uploadValidation.count()
-    )
-    const firstRecord = await database.uploadValidation.findFirst()
-    console.log('first record in the db', firstRecord)
-    const validationRecord = await database.uploadValidation.updateMany({
+    const validationRecord = await db.uploadValidation.updateMany({
       data: input,
-      where: { uploadId },
+      where: { uploadId, passed: false },
     })
-    console.log(`Records updated: ${validationRecord.count}`)
-    if (!validationRecord || validationRecord.count === 0) {
+    logger.info(`Records updated: ${validationRecord.count}`)
+    if (!validationRecord) {
       logger.error('Validation record not found')
       throw new Error('Validation record not found')
     }
