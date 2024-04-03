@@ -1,57 +1,75 @@
-// import { S3EventRecord } from 'aws-lambda'
+import { db } from 'src/lib/db'
 
-// import { handler } from './cpfValidation'
+import { processRecord } from './cpfValidation'
 
-//   Improve this test with help from the Redwood Testing Doc:
-//    https://redwoodjs.com/docs/testing#testing-functions
+class MockS3Client {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  commands: any[] = []
+  mockDocumentBody: string
+  constructor(documentBody: string) {
+    this.mockDocumentBody = documentBody
+  }
 
-describe('cpfValidation function', () => {
-  it('Dummy test', () => {
-    expect(1 + 1).toBe(2)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async send(command: any) {
+    this.commands.push(command)
+    return Promise.resolve({ Body: this.mockDocumentBody })
+  }
+}
+
+scenario('cpfValidation function - no errors', async (scenario) => {
+  const expectedBody = JSON.stringify([])
+  const mocks3 = new MockS3Client(expectedBody)
+  const record = {
+    s3: {
+      s3SchemaVersion: '1.0',
+      configurationId: 'test-configurationId',
+      bucket: {
+        name: 'test-bucket',
+        arn: 'test-arn',
+        ownerIdentity: {
+          principalId: 'test-principalId',
+        },
+      },
+      object: {
+        key: `/uploads/12/34/56/${scenario.uploadValidation.one.id}/{filename}`,
+      },
+    },
+  }
+  await processRecord(record, mocks3)
+
+  const updatedRecord = await db.uploadValidation.findUnique({
+    where: { id: scenario.uploadValidation.one.id },
   })
-  // it('Should respond with 200', async () => {
-  //   const record: S3EventRecord = {
-  //     eventVersion: '2.0',
-  //     eventSource: 'aws:s3',
-  //     eventName: 'ObjectCreated:Put',
-  //     eventTime: '1970-01-01T00:00:00.000Z',
-  //     userIdentity: { principalId: 'test-principalId' },
-  //     requestParameters: { sourceIPAddress: 'test-sourceIPAddress' },
-  //     responseElements: {
-  //       'x-amz-request-id': 'test-x-amz-request-id',
-  //       'x-amz-id-2': 'test-x-amz-id-2',
-  //     },
-  //     awsRegion: 'us-east-1',
-  //     s3: {
-  //       s3SchemaVersion: '1.0',
-  //       configurationId: 'test-configurationId',
-  //       bucket: {
-  //         name: 'test-bucket',
-  //         arn: 'test-arn',
-  //         ownerIdentity: {
-  //           principalId: 'test-principalId',
-  //         },
-  //       },
-  //       object: {
-  //         key: 'test-key',
-  //         size: 1234,
-  //         eTag: 'test-etag',
-  //         sequencer: 'test-sequencer',
-  //       },
-  //     },
-  //   }
-  //   const s3Event = {
-  //     Records: [record],
-  //   }
-  //   const response = await handler(s3Event, null, null)
-  //   const { data } = JSON.parse(response.body)
-  //   expect(response.statusCode).toBe(200)
-  //   expect(data).toBe('excelToJson function')
+  expect(mocks3.commands.length).toEqual(2)
+  expect(updatedRecord.results).toEqual([])
+  expect(updatedRecord.passed).toEqual(true)
 })
 
-// You can also use scenarios to test your api functions
-// See guide here: https://redwoodjs.com/docs/testing#scenarios
-//
-// scenario('Scenario test', async () => {
-//
-// })
+scenario('cpfValidation function - error', async (scenario) => {
+  const expectedBody = { error: 'error' }
+  const mocks3 = new MockS3Client(JSON.stringify(expectedBody))
+  const record = {
+    s3: {
+      s3SchemaVersion: '1.0',
+      configurationId: 'test-configurationId',
+      bucket: {
+        name: 'test-bucket',
+        arn: 'test-arn',
+        ownerIdentity: {
+          principalId: 'test-principalId',
+        },
+      },
+      object: {
+        key: `/uploads/12/34/56/${scenario.uploadValidation.one.id}/{filename}`,
+      },
+    },
+  }
+  await processRecord(record, mocks3)
+  expect(mocks3.commands.length).toEqual(2)
+  const updatedRecord = await db.uploadValidation.findUnique({
+    where: { id: scenario.uploadValidation.one.id },
+  })
+  expect(updatedRecord.results).toEqual(expectedBody)
+  expect(updatedRecord.passed).toEqual(false)
+})
