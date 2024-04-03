@@ -48,6 +48,9 @@ export const processRecord = async (
   const bucket = record.s3.bucket.name
   const key = record.s3.object.key
 
+  const allRecords = await db.uploadValidation.findMany()
+  logger.info(`Key: ${key} All records: ${JSON.stringify(allRecords)}`)
+
   // Download the JSON errors file from S3
   const getObjectResponse = await s3Client.send(
     new GetObjectCommand({ Bucket: bucket, Key: key })
