@@ -68,12 +68,14 @@ export const processRecord = async (
       uploadId: uploadId,
       passed: passed,
     }
+    console.log('Updating upload id', uploadId)
+    console.log('Setting results to ', results)
     // There should be an existing validation Record in the DB that will need to be updated
     const validationRecord = await db.uploadValidation.updateMany({
       data: input,
       where: { uploadId, passed: false },
     })
-    logger.info(`Records updated: ${validationRecord.count}`)
+    console.log(`Records updated: ${validationRecord.count}`)
     if (!validationRecord) {
       logger.error('Validation record not found')
       throw new Error('Validation record not found')
