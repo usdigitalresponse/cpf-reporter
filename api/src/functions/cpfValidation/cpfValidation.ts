@@ -87,7 +87,7 @@ export const processRecord = async (
       })
     )
   } else {
-    logger.warn('No body in getObjectResponse')
+    logger.warn(`No body in getObjectResponse ${key}`)
   }
 }
 
