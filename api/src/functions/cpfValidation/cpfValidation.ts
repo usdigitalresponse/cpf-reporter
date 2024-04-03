@@ -57,7 +57,7 @@ export const processRecord = async (
     /* example file path/key
          /uploads/organization_id/agency_id/reporting_period_id/upload_id/{filename}
       */
-    const result = JSON.parse(getObjectResponse.Body.toString())
+    const result = JSON.parse(getObjectResponse.Body.toString()) || []
 
     // when the results array is empty then we know the file has passed validations
     const passed = result.length === 0
