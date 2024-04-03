@@ -37,15 +37,15 @@ export const getCurrentUser = async (
 ): Promise<RedwoodUser | null> => {
   // Verify that the request is coming from the local development environment
   // and is only being processed within the local environment
-  // if (process.env.AUTH_PROVIDER === 'local') {
-  //   const user: RedwoodUser = await db.user.findFirst({
-  //     where: { email: token },
-  //     include: { agency: true },
-  //   })
-  //   // Redwood <PrivateSet> and hasRole checks require the roles to be an array
-  //   // user.roles = [`${user.role}`]
-  //   return user
-  // }
+  if (process.env.AUTH_PROVIDER === 'local') {
+    const user: RedwoodUser = await db.user.findFirst({
+      where: { email: token },
+      include: { agency: true },
+    })
+    // Redwood <PrivateSet> and hasRole checks require the roles to be an array
+    user.roles = [`${user.role}`]
+    return user
+  }
 
   return {
     email: 'usdr-admin@usdr.dev',

@@ -1,18 +1,18 @@
-import Button from 'react-bootstrap/Button';
+import Button from 'react-bootstrap/Button'
 
 interface ValidationResult {
-  message: string;
-  tab?: string;
-  row?: string;
-  col?: string;
-  severity: 'warn' | 'err' | 'info';
+  message: string
+  tab?: string
+  row?: string
+  col?: string
+  severity: 'warn' | 'err' | 'info'
 }
 
 interface UploadValidationButtonGroupProps {
-  latestValidation?: { passed: boolean, results: ValidationResult[] | null };
-  handleFileDownload: () => void;
-  handleForceInvalidate: () => void;
-  handleValidate: () => void;
+  latestValidation?: { passed: boolean; results: ValidationResult[] | null }
+  handleFileDownload: () => void
+  handleForceInvalidate: () => void
+  handleValidate: () => void
 }
 
 const UploadValidationButtonGroup = ({
@@ -28,19 +28,23 @@ const UploadValidationButtonGroup = ({
   */
   const renderValidationButtons = () => {
     if (!latestValidation) {
-      return null;
+      return null
     }
 
-    const { passed, results } = latestValidation;
+    const { passed, results } = latestValidation
 
     if (results === null) {
-      return <span className="fst-italic">Validation in progress...</span>;
+      return <span className="fst-italic">Validation in progress...</span>
     }
 
     return (
       <>
         {passed && (
-          <Button variant="outline-primary" size="sm" onClick={handleForceInvalidate}>
+          <Button
+            variant="outline-primary"
+            size="sm"
+            onClick={handleForceInvalidate}
+          >
             Invalidate
           </Button>
         )}{' '}
@@ -48,8 +52,8 @@ const UploadValidationButtonGroup = ({
           {passed ? 'Re-Validate' : 'Validate'}
         </Button>
       </>
-    );
-  };
+    )
+  }
 
   return (
     <li className="list-group-item">
@@ -60,7 +64,7 @@ const UploadValidationButtonGroup = ({
         {renderValidationButtons()}
       </div>
     </li>
-  );
-};
+  )
+}
 
-export default UploadValidationButtonGroup;
+export default UploadValidationButtonGroup

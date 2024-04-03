@@ -14,11 +14,11 @@ export const ValidUpload: Story = {
   args: {
     latestValidation: {
       passed: true,
-      results: []
+      results: [],
     },
-    handleFileDownload: () => { },
-    handleForceInvalidate: () => { },
-    handleValidate: () => { },
+    handleFileDownload: () => {},
+    handleForceInvalidate: () => {},
+    handleValidate: () => {},
   },
 }
 
@@ -33,12 +33,12 @@ export const InvalidUpload: Story = {
           message: 'EC code must be set',
           row: '2',
           col: 'D',
-        }
-      ]
+        },
+      ],
     },
-    handleFileDownload: () => { },
-    handleForceInvalidate: () => { },
-    handleValidate: () => { },
+    handleFileDownload: () => {},
+    handleForceInvalidate: () => {},
+    handleValidate: () => {},
   },
 }
 
@@ -46,10 +46,10 @@ export const UploadValidationInProgress: Story = {
   args: {
     latestValidation: {
       passed: false,
-      results: null
+      results: null,
     },
-    handleFileDownload: () => { },
-    handleForceInvalidate: () => { },
-    handleValidate: () => { },
+    handleFileDownload: () => {},
+    handleForceInvalidate: () => {},
+    handleValidate: () => {},
   },
 }
