@@ -69,7 +69,7 @@ export const processRecord = async (
       passed: passed,
     }
     console.log('Updating upload id', uploadId)
-    console.log('Setting results to ', results)
+    console.log('Setting results to ', result)
     // There should be an existing validation Record in the DB that will need to be updated
     const validationRecord = await db.uploadValidation.updateMany({
       data: input,
