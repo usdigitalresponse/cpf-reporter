@@ -1,49 +1,54 @@
 import Button from 'react-bootstrap/Button';
 
+interface ValidationResult {
+  message: string;
+  tab?: string;
+  row?: string;
+  col?: string;
+  severity: 'warn' | 'err' | 'info';
+}
+
 interface UploadValidationButtonGroupProps {
-  latestValidation?: { passed: boolean, results: JSON | null };
+  latestValidation?: { passed: boolean, results: ValidationResult[] | null };
   handleFileDownload: () => void;
   handleForceInvalidate: () => void;
   handleValidate: () => void;
 }
 
-const UploadValidationButtonGroup: React.FC<UploadValidationButtonGroupProps> = ({
+const UploadValidationButtonGroup = ({
   latestValidation,
   handleFileDownload,
   handleForceInvalidate,
   handleValidate,
-}) => {
-
+}: UploadValidationButtonGroupProps) => {
   /*
-    If the upload validation is in progress (results are null and passed is false), render "Validation in progress...".
-    If the upload has been validated, render "Invalidate" and "Re-validate" buttons
-    If the upload has been invalidated, render the "Re-Validate" button
+    If the upload validation is in progress (results are null), renders "Validation in progress...".
+    If the upload has been validated, renders "Invalidate" and "Re-validate" buttons
+    If the upload has been invalidated, renders the "Validate" button
   */
   const renderValidationButtons = () => {
+    if (!latestValidation) {
+      return null;
+    }
+
     const { passed, results } = latestValidation;
 
     if (results === null) {
       return <span className="fst-italic">Validation in progress...</span>;
     }
 
-    if (passed) {
-      return (
-        <>
+    return (
+      <>
+        {passed && (
           <Button variant="outline-primary" size="sm" onClick={handleForceInvalidate}>
             Invalidate
-          </Button>{' '}
-          <Button variant="outline-primary" size="sm" onClick={handleValidate}>
-            Re-validate
           </Button>
-        </>
-      );
-    } else {
-      return (
-        <Button variant="outline-primary" size="sm" onClick={handleValidate}>
-          Re-validate
+        )}{' '}
+        <Button variant="primary" size="sm" onClick={handleValidate}>
+          {passed ? 'Re-Validate' : 'Validate'}
         </Button>
-      );
-    }
+      </>
+    );
   };
 
   return (
