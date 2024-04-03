@@ -1,6 +1,6 @@
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
-const standardSpec = {
+export const standard = defineScenario({
   uploadValidation: {
     one: {
       data: {
@@ -9,7 +9,7 @@ const standardSpec = {
         results: null,
         upload: {
           create: {
-            filename: 'String',
+            filename: 'abc123',
             updatedAt: '2023-12-08T21:03:20.706Z',
             uploadedBy: {
               create: {
@@ -24,22 +24,22 @@ const standardSpec = {
             organization: { create: { name: 'String' } },
             reportingPeriod: {
               create: {
-                name: 'String',
+                name: 'rep-period-1',
                 startDate: '2023-12-08T21:03:20.706Z',
                 endDate: '2023-12-08T21:03:20.706Z',
                 updatedAt: '2023-12-08T21:03:20.706Z',
                 inputTemplate: {
                   create: {
-                    name: 'String',
-                    version: 'String',
+                    name: 'input-template-1',
+                    version: '1',
                     effectiveDate: '2023-12-08T21:03:20.706Z',
                     updatedAt: '2023-12-08T21:03:20.706Z',
                   },
                 },
                 outputTemplate: {
                   create: {
-                    name: 'String',
-                    version: 'String',
+                    name: 'output-template-1',
+                    version: '1',
                     effectiveDate: '2023-12-08T21:03:20.706Z',
                     updatedAt: '2023-12-08T21:03:20.706Z',
                   },
@@ -49,8 +49,8 @@ const standardSpec = {
             },
             expenditureCategory: {
               create: {
-                name: 'String',
-                code: 'String',
+                name: 'ABC123',
+                code: 'ABC123',
                 updatedAt: '2023-12-08T21:03:20.706Z',
               },
             },
@@ -58,18 +58,21 @@ const standardSpec = {
         },
         initiatedBy: {
           create: {
-            name: 'String',
-            email: 'String2',
+            name: 'USDR_ADMIN',
+            email: 'usdr_admin@usdigitalresponse.org',
             role: 'USDR_ADMIN',
             updatedAt: '2023-12-08T21:03:20.706Z',
-            agency: { create: { name: 'String', code: 'String' } },
+            agency: {
+              create: {
+                name: 'USDR-CPFVALIDATION',
+                code: 'USDR-CPFVALIDATION',
+              },
+            },
           },
         },
       },
     },
   },
-}
-
-export const standard = defineScenario(standardSpec)
+})
 
 export type StandardScenario = ScenarioData<unknown>
