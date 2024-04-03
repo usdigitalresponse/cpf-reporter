@@ -78,9 +78,16 @@ export const processRecord = async (
         results: { equals: Prisma.JsonNull },
       },
     })
+    const secondaryRecords = await db.uploadValidation.findMany({
+      where: {
+        uploadId,
+        passed: false,
+      },
+    })
+    console.log(secondaryRecords, `Secondary for: ${uploadId}`)
 
     if (!validationRecord) {
-      logger.error('Validation record not found')
+      logger.error(`Validation record not found for uploadId: ${uploadId}`)
       throw new Error('Validation record not found')
     } else {
       const updatedRecord = await db.uploadValidation.update({
