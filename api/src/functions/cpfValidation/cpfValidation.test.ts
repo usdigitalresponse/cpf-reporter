@@ -17,7 +17,7 @@ class MockS3Client {
   }
 }
 
-function buildRecord(uploadValidationId: string) {
+function buildRecord(uploadId: string) {
   return {
     s3: {
       s3SchemaVersion: '1.0',
@@ -30,7 +30,7 @@ function buildRecord(uploadValidationId: string) {
         },
       },
       object: {
-        key: `/uploads/12/34/56/${uploadValidationId}/{filename}`,
+        key: `/uploads/12/34/56/${uploadId}/{filename}`,
       },
     },
   }
@@ -40,7 +40,8 @@ describe('cpfValidation function', () => {
   scenario('no validation errors', async (scenario) => {
     const expectedBody = JSON.stringify([])
     const mocks3 = new MockS3Client(expectedBody)
-    const record = buildRecord(scenario.uploadValidation.one.id)
+    const record = buildRecord(scenario.uploadValidation.one.uploadId)
+    console.log(scenario, 'scenario')
 
     await processRecord(record, mocks3)
 
@@ -56,7 +57,7 @@ describe('cpfValidation function', () => {
   scenario('validation error', async (scenario) => {
     const expectedBody = [{ error: 'error' }]
     const mocks3 = new MockS3Client(JSON.stringify(expectedBody))
-    const record = buildRecord(scenario.uploadValidation.one.id)
+    const record = buildRecord(scenario.uploadValidation.one.uploadId)
 
     await processRecord(record, mocks3)
     expect(mocks3.commands.length).toEqual(2)
@@ -70,7 +71,7 @@ describe('cpfValidation function', () => {
 
   scenario('no body in s3 object', async (scenario) => {
     const mocks3 = new MockS3Client(null)
-    const record = buildRecord(scenario.uploadValidation.one.id)
+    const record = buildRecord(scenario.uploadValidation.one.uploadId)
 
     await processRecord(record, mocks3)
     expect(mocks3.commands.length).toEqual(1) // No DeleteObjectCommand
@@ -84,7 +85,7 @@ describe('cpfValidation function', () => {
 
   scenario('no matching upload record', async (scenario) => {
     const mocks3 = new MockS3Client(null)
-    const record = buildRecord(scenario.uploadValidation.one.id + 1)
+    const record = buildRecord(scenario.uploadValidation.one.uploadId + 1)
 
     await processRecord(record, mocks3)
     expect(mocks3.commands.length).toEqual(1)
@@ -98,7 +99,7 @@ describe('cpfValidation function', () => {
 
   scenario('no key found in path', async (scenario) => {
     const mocks3 = new MockS3Client(null)
-    const record = buildRecord(scenario.uploadValidation.one.id)
+    const record = buildRecord(scenario.uploadValidation.one.uploadId)
 
     record.s3.object.key = 'bad-key'
 
