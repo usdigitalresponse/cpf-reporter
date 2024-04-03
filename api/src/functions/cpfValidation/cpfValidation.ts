@@ -55,7 +55,7 @@ export const processRecord = async (
   // Add the contents of the JSON to the database
   if (getObjectResponse.Body) {
     /* example file path/key
-         /uploads/organization_id/agency_id/reporting_period_id/expenditure_category_code/upload_id/{filename}
+         /uploads/organization_id/agency_id/reporting_period_id/upload_id/{filename}
       */
     const result = JSON.parse(getObjectResponse.Body.toString())
 
