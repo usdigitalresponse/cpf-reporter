@@ -1,3 +1,4 @@
+import type { UploadUncheckedCreateInput } from '@prisma/client'
 import type {
   QueryResolvers,
   MutationResolvers,
@@ -20,12 +21,14 @@ export const upload: QueryResolvers['upload'] = ({ id }) => {
 export const createUpload: MutationResolvers['createUpload'] = async ({
   input,
 }) => {
-  const additionalInput = {
+  const inputWithContext: UploadUncheckedCreateInput = {
+    ...input,
     uploadById: context.currentUser.id,
-    agencyId: context.currentUser.agencyId,
+    agencyId: context.currentUser.agencyId as number,
+    organizationId: context.currentUser.agency.organizationId,
   }
   const upload = await db.upload.create({
-    data: input,
+    data: inputWithContext,
   })
   const signedUrl = await s3PutSignedUrl(
     upload,
