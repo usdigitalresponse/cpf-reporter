@@ -26,7 +26,6 @@ model Organization {
   agencies          Agency[]
   name              String
   reportingPeriods  ReportingPeriod[]
-  uploads           Upload[]
   subrecipients     Subrecipient[]
   projects          Project[]
 }
@@ -114,8 +113,6 @@ model Upload {
   uploadedBy            User                 @relation(fields: [uploadedById], references: [id])
   agencyId              Int
   agency                Agency               @relation(fields: [agencyId], references: [id])
-  organizationId        Int
-  organization          Organization         @relation(fields: [organizationId], references: [id])
   reportingPeriodId     Int
   reportingPeriod       ReportingPeriod      @relation(fields: [reportingPeriodId], references: [id])
   expenditureCategoryId Int?
@@ -123,7 +120,6 @@ model Upload {
   createdAt             DateTime             @default(now()) @db.Timestamptz(6)
   updatedAt             DateTime             @default(now()) @db.Timestamptz(6)
   validations           UploadValidation[]
-  subrecipients         Subrecipient[]
 }
 
 model UploadValidation {
@@ -146,8 +142,6 @@ model Subrecipient {
   startDate           DateTime     @db.Date
   endDate             DateTime     @db.Date
   certifiedAt         DateTime?    @db.Timestamptz(6)
-  originationUploadId Int
-  originationUpload   Upload       @relation(fields: [originationUploadId], references: [id])
   createdAt           DateTime     @default(now()) @db.Timestamptz(6)
   updatedAt           DateTime     @default(now()) @db.Timestamptz(6)
 }

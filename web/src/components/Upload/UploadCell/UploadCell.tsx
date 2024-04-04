@@ -11,7 +11,6 @@ export const QUERY = gql`
       filename
       uploadedById
       agencyId
-      organizationId
       reportingPeriodId
       expenditureCategoryId
       createdAt
