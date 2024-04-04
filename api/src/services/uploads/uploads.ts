@@ -23,7 +23,7 @@ export const createUpload: MutationResolvers['createUpload'] = async ({
 }) => {
   const inputWithContext: UploadUncheckedCreateInput = {
     ...input,
-    uploadById: context.currentUser.id,
+    uploadedById: context.currentUser.id,
     agencyId: context.currentUser.agencyId as number,
     organizationId: context.currentUser.agency.organizationId,
   }
