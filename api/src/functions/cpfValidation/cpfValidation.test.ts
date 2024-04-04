@@ -1,57 +1,109 @@
-// import { S3EventRecord } from 'aws-lambda'
+import { db } from 'src/lib/db'
 
-// import { handler } from './cpfValidation'
+import { processRecord } from './cpfValidation'
 
-//   Improve this test with help from the Redwood Testing Doc:
-//    https://redwoodjs.com/docs/testing#testing-functions
+class MockS3Client {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  commands: any[] = []
+  mockDocumentBody: string
+  constructor(documentBody: string) {
+    this.mockDocumentBody = documentBody
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async send(command: any) {
+    this.commands.push(command)
+    return Promise.resolve({ Body: this.mockDocumentBody })
+  }
+}
+
+function buildRecord(uploadValidationId: string) {
+  return {
+    s3: {
+      s3SchemaVersion: '1.0',
+      configurationId: 'test-configurationId',
+      bucket: {
+        name: 'test-bucket',
+        arn: 'test-arn',
+        ownerIdentity: {
+          principalId: 'test-principalId',
+        },
+      },
+      object: {
+        key: `/uploads/12/34/56/${uploadValidationId}/{filename}`,
+      },
+    },
+  }
+}
 
 describe('cpfValidation function', () => {
-  it('Dummy test', () => {
-    expect(1 + 1).toBe(2)
-  })
-  // it('Should respond with 200', async () => {
-  //   const record: S3EventRecord = {
-  //     eventVersion: '2.0',
-  //     eventSource: 'aws:s3',
-  //     eventName: 'ObjectCreated:Put',
-  //     eventTime: '1970-01-01T00:00:00.000Z',
-  //     userIdentity: { principalId: 'test-principalId' },
-  //     requestParameters: { sourceIPAddress: 'test-sourceIPAddress' },
-  //     responseElements: {
-  //       'x-amz-request-id': 'test-x-amz-request-id',
-  //       'x-amz-id-2': 'test-x-amz-id-2',
-  //     },
-  //     awsRegion: 'us-east-1',
-  //     s3: {
-  //       s3SchemaVersion: '1.0',
-  //       configurationId: 'test-configurationId',
-  //       bucket: {
-  //         name: 'test-bucket',
-  //         arn: 'test-arn',
-  //         ownerIdentity: {
-  //           principalId: 'test-principalId',
-  //         },
-  //       },
-  //       object: {
-  //         key: 'test-key',
-  //         size: 1234,
-  //         eTag: 'test-etag',
-  //         sequencer: 'test-sequencer',
-  //       },
-  //     },
-  //   }
-  //   const s3Event = {
-  //     Records: [record],
-  //   }
-  //   const response = await handler(s3Event, null, null)
-  //   const { data } = JSON.parse(response.body)
-  //   expect(response.statusCode).toBe(200)
-  //   expect(data).toBe('excelToJson function')
-})
+  scenario('no validation errors', async (scenario) => {
+    const expectedBody = JSON.stringify([])
+    const mocks3 = new MockS3Client(expectedBody)
+    const record = buildRecord(scenario.uploadValidation.one.uploadId)
 
-// You can also use scenarios to test your api functions
-// See guide here: https://redwoodjs.com/docs/testing#scenarios
-//
-// scenario('Scenario test', async () => {
-//
-// })
+    await processRecord(record, mocks3)
+
+    const updatedRecord = await db.uploadValidation.findUnique({
+      where: { id: scenario.uploadValidation.one.id },
+    })
+    expect(mocks3.commands.length).toEqual(2)
+    expect(updatedRecord.results).toEqual([])
+    expect(updatedRecord.passed).toEqual(true)
+  })
+
+  scenario('validation error', async (scenario) => {
+    const expectedBody = { error: 'error' }
+    const mocks3 = new MockS3Client(JSON.stringify(expectedBody))
+    const record = buildRecord(scenario.uploadValidation.one.uploadId)
+
+    await processRecord(record, mocks3)
+    expect(mocks3.commands.length).toEqual(2)
+    const updatedRecord = await db.uploadValidation.findUnique({
+      where: { id: scenario.uploadValidation.one.id },
+    })
+    expect(updatedRecord.results).toEqual(expectedBody)
+    expect(updatedRecord.passed).toEqual(false)
+  })
+
+  scenario('no body in s3 object', async (scenario) => {
+    const mocks3 = new MockS3Client(null)
+    const record = buildRecord(scenario.uploadValidation.one.uploadId)
+
+    await processRecord(record, mocks3)
+    expect(mocks3.commands.length).toEqual(1) // No DeleteObjectCommand
+    const existingRecord = await db.uploadValidation.findUnique({
+      where: { id: scenario.uploadValidation.one.id },
+    })
+    expect(existingRecord.results).toEqual(null)
+    expect(existingRecord.passed).toEqual(false)
+  })
+
+  scenario('no matching upload record', async (scenario) => {
+    const mocks3 = new MockS3Client(null)
+    const record = buildRecord(scenario.uploadValidation.one.uploadId + 1)
+
+    await processRecord(record, mocks3)
+    expect(mocks3.commands.length).toEqual(1)
+    const existingRecord = await db.uploadValidation.findUnique({
+      where: { id: scenario.uploadValidation.one.id },
+    })
+    expect(existingRecord.results).toEqual(null)
+    expect(existingRecord.passed).toEqual(false)
+  })
+
+  scenario('no key found in path', async (scenario) => {
+    const mocks3 = new MockS3Client(null)
+    const record = buildRecord(scenario.uploadValidation.one.uploadId)
+
+    record.s3.object.key = 'bad-key'
+
+    await processRecord(record, mocks3)
+    expect(mocks3.commands.length).toEqual(1)
+    const existingRecord = await db.uploadValidation.findUnique({
+      where: { id: scenario.uploadValidation.one.id },
+    })
+    expect(existingRecord.results).toEqual(null)
+    expect(existingRecord.passed).toEqual(false)
+  })
+})
