@@ -1,5 +1,7 @@
 import type { Upload } from '@prisma/client'
 
+import { db } from 'src/lib/db'
+
 import {
   uploads,
   upload,
@@ -17,6 +19,25 @@ import type { StandardScenario } from './uploads.scenarios'
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
 describe('uploads', () => {
+  // beforeEach(() => {
+  //   mockCurrentUser({
+  //     id: 1,
+  //     email: 'usdr-admin@usdr.dev',
+  //     name: 'USDR Admin',
+  //     role: 'USDR_ADMIN',
+  //     roles: ['USDR_ADMIN'],
+  //     agency: {
+  //       id: 1,
+  //       name: 'Main Agency',
+  //       abbreviation: 'MAUSDR',
+  //       code: 'MAUSDR',
+  //       organizationId: 1,
+  //     },
+  //     agencyId: 1, // TO_DEPRECATE
+  //     createdAt: new Date().toISOString(),
+  //     updatedAt: new Date().toISOString(),
+  //   })
+  // })
   scenario('returns all uploads', async (scenario: StandardScenario) => {
     const result = await uploads()
 
@@ -30,12 +51,18 @@ describe('uploads', () => {
   })
 
   scenario('creates a upload', async (scenario: StandardScenario) => {
+    const user = await db.user.findUnique({
+      where: { id: scenario.upload.two.uploadedById },
+      include: { agency: true },
+    })
+    mockCurrentUser(user)
+
     const result = await createUpload({
       input: {
         filename: 'String',
-        uploadedById: scenario.upload.two.uploadedById,
-        agencyId: scenario.upload.two.agencyId,
-        organizationId: scenario.upload.two.organizationId,
+        // uploadedById: scenario.upload.two.uploadedById,
+        // agencyId: scenario.upload.two.agencyId,
+        // organizationId: scenario.upload.two.organizationId,
         reportingPeriodId: scenario.upload.two.reportingPeriodId,
       },
     })
