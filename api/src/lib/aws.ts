@@ -64,7 +64,7 @@ export function uploadWorkbook(
   uploadId: number,
   body: StreamingBlobPayloadInputTypes
 ) {
-  const folderName = `uploads/${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.expenditureCategoryId}/${uploadId}/${upload.filename}`
+  const folderName = `uploads/${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${uploadId}/${upload.filename}`
   return sendPutObjectToS3Bucket(REPORTING_DATA_BUCKET_NAME, folderName, body)
 }
 
@@ -104,12 +104,11 @@ export async function s3PutSignedUrl(
   uploadId: number
 ): Promise<string> {
   const s3 = getS3Client()
-  const key = `uploads/${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.expenditureCategoryId}/${uploadId}/${upload.filename}`
+  const key = `uploads/${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${uploadId}/${upload.filename}`
   const baseParams: PutObjectCommandInput = {
     Bucket: REPORTING_DATA_BUCKET_NAME,
     Key: key,
-    ContentType:
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ContentType: 'application/vnd.ms-excel.sheet.macroenabled.12',
     ServerSideEncryption: 'AES256',
   }
   const url = await awsGetSignedUrl(s3, new PutObjectCommand(baseParams), {

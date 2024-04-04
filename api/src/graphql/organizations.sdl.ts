@@ -5,8 +5,6 @@ export const schema = gql`
     users: [User]!
     name: String!
     reportingPeriods: [ReportingPeriod]!
-    uploads: [Upload]!
-    uploadValidations: [UploadValidation]!
     subrecipients: [Subrecipient]!
     projects: [Project]!
   }

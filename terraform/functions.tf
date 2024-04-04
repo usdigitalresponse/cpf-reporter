@@ -447,8 +447,8 @@ module "lambda_function-cpfValidation" {
         "s3:PutObject"
       ]
       resources = [
-        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsm.json
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsm.json",
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/}/{upload_id}/{filename}.xlsm.json
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm.json",
       ]
     }
   }

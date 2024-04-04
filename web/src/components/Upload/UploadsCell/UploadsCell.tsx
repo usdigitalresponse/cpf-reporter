@@ -24,8 +24,7 @@ export const QUERY = gql`
       }
       latestValidation {
         createdAt
-        invalidatedAt
-        validatedAt
+        passed
       }
       createdAt
       updatedAt

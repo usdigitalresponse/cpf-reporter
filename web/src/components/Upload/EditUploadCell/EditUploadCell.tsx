@@ -14,7 +14,6 @@ export const QUERY = gql`
       filename
       uploadedById
       agencyId
-      organizationId
       reportingPeriodId
       expenditureCategoryId
       createdAt
@@ -29,7 +28,6 @@ const UPDATE_UPLOAD_MUTATION = gql`
       filename
       uploadedById
       agencyId
-      organizationId
       reportingPeriodId
       expenditureCategoryId
       createdAt
