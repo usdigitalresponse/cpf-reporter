@@ -65,10 +65,6 @@ const Upload = ({ upload }: Props) => {
               <td>{upload.agencyId}</td>
             </tr>
             <tr>
-              <th>Organization id</th>
-              <td>{upload.organizationId}</td>
-            </tr>
-            <tr>
               <th>Reporting period id</th>
               <td>{upload.reportingPeriodId}</td>
             </tr>

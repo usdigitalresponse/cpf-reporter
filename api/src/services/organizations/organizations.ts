@@ -58,7 +58,6 @@ export const createOrganizationAgencyAdmin: MutationResolvers['createOrganizatio
         email: userEmail,
         name: userName,
         agencyId: agency.id,
-        organizationId: organization.id,
         role: 'ORGANIZATION_ADMIN',
       },
     })
@@ -89,7 +88,7 @@ export const Organization: OrganizationRelationResolvers = {
     return db.organization.findUnique({ where: { id: root?.id } }).agencies()
   },
   users: (_obj, { root }) => {
-    return db.organization.findUnique({ where: { id: root?.id } }).users()
+    return db.user.findMany({ where: { agency: { organizationId: root?.id } } })
   },
   reportingPeriods: (_obj, { root }) => {
     return db.organization
@@ -98,11 +97,6 @@ export const Organization: OrganizationRelationResolvers = {
   },
   uploads: (_obj, { root }) => {
     return db.organization.findUnique({ where: { id: root?.id } }).uploads()
-  },
-  uploadValidations: (_obj, { root }) => {
-    return db.organization
-      .findUnique({ where: { id: root?.id } })
-      .uploadValidations()
   },
   subrecipients: (_obj, { root }) => {
     return db.organization

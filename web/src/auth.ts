@@ -15,6 +15,13 @@ export interface AuthClient {
   getUserMetadata: () => User | null
 }
 
+interface Agency {
+  name: string
+  abbreviation: string
+  code: string
+  organizationId: number
+}
+
 // If you're integrating with an auth service provider you should delete this interface.
 // This type should be inferred from the general interface above.
 interface User {
@@ -24,6 +31,7 @@ interface User {
   email?: string
   username?: string
   roles: string[]
+  agency: Agency
 }
 
 // If you're integrating with an auth service provider you should delete this interface

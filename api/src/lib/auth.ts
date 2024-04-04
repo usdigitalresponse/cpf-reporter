@@ -1,14 +1,13 @@
+import type { User } from 'types/graphql'
+
 import { Decoded } from '@redwoodjs/api'
 import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
 
 import { db } from 'src/lib/db'
 
-/**
- * Represents the user attributes returned by the decoding the
- * Authentication provider's JWT together with an optional list of roles.
- */
-type RedwoodUser = Record<string, unknown> & { roles?: string[] }
-
+interface CurrentUser extends User {
+  roles?: string[]
+}
 /**
  * getCurrentUser returns the user information together with
  * an optional collection of roles used by requireAuth() to check
@@ -34,11 +33,11 @@ type RedwoodUser = Record<string, unknown> & { roles?: string[] }
 export const getCurrentUser = async (
   decoded: Decoded,
   { token }: { token: string }
-): Promise<RedwoodUser | null> => {
+): Promise<CurrentUser | null> => {
   // Verify that the request is coming from the local development environment
   // and is only being processed within the local environment
   if (process.env.AUTH_PROVIDER === 'local') {
-    const user: RedwoodUser = await db.user.findFirst({
+    const user: CurrentUser = await db.user.findFirst({
       where: { email: token },
       include: { agency: true },
     })
@@ -54,13 +53,13 @@ export const getCurrentUser = async (
     role: 'USDR_ADMIN',
     roles: ['USDR_ADMIN'],
     agency: {
+      id: 1,
       name: 'Main Agency',
       abbreviation: 'MAUSDR',
       code: 'MAUSDR',
       organizationId: 1,
     },
     agencyId: 1, // TO_DEPRECATE
-    organizationId: 1, // TO_DEPRECATE
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }

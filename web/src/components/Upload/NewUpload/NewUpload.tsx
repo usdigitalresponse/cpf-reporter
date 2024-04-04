@@ -37,7 +37,7 @@ const NewUpload = () => {
       <div className="rw-segment-main">
         <UploadForm
           userId={currentUser.id}
-          organizationId={currentUser.organizationId}
+          organizationId={currentUser.agency.organizationId}
           loading={loading}
           error={error}
         />
