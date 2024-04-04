@@ -52,14 +52,11 @@ const UploadForm = (props: UploadFormProps) => {
 
   const onSubmit = async (data) => {
     data.filename = data.file[0].name
-    data.agencyId = parseInt(data.agencyId)
+    // data.agencyId = parseInt(data.agencyId)
     data.reportingPeriodId = parseInt(data.reportingPeriodId)
 
     const uploadInput = {
-      uploadedById: props.userId,
-      agencyId: data.agencyId,
       filename: data.file[0].name,
-      organizationId: props.organizationId,
       reportingPeriodId: data.reportingPeriodId,
     }
     const res = await create({ variables: { input: uploadInput } })

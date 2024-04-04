@@ -27,11 +27,7 @@ export const schema = gql`
 
   input CreateUploadInput {
     filename: String!
-    uploadedById: Int!
-    agencyId: Int!
-    organizationId: Int!
     reportingPeriodId: Int!
-    expenditureCategoryId: Int
   }
 
   input UpdateUploadInput {

@@ -20,10 +20,18 @@ export const upload: QueryResolvers['upload'] = ({ id }) => {
 export const createUpload: MutationResolvers['createUpload'] = async ({
   input,
 }) => {
+  const additionalInput = {
+    uploadById: context.currentUser.id,
+    agencyId: context.currentUser.agencyId,
+  }
   const upload = await db.upload.create({
     data: input,
   })
-  const signedUrl = await s3PutSignedUrl(upload, upload.id)
+  const signedUrl = await s3PutSignedUrl(
+    upload,
+    upload.id,
+    context.currentUser.agency.organizationId
+  )
 
   return { ...upload, signedUrl }
 }

@@ -48,6 +48,7 @@ export const getCurrentUser = async (
   }
 
   return {
+    id: 1,
     email: 'usdr-admin@usdr.dev',
     name: 'USDR Admin',
     role: 'USDR_ADMIN',
