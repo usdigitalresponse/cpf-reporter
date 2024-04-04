@@ -13,7 +13,7 @@ import {
 } from '@aws-sdk/client-sqs'
 import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { StreamingBlobPayloadInputTypes } from '@smithy/types'
-import { QueryResolvers, CreateUploadInput } from 'types/graphql'
+import { QueryResolvers, CreateUploadInput, Upload } from 'types/graphql'
 
 const REPORTING_DATA_BUCKET_NAME = `${process.env.REPORTING_DATA_BUCKET_NAME}`
 
@@ -60,7 +60,7 @@ function getS3Client() {
 }
 
 export function uploadWorkbook(
-  upload: CreateUploadInput,
+  upload: Upload,
   uploadId: number,
   body: StreamingBlobPayloadInputTypes
 ) {
@@ -100,7 +100,7 @@ async function sendHeadObjectToS3Bucket(bucketName: string, key: string) {
 }
 
 export async function s3PutSignedUrl(
-  upload: CreateUploadInput,
+  upload: Upload,
   uploadId: number,
   organizationId: number
 ): Promise<string> {
@@ -171,13 +171,6 @@ async function receiveSqsMessage(queueUrl: string) {
       MaxNumberOfMessages: 1,
     })
   )
-}
-
-export const s3PutObjectSignedUrl: QueryResolvers['s3PutObjectSignedUrl'] = ({
-  upload,
-  uploadId,
-}) => {
-  return s3PutSignedUrl(upload, uploadId)
 }
 
 export default {
