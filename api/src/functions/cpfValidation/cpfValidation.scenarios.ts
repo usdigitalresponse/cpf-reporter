@@ -25,7 +25,6 @@ export const standard = defineScenario<
               },
             },
             agency: { create: { name: 'ABC123-1', code: 'ABC123-1' } },
-            organization: { create: { name: 'String' } },
             reportingPeriod: {
               create: {
                 name: 'rep-period-1',
