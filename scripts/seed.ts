@@ -112,6 +112,25 @@ export default async () => {
       )
     )
 
+    const reportingPeriods = [
+      {
+        name: '2024 Q1',
+        startDate: new Date('2024-01-01'),
+        endDate: new Date('2024-03-31'),
+        organizationId: 1,
+        inputTemplateId: 1,
+        outputTemplateId: 1,
+      },
+    ]
+    await Promise.all(
+      reportingPeriods.map(
+        async (data: Prisma.ReportingPeriodCreateArgs['data']) => {
+          const record = await db.reportingPeriod.create({ data })
+          console.log(record)
+        }
+      )
+    )
+
     // If using dbAuth and seeding users, you'll need to add a `hashedPassword`
     // and associated `salt` to their record. Here's how to create them using
     // the same algorithm that dbAuth uses internally:
