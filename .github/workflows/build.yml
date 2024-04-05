@@ -480,13 +480,13 @@ jobs:
 
   python-function-zips:
     name: Build Python Lambda function zip artifacts
-    if: inputs.build-python-functions
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: none
     env:
       ARTIFACTS_KEY: python-${{ inputs.ref }}
+      BUILD_OUTPUT_PATH: ${{ github.workspace }}/python/dist
       ARTIFACTS_PATH: ${{ github.workspace }}/python/dist/zipballs
     outputs:
       artifacts-key: ${{ env.ARTIFACTS_KEY }}
