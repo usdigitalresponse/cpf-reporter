@@ -46,14 +46,27 @@ class TestValidateCoverSheet:
         assert errors == []
         assert schema == SCHEMA_BY_PROJECT["1A"]
 
+    def test_invalid_cover_sheet(self, invalid_cover_sheet: Worksheet):
+        errors, schema = validate_cover_sheet(invalid_cover_sheet)
+        assert errors != []
+        assert schema is None
 
-class TestValidateProjectSheet:
-    def test_valid_cover_sheet(self, valid_projectsheet: Worksheet):
-        errors = validate_project_sheet(valid_projectsheet, SCHEMA_BY_PROJECT["1A"])
+
+class TestValidateproject_sheet:
+    def test_valid_project_sheet(self, valid_project_sheet: Worksheet):
+        errors = validate_project_sheet(valid_project_sheet, SCHEMA_BY_PROJECT["1A"])
         assert errors == []
+
+    def test_invalid_project_sheet(self, invalid_project_sheet: Worksheet):
+        errors = validate_project_sheet(invalid_project_sheet, SCHEMA_BY_PROJECT["1A"])
+        assert errors != []
 
 
 class TestValidateSubrecipientSheet:
     def test_valid_subrecipient_sheet(self, valid_subrecipientsheet: Worksheet):
         errors = validate_subrecipient_sheet(valid_subrecipientsheet)
         assert errors == []
+
+    def test_invalid_subrecipient_sheet(self, invalid_subrecipient_sheet: Worksheet):
+        errors = validate_subrecipient_sheet(invalid_subrecipient_sheet)
+        assert errors != []
