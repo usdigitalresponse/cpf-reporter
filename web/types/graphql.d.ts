@@ -883,7 +883,7 @@ export type FindUploadByIdVariables = Exact<{
 }>;
 
 
-export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, uploadedById: number, agencyId: number, reportingPeriodId: number, expenditureCategoryId?: number | null, createdAt: string, updatedAt: string } | null };
+export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, agency: { __typename?: 'Agency', code: string }, expenditureCategory?: { __typename?: 'ExpenditureCategory', code: string } | null, reportingPeriod: { __typename?: 'ReportingPeriod', name: string }, uploadedBy: { __typename?: 'User', name: string }, latestValidation?: { __typename?: 'UploadValidation', results?: Prisma.JsonValue | null, passed: boolean } | null } | null };
 
 export type FindUploadsVariables = Exact<{ [key: string]: never; }>;
 
