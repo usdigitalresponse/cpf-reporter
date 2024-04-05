@@ -26,9 +26,12 @@ jobs:
     with:
       api-test-outcome: ${{ needs.qa.outputs.api-test-outcome }}
       api-test-coverage-markdown-report: ${{ needs.qa.outputs.api-test-coverage-markdown-report }}
+      python-test-outcome: ${{ needs.qa.outputs.python-test-outcome }}
+      python-test-coverage-markdown-report: ${{ needs.qa.outputs.python-test-coverage-markdown-report }}
       web-test-outcome: ${{ needs.qa.outputs.web-test-outcome }}
       web-test-coverage-markdown-report: ${{ needs.qa.outputs.web-test-coverage-markdown-report }}
       eslint-outcome: ${{ needs.qa.outputs.eslint-outcome }}
+      ruff-outcome: ${{ needs.qa.outputs.ruff-outcome }}
       tflint-outcome: ${{ needs.qa.outputs.tflint-outcome }}
       pr-number: ${{ github.event.pull_request.number }}
       write-summary: true
@@ -53,6 +56,8 @@ jobs:
       build-console-image: true
       build-api-functions: true
       api-function-artifact-retention-days: 14
+      build-python-functions: true
+      python-function-artifact-retention-days: 14
       build-web: true
       web-artifact-retention-days: 14
       web-dotenv: |
@@ -84,6 +89,8 @@ jobs:
       api-functions-artifacts-key: ${{ needs.build.outputs.api-functions-artifacts-key }}
       api-functions-artifacts-path: ${{ needs.build.outputs.api-functions-artifacts-path }}
       console-image: ${{ needs.build.outputs.console-image-full-name }}
+      python-functions-artifacts-key: ${{ needs.build.outputs.python-functions-artifacts-key }}
+      python-functions-artifacts-path: ${{ needs.build.outputs.python-functions-artifacts-path }}
       web-artifacts-key: ${{ needs.build.outputs.web-artifacts-key }}
       web-artifacts-path: ${{ needs.build.outputs.web-artifacts-path }}
       aws-region: us-west-2

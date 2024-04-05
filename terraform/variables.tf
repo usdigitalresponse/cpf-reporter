@@ -175,16 +175,22 @@ variable "datadog_metrics_metadata" {
   default = {}
 }
 
-variable "datadog_lambda_tracer_version" {
-  description = "Version to use for the Datadog Lambda Tracer layer (when var.datadog_enabled is true)."
+variable "datadog_lambda_js_tracer_version" {
+  description = "Version to use for the Datadog Lambda Tracer layer for JavaScript (when var.datadog_enabled is true)."
   type        = string
-  default     = "101"
+  default     = "108"
+}
+
+variable "datadog_lambda_py_tracer_version" {
+  description = "Version to use for the Datadog Lambda Tracer layer for JavaScript (when var.datadog_enabled is true)."
+  type        = string
+  default     = "91"
 }
 
 variable "datadog_lambda_extension_version" {
   description = "Version to use for the Datadog Lambda Extension layer (when var.datadog_enabled is true)."
   type        = string
-  default     = "51"
+  default     = "55"
 }
 
 // RDS Postgres options
@@ -225,10 +231,16 @@ variable "console_container_image" {
 }
 
 // Lambda
-variable "lambda_runtime" {
+variable "lambda_js_runtime" {
   description = "Lambda runtime for the target Node.js version."
   type        = string
   default     = "nodejs18.x"
+}
+
+variable "lambda_py_runtime" {
+  description = "Lambda runtime for the target Python version."
+  type        = string
+  default     = "python3.12"
 }
 
 variable "lambda_arch" {
@@ -242,8 +254,14 @@ variable "lambda_arch" {
   }
 }
 
-variable "lambda_artifacts_base_path" {
-  description = "Path to the directory where per-Lambda zip file artifacts are stored."
+variable "lambda_js_artifacts_base_path" {
+  description = "Path to the directory where per-Lambda zip file artifacts are stored for JavaScript runtime."
+  type        = string
+  default     = ""
+}
+
+variable "lambda_py_artifacts_base_path" {
+  description = "Path to the directory where per-Lambda zip file artifacts are stored for Python runtime."
   type        = string
   default     = ""
 }

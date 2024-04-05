@@ -47,6 +47,9 @@ autolabeler:
       - '**/.nycrc'
       - '**/eslintrc.js'
       - '**/.browserslistrc'
+  - label: python
+    files:
+      - 'python/**'
   - label: database
     files:
       - 'api/db/**'
@@ -66,6 +69,7 @@ autolabeler:
     files:
       - '**/yarn.lock'
       - '**/.terraform.lock.hcl'
+      - '**/poetry.lock'
     branch:
       - '/^dependabot\/.+$/i'
   - label: documentation
