@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, Field, condecimal, conint, validator
+from pydantic import BaseModel, ConfigDict, Field, condecimal, conint, validator
 
 
 class StateAbbreviation(Enum):
@@ -93,6 +93,8 @@ class ProjectInvestmentType(str, Enum):
 
 
 class BaseProjectRow(BaseModel):
+    model_config = ConfigDict(coerce_numbers_to_str=True)
+
     Project_Name__c: str = Field(
         ..., serialization_alias="Project Name", max_length=100
     )
@@ -510,6 +512,8 @@ class Project1CRow(BaseProjectRow, AddressFields):
 
 
 class SubrecipientRow(BaseModel):
+    model_config = ConfigDict(coerce_numbers_to_str=True)
+
     Name: str = Field(..., serialization_alias="Subrecipient Name", max_length=80)
     EIN__c: str = Field(
         ...,
