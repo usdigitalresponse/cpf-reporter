@@ -22,10 +22,28 @@ def valid_coversheet(valid_workbook) -> openpyxl.worksheet.worksheet.Worksheet:
 
 
 @pytest.fixture
-def valid_projectsheet(valid_workbook) -> openpyxl.worksheet.worksheet.Worksheet:
+def valid_project_sheet(valid_workbook) -> openpyxl.worksheet.worksheet.Worksheet:
     return valid_workbook["Project"]
 
 
 @pytest.fixture
 def valid_subrecipientsheet(valid_workbook) -> openpyxl.worksheet.worksheet.Worksheet:
     return valid_workbook["Subrecipients"]
+
+
+@pytest.fixture
+def invalid_cover_sheet(valid_coversheet):
+    valid_coversheet["A2"] = "INVALID"
+    return valid_coversheet
+
+
+@pytest.fixture
+def invalid_project_sheet(valid_project_sheet):
+    valid_project_sheet["D13"] = "X" * 21
+    return valid_project_sheet
+
+
+@pytest.fixture
+def invalid_subrecipient_sheet(valid_subrecipientsheet):
+    valid_subrecipientsheet["D13"] = "INVALID"
+    return valid_subrecipientsheet
