@@ -4,7 +4,6 @@ from typing import Any, List, Optional, Tuple
 from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import ValidationError
-
 from src.schemas.latest.schema import (
     SCHEMA_BY_PROJECT,
     CoverSheetRow,
@@ -12,22 +11,19 @@ from src.schemas.latest.schema import (
     SubrecipientRow,
 )
 
+type Errors = List[str]
 
-def map_values_to_headers(headers, values):
+
+def map_values_to_headers(headers: Tuple, values: List[any]):
     return dict(zip(headers, values))
 
 
-def is_empty_row(row_values):
+def is_empty_row(row_values: Tuple):
     return all(value in (None, "") for value in row_values)
 
 
 def get_headers(sheet: Worksheet, cell_range: str) -> tuple:
     return tuple(header_cell.value for header_cell in sheet[cell_range][0])
-
-
-"""
-TODO: Break this function apart into smaller chunks for easier testing
-"""
 
 
 def validate(workbook: bytes):
@@ -69,7 +65,7 @@ def validate(workbook: bytes):
 
 
 # Accepts a workbook from openpyxl
-def validate_logic_sheet(logic_sheet: Any):
+def validate_logic_sheet(logic_sheet: Worksheet) -> Errors:
     errors = []
     try:
         # Cell B1 contains the version
@@ -79,11 +75,13 @@ def validate_logic_sheet(logic_sheet: Any):
     return errors
 
 
-def validate_cover_sheet(cover_sheet) -> Tuple[Optional[List[str]], Optional[Any]]:
+def validate_cover_sheet(
+    cover_sheet: Worksheet,
+) -> Tuple[Errors, Optional[Any]]:
     errors = []
     project_schema = None
     cover_header = get_headers(cover_sheet, "A1:B1")
-    cover_row = cover_sheet[2]
+    cover_row = map(lambda cell: cell.value, cover_sheet[2])
     row_dict = map_values_to_headers(cover_header, cover_row)
     try:
         CoverSheetRow(**row_dict)
@@ -93,10 +91,10 @@ def validate_cover_sheet(cover_sheet) -> Tuple[Optional[List[str]], Optional[Any
 
         # This does not need to be a silent failure. This would be a critical error.
     project_schema = SCHEMA_BY_PROJECT[row_dict["Project Use Code"]]
-    return (None, project_schema)
+    return (errors, project_schema)
 
 
-def validate_project_sheet(project_sheet, project_schema) -> List[str]:
+def validate_project_sheet(project_sheet: Worksheet, project_schema) -> Errors:
     errors = []
     project_headers = get_headers(project_sheet, "C3:DS3")
     current_row = 12
@@ -106,9 +104,7 @@ def validate_project_sheet(project_sheet, project_schema) -> List[str]:
         current_row += 1
         if is_empty_row(project_row):
             continue
-        # print(project_row)
         row_dict = map_values_to_headers(project_headers, project_row)
-        # print(row_dict['Capital_Asset_Ownership_Type__c'])
         try:
             project_schema(**row_dict)
         except ValidationError as e:
@@ -116,7 +112,7 @@ def validate_project_sheet(project_sheet, project_schema) -> List[str]:
     return errors
 
 
-def validate_subrecipient_sheet(subrecipient_sheet) -> List[str]:
+def validate_subrecipient_sheet(subrecipient_sheet: Worksheet) -> Errors:
     errors = []
     subrecipient_headers = get_headers(subrecipient_sheet, "C3:O3")
     current_row = 12
@@ -135,6 +131,10 @@ def validate_subrecipient_sheet(subrecipient_sheet) -> List[str]:
     return errors
 
 if __name__ == "__main__":
+    """
+        Main function to test validate function
+        Run with `poetry run python -m src.lib.workbook_validator upload.xlsm`
+    """
     import sys
 
     file_path = sys.argv[1]
