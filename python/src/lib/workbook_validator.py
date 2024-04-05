@@ -42,14 +42,14 @@ def validate(workbook: bytes):
     2. Validate logic sheet to make sure the sheet has an appropriate version
     """
     errors = validate_logic_sheet(wb["Logic"])
-    if errors.length > 0:
+    if len(errors) > 0:
         return errors
 
     """
     3. Validate cover sheet and project selection. Pick the appropriate validator for the next step.
     """
     errors, project_schema = validate_cover_sheet(wb["Cover"])
-    if errors.length > 0:
+    if len(errors) > 0:
         return errors
 
     """
@@ -133,3 +133,16 @@ def validate_subrecipient_sheet(subrecipient_sheet) -> List[str]:
             errors.append(f"Subrecipients Sheet: Row Num {current_row} Error: {e}")
 
     return errors
+
+if __name__ == "__main__":
+    import sys
+
+    file_path = sys.argv[1]
+    with open(file_path, "rb") as f:
+        errors = validate(f.read())
+        if errors:
+            print("Errors found:")
+            for error in errors:
+                print(error)
+        else:
+            print("No errors found")
