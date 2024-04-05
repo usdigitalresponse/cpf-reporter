@@ -7,9 +7,6 @@ export const schema = gql`
     passed: Boolean!
     initiatedById: Int!
     initiatedBy: User!
-    validatedAt: DateTime
-    invalidationResults: JSON
-    invalidatedAt: DateTime
     createdAt: DateTime!
     updatedAt: DateTime!
   }
@@ -24,9 +21,6 @@ export const schema = gql`
     results: JSON
     passed: Boolean!
     initiatedById: Int!
-    validatedAt: DateTime
-    invalidationResults: JSON
-    invalidatedAt: DateTime
   }
 
   input UpdateUploadValidationInput {
@@ -34,9 +28,6 @@ export const schema = gql`
     results: JSON
     passed: Boolean
     initiatedById: Int
-    validatedAt: DateTime
-    invalidationResults: JSON
-    invalidatedAt: DateTime
   }
 
   type Mutation {

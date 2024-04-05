@@ -7,9 +7,7 @@ import {
   FileField,
   FormError,
   FieldError,
-  Label,
   Submit,
-  TextAreaField,
 } from '@redwoodjs/forms'
 import type { RWGqlError } from '@redwoodjs/forms'
 import { navigate, routes } from '@redwoodjs/router'
@@ -60,7 +58,6 @@ const UploadForm = (props: UploadFormProps) => {
     const uploadInput = {
       uploadedById: props.userId,
       agencyId: data.agencyId,
-      notes: data.notes,
       filename: data.file[0].name,
       organizationId: props.organizationId,
       reportingPeriodId: data.reportingPeriodId,
@@ -105,14 +102,6 @@ const UploadForm = (props: UploadFormProps) => {
       <OrganizationPickListsCell id={props.organizationId} />
       <FileField name="file" validation={{ required: true }} />
       <FieldError name="file" className="rw-field-error" />
-      <Label
-        name="notes"
-        className="rw-label"
-        errorClassName="rw-label rw-label-error"
-      >
-        Notes
-      </Label>
-      <TextAreaField name="notes"></TextAreaField>
       <div className="rw-button-group">
         <Submit disabled={props.loading} className="rw-button rw-button-blue">
           Submit

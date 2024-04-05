@@ -51,9 +51,6 @@ export const Upload: UploadRelationResolvers = {
   agency: (_obj, { root }) => {
     return db.upload.findUnique({ where: { id: root?.id } }).agency()
   },
-  organization: (_obj, { root }) => {
-    return db.upload.findUnique({ where: { id: root?.id } }).organization()
-  },
   reportingPeriod: (_obj, { root }) => {
     return db.upload.findUnique({ where: { id: root?.id } }).reportingPeriod()
   },
@@ -73,8 +70,5 @@ export const Upload: UploadRelationResolvers = {
       },
     })
     return latestValidation
-  },
-  subrecipients: (_obj, { root }) => {
-    return db.upload.findUnique({ where: { id: root?.id } }).subrecipients()
   },
 }

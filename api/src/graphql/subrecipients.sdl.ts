@@ -9,8 +9,6 @@ export const schema = gql`
     certifiedAt: DateTime
     certifiedById: Int
     certifiedBy: User
-    originationUploadId: Int!
-    originationUpload: Upload!
     createdAt: DateTime!
     updatedAt: DateTime!
   }
@@ -27,7 +25,6 @@ export const schema = gql`
     endDate: DateTime!
     certifiedAt: DateTime
     certifiedById: Int
-    originationUploadId: Int!
   }
 
   input UpdateSubrecipientInput {
@@ -37,7 +34,6 @@ export const schema = gql`
     endDate: DateTime
     certifiedAt: DateTime
     certifiedById: Int
-    originationUploadId: Int
   }
 
   type Mutation {
