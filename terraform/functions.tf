@@ -35,7 +35,7 @@ locals {
     data.aws_region.current.name,
     { aws = "464622532012", aws-us-gov = "002406178527" }[data.aws_partition.current.id],
     "layer",
-    "Datadog-Python312-x",
+    format("Datadog-Python312%s", var.lambda_arch == "arm64" ? "-ARM" : ""),
     var.datadog_lambda_py_tracer_version,
   ])
   lambda_default_environment_variables = merge(
