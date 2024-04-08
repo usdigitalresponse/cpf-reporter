@@ -223,9 +223,12 @@ resource "aws_s3_object" "lambda_artifact-cpfValidation" {
 
 // Python Lambdas use a common (rather than function-specific) zip artifact
 resource "aws_s3_object" "lambda_artifact-python" {
-  bucket = module.lambda_artifacts_bucket.bucket_id
-  key    = "python.${filemd5("${local.lambda_py_artifacts_base_path}/lambda.zip")}.zip"
-  source = "${local.lambda_py_artifacts_base_path}/lambda.zip"
+  bucket                 = module.lambda_artifacts_bucket.bucket_id
+  key                    = "python.${filemd5("${local.lambda_py_artifacts_base_path}/lambda.zip")}.zip"
+  source                 = "${local.lambda_py_artifacts_base_path}/lambda.zip"
+  source_hash            = filemd5("${local.lambda_py_artifacts_base_path}/lambda.zip")
+  etag                   = filemd5("${local.lambda_py_artifacts_base_path}/lambda.zip")
+  server_side_encryption = "AES256"
 }
 
 resource "aws_s3_bucket_notification" "reporting_data" {
@@ -457,8 +460,8 @@ module "lambda_function-cpfValidation" {
   publish        = true
   create_package = false
   s3_existing_package = {
-    bucket = aws_s3_object.lambda_artifact-cpfValidation.bucket
-    key    = aws_s3_object.lambda_artifact-cpfValidation.key
+    bucket = aws_s3_object.lambda_artifact-python.bucket
+    key    = aws_s3_object.lambda_artifact-python.key
   }
 
   // Runtime
