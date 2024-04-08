@@ -871,24 +871,17 @@ export type CreateUploadMutationVariables = Exact<{
 
 export type CreateUploadMutation = { __typename?: 'Mutation', createUpload: { __typename?: 'Upload', id: number, signedUrl?: string | null } };
 
-export type DeleteUploadMutationVariables = Exact<{
-  id: Scalars['Int'];
-}>;
-
-
-export type DeleteUploadMutation = { __typename?: 'Mutation', deleteUpload: { __typename?: 'Upload', id: number } };
-
 export type FindUploadByIdVariables = Exact<{
   id: Scalars['Int'];
 }>;
 
 
-export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, agency: { __typename?: 'Agency', code: string }, expenditureCategory?: { __typename?: 'ExpenditureCategory', code: string } | null, reportingPeriod: { __typename?: 'ReportingPeriod', name: string }, uploadedBy: { __typename?: 'User', name: string }, latestValidation?: { __typename?: 'UploadValidation', results?: Prisma.JsonValue | null, passed: boolean } | null } | null };
+export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, agency: { __typename?: 'Agency', code: string }, expenditureCategory?: { __typename?: 'ExpenditureCategory', code: string } | null, reportingPeriod: { __typename?: 'ReportingPeriod', name: string }, uploadedBy: { __typename?: 'User', name: string }, latestValidation?: { __typename?: 'UploadValidation', passed: boolean, results?: Prisma.JsonValue | null, createdAt: string, initiatedBy: { __typename?: 'User', name: string } } | null } | null };
 
 export type FindUploadsVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, code: string }, expenditureCategory?: { __typename?: 'ExpenditureCategory', id: number, code: string } | null, latestValidation?: { __typename?: 'UploadValidation', createdAt: string, passed: boolean } | null }> };
+export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, code: string }, expenditureCategory?: { __typename?: 'ExpenditureCategory', id: number, code: string } | null, latestValidation?: { __typename?: 'UploadValidation', createdAt: string, passed: boolean, results?: Prisma.JsonValue | null } | null }> };
 
 export type EditUserByIdVariables = Exact<{
   id: Scalars['Int'];

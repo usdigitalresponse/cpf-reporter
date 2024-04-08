@@ -15,7 +15,8 @@ interface Props {
   }[]
 }
 
-const UploadValidationResultsTable = ({ errors }: Props) => {
+const UploadValidationResultsTable = ({ results }) => {
+  // console.log('UploadValidationResultsTable', results)
   return (
     <>
       <div className="row">
@@ -41,7 +42,7 @@ const UploadValidationResultsTable = ({ errors }: Props) => {
               </tr>
             </thead>
             <tbody>
-              {errors.map((error, i) => (
+              {results?.errors && results.errors.map((error, i) => (
                 <tr key={i}>
                   <td>{i + 1}</td>
                   <td

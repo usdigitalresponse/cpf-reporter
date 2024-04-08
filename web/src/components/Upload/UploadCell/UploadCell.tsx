@@ -22,8 +22,12 @@ export const QUERY = gql`
         name
       }
       latestValidation {
-        results
         passed
+        results
+        createdAt
+        initiatedBy {
+          name
+        }
       }
       createdAt
       updatedAt

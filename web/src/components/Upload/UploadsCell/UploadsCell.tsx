@@ -25,6 +25,7 @@ export const QUERY = gql`
       latestValidation {
         createdAt
         passed
+        results
       }
       createdAt
       updatedAt
