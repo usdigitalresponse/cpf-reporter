@@ -26,6 +26,17 @@ maybe you need a nonstandard import behavior, or an import is necessary for its 
 In these cases, specific findings can be ignored.
 Check the [ESLint documentation](https://eslint.org/docs/latest/use/configure/rules) for the most appropriate way to ignore the finding.
 
+### Ruff
+
+The [Ruff](https://docs.astral.sh/ruff/) QA check determines whether Python files beneath the `python` directory are formatted consistently with the rules configured for this project.
+Most issues that Ruff finds are errors, although warnings are possible.
+
+To fix issues reported by Ruff, first review the failures by running `poetry run ruff check` from the `python` directory of this repository, which will output all violations detected in Python source code.
+Most Ruff issues can be fixed automatically by adding the `--fix` flag to this command
+(or by running the [formatter](https://docs.astral.sh/ruff/formatter/)),
+but you can also resolve them manually if you prefer.
+
+
 ### TFlint
 
 The [TFLint](https://github.com/terraform-linters/tflint) QA check determines whether Terraform files beneath the `terraform/` directory are using best practices and/or contain potential errors.
