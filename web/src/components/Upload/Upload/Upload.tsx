@@ -1,32 +1,23 @@
-import type { FindUploadById } from 'types/graphql'
-
 import { timeTag } from 'src/lib/formatters'
 
 import UploadValidationButtonGroup from '../UploadValidationButtonGroup/UploadValidationButtonGroup'
 import UploadValidationResultsTable from '../UploadValidationResultsTable/UploadValidationResultsTable'
 import UploadValidationStatus from '../UploadValidationStatus/UploadValidationStatus'
 
-interface Props {
-  upload: NonNullable<FindUploadById['upload']>
-}
-
-const Upload = ({ upload }: Props) => {
-  console.log('Upload', upload)
-
-  const hasErrors = upload.latestValidation?.results !== null &&
-    (upload.latestValidation?.results && Object.keys(upload.latestValidation?.results).length > 0)
-  ;
+const Upload = ({ upload }) => {    
+  const hasErrors =
+    upload.latestValidation?.results !== null &&
+    Array.isArray(upload.latestValidation?.results) &&
+    upload.latestValidation?.results.length > 0
 
   // TODO: Replace functions below with mutations
   const handleFileDownload = () => {}
-
-  const handleValidate = async () => {}
-
-  const handleForceInvalidate = async () => {}
+  const handleValidate = () => {}
+  const handleForceInvalidate = () => {}
 
   return (
     <>
-      {hasErrors && <UploadValidationResultsTable results={upload.latestValidation?.results} />}
+      {hasErrors && <UploadValidationResultsTable errors={upload.latestValidation?.results} />}
 
       <h3>Upload {upload.id} details</h3>
       <div className="row">
