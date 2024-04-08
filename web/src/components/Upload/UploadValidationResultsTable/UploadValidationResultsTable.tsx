@@ -68,3 +68,4 @@ const UploadValidationResultsTable = ({ errors }: Props) => {
 }
 
 export default UploadValidationResultsTable
+export { Severity }

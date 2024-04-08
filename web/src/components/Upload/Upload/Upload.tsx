@@ -4,7 +4,8 @@ import UploadValidationButtonGroup from '../UploadValidationButtonGroup/UploadVa
 import UploadValidationResultsTable from '../UploadValidationResultsTable/UploadValidationResultsTable'
 import UploadValidationStatus from '../UploadValidationStatus/UploadValidationStatus'
 
-const Upload = ({ upload }) => {    
+const Upload = ({ upload }) => {
+  console.log(upload)
   const hasErrors =
     upload.latestValidation?.results !== null &&
     Array.isArray(upload.latestValidation?.results) &&
@@ -17,7 +18,11 @@ const Upload = ({ upload }) => {
 
   return (
     <>
-      {hasErrors && <UploadValidationResultsTable errors={upload.latestValidation?.results} />}
+      {hasErrors && (
+        <UploadValidationResultsTable
+          errors={upload.latestValidation?.results}
+        />
+      )}
 
       <h3>Upload {upload.id} details</h3>
       <div className="row">
@@ -31,12 +36,14 @@ const Upload = ({ upload }) => {
               <span className="fw-bold">Reporting period: </span>
               {upload.reportingPeriod?.name}
             </li>
-            <li className='list-group-item'>
-              <span className="fw-bold">Agency: </span>{upload.agency?.code}
+            <li className="list-group-item">
+              <span className="fw-bold">Agency: </span>
+              {upload.agency?.code}
             </li>
             <li
-              className={`list-group-item ${!upload.expenditureCategory.code && 'list-group-item-warning'
-                }`}
+              className={`list-group-item ${
+                !upload.expenditureCategory.code && 'list-group-item-warning'
+              }`}
             >
               <span className="fw-bold">EC Code: </span>
               {upload.expenditureCategory.code || 'Not set'}
