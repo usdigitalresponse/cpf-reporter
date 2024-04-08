@@ -5,7 +5,6 @@ import UploadValidationResultsTable from '../UploadValidationResultsTable/Upload
 import UploadValidationStatus from '../UploadValidationStatus/UploadValidationStatus'
 
 const Upload = ({ upload }) => {
-  console.log(upload)
   const hasErrors =
     upload.latestValidation?.results !== null &&
     Array.isArray(upload.latestValidation?.results) &&

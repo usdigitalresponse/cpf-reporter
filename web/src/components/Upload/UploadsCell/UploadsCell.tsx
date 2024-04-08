@@ -23,6 +23,7 @@ export const QUERY = gql`
         code
       }
       latestValidation {
+        id
         createdAt
         passed
         results

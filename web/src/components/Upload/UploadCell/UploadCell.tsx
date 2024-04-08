@@ -19,9 +19,11 @@ export const QUERY = gql`
         name
       }
       uploadedBy {
+        id
         name
       }
       latestValidation {
+        id
         passed
         results
         createdAt

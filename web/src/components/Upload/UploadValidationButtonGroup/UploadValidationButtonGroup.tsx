@@ -1,11 +1,26 @@
 import Button from 'react-bootstrap/Button'
 
+interface ValidationResult {
+  message: string
+  tab?: string
+  row?: string
+  col?: string
+  severity: 'warn' | 'err' | 'info'
+}
+
+interface UploadValidationButtonGroupProps {
+  latestValidation?: { passed: boolean; results: ValidationResult[] | null }
+  handleFileDownload: () => void
+  handleForceInvalidate: () => void
+  handleValidate: () => void
+}
+
 const UploadValidationButtonGroup = ({
   latestValidation,
   handleFileDownload,
   handleForceInvalidate,
   handleValidate,
-}) => {
+}: UploadValidationButtonGroupProps) => {
   /*
     If the upload has been validated, renders "Invalidate" and "Re-validate" buttons
     If the upload has been invalidated, renders the "Validate" button
