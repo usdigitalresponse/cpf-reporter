@@ -23,7 +23,7 @@ function valueAsLink(cell): JSX.Element {
 function validationDisplay(row) {
   const { latestValidation } = row
 
-  if (!latestValidation) {
+  if (!latestValidation || latestValidation.results === null) {
     return 'Not set'
   }
 
