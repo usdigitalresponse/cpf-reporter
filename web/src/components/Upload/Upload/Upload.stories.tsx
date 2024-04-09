@@ -66,7 +66,7 @@ export const InvalidUpload: Story = {
             row: '1',
             tab: 'Logic',
             message:
-              '!!!Upload template version is older than the latest input template',
+              'Upload template version is older than the latest input template',
             severity: 'warn',
           },
           {

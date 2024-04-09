@@ -74,7 +74,7 @@ export const Success = ({
                 )}
               </td>
               <td>
-                <nav className="rw-table-actions">
+                <nav>
                   <Link
                     to={routes.editReportingPeriod({ id: item.id })}
                     title={'Edit reporting period ' + item.id}
