@@ -21,6 +21,12 @@ const CREATE_UPLOAD = gql`
     createUpload(input: $input) {
       id
       signedUrl
+      validations {
+        id
+        passed
+        initiatedById
+        results
+      }
     }
   }
 `

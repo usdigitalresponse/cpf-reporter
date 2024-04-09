@@ -10,6 +10,12 @@ const CREATE_UPLOAD_MUTATION = gql`
     createUpload(input: $input) {
       id
       signedUrl
+      validations {
+        id
+        passed
+        initiatedById
+        results
+      }
     }
   }
 `

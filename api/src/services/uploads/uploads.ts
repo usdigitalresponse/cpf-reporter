@@ -23,6 +23,14 @@ export const createUpload: MutationResolvers['createUpload'] = async ({
   const upload = await db.upload.create({
     data: input,
   })
+  const uploadValidation = await db.uploadValidation.create({
+    data: {
+      uploadId: upload.id,
+      initiatedById: upload.uploadedById,
+      passed: false,
+      results: null,
+    },
+  })
   const signedUrl = await s3PutSignedUrl(upload, upload.id)
 
   return { ...upload, signedUrl }
