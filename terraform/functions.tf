@@ -201,23 +201,12 @@ resource "aws_s3_object" "lambda_artifact-graphql" {
   server_side_encryption = "AES256"
 }
 
-// TODO: Can this be removed?
-resource "aws_s3_object" "lambda_artifact-excelToJson" {
+resource "aws_s3_object" "lambda_artifact-processValidationJson" {
   bucket                 = module.lambda_artifacts_bucket.bucket_id
-  key                    = "excelToJson.${filemd5("${local.lambda_js_artifacts_base_path}/excelToJson.zip")}.zip"
-  source                 = "${local.lambda_js_artifacts_base_path}/excelToJson.zip"
-  source_hash            = filemd5("${local.lambda_js_artifacts_base_path}/excelToJson.zip")
-  etag                   = filemd5("${local.lambda_js_artifacts_base_path}/excelToJson.zip")
-  server_side_encryption = "AES256"
-}
-
-// TODO: Can this be removed?
-resource "aws_s3_object" "lambda_artifact-cpfValidation" {
-  bucket                 = module.lambda_artifacts_bucket.bucket_id
-  key                    = "cpfValidation.${filemd5("${local.lambda_js_artifacts_base_path}/cpfValidation.zip")}.zip"
-  source                 = "${local.lambda_js_artifacts_base_path}/cpfValidation.zip"
-  source_hash            = filemd5("${local.lambda_js_artifacts_base_path}/cpfValidation.zip")
-  etag                   = filemd5("${local.lambda_js_artifacts_base_path}/cpfValidation.zip")
+  key                    = "processValidationJson.${filemd5("${local.lambda_js_artifacts_base_path}/processValidationJson.zip")}.zip"
+  source                 = "${local.lambda_js_artifacts_base_path}/processValidationJson.zip"
+  source_hash            = filemd5("${local.lambda_js_artifacts_base_path}/processValidationJson.zip")
+  etag                   = filemd5("${local.lambda_js_artifacts_base_path}/processValidationJson.zip")
   server_side_encryption = "AES256"
 }
 
@@ -234,19 +223,11 @@ resource "aws_s3_object" "lambda_artifact-python" {
 resource "aws_s3_bucket_notification" "reporting_data" {
   bucket = module.reporting_data_bucket.bucket_id
 
-  // TODO: Can this be removed?
   lambda_function {
-    lambda_function_arn = module.lambda_function-excelToJson.lambda_function_arn
+    lambda_function_arn = module.lambda_function-processValidationJson.lambda_function_arn
     events              = ["s3:ObjectCreated:*"]
     filter_prefix       = "uploads/"
     filter_suffix       = ".json"
-  }
-
-  lambda_function {
-    lambda_function_arn = module.lambda_function-cpfValidation.lambda_function_arn
-    events              = ["s3:ObjectCreated:*"]
-    filter_prefix       = "uploads/"
-    filter_suffix       = ".xlsm"
   }
 }
 
@@ -340,12 +321,12 @@ module "lambda_function-graphql" {
   }
 }
 
-module "lambda_function-excelToJson" {
+module "lambda_function-processValidationJson" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.5.0"
 
   // Metadata
-  function_name = "${var.namespace}-excelToJson"
+  function_name = "${var.namespace}-processValidationJson"
   description   = "Reacts to S3 events and converts Excel files to JSON."
 
   // Networking
@@ -386,12 +367,12 @@ module "lambda_function-excelToJson" {
   // Artifacts
   create_package = false
   s3_existing_package = {
-    bucket = aws_s3_object.lambda_artifact-excelToJson.bucket
-    key    = aws_s3_object.lambda_artifact-excelToJson.key
+    bucket = aws_s3_object.lambda_artifact-processValidationJson.bucket
+    key    = aws_s3_object.lambda_artifact-processValidationJson.key
   }
 
   // Runtime
-  handler       = var.datadog_enabled ? local.datadog_lambda_js_handler : "excelToJson.handler"
+  handler       = var.datadog_enabled ? local.datadog_lambda_js_handler : "processValidationJson.handler"
   runtime       = var.lambda_js_runtime
   architectures = [var.lambda_arch]
   publish       = true
@@ -399,7 +380,7 @@ module "lambda_function-excelToJson" {
   timeout       = 300 # 5 minutes, in seconds
   memory_size   = 512 # MB
   environment_variables = merge(local.lambda_default_environment_variables, {
-    DD_LAMBDA_HANDLER = "excelToJson.handler"
+    DD_LAMBDA_HANDLER = "processValidationJson.handler"
   })
 
   // Triggers
