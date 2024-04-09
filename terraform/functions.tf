@@ -201,23 +201,12 @@ resource "aws_s3_object" "lambda_artifact-graphql" {
   server_side_encryption = "AES256"
 }
 
-// TODO: Can this be removed?
-resource "aws_s3_object" "lambda_artifact-excelToJson" {
+resource "aws_s3_object" "lambda_artifact-processValidationJson" {
   bucket                 = module.lambda_artifacts_bucket.bucket_id
-  key                    = "excelToJson.${filemd5("${local.lambda_js_artifacts_base_path}/excelToJson.zip")}.zip"
-  source                 = "${local.lambda_js_artifacts_base_path}/excelToJson.zip"
-  source_hash            = filemd5("${local.lambda_js_artifacts_base_path}/excelToJson.zip")
-  etag                   = filemd5("${local.lambda_js_artifacts_base_path}/excelToJson.zip")
-  server_side_encryption = "AES256"
-}
-
-// TODO: Can this be removed?
-resource "aws_s3_object" "lambda_artifact-cpfValidation" {
-  bucket                 = module.lambda_artifacts_bucket.bucket_id
-  key                    = "cpfValidation.${filemd5("${local.lambda_js_artifacts_base_path}/cpfValidation.zip")}.zip"
-  source                 = "${local.lambda_js_artifacts_base_path}/cpfValidation.zip"
-  source_hash            = filemd5("${local.lambda_js_artifacts_base_path}/cpfValidation.zip")
-  etag                   = filemd5("${local.lambda_js_artifacts_base_path}/cpfValidation.zip")
+  key                    = "processValidationJson.${filemd5("${local.lambda_js_artifacts_base_path}/processValidationJson.zip")}.zip"
+  source                 = "${local.lambda_js_artifacts_base_path}/processValidationJson.zip"
+  source_hash            = filemd5("${local.lambda_js_artifacts_base_path}/processValidationJson.zip")
+  etag                   = filemd5("${local.lambda_js_artifacts_base_path}/processValidationJson.zip")
   server_side_encryption = "AES256"
 }
 

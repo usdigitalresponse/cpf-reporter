@@ -1,6 +1,6 @@
 import { db } from 'src/lib/db'
 
-import { processRecord } from './cpfValidation'
+import { processRecord } from './processValidationJson'
 
 class MockS3Client {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
