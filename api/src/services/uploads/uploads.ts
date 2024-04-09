@@ -23,7 +23,9 @@ export const createUpload: MutationResolvers['createUpload'] = async ({
   const upload = await db.upload.create({
     data: input,
   })
-  const uploadValidation = await db.uploadValidation.create({
+  // We don't need to store the result of the validation creation, it will be provided via
+  // the relation resolver below
+  await db.uploadValidation.create({
     data: {
       uploadId: upload.id,
       initiatedById: upload.uploadedById,
