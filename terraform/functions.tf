@@ -321,12 +321,12 @@ module "lambda_function-graphql" {
   }
 }
 
-module "lambda_function-excelToJson" {
+module "lambda_function-processValidationJson" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.5.0"
 
   // Metadata
-  function_name = "${var.namespace}-excelToJson"
+  function_name = "${var.namespace}-processValidationJson"
   description   = "Reacts to S3 events and converts Excel files to JSON."
 
   // Networking
@@ -367,12 +367,12 @@ module "lambda_function-excelToJson" {
   // Artifacts
   create_package = false
   s3_existing_package = {
-    bucket = aws_s3_object.lambda_artifact-excelToJson.bucket
-    key    = aws_s3_object.lambda_artifact-excelToJson.key
+    bucket = aws_s3_object.lambda_artifact-processValidationJson.bucket
+    key    = aws_s3_object.lambda_artifact-processValidationJson.key
   }
 
   // Runtime
-  handler       = var.datadog_enabled ? local.datadog_lambda_js_handler : "excelToJson.handler"
+  handler       = var.datadog_enabled ? local.datadog_lambda_js_handler : "processValidationJson.handler"
   runtime       = var.lambda_js_runtime
   architectures = [var.lambda_arch]
   publish       = true
@@ -380,7 +380,7 @@ module "lambda_function-excelToJson" {
   timeout       = 300 # 5 minutes, in seconds
   memory_size   = 512 # MB
   environment_variables = merge(local.lambda_default_environment_variables, {
-    DD_LAMBDA_HANDLER = "excelToJson.handler"
+    DD_LAMBDA_HANDLER = "processValidationJson.handler"
   })
 
   // Triggers
