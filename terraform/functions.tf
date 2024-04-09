@@ -223,19 +223,11 @@ resource "aws_s3_object" "lambda_artifact-python" {
 resource "aws_s3_bucket_notification" "reporting_data" {
   bucket = module.reporting_data_bucket.bucket_id
 
-  // TODO: Can this be removed?
   lambda_function {
-    lambda_function_arn = module.lambda_function-excelToJson.lambda_function_arn
+    lambda_function_arn = module.lambda_function-processValidationJson.lambda_function_arn
     events              = ["s3:ObjectCreated:*"]
     filter_prefix       = "uploads/"
     filter_suffix       = ".json"
-  }
-
-  lambda_function {
-    lambda_function_arn = module.lambda_function-cpfValidation.lambda_function_arn
-    events              = ["s3:ObjectCreated:*"]
-    filter_prefix       = "uploads/"
-    filter_suffix       = ".xlsm"
   }
 }
 
