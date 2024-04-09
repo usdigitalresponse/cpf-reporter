@@ -5,6 +5,7 @@ import type {
 } from 'types/graphql'
 
 import { s3PutSignedUrl } from 'src/lib/aws'
+import { getSignedUrl } from 'src/lib/aws'
 import { db } from 'src/lib/db'
 
 export const uploads: QueryResolvers['uploads'] = () => {
@@ -43,6 +44,17 @@ export const deleteUpload: MutationResolvers['deleteUpload'] = ({ id }) => {
     where: { id },
   })
 }
+
+export const downloadUploadFile: MutationResolvers['downloadUploadFile'] =
+  async ({ id }) => {
+    const upload = await db.upload.findUnique({
+      where: { id },
+      include: { agency: true },
+    })
+    const signedUrl = await getSignedUrl(upload)
+
+    return signedUrl
+  }
 
 export const Upload: UploadRelationResolvers = {
   uploadedBy: (_obj, { root }) => {

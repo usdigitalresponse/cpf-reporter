@@ -121,9 +121,10 @@ export async function s3PutSignedUrl(
  *  This function is a wrapper around the getSignedUrl function from the @aws-sdk/s3-request-presigner package.
  *  Exists to organize the imports and to make it easier to mock in tests.
  */
-async function getSignedUrl(bucketName: string, key: string) {
+async function getSignedUrl(upload: Upload): Promise<string> {
+  const key = `uploads/${upload.agency.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.id}/${upload.filename}`
   const s3 = getS3Client()
-  const baseParams = { Bucket: bucketName, Key: key }
+  const baseParams = { Bucket: REPORTING_DATA_BUCKET_NAME, Key: key }
   return awsGetSignedUrl(s3, new GetObjectCommand(baseParams), {
     expiresIn: 60,
   })

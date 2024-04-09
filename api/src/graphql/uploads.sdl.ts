@@ -42,5 +42,6 @@ export const schema = gql`
     createUpload(input: CreateUploadInput!): Upload! @requireAuth
     updateUpload(id: Int!, input: UpdateUploadInput!): Upload! @requireAuth
     deleteUpload(id: Int!): Upload! @requireAuth
+    downloadUploadFile(id: Int!): String! @requireAuth
   }
 `
