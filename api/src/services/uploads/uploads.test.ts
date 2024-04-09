@@ -1,5 +1,7 @@
 import type { Upload } from '@prisma/client'
 
+import { db } from 'src/lib/db'
+
 import {
   uploads,
   upload,
@@ -8,7 +10,6 @@ import {
   deleteUpload,
   Upload as UploadRelationResolver,
 } from './uploads'
-import { db } from 'src/lib/db'
 import type { StandardScenario } from './uploads.scenarios'
 
 // Generated boilerplate tests do not account for all circumstances
@@ -47,7 +48,9 @@ describe('uploads', () => {
       scenario.upload.two.reportingPeriodId
     )
 
-    const validations = await db.upload.findUnique({ where: { id: result.id } }).validations()
+    const validations = await db.upload
+      .findUnique({ where: { id: result.id } })
+      .validations()
     expect(validations.length).toBe(1)
     expect(validations[0].passed).toBeFalsy()
     expect(validations[0].results).toBeNull()
