@@ -41,11 +41,11 @@ const Upload = ({ upload }) => {
             </li>
             <li
               className={`list-group-item ${
-                !upload.expenditureCategory.code && 'list-group-item-warning'
+                !upload.expenditureCategory?.code && 'list-group-item-warning'
               }`}
             >
               <span className="fw-bold">EC Code: </span>
-              {upload.expenditureCategory.code || 'Not set'}
+              {upload.expenditureCategory?.code || 'Not set'}
             </li>
             <li className="list-group-item">
               <span className="fw-bold">Created: </span>

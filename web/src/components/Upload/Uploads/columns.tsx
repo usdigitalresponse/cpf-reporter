@@ -47,7 +47,7 @@ export const columnDefs = [
     header: 'Agency',
   }),
   columnHelper.accessor('expenditureCategory.code', {
-    cell: (info) => info.getValue(),
+    cell: (info) => info.getValue() ?? 'Not set',
     header: 'EC Code',
   }),
   columnHelper.accessor('uploadedBy.email', {
