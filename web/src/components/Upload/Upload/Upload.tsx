@@ -1,17 +1,37 @@
+import { useMutation } from '@redwoodjs/web'
+
 import { timeTag } from 'src/lib/formatters'
 
 import UploadValidationButtonGroup from '../UploadValidationButtonGroup/UploadValidationButtonGroup'
 import UploadValidationResultsTable from '../UploadValidationResultsTable/UploadValidationResultsTable'
 import UploadValidationStatus from '../UploadValidationStatus/UploadValidationStatus'
 
+const DOWNLOAD_UPLOAD_FILE = gql`
+  mutation downloadUploadFile($id: Int!) {
+    downloadUploadFile(id: $id) {
+      id
+    }
+  }
+`
 const Upload = ({ upload }) => {
   const hasErrors =
     upload.latestValidation?.results !== null &&
     Array.isArray(upload.latestValidation?.results) &&
     upload.latestValidation?.results.length > 0
 
-  // TODO: Replace functions below with mutations
-  const handleFileDownload = () => {}
+  const [downloadUploadFile] = useMutation(DOWNLOAD_UPLOAD_FILE, {
+    onCompleted: (resultUrl) => {
+      console.log('Opening download file link in new tab..')
+      window.open(resultUrl, '_blank').focus()
+    },
+    onError: (error) => {
+      console.error('Error downloading upload file', error)
+    },
+  })
+  const handleFileDownload = () => {
+    downloadUploadFile({ variables: { id: upload.id } })
+  }
+
   const handleValidate = () => {}
   const handleForceInvalidate = () => {}
 
