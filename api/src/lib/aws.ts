@@ -13,7 +13,7 @@ import {
 } from '@aws-sdk/client-sqs'
 import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { StreamingBlobPayloadInputTypes } from '@smithy/types'
-import { QueryResolvers, CreateUploadInput } from 'types/graphql'
+import { CreateUploadInput } from 'types/graphql'
 
 const REPORTING_DATA_BUCKET_NAME = `${process.env.REPORTING_DATA_BUCKET_NAME}`
 
