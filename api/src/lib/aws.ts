@@ -164,13 +164,6 @@ async function receiveSqsMessage(queueUrl: string) {
   )
 }
 
-export const s3PutObjectSignedUrl: QueryResolvers['s3PutObjectSignedUrl'] = ({
-  upload,
-  uploadId,
-}) => {
-  return s3PutSignedUrl(upload, uploadId)
-}
-
 export default {
   sendPutObjectToS3Bucket,
   sendHeadObjectToS3Bucket,
