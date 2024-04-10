@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import type {
   QueryResolvers,
   MutationResolvers,
@@ -20,8 +21,13 @@ export const upload: QueryResolvers['upload'] = ({ id }) => {
 export const createUpload: MutationResolvers['createUpload'] = async ({
   input,
 }) => {
+  const inputWithContext: Prisma.UploadUncheckedCreateInput = {
+    ...input,
+    uploadedById: context.currentUser.id,
+  }
+  console.log('inputWithContext', inputWithContext)
   const upload = await db.upload.create({
-    data: input,
+    data: inputWithContext,
   })
   // We don't need to store the result of the validation creation, it will be provided via
   // the relation resolver below

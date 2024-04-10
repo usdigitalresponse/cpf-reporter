@@ -32,10 +32,10 @@ describe('uploads', () => {
   })
 
   scenario('creates an upload', async (scenario: StandardScenario) => {
+    mockCurrentUser(scenario.user.one)
     const result = await createUpload({
       input: {
         filename: 'String',
-        uploadedById: scenario.upload.two.uploadedById,
         agencyId: scenario.upload.two.agencyId,
         reportingPeriodId: scenario.upload.two.reportingPeriodId,
       },
@@ -88,7 +88,6 @@ describe('uploads', () => {
               agencyId: scenario.upload.one.agencyId,
               createdAt: scenario.upload.one.createdAt,
               filename: scenario.upload.one.filename,
-              organizationId: scenario.upload.one.agencyId,
               reportingPeriodId: scenario.upload.one.reportingPeriodId,
               updatedAt: scenario.upload.one.updatedAt,
               uploadedById: scenario.upload.one.uploadedById,
@@ -108,7 +107,6 @@ describe('uploads', () => {
               agencyId: scenario.upload.two.agencyId,
               createdAt: scenario.upload.two.createdAt,
               filename: scenario.upload.two.filename,
-              organizationId: scenario.upload.two.agencyId,
               reportingPeriodId: scenario.upload.two.reportingPeriodId,
               updatedAt: scenario.upload.two.updatedAt,
               uploadedById: scenario.upload.two.uploadedById,

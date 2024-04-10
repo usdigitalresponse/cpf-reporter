@@ -62,7 +62,6 @@ const UploadForm = (props: UploadFormProps) => {
     data.reportingPeriodId = parseInt(data.reportingPeriodId)
 
     const uploadInput = {
-      uploadedById: props.userId,
       agencyId: data.agencyId,
       filename: data.file[0].name,
       reportingPeriodId: data.reportingPeriodId,
