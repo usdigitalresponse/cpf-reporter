@@ -35,7 +35,10 @@ const AgencyForm = (props: AgencyFormProps) => {
   }
 
   const onSubmit = (data: FormAgency) => {
-    const modifiedData = { ...data, organizationId: currentUser.organizationId }
+    const modifiedData = {
+      ...data,
+      organizationId: currentUser.agency.organizationId,
+    }
     onSave(modifiedData, props?.agency?.id)
   }
 
