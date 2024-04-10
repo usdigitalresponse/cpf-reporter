@@ -59,15 +59,6 @@ function getS3Client() {
   return s3
 }
 
-export function uploadWorkbook(
-  upload: CreateUploadInput,
-  uploadId: number,
-  body: StreamingBlobPayloadInputTypes
-) {
-  const folderName = `uploads/${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${uploadId}/${upload.filename}`
-  return sendPutObjectToS3Bucket(REPORTING_DATA_BUCKET_NAME, folderName, body)
-}
-
 async function sendPutObjectToS3Bucket(
   bucketName: string,
   key: string,
@@ -101,10 +92,11 @@ async function sendHeadObjectToS3Bucket(bucketName: string, key: string) {
 
 export async function s3PutSignedUrl(
   upload: CreateUploadInput,
-  uploadId: number
+  uploadId: number,
+  organizationId: number
 ): Promise<string> {
   const s3 = getS3Client()
-  const key = `uploads/${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${uploadId}/${upload.filename}`
+  const key = `uploads/${organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${uploadId}/${upload.filename}`
   const baseParams: PutObjectCommandInput = {
     Bucket: REPORTING_DATA_BUCKET_NAME,
     Key: key,
