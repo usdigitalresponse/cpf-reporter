@@ -25,7 +25,7 @@ export const createUpload: MutationResolvers['createUpload'] = async ({
     ...input,
     uploadedById: context.currentUser.id,
   }
-  console.log('inputWithContext', inputWithContext)
+
   const upload = await db.upload.create({
     data: inputWithContext,
   })
@@ -39,7 +39,11 @@ export const createUpload: MutationResolvers['createUpload'] = async ({
       results: null,
     },
   })
-  const signedUrl = await s3PutSignedUrl(upload, upload.id)
+  const signedUrl = await s3PutSignedUrl(
+    upload,
+    upload.id,
+    context.currentUser.agency.organizationId
+  )
 
   return { ...upload, signedUrl }
 }
