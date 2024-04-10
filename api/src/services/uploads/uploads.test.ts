@@ -1,5 +1,7 @@
 import type { Upload } from '@prisma/client'
 
+import { db } from 'src/lib/db'
+
 import {
   uploads,
   upload,
@@ -29,7 +31,7 @@ describe('uploads', () => {
     expect(result).toEqual(scenario.upload.one)
   })
 
-  scenario('creates a upload', async (scenario: StandardScenario) => {
+  scenario('creates an upload', async (scenario: StandardScenario) => {
     const result = await createUpload({
       input: {
         filename: 'String',
@@ -45,9 +47,16 @@ describe('uploads', () => {
     expect(result.reportingPeriodId).toEqual(
       scenario.upload.two.reportingPeriodId
     )
+
+    const validations = await db.upload
+      .findUnique({ where: { id: result.id } })
+      .validations()
+    expect(validations.length).toBe(1)
+    expect(validations[0].passed).toBeFalsy()
+    expect(validations[0].results).toBeNull()
   })
 
-  scenario('updates a upload', async (scenario: StandardScenario) => {
+  scenario('updates an upload', async (scenario: StandardScenario) => {
     const original = (await upload({ id: scenario.upload.one.id })) as Upload
     const result = await updateUpload({
       id: original.id,
@@ -57,7 +66,7 @@ describe('uploads', () => {
     expect(result.filename).toEqual('String2')
   })
 
-  scenario('deletes a upload', async (scenario: StandardScenario) => {
+  scenario('deletes an upload', async (scenario: StandardScenario) => {
     const original = (await deleteUpload({
       id: scenario.upload.one.id,
     })) as Upload
