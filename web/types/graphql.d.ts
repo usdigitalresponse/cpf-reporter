@@ -869,7 +869,7 @@ export type CreateUploadMutationVariables = Exact<{
 }>;
 
 
-export type CreateUploadMutation = { __typename?: 'Mutation', createUpload: { __typename?: 'Upload', id: number, signedUrl?: string | null } };
+export type CreateUploadMutation = { __typename?: 'Mutation', createUpload: { __typename?: 'Upload', id: number, signedUrl?: string | null, validations: Array<{ __typename?: 'UploadValidation', id: number, passed: boolean, initiatedById: number, results?: Prisma.JsonValue | null } | null> } };
 
 export type FindUploadByIdVariables = Exact<{
   id: Scalars['Int'];
