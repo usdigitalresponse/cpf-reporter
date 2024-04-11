@@ -74,6 +74,7 @@ const UploadForm = (props: UploadFormProps) => {
         method: 'PUT',
         headers: {
           'Content-Type': data.file[0].type,
+          'x-amz-server-side-encryption': 'AES256',
         },
         body: data.file[0],
       })
