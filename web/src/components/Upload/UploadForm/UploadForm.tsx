@@ -76,7 +76,7 @@ const UploadForm = (props: UploadFormProps) => {
           'Content-Type': data.file[0].type,
           'x-amz-server-side-encryption': 'AES256',
         },
-        body: formData,
+        body: data.file[0],
       })
         .then((response) => {
           if (!response.ok) {
