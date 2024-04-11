@@ -277,7 +277,7 @@ module "lambda_function-graphql" {
       resources = [data.aws_ssm_parameter.passage_api_key_secret_arn.value]
     }
     GeneratePresignedUploadURLs = {
-      effect = "Allow"
+      effect  = "Allow"
       actions = ["s3:PutObject"]
       resources = [
         # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm
