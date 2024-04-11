@@ -75,7 +75,7 @@ const UploadForm = (props: UploadFormProps) => {
         headers: {
           'Content-Type': data.file[0].type,
         },
-        body: formData,
+        body: data.file[0],
       })
         .then((response) => {
           if (!response.ok) {
