@@ -341,7 +341,7 @@ module "lambda_function-processValidationJson" {
 
   // Metadata
   function_name = "${var.namespace}-processValidationJson"
-  description   = "Reacts to S3 events and converts Excel files to JSON."
+  description   = "Reacts to S3 events and processes uploaded JSON files."
 
   // Networking
   attach_network_policy  = false
@@ -357,23 +357,16 @@ module "lambda_function-processValidationJson" {
   policy_jsons                      = local.lambda_default_execution_policies
   attach_policy_statements          = true
   policy_statements = {
-    AllowDownloadExcelObjects = {
+    AllowDownloadAndDeleteJsonObjects = {
       effect = "Allow"
       actions = [
         "s3:GetObject",
         "s3:HeadObject",
+        "s3:DeleteObject",
       ]
-      resources = [
-        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
-      ]
-    }
-    AllowUploadJsonObjects = {
-      effect  = "Allow"
-      actions = ["s3:PutObject"]
       resources = [
         # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm.json
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm.json",
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.json",
       ]
     }
   }
