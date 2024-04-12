@@ -1,6 +1,4 @@
-from io import BytesIO
-from tempfile import TemporaryFile
-from typing import Any, List, Optional, Tuple
+from typing import Any, BinaryIO, List, Optional, Tuple
 
 from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
@@ -27,14 +25,19 @@ def get_headers(sheet: Worksheet, cell_range: str) -> tuple:
     return tuple(header_cell.value for header_cell in sheet[cell_range][0])
 
 
-def validate(workbook: TemporaryFile):
+def validate(workbook: BinaryIO) -> Errors:
+    """Validates a given Excel workbook according to CPF validation rules.
+
+    Args:
+        workbook: The Excel workbook file to read and validate.
     """
+
+    """TemporaryFile
     1. Load workbook in read-only mode
     See: https://openpyxl.readthedocs.io/en/stable/optimized.html
     If there is any trouble loading files from memory please see here: https://stackoverflow.com/questions/20635778/using-openpyxl-to-read-file-from-memory
     """
-    file_bytes = workbook.read()
-    wb = load_workbook(filename=BytesIO(file_bytes), read_only=True)
+    wb = load_workbook(filename=workbook, read_only=True)
 
     """
     2. Validate logic sheet to make sure the sheet has an appropriate version
