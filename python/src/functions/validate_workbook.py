@@ -8,7 +8,7 @@ from aws_lambda_typing.events import S3Event
 from mypy_boto3_s3.client import S3Client
 
 from src.lib.logging import get_logger, reset_contextvars
-from src.lib.workbook_validator import validate
+from src.lib.workbook_validator import validate, BinaryTempFile
 
 
 @reset_contextvars
@@ -45,7 +45,7 @@ def handle(event: S3Event, context: Context):
     )
 
 
-def download_workbook(client: S3Client, bucket: str, key: str, destination: tempfile._TemporaryFileWrapper):
+def download_workbook(client: S3Client, bucket: str, key: str, destination: BinaryTempFile):
     """Downloads an S3 object to a local file.
 
     Args:
@@ -64,7 +64,7 @@ def download_workbook(client: S3Client, bucket: str, key: str, destination: temp
         raise
 
 
-def validate_workbook(file: tempfile._TemporaryFileWrapper) -> list[str]:
+def validate_workbook(file: BinaryTempFile) -> list[str]:
     """Wrapper for workbook validation with logging.
 
     Args:
