@@ -1,6 +1,8 @@
+from tempfile import TemporaryFile
+
+
 import pytest
 from openpyxl.worksheet.worksheet import Worksheet
-
 from src.lib.workbook_validator import (
     SCHEMA_BY_PROJECT,
     is_empty_row,
@@ -35,7 +37,7 @@ class TestIsEmptyRow:
 
 
 class TestValidateWorkbook:
-    def test_valid_full_workbook(self, valid_file: bytes):
+    def test_valid_full_workbook(self, valid_file: TemporaryFile):
         errors = validate(valid_file)
         assert errors == []
 
