@@ -58,7 +58,6 @@ def download_workbook(client: S3Client, bucket: str, key: str, destination: temp
     logger.debug("downloading workbook from s3")
 
     try:
-        client: S3Client = boto3.client("s3")
         client.download_fileobj(bucket, key, destination)
     except:
         logger.exception("failed to download workbook from S3")
