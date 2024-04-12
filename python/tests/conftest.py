@@ -1,4 +1,4 @@
-from tempfile import TemporaryFile
+from typing import BinaryIO
 
 import openpyxl
 import pytest
@@ -7,7 +7,7 @@ _SAMPLE_VALID_XLSM = "tests/data/sample_valid.xlsm"
 
 
 @pytest.fixture
-def valid_file() -> TemporaryFile:
+def valid_file() -> BinaryIO:
     file_path = _SAMPLE_VALID_XLSM
     return open(file_path, "rb")
 

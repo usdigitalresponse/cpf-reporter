@@ -1,5 +1,4 @@
-from tempfile import TemporaryFile
-
+from typing import BinaryIO
 
 import pytest
 from openpyxl.worksheet.worksheet import Worksheet
@@ -37,7 +36,7 @@ class TestIsEmptyRow:
 
 
 class TestValidateWorkbook:
-    def test_valid_full_workbook(self, valid_file: TemporaryFile):
+    def test_valid_full_workbook(self, valid_file: BinaryIO):
         errors = validate(valid_file)
         assert errors == []
 
