@@ -1,5 +1,4 @@
-from typing import Any, BinaryIO, Iterable, List, Optional, Tuple
-from tempfile import _TemporaryFileWrapper
+from typing import Any, IO, Iterable, List, Optional, Tuple
 
 from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
@@ -12,7 +11,6 @@ from src.schemas.latest.schema import (
 )
 
 type Errors = List[str]
-type BinaryTempFile = _TemporaryFileWrapper[bytes]
 
 
 def map_values_to_headers(headers: Tuple, values: Iterable[Any]):
@@ -27,7 +25,7 @@ def get_headers(sheet: Worksheet, cell_range: str) -> tuple:
     return tuple(header_cell.value for header_cell in sheet[cell_range][0])
 
 
-def validate(workbook: BinaryTempFile | BinaryIO) -> Errors:
+def validate(workbook: IO[bytes]) -> Errors:
     """Validates a given Excel workbook according to CPF validation rules.
 
     Args:

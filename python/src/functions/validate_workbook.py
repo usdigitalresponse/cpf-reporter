@@ -1,5 +1,6 @@
 import json
 import tempfile
+from typing import IO
 
 import boto3
 import structlog
@@ -8,7 +9,7 @@ from aws_lambda_typing.events import S3Event
 from mypy_boto3_s3.client import S3Client
 
 from src.lib.logging import get_logger, reset_contextvars
-from src.lib.workbook_validator import validate, BinaryTempFile
+from src.lib.workbook_validator import validate
 
 
 @reset_contextvars
@@ -45,14 +46,14 @@ def handle(event: S3Event, context: Context):
     )
 
 
-def download_workbook(client: S3Client, bucket: str, key: str, destination: BinaryTempFile):
+def download_workbook(client: S3Client, bucket: str, key: str, destination: IO[bytes]):
     """Downloads an S3 object to a local file.
 
     Args:
         client: Client facilitating download from S3
         bucket: Name of the S3 bucket containing the workbook
         key: S3 object key for the file to download
-        destination: File-like object where the S3 object will be written
+        destination: File-like object (in binary mode) where the S3 object will be written
     """
     logger = get_logger()
     logger.debug("downloading workbook from s3")
@@ -64,7 +65,7 @@ def download_workbook(client: S3Client, bucket: str, key: str, destination: Bina
         raise
 
 
-def validate_workbook(file: BinaryTempFile) -> list[str]:
+def validate_workbook(file: IO[bytes]) -> list[str]:
     """Wrapper for workbook validation with logging.
 
     Args:
