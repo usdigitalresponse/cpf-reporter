@@ -1,4 +1,5 @@
 from io import BytesIO
+from tempfile import TemporaryFile
 from typing import Any, List, Optional, Tuple
 
 from openpyxl import load_workbook
@@ -26,13 +27,14 @@ def get_headers(sheet: Worksheet, cell_range: str) -> tuple:
     return tuple(header_cell.value for header_cell in sheet[cell_range][0])
 
 
-def validate(workbook: bytes):
+def validate(workbook: TemporaryFile):
     """
     1. Load workbook in read-only mode
     See: https://openpyxl.readthedocs.io/en/stable/optimized.html
     If there is any trouble loading files from memory please see here: https://stackoverflow.com/questions/20635778/using-openpyxl-to-read-file-from-memory
     """
-    wb = load_workbook(filename=BytesIO(workbook), read_only=True)
+    file_bytes = workbook.read()
+    wb = load_workbook(filename=BytesIO(file_bytes), read_only=True)
 
     """
     2. Validate logic sheet to make sure the sheet has an appropriate version
@@ -139,7 +141,7 @@ if __name__ == "__main__":
 
     file_path = sys.argv[1]
     with open(file_path, "rb") as f:
-        errors = validate(f.read())
+        errors = validate(f)
         if errors:
             print("Errors found:")
             for error in errors:
