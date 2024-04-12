@@ -1,4 +1,4 @@
-from typing import Any, BinaryIO, List, Optional, Tuple
+from typing import Any, BinaryIO, Iterable, List, Optional, Tuple
 
 from openpyxl import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
@@ -13,7 +13,7 @@ from src.schemas.latest.schema import (
 type Errors = List[str]
 
 
-def map_values_to_headers(headers: Tuple, values: List[any]):
+def map_values_to_headers(headers: Tuple, values: Iterable[Any]):
     return dict(zip(headers, values))
 
 

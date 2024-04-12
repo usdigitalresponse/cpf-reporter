@@ -1,4 +1,3 @@
-import io
 import json
 import tempfile
 
@@ -46,7 +45,7 @@ def handle(event: S3Event, context: Context):
     )
 
 
-def download_workbook(client: S3Client, bucket: str, key: str, destination: io.FileIO):
+def download_workbook(client: S3Client, bucket: str, key: str, destination: tempfile._TemporaryFileWrapper):
     """Downloads an S3 object to a local file.
 
     Args:
@@ -66,7 +65,7 @@ def download_workbook(client: S3Client, bucket: str, key: str, destination: io.F
         raise
 
 
-def validate_workbook(file) -> list[str]:
+def validate_workbook(file: tempfile._TemporaryFileWrapper) -> list[str]:
     """Wrapper for workbook validation with logging.
 
     Args:
