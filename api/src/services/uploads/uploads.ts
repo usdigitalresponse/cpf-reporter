@@ -6,7 +6,10 @@ import type {
 } from 'types/graphql'
 
 import { s3PutSignedUrl } from 'src/lib/aws'
+import aws from 'src/lib/aws'
 import { db } from 'src/lib/db'
+import { logger } from 'src/lib/logger'
+import { ValidationError } from 'src/lib/validation-error'
 
 export const uploads: QueryResolvers['uploads'] = () => {
   return db.upload.findMany()
@@ -63,6 +66,20 @@ export const deleteUpload: MutationResolvers['deleteUpload'] = ({ id }) => {
     where: { id },
   })
 }
+
+export const downloadUploadFile: MutationResolvers['downloadUploadFile'] =
+  async ({ id }) => {
+    const upload = await db.upload.findUnique({
+      where: { id },
+      include: { agency: true },
+    })
+    if (!upload) {
+      throw new ValidationError(`Upload with id ${id} not found`)
+    }
+    logger.info(`Downloading file for upload ${id}`)
+    const signedUrl = await aws.getSignedUrl(upload)
+    return signedUrl
+  }
 
 export const Upload: UploadRelationResolvers = {
   uploadedBy: (_obj, { root }) => {
