@@ -1,6 +1,6 @@
-import io
 import json
 import tempfile
+from typing import IO
 
 import boto3
 import structlog
@@ -46,27 +46,26 @@ def handle(event: S3Event, context: Context):
     )
 
 
-def download_workbook(client: S3Client, bucket: str, key: str, destination: io.FileIO):
+def download_workbook(client: S3Client, bucket: str, key: str, destination: IO[bytes]):
     """Downloads an S3 object to a local file.
 
     Args:
         client: Client facilitating download from S3
         bucket: Name of the S3 bucket containing the workbook
         key: S3 object key for the file to download
-        destination: File-like object where the S3 object will be written
+        destination: File-like object (in binary mode) where the S3 object will be written
     """
     logger = get_logger()
     logger.debug("downloading workbook from s3")
 
     try:
-        client: S3Client = boto3.client("s3")
         client.download_fileobj(bucket, key, destination)
     except:
         logger.exception("failed to download workbook from S3")
         raise
 
 
-def validate_workbook(file) -> list[str]:
+def validate_workbook(file: IO[bytes]) -> list[str]:
     """Wrapper for workbook validation with logging.
 
     Args:

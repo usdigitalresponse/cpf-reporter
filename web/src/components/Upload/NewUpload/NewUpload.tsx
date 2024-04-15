@@ -10,6 +10,12 @@ const CREATE_UPLOAD_MUTATION = gql`
     createUpload(input: $input) {
       id
       signedUrl
+      validations {
+        id
+        passed
+        initiatedById
+        results
+      }
     }
   }
 `
@@ -37,7 +43,7 @@ const NewUpload = () => {
       <div className="rw-segment-main">
         <UploadForm
           userId={currentUser.id}
-          organizationId={currentUser.organizationId}
+          organizationId={currentUser.agency.organizationId}
           loading={loading}
           error={error}
         />

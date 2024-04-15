@@ -1,5 +1,7 @@
 import type { Upload } from '@prisma/client'
 
+import { db } from 'src/lib/db'
+
 import {
   uploads,
   upload,
@@ -29,11 +31,11 @@ describe('uploads', () => {
     expect(result).toEqual(scenario.upload.one)
   })
 
-  scenario('creates a upload', async (scenario: StandardScenario) => {
+  scenario('creates an upload', async (scenario: StandardScenario) => {
+    mockCurrentUser(scenario.user.one)
     const result = await createUpload({
       input: {
         filename: 'String',
-        uploadedById: scenario.upload.two.uploadedById,
         agencyId: scenario.upload.two.agencyId,
         reportingPeriodId: scenario.upload.two.reportingPeriodId,
       },
@@ -45,9 +47,16 @@ describe('uploads', () => {
     expect(result.reportingPeriodId).toEqual(
       scenario.upload.two.reportingPeriodId
     )
+
+    const validations = await db.upload
+      .findUnique({ where: { id: result.id } })
+      .validations()
+    expect(validations.length).toBe(1)
+    expect(validations[0].passed).toBeFalsy()
+    expect(validations[0].results).toBeNull()
   })
 
-  scenario('updates a upload', async (scenario: StandardScenario) => {
+  scenario('updates an upload', async (scenario: StandardScenario) => {
     const original = (await upload({ id: scenario.upload.one.id })) as Upload
     const result = await updateUpload({
       id: original.id,
@@ -57,7 +66,7 @@ describe('uploads', () => {
     expect(result.filename).toEqual('String2')
   })
 
-  scenario('deletes a upload', async (scenario: StandardScenario) => {
+  scenario('deletes an upload', async (scenario: StandardScenario) => {
     const original = (await deleteUpload({
       id: scenario.upload.one.id,
     })) as Upload
@@ -79,7 +88,6 @@ describe('uploads', () => {
               agencyId: scenario.upload.one.agencyId,
               createdAt: scenario.upload.one.createdAt,
               filename: scenario.upload.one.filename,
-              organizationId: scenario.upload.one.agencyId,
               reportingPeriodId: scenario.upload.one.reportingPeriodId,
               updatedAt: scenario.upload.one.updatedAt,
               uploadedById: scenario.upload.one.uploadedById,
@@ -99,7 +107,6 @@ describe('uploads', () => {
               agencyId: scenario.upload.two.agencyId,
               createdAt: scenario.upload.two.createdAt,
               filename: scenario.upload.two.filename,
-              organizationId: scenario.upload.two.agencyId,
               reportingPeriodId: scenario.upload.two.reportingPeriodId,
               updatedAt: scenario.upload.two.updatedAt,
               uploadedById: scenario.upload.two.uploadedById,

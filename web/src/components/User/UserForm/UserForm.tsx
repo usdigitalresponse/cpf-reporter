@@ -46,7 +46,7 @@ const UserForm = (props: UserFormProps) => {
     error: agenciesError,
     data: agenciesData,
   } = useQuery(GET_AGENCIES_UNDER_USER_ORGANIZATION, {
-    variables: { organizationId: currentUser.organizationId },
+    variables: { organizationId: currentUser.agency.organizationId },
   })
   const agencies = agenciesData?.agenciesByOrganization
 

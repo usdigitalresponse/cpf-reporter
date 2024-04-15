@@ -7,7 +7,7 @@ import UsersCell from 'src/components/User/UsersCell'
 
 const UsersPage = () => {
   const { currentUser } = useAuth()
-  const organizationIdOfUser = currentUser.organizationId
+  const organizationIdOfUser = currentUser.agency.organizationId
 
   return (
     <div>

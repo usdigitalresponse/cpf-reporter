@@ -229,6 +229,12 @@ resource "aws_s3_bucket_notification" "reporting_data" {
     filter_prefix       = "uploads/"
     filter_suffix       = ".json"
   }
+  lambda_function {
+    lambda_function_arn = module.lambda_function-cpfValidation.lambda_function_arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "uploads/"
+    filter_suffix       = ".xlsm"
+  }
 }
 
 module "lambda_function-graphql" {
@@ -275,6 +281,14 @@ module "lambda_function-graphql" {
       effect    = "Allow"
       actions   = ["secretsmanager:GetSecretValue"]
       resources = [data.aws_ssm_parameter.passage_api_key_secret_arn.value]
+    }
+    GeneratePresignedUploadURLs = {
+      effect  = "Allow"
+      actions = ["s3:PutObject"]
+      resources = [
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
+      ]
     }
   }
 
@@ -327,7 +341,7 @@ module "lambda_function-processValidationJson" {
 
   // Metadata
   function_name = "${var.namespace}-processValidationJson"
-  description   = "Reacts to S3 events and converts Excel files to JSON."
+  description   = "Reacts to S3 events and processes uploaded JSON files."
 
   // Networking
   attach_network_policy  = false
@@ -343,23 +357,16 @@ module "lambda_function-processValidationJson" {
   policy_jsons                      = local.lambda_default_execution_policies
   attach_policy_statements          = true
   policy_statements = {
-    AllowDownloadExcelObjects = {
+    AllowDownloadAndDeleteJsonObjects = {
       effect = "Allow"
       actions = [
         "s3:GetObject",
         "s3:HeadObject",
+        "s3:DeleteObject",
       ]
       resources = [
-        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsm
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsm",
-      ]
-    }
-    AllowUploadJsonObjects = {
-      effect  = "Allow"
-      actions = ["s3:PutObject"]
-      resources = [
-        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsm.json
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsm.json",
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm.json
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.json",
       ]
     }
   }
@@ -421,7 +428,7 @@ module "lambda_function-cpfValidation" {
         "s3:HeadObject",
       ]
       resources = [
-        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsm.json
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm.json
         "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
       ]
     }
@@ -431,7 +438,7 @@ module "lambda_function-cpfValidation" {
         "s3:PutObject"
       ]
       resources = [
-        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsm.json
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm.json
         "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm.json",
       ]
     }

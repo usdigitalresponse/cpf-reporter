@@ -2,136 +2,125 @@ import type { Prisma, Upload } from '@prisma/client'
 
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
-export const standard = defineScenario<Prisma.UploadCreateArgs>({
-  upload: {
+export const standard = defineScenario<
+  | Prisma.OrganizationCreateArgs
+  | Prisma.AgencyCreateArgs
+  | Prisma.UserCreateArgs
+  | Prisma.ReportingPeriodCreateArgs
+  | Prisma.UploadCreateArgs
+>({
+  organization: {
     one: {
       data: {
+        name: 'USDR',
+      },
+    },
+  },
+  agency: {
+    one: (scenario) => ({
+      data: {
+        name: 'Agency1',
+        organizationId: scenario.organization.one.id,
+        code: 'A1',
+      },
+      include: {
+        organization: true,
+      },
+    }),
+  },
+  user: {
+    one: (scenario) => ({
+      data: {
+        email: 'uniqueemail1@test.com',
+        name: 'String',
+        role: 'ORGANIZATION_ADMIN',
+        agencyId: scenario.agency.one.id,
+      },
+      include: {
+        agency: true,
+      },
+    }),
+    two: (scenario) => ({
+      data: {
+        email: 'uniqueemail25@test.com',
+        name: 'String',
+        role: 'ORGANIZATION_STAFF',
+        agencyId: scenario.agency.one.id,
+      },
+      include: {
+        agency: true,
+      },
+    }),
+  },
+  reportingPeriod: {
+    one: (scenario) => ({
+      data: {
+        name: 'String',
+        startDate: '2024-01-26T15:11:27.688Z',
+        endDate: '2024-01-26T15:11:27.688Z',
+        organization: { connect: { id: scenario.organization.one.id } },
+        inputTemplate: {
+          create: {
+            name: 'String',
+            version: 'String',
+            effectiveDate: '2024-01-26T15:11:27.688Z',
+          },
+        },
+        outputTemplate: {
+          create: {
+            name: 'String',
+            version: 'String',
+            effectiveDate: '2024-01-26T15:11:27.688Z',
+          },
+        },
+      },
+    }),
+  },
+  upload: {
+    one: (scenario) => ({
+      data: {
         filename: 'String',
-        uploadedBy: {
-          create: {
-            email: 'uniqueemail1@test.com',
-            name: 'String',
-            role: 'USDR_ADMIN',
-            agency: { create: { name: 'String', code: 'String' } },
-          },
-        },
-        agency: { create: { name: 'String', code: 'String' } },
-        reportingPeriod: {
-          create: {
-            name: 'String',
-            startDate: '2024-01-26T15:11:27.688Z',
-            endDate: '2024-01-26T15:11:27.688Z',
-            organization: { create: { name: 'String' } },
-            inputTemplate: {
-              create: {
-                name: 'String',
-                version: 'String',
-                effectiveDate: '2024-01-26T00:00:00.000Z',
-              },
-            },
-            outputTemplate: {
-              create: {
-                name: 'String',
-                version: 'String',
-                effectiveDate: '2024-01-26T00:00:00.000Z',
-              },
-            },
-          },
-        },
+        uploadedById: scenario.user.one.id,
+        agencyId: scenario.agency.one.id,
+        reportingPeriodId: scenario.reportingPeriod.one.id,
         validations: {
           create: [
             {
               passed: true,
               results: '{error:false}',
               createdAt: '2024-01-26T15:11:27.000Z',
-              initiatedBy: {
-                create: {
-                  email: 'uniqueemail2@test.com',
-                  name: 'String',
-                  role: 'USDR_ADMIN',
-                  agency: { create: { name: 'String', code: 'String' } },
-                },
-              },
+              initiatedById: scenario.user.one.id,
             },
             {
               passed: true,
               results: '{error:false}',
               createdAt: '2024-01-27T10:32:00.000Z',
-              initiatedBy: {
-                create: {
-                  email: 'uniqueemail3@test.com',
-                  name: 'String',
-                  role: 'USDR_ADMIN',
-                  agency: { create: { name: 'String', code: 'String' } },
-                },
-              },
+              initiatedById: scenario.user.one.id,
             },
           ],
         },
         createdAt: '2024-01-20T15:11:27.000Z',
         updatedAt: '2024-01-20T15:11:27.000Z',
       },
-    },
-    two: {
+    }),
+    two: (scenario) => ({
       data: {
         filename: 'String',
-        uploadedBy: {
-          create: {
-            email: 'uniqueemail4@test.com',
-            name: 'String',
-            role: 'USDR_ADMIN',
-            agency: { create: { name: 'String', code: 'String' } },
-          },
-        },
-        agency: { create: { name: 'String', code: 'String' } },
-        reportingPeriod: {
-          create: {
-            name: 'String',
-            startDate: '2024-01-26T15:11:27.688Z',
-            endDate: '2024-01-26T15:11:27.688Z',
-            organization: { create: { name: 'String' } },
-            inputTemplate: {
-              create: {
-                name: 'String',
-                version: 'String',
-                effectiveDate: '2024-01-26T15:11:27.688Z',
-              },
-            },
-            outputTemplate: {
-              create: {
-                name: 'String',
-                version: 'String',
-                effectiveDate: '2024-01-26T15:11:27.688Z',
-              },
-            },
-          },
-        },
+        uploadedById: scenario.user.one.id,
+        agencyId: scenario.agency.one.id,
+        reportingPeriodId: scenario.reportingPeriod.one.id,
         validations: {
           create: [
             {
               passed: true,
               results: '{error:false}',
-              initiatedBy: {
-                create: {
-                  email: 'uniqueemail5@test.com',
-                  name: 'String',
-                  role: 'USDR_ADMIN',
-                  agency: { create: { name: 'String', code: 'String' } },
-                },
-              },
+              initiatedById: scenario.user.one.id,
               createdAt: '2024-01-29T18:13:25.000Z',
             },
             {
               passed: true,
               results: '{error:false}',
-              initiatedBy: {
-                create: {
-                  email: 'uniqueemail6@test.com',
-                  name: 'String',
-                  role: 'USDR_ADMIN',
-                  agency: { create: { name: 'String', code: 'String' } },
-                },
-              },
+              initiatedById: scenario.user.one.id,
               createdAt: '2024-01-29T17:10:22.000Z',
             },
           ],
@@ -139,7 +128,7 @@ export const standard = defineScenario<Prisma.UploadCreateArgs>({
         createdAt: '2024-01-21T18:10:17.000Z',
         updatedAt: '2024-01-21T18:10:17.000Z',
       },
-    },
+    }),
   },
 })
 

@@ -1,3 +1,5 @@
+from typing import BinaryIO
+
 import openpyxl
 import pytest
 
@@ -5,10 +7,9 @@ _SAMPLE_VALID_XLSM = "tests/data/sample_valid.xlsm"
 
 
 @pytest.fixture
-def valid_file() -> bytes:
+def valid_file() -> BinaryIO:
     file_path = _SAMPLE_VALID_XLSM
-    with open(file_path, "rb") as f:
-        return f.read()
+    return open(file_path, "rb")
 
 
 @pytest.fixture

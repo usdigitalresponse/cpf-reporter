@@ -7,7 +7,7 @@ import AgenciesCell from 'src/components/Agency/AgenciesCell'
 
 const AgenciesPage = () => {
   const { currentUser } = useAuth()
-  const organizationIdOfUser = currentUser.organizationId
+  const organizationIdOfUser = currentUser.agency.organizationId
 
   return (
     <div>
