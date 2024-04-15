@@ -5,8 +5,9 @@ import type {
 } from 'types/graphql'
 
 import { s3PutSignedUrl } from 'src/lib/aws'
-import { getSignedUrl } from 'src/lib/aws'
+import aws from 'src/lib/aws'
 import { db } from 'src/lib/db'
+import { logger } from 'src/lib/logger'
 
 export const uploads: QueryResolvers['uploads'] = () => {
   return db.upload.findMany()
@@ -51,8 +52,8 @@ export const downloadUploadFile: MutationResolvers['downloadUploadFile'] =
       where: { id },
       include: { agency: true },
     })
-    const signedUrl = await getSignedUrl(upload)
-
+    logger.info(`Downloading file for upload ${id}`)
+    const signedUrl = await aws.getSignedUrl(upload)
     return signedUrl
   }
 

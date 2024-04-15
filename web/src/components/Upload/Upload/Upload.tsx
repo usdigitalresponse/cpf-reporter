@@ -8,9 +8,7 @@ import UploadValidationStatus from '../UploadValidationStatus/UploadValidationSt
 
 const DOWNLOAD_UPLOAD_FILE = gql`
   mutation downloadUploadFile($id: Int!) {
-    downloadUploadFile(id: $id) {
-      id
-    }
+    downloadUploadFile(id: $id)
   }
 `
 const Upload = ({ upload }) => {
@@ -20,9 +18,10 @@ const Upload = ({ upload }) => {
     upload.latestValidation?.results.length > 0
 
   const [downloadUploadFile] = useMutation(DOWNLOAD_UPLOAD_FILE, {
-    onCompleted: (resultUrl) => {
+    onCompleted: ({ downloadUploadFile }) => {
+      console.log(downloadUploadFile)
       console.log('Opening download file link in new tab..')
-      window.open(resultUrl, '_blank').focus()
+      window.open(downloadUploadFile, '_blank').focus()
     },
     onError: (error) => {
       console.error('Error downloading upload file', error)

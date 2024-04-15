@@ -175,6 +175,7 @@ export type Mutation = {
   deleteUpload: Upload;
   deleteUploadValidation: UploadValidation;
   deleteUser: User;
+  downloadUploadFile: Scalars['String'];
   updateAgency: Agency;
   updateExpenditureCategory: ExpenditureCategory;
   updateInputTemplate: InputTemplate;
@@ -300,6 +301,11 @@ export type MutationdeleteUploadValidationArgs = {
 
 
 export type MutationdeleteUserArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationdownloadUploadFileArgs = {
   id: Scalars['Int'];
 };
 
@@ -870,6 +876,13 @@ export type CreateUploadMutationVariables = Exact<{
 
 
 export type CreateUploadMutation = { __typename?: 'Mutation', createUpload: { __typename?: 'Upload', id: number, signedUrl?: string | null } };
+
+export type downloadUploadFileVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type downloadUploadFile = { __typename?: 'Mutation', downloadUploadFile: string };
 
 export type FindUploadByIdVariables = Exact<{
   id: Scalars['Int'];
