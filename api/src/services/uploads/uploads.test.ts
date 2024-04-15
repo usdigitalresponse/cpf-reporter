@@ -131,7 +131,7 @@ describe('downloads', () => {
   scenario('returns a download link', async (scenario: StandardScenario) => {
     const result = await downloadUploadFile({ id: scenario.upload.one.id })
     console.log(result)
-    expect(result).toMatch(/https:\/\/.*\.amazonaws\.com\/uploads\/.*/)
+    expect(result).toMatch(/^https:\/\/.*\.amazonaws\.com\/uploads\/.*$/)
   })
   scenario('handles a missing value', async (_scenario: StandardScenario) => {
     await expect(downloadUploadFile({ id: -1 })).rejects.toThrow(
