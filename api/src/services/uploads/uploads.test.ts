@@ -8,6 +8,7 @@ import {
   createUpload,
   updateUpload,
   deleteUpload,
+  downloadUploadFile,
   Upload as UploadRelationResolver,
 } from './uploads'
 import type { StandardScenario } from './uploads.scenarios'
@@ -124,4 +125,17 @@ describe('uploads', () => {
       )
     }
   )
+})
+
+describe('downloads', () => {
+  scenario('returns a download link', async (scenario: StandardScenario) => {
+    const result = await downloadUploadFile({ id: scenario.upload.one.id })
+    console.log(result)
+    expect(result).toMatch(/https:\/\/.*\.amazonaws\.com\/uploads\/.*/)
+  })
+  scenario('handles a missing value', async (_scenario: StandardScenario) => {
+    await expect(downloadUploadFile({ id: -1 })).rejects.toThrow(
+      'Upload with id -1 not found'
+    )
+  })
 })
