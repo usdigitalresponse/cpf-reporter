@@ -38,7 +38,7 @@ function buildRecord(uploadValidationId: string) {
         },
       },
       object: {
-        key: `/uploads/12/34/56/${uploadValidationId}/{filename}`,
+        key: `uploads/12/34/56/${uploadValidationId}/{filename}`,
       },
     },
   }

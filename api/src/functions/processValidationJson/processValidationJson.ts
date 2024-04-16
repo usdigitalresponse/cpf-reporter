@@ -150,11 +150,12 @@ export const processRecord = async (
 function extractUploadIdFromKey(key: string): number {
   logger.debug(`Extracting upload_id from key: ${key}`)
   const regex =
-    /\/uploads\/(?<organization_id>\w+)\/(?<agency_id>\w+)\/(?<reporting_period_id>\w+)\/(?<upload_id>\w+)\/(?<filename>.+)/
+    /uploads\/(?<organization_id>\w+)\/(?<agency_id>\w+)\/(?<reporting_period_id>\w+)\/(?<upload_id>\w+)\/(?<filename>.+)/
   const match = key.match(regex)
   if (!match) {
     throw new Error('Invalid key format')
   }
+  console.log(match)
   logger.info(`Extracted upload_id: ${match.groups.upload_id}`)
   return parseInt(match.groups.upload_id)
 }
