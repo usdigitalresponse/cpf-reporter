@@ -73,7 +73,6 @@ export const processRecord = async (
 
     // when the results array is empty then we know the file has passed validations
     const passed = result.length === 0
-    console.log('passed', passed)
 
     const uploadId = extractUploadIdFromKey(key)
     const input = {
