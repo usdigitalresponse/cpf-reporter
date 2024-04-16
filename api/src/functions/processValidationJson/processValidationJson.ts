@@ -1,6 +1,5 @@
 import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Prisma } from '@prisma/client'
-import { NodeJsClient } from '@smithy/types'
 import { S3Handler, S3ObjectCreatedNotificationEvent } from 'aws-lambda'
 
 import aws from 'src/lib/aws'
