@@ -90,7 +90,7 @@ def validate_workbook(file: IO[bytes]) -> ValidationResults:
     )
     results: ValidationResults = {
         "errors": errors,
-        "project_use_code": project_use_code,
+        "projectUseCode": project_use_code,
     }
     return results
 
