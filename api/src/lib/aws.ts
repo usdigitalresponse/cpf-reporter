@@ -171,4 +171,5 @@ export default {
   getSignedUrl,
   sendSqsMessage,
   receiveSqsMessage,
+  getS3Client,
 }

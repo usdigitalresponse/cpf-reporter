@@ -2,12 +2,20 @@ import { db } from 'src/lib/db'
 
 import { processRecord } from './processValidationJson'
 
+type DocumentBody = {
+  transformToString: () => string
+}
+
 class MockS3Client {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   commands: any[] = []
-  mockDocumentBody: string
+  mockDocumentBody: DocumentBody = { transformToString: () => '' }
   constructor(documentBody: string) {
-    this.mockDocumentBody = documentBody
+    if (documentBody) {
+      this.mockDocumentBody.transformToString = () => documentBody
+    } else {
+      this.mockDocumentBody = null
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
