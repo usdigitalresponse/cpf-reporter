@@ -20,6 +20,11 @@ type Response = {
   statusCode: number
 }
 
+type ResultSchema = {
+  errors: string[]
+  projectUseCode: string
+}
+
 type UploadValidationS3Client = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   send: (command: GetObjectCommand | DeleteObjectCommand) => Promise<any>
@@ -96,17 +101,44 @@ export const processRecord = async (
          /uploads/organization_id/agency_id/reporting_period_id/upload_id/{filename}
       */
     const strBody = await getObjectResponse.Body.transformToString()
-    const result = JSON.parse(strBody) || []
+    const result: ResultSchema = JSON.parse(strBody)
 
     // when the results array is empty then we know the file has passed validations
-    const passed = result.length === 0
+    const passed = result.errors.length === 0
 
     const uploadId = extractUploadIdFromKey(key)
-    const input = {
-      results: result,
-      uploadId: uploadId,
-      passed: passed,
+
+    // Verify valid expenditureCategory
+    /*
+    The category must be one of the following values:
+      {
+        name: '1A - Broadband Infrastructure',
+        code: '1A',
+      },
+      {
+        name: '1B - Digital Connectivity Technology',
+        code: '1B',
+      },
+      {
+        name: '1C - Multi-Purpose Community Facility',
+        code: '1C',
+      },
+    */
+    const expenditureCategory = await db.expenditureCategory.findFirst({
+      where: { code: result.projectUseCode },
+    })
+    if (!expenditureCategory) {
+      logger.error(
+        `Expenditure category not found: ${result.projectUseCode} - key: ${key}`
+      )
+      throw new Error('Expenditure category not found')
     }
+
+    // Update the Upload record with the expenditure category Id
+    await db.upload.update({
+      data: { expenditureCategoryId: expenditureCategory.id },
+      where: { id: uploadId },
+    })
 
     // There should be an existing validation Record in the DB that will need to be updated
     const validationRecord = await db.uploadValidation.findFirst({
@@ -118,9 +150,14 @@ export const processRecord = async (
       throw new Error('Validation record not found')
     }
 
+    const uploadValidationInput = {
+      results: result,
+      uploadId: uploadId,
+      passed: passed,
+    }
     try {
       await db.uploadValidation.update({
-        data: input,
+        data: uploadValidationInput,
         where: { id: validationRecord.id },
       })
     } catch (err) {
