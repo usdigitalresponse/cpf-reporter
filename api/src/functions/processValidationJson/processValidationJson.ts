@@ -1,15 +1,7 @@
-import {
-  S3Client,
-  GetObjectCommand,
-  DeleteObjectCommand,
-} from '@aws-sdk/client-s3'
+import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Prisma } from '@prisma/client'
 import { NodeJsClient } from '@smithy/types'
-import {
-  S3Handler,
-  Context,
-  S3ObjectCreatedNotificationEvent,
-} from 'aws-lambda'
+import { S3Handler, S3ObjectCreatedNotificationEvent } from 'aws-lambda'
 
 import aws from 'src/lib/aws'
 import { db } from 'src/lib/db'
@@ -35,14 +27,9 @@ type UploadValidationS3Client = {
 }
 
 export const handler: S3Handler = async (
-  event: S3ObjectCreatedNotificationEvent,
-  context: Context
+  event: S3ObjectCreatedNotificationEvent
 ): Promise<Response> => {
-  console.log(event)
-  console.log('Function name: ', context.functionName)
   const s3 = aws.getS3Client()
-  event = event.queryStringParameters
-  console.log(event)
   await Promise.all(
     event.Records.map(async (record) => {
       try {
@@ -62,7 +49,6 @@ export const processRecord = async (
   record: UploadValidationRecord,
   s3Client: UploadValidationS3Client
 ): Promise<void> => {
-  console.log(record)
   const bucket = record.s3.bucket.name
   const key = record.s3.object.key
 
