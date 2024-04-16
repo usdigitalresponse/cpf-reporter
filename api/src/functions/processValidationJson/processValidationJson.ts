@@ -155,7 +155,6 @@ function extractUploadIdFromKey(key: string): number {
   if (!match) {
     throw new Error('Invalid key format')
   }
-  console.log(match)
   logger.info(`Extracted upload_id: ${match.groups.upload_id}`)
   return parseInt(match.groups.upload_id)
 }
