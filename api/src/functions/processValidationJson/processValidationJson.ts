@@ -29,6 +29,34 @@ export const handler: S3Handler = async (
   event: S3ObjectCreatedNotificationEvent
 ): Promise<Response> => {
   const s3 = aws.getS3Client()
+  if (process.env.LOCALSTACK_HOSTNAME) {
+    /*
+    This allows us to easily test this function during local development by making a GET request as follows:
+    http://localhost:8911/processValidationJson?Records[0][s3][bucket][name]=cpf-reporter&Records[0][s3][object][key]=/uploads/1/2/3/14/test.json
+    {  
+      "Records":[  
+          {  
+            "s3":{
+                "bucket":{  
+                  "name":"cpf-reporter"
+                },
+                "object":{  
+                  "key":"/uploads/1/2/3/4/test.json"
+                }
+            }
+          }
+      ]
+    }
+
+    Ensure that the local environment has the following object setup in S3:
+    awslocal s3api put-object \
+      --bucket cpf-reporter \
+      --key /uploads/1/2/3/16/test.json \
+      --body test.json
+    Verify that the database has a record with the upload_id of 16 in the `UploadValidation` table where passed: false and results: null.
+    */
+    event = event.queryStringParameters
+  }
   await Promise.all(
     event.Records.map(async (record) => {
       try {
