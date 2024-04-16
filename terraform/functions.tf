@@ -290,6 +290,17 @@ module "lambda_function-graphql" {
         "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
       ]
     }
+    AllowDownloadXLSMFiles = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:HeadObject",
+      ]
+      resources = [
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
+      ]
+    }
   }
 
   // Artifacts
