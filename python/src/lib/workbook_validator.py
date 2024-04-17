@@ -59,7 +59,7 @@ def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str]]:
     if len(errors) > 0:
         return errors, None
 
-     project_use_code = get_project_use_code(wb["Cover"])
+    project_use_code = get_project_use_code(wb["Cover"])
 
     """
     4. Ensure all project rows are validated with the schema
