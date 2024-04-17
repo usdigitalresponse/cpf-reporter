@@ -355,9 +355,12 @@ module "lambda_function-processValidationJson" {
   description   = "Reacts to S3 events and processes uploaded JSON files."
 
   // Networking
-  attach_network_policy  = false
-  vpc_subnet_ids         = null
-  vpc_security_group_ids = null
+  attach_network_policy = true
+  vpc_subnet_ids        = local.private_subnet_ids
+  vpc_security_group_ids = [
+    module.lambda_security_group.id,
+    module.postgres.security_group_id,
+  ]
 
   // Permissions
   role_permissions_boundary         = local.permissions_boundary_arn
@@ -368,6 +371,21 @@ module "lambda_function-processValidationJson" {
   policy_jsons                      = local.lambda_default_execution_policies
   attach_policy_statements          = true
   policy_statements = {
+    PostgresIAMAuth = {
+      effect    = "Allow"
+      actions   = ["rds-db:connect"]
+      resources = ["${local.postgres_rds_connect_resource_base_arn}/${module.postgres.cluster_master_username}"]
+    }
+    GetPostgresSecret = {
+      effect    = "Allow"
+      actions   = ["ssm:GetParameters", "ssm:GetParameter"]
+      resources = [aws_ssm_parameter.postgres_master_password.arn]
+    }
+    DecryptPostgresSecret = {
+      effect    = "Allow"
+      actions   = ["kms:Decrypt"]
+      resources = [data.aws_kms_key.ssm.arn]
+    }
     AllowDownloadAndDeleteJsonObjects = {
       effect = "Allow"
       actions = [
@@ -383,6 +401,7 @@ module "lambda_function-processValidationJson" {
   }
 
   // Artifacts
+  publish        = true
   create_package = false
   s3_existing_package = {
     bucket = aws_s3_object.lambda_artifact-processValidationJson.bucket
@@ -393,12 +412,24 @@ module "lambda_function-processValidationJson" {
   handler       = var.datadog_enabled ? local.datadog_lambda_js_handler : "processValidationJson.handler"
   runtime       = var.lambda_js_runtime
   architectures = [var.lambda_arch]
-  publish       = true
   layers        = local.lambda_js_layer_arns
   timeout       = 300 # 5 minutes, in seconds
   memory_size   = 512 # MB
   environment_variables = merge(local.lambda_default_environment_variables, {
-    DD_LAMBDA_HANDLER = "processValidationJson.handler"
+    DATABASE_URL = format(
+      "postgres://%s@%s:%s/%s?%s",
+      module.postgres.cluster_master_username,
+      module.postgres.cluster_endpoint,
+      module.postgres.cluster_port,
+      module.postgres.cluster_database_name,
+      join("&", [
+        "sslmode=verify",
+        "connection_limit=1", // Can be tuned for parallel query performance: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections#serverless-environments-faas
+      ])
+    )
+    DATABASE_SECRET_SOURCE             = "ssm"
+    DATABASE_SECRET_SSM_PARAMETER_PATH = aws_ssm_parameter.postgres_master_password.name
+    DD_LAMBDA_HANDLER                  = "processValidationJson.handler"
   })
 
   // Triggers
