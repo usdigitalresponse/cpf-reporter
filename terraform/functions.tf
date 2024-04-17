@@ -371,6 +371,21 @@ module "lambda_function-processValidationJson" {
   policy_jsons                      = local.lambda_default_execution_policies
   attach_policy_statements          = true
   policy_statements = {
+    PostgresIAMAuth = {
+      effect    = "Allow"
+      actions   = ["rds-db:connect"]
+      resources = ["${local.postgres_rds_connect_resource_base_arn}/${module.postgres.cluster_master_username}"]
+    }
+    GetPostgresSecret = {
+      effect    = "Allow"
+      actions   = ["ssm:GetParameters", "ssm:GetParameter"]
+      resources = [aws_ssm_parameter.postgres_master_password.arn]
+    }
+    DecryptPostgresSecret = {
+      effect    = "Allow"
+      actions   = ["kms:Decrypt"]
+      resources = [data.aws_kms_key.ssm.arn]
+    }
     AllowDownloadAndDeleteJsonObjects = {
       effect = "Allow"
       actions = [
@@ -386,6 +401,7 @@ module "lambda_function-processValidationJson" {
   }
 
   // Artifacts
+  publish        = true
   create_package = false
   s3_existing_package = {
     bucket = aws_s3_object.lambda_artifact-processValidationJson.bucket
@@ -396,7 +412,6 @@ module "lambda_function-processValidationJson" {
   handler       = var.datadog_enabled ? local.datadog_lambda_js_handler : "processValidationJson.handler"
   runtime       = var.lambda_js_runtime
   architectures = [var.lambda_arch]
-  publish       = true
   layers        = local.lambda_js_layer_arns
   timeout       = 300 # 5 minutes, in seconds
   memory_size   = 512 # MB
