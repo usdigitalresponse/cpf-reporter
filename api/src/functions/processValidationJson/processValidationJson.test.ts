@@ -116,13 +116,16 @@ describe('cpfValidation function', () => {
     expect(existingRecord.passed).toEqual(false)
   })
 
-  scenario('no expenditure category found for result project use code', async (scenario) => {
-    const expectedResult = { errors: [], projectUseCode: '13A' }
-    const mocks3 = new MockS3Client(JSON.stringify(expectedResult))
-    const record = buildRecord(scenario.uploadValidation.one.uploadId)
+  scenario(
+    'no expenditure category found for result project use code',
+    async (scenario) => {
+      const expectedResult = { errors: [], projectUseCode: '13A' }
+      const mocks3 = new MockS3Client(JSON.stringify(expectedResult))
+      const record = buildRecord(scenario.uploadValidation.one.uploadId)
 
-    expect(
-      async () => await processRecord(record, mocks3)
-    ).rejects.toThrow('Expenditure category not found')
-  })
+      expect(async () => await processRecord(record, mocks3)).rejects.toThrow(
+        'Expenditure category not found'
+      )
+    }
+  )
 })
