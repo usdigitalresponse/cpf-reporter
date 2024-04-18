@@ -14,7 +14,7 @@ export const ValidUpload: Story = {
   args: {
     latestValidation: {
       passed: true,
-      results: [],
+      results: {},
     },
     handleFileDownload: () => {},
     handleForceInvalidate: () => {},
@@ -26,15 +26,17 @@ export const InvalidUpload: Story = {
   args: {
     latestValidation: {
       passed: false,
-      results: [
-        {
-          tab: 'Cover',
-          severity: 'err',
-          message: 'EC code must be set',
-          row: '2',
-          col: 'D',
-        },
-      ],
+      results: {
+        errors: [
+          {
+            tab: 'Cover',
+            severity: 'err',
+            message: 'EC code must be set',
+            row: '2',
+            col: 'D',
+          },
+        ],
+      },
     },
     handleFileDownload: () => {},
     handleForceInvalidate: () => {},

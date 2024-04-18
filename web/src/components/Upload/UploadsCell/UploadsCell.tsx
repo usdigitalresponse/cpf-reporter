@@ -26,7 +26,9 @@ export const QUERY = gql`
         id
         createdAt
         passed
-        results
+        results {
+          errors
+        }
       }
       createdAt
       updatedAt
