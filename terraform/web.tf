@@ -267,7 +267,7 @@ module "cdn" {
 
   ordered_cache_behavior = [
     {
-      path_pattern           = "/${aws_s3_object.website_deploy_config.key}"
+      path_pattern           = "/deploy-config.js"
       target_origin_id       = local.website_config_origin_path
       viewer_protocol_policy = "redirect-to-https"
 

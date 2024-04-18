@@ -1,13 +1,21 @@
 import { db } from 'src/lib/db'
 
-import { processRecord } from './cpfValidation'
+import { processRecord } from './processValidationJson'
+
+type DocumentBody = {
+  transformToString: () => string
+}
 
 class MockS3Client {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   commands: any[] = []
-  mockDocumentBody: string
+  mockDocumentBody: DocumentBody = { transformToString: () => '' }
   constructor(documentBody: string) {
-    this.mockDocumentBody = documentBody
+    if (documentBody) {
+      this.mockDocumentBody.transformToString = () => documentBody
+    } else {
+      this.mockDocumentBody = null
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,7 +38,7 @@ function buildRecord(uploadValidationId: string) {
         },
       },
       object: {
-        key: `/uploads/12/34/56/${uploadValidationId}/{filename}`,
+        key: `uploads/12/34/56/${uploadValidationId}/{filename}`,
       },
     },
   }
@@ -38,7 +46,8 @@ function buildRecord(uploadValidationId: string) {
 
 describe('cpfValidation function', () => {
   scenario('no validation errors', async (scenario) => {
-    const expectedBody = JSON.stringify([])
+    const noErrorResults = { errors: [] }
+    const expectedBody = JSON.stringify(noErrorResults)
     const mocks3 = new MockS3Client(expectedBody)
     const record = buildRecord(scenario.uploadValidation.one.uploadId)
 
@@ -48,12 +57,12 @@ describe('cpfValidation function', () => {
       where: { id: scenario.uploadValidation.one.id },
     })
     expect(mocks3.commands.length).toEqual(2)
-    expect(updatedRecord.results).toEqual([])
+    expect(updatedRecord.results).toEqual(noErrorResults)
     expect(updatedRecord.passed).toEqual(true)
   })
 
   scenario('validation error', async (scenario) => {
-    const expectedBody = { error: 'error' }
+    const expectedBody = { errors: 'error' }
     const mocks3 = new MockS3Client(JSON.stringify(expectedBody))
     const record = buildRecord(scenario.uploadValidation.one.uploadId)
 
@@ -105,5 +114,15 @@ describe('cpfValidation function', () => {
     })
     expect(existingRecord.results).toEqual(null)
     expect(existingRecord.passed).toEqual(false)
+  })
+
+  scenario('no expenditure category found for result project use code', async (scenario) => {
+    const expectedResult = { errors: [], projectUseCode: '13A' }
+    const mocks3 = new MockS3Client(JSON.stringify(expectedResult))
+    const record = buildRecord(scenario.uploadValidation.one.uploadId)
+
+    expect(
+      async () => await processRecord(record, mocks3)
+    ).rejects.toThrow('Expenditure category not found')
   })
 })

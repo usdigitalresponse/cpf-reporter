@@ -21,6 +21,12 @@ const CREATE_UPLOAD = gql`
     createUpload(input: $input) {
       id
       signedUrl
+      validations {
+        id
+        passed
+        initiatedById
+        results
+      }
     }
   }
 `
@@ -56,10 +62,8 @@ const UploadForm = (props: UploadFormProps) => {
     data.reportingPeriodId = parseInt(data.reportingPeriodId)
 
     const uploadInput = {
-      uploadedById: props.userId,
       agencyId: data.agencyId,
       filename: data.file[0].name,
-      organizationId: props.organizationId,
       reportingPeriodId: data.reportingPeriodId,
     }
     const res = await create({ variables: { input: uploadInput } })
@@ -70,8 +74,9 @@ const UploadForm = (props: UploadFormProps) => {
         method: 'PUT',
         headers: {
           'Content-Type': data.file[0].type,
+          'x-amz-server-side-encryption': 'AES256',
         },
-        body: formData,
+        body: data.file[0],
       })
         .then((response) => {
           if (!response.ok) {

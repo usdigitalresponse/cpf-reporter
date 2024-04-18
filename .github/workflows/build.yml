@@ -22,6 +22,10 @@ on:
         description: Whether to build a RedwoodJS console Docker image.
         type: boolean
         default: true
+      build-python-functions:
+        description: Whether to build zip artifacts for Python functions.
+        type: boolean
+        default: true
       build-web:
         description: Whether to build website distribution artifacts for the client package.
         type: boolean
@@ -78,6 +82,10 @@ on:
         description: Value to set for the `org.opencontainers.image.version label`.
         type: string
         default: ""
+      python-function-artifact-retention-days:
+        description: Number of days to retain Python function build artifacts.
+        type: number
+        default: 90
       web-artifact-retention-days:
         description: Number of days to retain website build artifacts.
         type: number
@@ -93,6 +101,8 @@ on:
         value: ${{ jobs.api-function-zips.result }}
       build-console-image-result:
         value: ${{ jobs.redwood-console-image.result }}
+      build-python-functions-result:
+        value: ${{ jobs.python-function-zips.result }}
       build-web-result:
         value: ${{ jobs.web-bundle.result }}
       api-image-digest:
@@ -117,6 +127,12 @@ on:
         value: ${{ jobs.redwood-console-image.outputs.attestation-artifacts-key }}
       console-attestation-artifacts-path:
         value: ${{ jobs.redwood-console-image.outputs.attestation-artifacts-path }}
+      python-functions-artifacts-key:
+        value: ${{ jobs.python-function-zips.outputs.artifacts-key }}
+      python-functions-artifacts-path:
+        value: ${{ jobs.python-function-zips.outputs.artifacts-path }}
+      python-functions-checksums-sha256:
+        value: ${{ jobs.python-function-zips.outputs.checksums-sha256 }}
       web-artifacts-key:
         value: ${{ jobs.web-bundle.outputs.artifacts-key }}
       web-artifacts-path:
@@ -442,7 +458,7 @@ jobs:
         run: |
           REPORT_FILE=$(mktemp -t summary.md.XXXXX)
           cat >> $REPORT_FILE << 'ENDOFREPORT'
-          ## Build Website Summary
+          ## Build JS API Functions Summary
 
           <details>
           <summary>Checksums</summary>
@@ -460,7 +476,92 @@ jobs:
           name: ${{ env.ARTIFACTS_KEY }}
           path: ${{ env.ARTIFACTS_PATH }}
           if-no-files-found: error
-          retention-days: ${{ inputs.web-artifact-retention-days }}
+          retention-days: ${{ inputs.api-function-artifact-retention-days }}
+
+  python-function-zips:
+    name: Build Python Lambda function zip artifacts
+    if: inputs.build-python-functions
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: none
+    env:
+      ARTIFACTS_KEY: python-${{ inputs.ref }}
+      ARTIFACTS_PATH: ${{ github.workspace }}/python/dist/zipballs
+    outputs:
+      artifacts-key: ${{ env.ARTIFACTS_KEY }}
+      artifacts-path: ${{ env.ARTIFACTS_PATH }}
+      checksums-sha256: ${{ steps.checksums.outcome.sha256 }}
+    steps:
+      - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+        with:
+          disable-sudo: true
+          egress-policy: audit
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          ref: ${{ inputs.ref }}
+          show-progress: 'false'
+          persist-credentials: 'false'
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Setup Python
+        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
+        with:
+          python-version-file: 'python/pyproject.toml'
+          cache: poetry
+      - name: Install dependencies
+        working-directory: python
+        run: |
+          poetry install --only main --sync --no-interaction --no-ansi
+          echo "INSTALLED_PACKAGE_DIR=$(poetry env info --path --no-interaction --no-ansi)/lib/python3.12/site-packages" >> $GITHUB_ENV
+        env:
+          POETRY_VIRTUALENVS_OPTIONS_ALWAYS_COPY: "true"
+          POETRY_VIRTUALENVS_OPTIONS_NO_PIP: "true"
+          POETRY_VIRTUALENVS_OPTIONS_NO_SETUPTOOLS: "true"
+      - name: Clean Python bytecode
+        run: find python/src $INSTALLED_PACKAGE_DIR | grep -E "(/__pycache__$|\.pyc$|\.pyo$)" | xargs rm -rf
+      - name: Create build artifact directory
+        run: mkdir -p $ARTIFACTS_PATH
+      - name: Zip third-party packages
+        run: |
+          pushd $INSTALLED_PACKAGE_DIR
+          zip -r $ARTIFACTS_PATH/lambda.zip .
+          popd
+      - name: Zip Python source code in repo
+        run: |
+          pushd python
+          zip -r $ARTIFACTS_PATH/lambda.zip src
+          popd
+      - name: Compute build artifact checksums
+        id: checksums
+        run: |
+          DIST_CHECKSUMS=$(find "$ARTIFACTS_PATH" -type f -exec sha256sum {} \;)
+          echo "sha256<<EOF" >> $GITHUB_OUTPUT
+          echo "$DIST_CHECKSUMS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      - name: Publish build results
+        run: |
+          REPORT_FILE=$(mktemp -t summary.md.XXXXX)
+          cat >> $REPORT_FILE << 'ENDOFREPORT'
+          ## Build Python API Functions Summary
+
+          <details>
+          <summary>Checksums</summary>
+
+          ```
+          ${{ steps.checksums.outputs.sha256 }}
+          ```
+
+          </details>
+          ENDOFREPORT
+          cat "$REPORT_FILE" >> $GITHUB_STEP_SUMMARY
+      - name: Upload build artifact
+        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        with:
+          name: ${{ env.ARTIFACTS_KEY }}
+          path: ${{ env.ARTIFACTS_PATH }}
+          if-no-files-found: error
+          retention-days: ${{ inputs.python-function-artifact-retention-days }}
 
   web-bundle:
     name: Build website deployment artifact

@@ -24,7 +24,6 @@ export const standard = defineScenario<
               },
             },
             agency: { create: { name: 'String', code: 'String' } },
-            organization: { create: { name: 'String' } },
             reportingPeriod: {
               create: {
                 name: 'String',
@@ -88,7 +87,6 @@ export const standard = defineScenario<
               },
             },
             agency: { create: { name: 'String', code: 'String' } },
-            organization: { create: { name: 'String' } },
             reportingPeriod: {
               create: {
                 name: 'String',
@@ -150,7 +148,6 @@ export const standard = defineScenario<
           },
         },
         agency: { create: { name: 'String', code: 'String' } },
-        organization: { create: { name: 'String' } },
         reportingPeriod: {
           create: {
             name: 'String',

@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import type {
   QueryResolvers,
   MutationResolvers,
@@ -5,7 +6,10 @@ import type {
 } from 'types/graphql'
 
 import { s3PutSignedUrl } from 'src/lib/aws'
+import aws from 'src/lib/aws'
 import { db } from 'src/lib/db'
+import { logger } from 'src/lib/logger'
+import { ValidationError } from 'src/lib/validation-error'
 
 export const uploads: QueryResolvers['uploads'] = () => {
   return db.upload.findMany()
@@ -20,10 +24,29 @@ export const upload: QueryResolvers['upload'] = ({ id }) => {
 export const createUpload: MutationResolvers['createUpload'] = async ({
   input,
 }) => {
+  const inputWithContext: Prisma.UploadUncheckedCreateInput = {
+    ...input,
+    uploadedById: context.currentUser.id,
+  }
+
   const upload = await db.upload.create({
-    data: input,
+    data: inputWithContext,
   })
-  const signedUrl = await s3PutSignedUrl(upload, upload.id)
+  // We don't need to store the result of the validation creation, it will be provided via
+  // the relation resolver below
+  await db.uploadValidation.create({
+    data: {
+      uploadId: upload.id,
+      initiatedById: upload.uploadedById,
+      passed: false,
+      results: null,
+    },
+  })
+  const signedUrl = await s3PutSignedUrl(
+    upload,
+    upload.id,
+    context.currentUser.agency.organizationId
+  )
 
   return { ...upload, signedUrl }
 }
@@ -44,15 +67,26 @@ export const deleteUpload: MutationResolvers['deleteUpload'] = ({ id }) => {
   })
 }
 
+export const downloadUploadFile: MutationResolvers['downloadUploadFile'] =
+  async ({ id }) => {
+    const upload = await db.upload.findUnique({
+      where: { id },
+      include: { agency: true },
+    })
+    if (!upload) {
+      throw new ValidationError(`Upload with id ${id} not found`)
+    }
+    logger.info(`Downloading file for upload ${id}`)
+    const signedUrl = await aws.getSignedUrl(upload)
+    return signedUrl
+  }
+
 export const Upload: UploadRelationResolvers = {
   uploadedBy: (_obj, { root }) => {
     return db.upload.findUnique({ where: { id: root?.id } }).uploadedBy()
   },
   agency: (_obj, { root }) => {
     return db.upload.findUnique({ where: { id: root?.id } }).agency()
-  },
-  organization: (_obj, { root }) => {
-    return db.upload.findUnique({ where: { id: root?.id } }).organization()
   },
   reportingPeriod: (_obj, { root }) => {
     return db.upload.findUnique({ where: { id: root?.id } }).reportingPeriod()
@@ -73,8 +107,5 @@ export const Upload: UploadRelationResolvers = {
       },
     })
     return latestValidation
-  },
-  subrecipients: (_obj, { root }) => {
-    return db.upload.findUnique({ where: { id: root?.id } }).subrecipients()
   },
 }

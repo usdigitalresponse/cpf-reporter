@@ -13,7 +13,7 @@ import {
 } from '@aws-sdk/client-sqs'
 import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { StreamingBlobPayloadInputTypes } from '@smithy/types'
-import { QueryResolvers, CreateUploadInput } from 'types/graphql'
+import { CreateUploadInput } from 'types/graphql'
 
 const REPORTING_DATA_BUCKET_NAME = `${process.env.REPORTING_DATA_BUCKET_NAME}`
 
@@ -59,15 +59,6 @@ function getS3Client() {
   return s3
 }
 
-export function uploadWorkbook(
-  upload: CreateUploadInput,
-  uploadId: number,
-  body: StreamingBlobPayloadInputTypes
-) {
-  const folderName = `uploads/${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${uploadId}/${upload.filename}`
-  return sendPutObjectToS3Bucket(REPORTING_DATA_BUCKET_NAME, folderName, body)
-}
-
 async function sendPutObjectToS3Bucket(
   bucketName: string,
   key: string,
@@ -101,15 +92,15 @@ async function sendHeadObjectToS3Bucket(bucketName: string, key: string) {
 
 export async function s3PutSignedUrl(
   upload: CreateUploadInput,
-  uploadId: number
+  uploadId: number,
+  organizationId: number
 ): Promise<string> {
   const s3 = getS3Client()
-  const key = `uploads/${upload.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${uploadId}/${upload.filename}`
+  const key = `uploads/${organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${uploadId}/${upload.filename}`
   const baseParams: PutObjectCommandInput = {
     Bucket: REPORTING_DATA_BUCKET_NAME,
     Key: key,
-    ContentType:
-      'application/vnd.ms-excel.sheet.macroenabled.12',
+    ContentType: 'application/vnd.ms-excel.sheet.macroenabled.12',
     ServerSideEncryption: 'AES256',
   }
   const url = await awsGetSignedUrl(s3, new PutObjectCommand(baseParams), {
@@ -122,9 +113,10 @@ export async function s3PutSignedUrl(
  *  This function is a wrapper around the getSignedUrl function from the @aws-sdk/s3-request-presigner package.
  *  Exists to organize the imports and to make it easier to mock in tests.
  */
-async function getSignedUrl(bucketName: string, key: string) {
+async function getSignedUrl(upload: Upload): Promise<string> {
+  const key = `uploads/${upload.agency.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.id}/${upload.filename}`
   const s3 = getS3Client()
-  const baseParams = { Bucket: bucketName, Key: key }
+  const baseParams = { Bucket: REPORTING_DATA_BUCKET_NAME, Key: key }
   return awsGetSignedUrl(s3, new GetObjectCommand(baseParams), {
     expiresIn: 60,
   })
@@ -173,17 +165,11 @@ async function receiveSqsMessage(queueUrl: string) {
   )
 }
 
-export const s3PutObjectSignedUrl: QueryResolvers['s3PutObjectSignedUrl'] = ({
-  upload,
-  uploadId,
-}) => {
-  return s3PutSignedUrl(upload, uploadId)
-}
-
 export default {
   sendPutObjectToS3Bucket,
   sendHeadObjectToS3Bucket,
   getSignedUrl,
   sendSqsMessage,
   receiveSqsMessage,
+  getS3Client,
 }

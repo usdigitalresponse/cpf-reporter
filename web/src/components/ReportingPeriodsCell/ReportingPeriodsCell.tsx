@@ -35,7 +35,7 @@ export const Success = ({
   reportingPeriods,
 }: CellSuccessProps<ReportingPeriodsQuery>) => {
   return (
-    <Table striped borderless>
+    <Table striped bordered>
       <thead>
         <tr>
           <th>Start Date</th>
@@ -64,7 +64,7 @@ export const Success = ({
               </td>
               <td>
                 {item.isCurrentPeriod ? (
-                  <button>Certify Reporting Period</button>
+                  <Button size="sm">Certify Reporting Period</Button>
                 ) : (
                   item.certifiedAt && (
                     <span>
@@ -73,8 +73,8 @@ export const Success = ({
                   )
                 )}
               </td>
-              <td className="border border-slate-700">
-                <nav className="rw-table-actions">
+              <td>
+                <nav>
                   <Link
                     to={routes.editReportingPeriod({ id: item.id })}
                     title={'Edit reporting period ' + item.id}

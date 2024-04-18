@@ -64,7 +64,7 @@ const User = ({ user }: Props) => {
             </tr>
             <tr>
               <th>Organization id</th>
-              <td>{user.organizationId}</td>
+              <td>{user.agency.organizationId}</td>
             </tr>
             <tr>
               <th>Role</th>

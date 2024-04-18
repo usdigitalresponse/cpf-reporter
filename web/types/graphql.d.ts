@@ -102,7 +102,6 @@ export type CreateSubrecipientInput = {
   endDate: Scalars['DateTime'];
   name: Scalars['String'];
   organizationId: Scalars['Int'];
-  originationUploadId: Scalars['Int'];
   startDate: Scalars['DateTime'];
 };
 
@@ -110,7 +109,6 @@ export type CreateUploadInput = {
   agencyId: Scalars['Int'];
   expenditureCategoryId?: InputMaybe<Scalars['Int']>;
   filename: Scalars['String'];
-  organizationId: Scalars['Int'];
   reportingPeriodId: Scalars['Int'];
   uploadedById: Scalars['Int'];
 };
@@ -177,6 +175,7 @@ export type Mutation = {
   deleteUpload: Upload;
   deleteUploadValidation: UploadValidation;
   deleteUser: User;
+  downloadUploadFile: Scalars['String'];
   updateAgency: Agency;
   updateExpenditureCategory: ExpenditureCategory;
   updateInputTemplate: InputTemplate;
@@ -306,6 +305,11 @@ export type MutationdeleteUserArgs = {
 };
 
 
+export type MutationdownloadUploadFileArgs = {
+  id: Scalars['Int'];
+};
+
+
 export type MutationupdateAgencyArgs = {
   id: Scalars['Int'];
   input: UpdateAgencyInput;
@@ -379,8 +383,6 @@ export type Organization = {
   projects: Array<Maybe<Project>>;
   reportingPeriods: Array<Maybe<ReportingPeriod>>;
   subrecipients: Array<Maybe<Subrecipient>>;
-  uploadValidations: Array<Maybe<UploadValidation>>;
-  uploads: Array<Maybe<Upload>>;
   users: Array<Maybe<User>>;
 };
 
@@ -575,8 +577,6 @@ export type Subrecipient = {
   name: Scalars['String'];
   organization: Organization;
   organizationId: Scalars['Int'];
-  originationUpload: Upload;
-  originationUploadId: Scalars['Int'];
   startDate: Scalars['DateTime'];
   updatedAt: Scalars['DateTime'];
 };
@@ -639,7 +639,6 @@ export type UpdateSubrecipientInput = {
   endDate?: InputMaybe<Scalars['DateTime']>;
   name?: InputMaybe<Scalars['String']>;
   organizationId?: InputMaybe<Scalars['Int']>;
-  originationUploadId?: InputMaybe<Scalars['Int']>;
   startDate?: InputMaybe<Scalars['DateTime']>;
 };
 
@@ -647,7 +646,6 @@ export type UpdateUploadInput = {
   agencyId?: InputMaybe<Scalars['Int']>;
   expenditureCategoryId?: InputMaybe<Scalars['Int']>;
   filename?: InputMaybe<Scalars['String']>;
-  organizationId?: InputMaybe<Scalars['Int']>;
   reportingPeriodId?: InputMaybe<Scalars['Int']>;
   uploadedById?: InputMaybe<Scalars['Int']>;
 };
@@ -677,12 +675,9 @@ export type Upload = {
   filename: Scalars['String'];
   id: Scalars['Int'];
   latestValidation?: Maybe<UploadValidation>;
-  organization: Organization;
-  organizationId: Scalars['Int'];
   reportingPeriod: ReportingPeriod;
   reportingPeriodId: Scalars['Int'];
   signedUrl?: Maybe<Scalars['String']>;
-  subrecipients: Array<Maybe<Subrecipient>>;
   updatedAt: Scalars['DateTime'];
   uploadedBy: User;
   uploadedById: Scalars['Int'];
@@ -865,7 +860,7 @@ export type EditUploadByIdVariables = Exact<{
 }>;
 
 
-export type EditUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, uploadedById: number, agencyId: number, organizationId: number, reportingPeriodId: number, expenditureCategoryId?: number | null, createdAt: string, updatedAt: string } | null };
+export type EditUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, uploadedById: number, agencyId: number, reportingPeriodId: number, expenditureCategoryId?: number | null, createdAt: string, updatedAt: string } | null };
 
 export type UpdateUploadMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -873,33 +868,33 @@ export type UpdateUploadMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUploadMutation = { __typename?: 'Mutation', updateUpload: { __typename?: 'Upload', id: number, filename: string, uploadedById: number, agencyId: number, organizationId: number, reportingPeriodId: number, expenditureCategoryId?: number | null, createdAt: string, updatedAt: string } };
+export type UpdateUploadMutation = { __typename?: 'Mutation', updateUpload: { __typename?: 'Upload', id: number, filename: string, uploadedById: number, agencyId: number, reportingPeriodId: number, expenditureCategoryId?: number | null, createdAt: string, updatedAt: string } };
 
 export type CreateUploadMutationVariables = Exact<{
   input: CreateUploadInput;
 }>;
 
 
-export type CreateUploadMutation = { __typename?: 'Mutation', createUpload: { __typename?: 'Upload', id: number, signedUrl?: string | null } };
+export type CreateUploadMutation = { __typename?: 'Mutation', createUpload: { __typename?: 'Upload', id: number, signedUrl?: string | null, validations: Array<{ __typename?: 'UploadValidation', id: number, passed: boolean, initiatedById: number, results?: Prisma.JsonValue | null } | null> } };
 
-export type DeleteUploadMutationVariables = Exact<{
+export type downloadUploadFileVariables = Exact<{
   id: Scalars['Int'];
 }>;
 
 
-export type DeleteUploadMutation = { __typename?: 'Mutation', deleteUpload: { __typename?: 'Upload', id: number } };
+export type downloadUploadFile = { __typename?: 'Mutation', downloadUploadFile: string };
 
 export type FindUploadByIdVariables = Exact<{
   id: Scalars['Int'];
 }>;
 
 
-export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, uploadedById: number, agencyId: number, organizationId: number, reportingPeriodId: number, expenditureCategoryId?: number | null, createdAt: string, updatedAt: string } | null };
+export type FindUploadById = { __typename?: 'Query', upload?: { __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, agency: { __typename?: 'Agency', code: string }, expenditureCategory?: { __typename?: 'ExpenditureCategory', code: string } | null, reportingPeriod: { __typename?: 'ReportingPeriod', name: string }, uploadedBy: { __typename?: 'User', id: number, name: string }, latestValidation?: { __typename?: 'UploadValidation', id: number, passed: boolean, results?: Prisma.JsonValue | null, createdAt: string, initiatedBy: { __typename?: 'User', name: string } } | null } | null };
 
 export type FindUploadsVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, code: string }, expenditureCategory?: { __typename?: 'ExpenditureCategory', id: number, code: string } | null, latestValidation?: { __typename?: 'UploadValidation', createdAt: string, passed: boolean } | null }> };
+export type FindUploads = { __typename?: 'Query', uploads: Array<{ __typename?: 'Upload', id: number, filename: string, createdAt: string, updatedAt: string, uploadedBy: { __typename?: 'User', id: number, email: string }, agency: { __typename?: 'Agency', id: number, code: string }, expenditureCategory?: { __typename?: 'ExpenditureCategory', id: number, code: string } | null, latestValidation?: { __typename?: 'UploadValidation', id: number, createdAt: string, passed: boolean, results?: Prisma.JsonValue | null } | null }> };
 
 export type EditUserByIdVariables = Exact<{
   id: Scalars['Int'];

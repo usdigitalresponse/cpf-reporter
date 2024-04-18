@@ -1,7 +1,9 @@
 // Lambda defaults
 locals {
-  lambda_artifacts_base_path = trimsuffix(coalesce(var.lambda_artifacts_base_path, "${path.module}/../api/dist/zipballs"), "/")
-  datadog_lambda_handler     = "/opt/nodejs/node_modules/datadog-lambda-js/handler.handler"
+  lambda_js_artifacts_base_path = trimsuffix(coalesce(var.lambda_js_artifacts_base_path, "${path.module}/../api/dist/zipballs"), "/")
+  lambda_py_artifacts_base_path = trimsuffix(coalesce(var.lambda_py_artifacts_base_path, "${path.module}/../python/dist/zipballs"), "/")
+  datadog_lambda_js_handler     = "/opt/nodejs/node_modules/datadog-lambda-js/handler.handler"
+  datadog_lambda_py_handler     = "datadog_lambda.handler.handler"
   datadog_lambda_custom_tags = {
     "git.repository_url" = var.git_repository_url
     "git.commit.sha"     = var.git_commit_sha
@@ -16,7 +18,7 @@ locals {
     format("Datadog-Extension%s", var.lambda_arch == "arm64" ? "-ARM" : ""),
     var.datadog_lambda_extension_version,
   ])
-  datadog_tracer_layer_arn = join(":", [
+  datadog_js_tracer_layer_arn = join(":", [
     "arn",
     data.aws_partition.current.id,
     "lambda",
@@ -24,7 +26,17 @@ locals {
     { aws = "464622532012", aws-us-gov = "002406178527" }[data.aws_partition.current.id],
     "layer",
     "Datadog-Node18-x",
-    var.datadog_lambda_tracer_version,
+    var.datadog_lambda_js_tracer_version,
+  ])
+  datadog_py_tracer_layer_arn = join(":", [
+    "arn",
+    data.aws_partition.current.id,
+    "lambda",
+    data.aws_region.current.name,
+    { aws = "464622532012", aws-us-gov = "002406178527" }[data.aws_partition.current.id],
+    "layer",
+    format("Datadog-Python312%s", var.lambda_arch == "arm64" ? "-ARM" : ""),
+    var.datadog_lambda_py_tracer_version,
   ])
   lambda_default_environment_variables = merge(
     !var.datadog_enabled ? {} : merge(
@@ -55,9 +67,13 @@ locals {
   lambda_default_execution_policies = compact([
     try(data.aws_iam_policy_document.read_datadog_api_key_secret[0].json, ""),
   ])
-  lambda_layer_arns = compact([
+  lambda_js_layer_arns = compact([
     var.datadog_enabled ? local.datadog_extension_layer_arn : "",
-    var.datadog_enabled ? local.datadog_tracer_layer_arn : "",
+    var.datadog_enabled ? local.datadog_js_tracer_layer_arn : "",
+  ])
+  lambda_py_layer_arns = compact([
+    var.datadog_enabled ? local.datadog_extension_layer_arn : "",
+    var.datadog_enabled ? local.datadog_py_tracer_layer_arn : "",
   ])
 }
 
@@ -178,28 +194,29 @@ module "reporting_data_bucket" {
 
 resource "aws_s3_object" "lambda_artifact-graphql" {
   bucket                 = module.lambda_artifacts_bucket.bucket_id
-  key                    = "graphql.${filemd5("${local.lambda_artifacts_base_path}/graphql.zip")}.zip"
-  source                 = "${local.lambda_artifacts_base_path}/graphql.zip"
-  source_hash            = filemd5("${local.lambda_artifacts_base_path}/graphql.zip")
-  etag                   = filemd5("${local.lambda_artifacts_base_path}/graphql.zip")
+  key                    = "graphql.${filemd5("${local.lambda_js_artifacts_base_path}/graphql.zip")}.zip"
+  source                 = "${local.lambda_js_artifacts_base_path}/graphql.zip"
+  source_hash            = filemd5("${local.lambda_js_artifacts_base_path}/graphql.zip")
+  etag                   = filemd5("${local.lambda_js_artifacts_base_path}/graphql.zip")
   server_side_encryption = "AES256"
 }
 
-resource "aws_s3_object" "lambda_artifact-excelToJson" {
+resource "aws_s3_object" "lambda_artifact-processValidationJson" {
   bucket                 = module.lambda_artifacts_bucket.bucket_id
-  key                    = "excelToJson.${filemd5("${local.lambda_artifacts_base_path}/excelToJson.zip")}.zip"
-  source                 = "${local.lambda_artifacts_base_path}/excelToJson.zip"
-  source_hash            = filemd5("${local.lambda_artifacts_base_path}/excelToJson.zip")
-  etag                   = filemd5("${local.lambda_artifacts_base_path}/excelToJson.zip")
+  key                    = "processValidationJson.${filemd5("${local.lambda_js_artifacts_base_path}/processValidationJson.zip")}.zip"
+  source                 = "${local.lambda_js_artifacts_base_path}/processValidationJson.zip"
+  source_hash            = filemd5("${local.lambda_js_artifacts_base_path}/processValidationJson.zip")
+  etag                   = filemd5("${local.lambda_js_artifacts_base_path}/processValidationJson.zip")
   server_side_encryption = "AES256"
 }
 
-resource "aws_s3_object" "lambda_artifact-cpfValidation" {
+// Python Lambdas use a common (rather than function-specific) zip artifact
+resource "aws_s3_object" "lambda_artifact-python" {
   bucket                 = module.lambda_artifacts_bucket.bucket_id
-  key                    = "cpfValidation.${filemd5("${local.lambda_artifacts_base_path}/cpfValidation.zip")}.zip"
-  source                 = "${local.lambda_artifacts_base_path}/cpfValidation.zip"
-  source_hash            = filemd5("${local.lambda_artifacts_base_path}/cpfValidation.zip")
-  etag                   = filemd5("${local.lambda_artifacts_base_path}/cpfValidation.zip")
+  key                    = "python.${filemd5("${local.lambda_py_artifacts_base_path}/lambda.zip")}.zip"
+  source                 = "${local.lambda_py_artifacts_base_path}/lambda.zip"
+  source_hash            = filemd5("${local.lambda_py_artifacts_base_path}/lambda.zip")
+  etag                   = filemd5("${local.lambda_py_artifacts_base_path}/lambda.zip")
   server_side_encryption = "AES256"
 }
 
@@ -207,17 +224,16 @@ resource "aws_s3_bucket_notification" "reporting_data" {
   bucket = module.reporting_data_bucket.bucket_id
 
   lambda_function {
-    lambda_function_arn = module.lambda_function-excelToJson.lambda_function_arn
+    lambda_function_arn = module.lambda_function-processValidationJson.lambda_function_arn
     events              = ["s3:ObjectCreated:*"]
     filter_prefix       = "uploads/"
-    filter_suffix       = ".xlsm"
+    filter_suffix       = ".json"
   }
-
   lambda_function {
     lambda_function_arn = module.lambda_function-cpfValidation.lambda_function_arn
     events              = ["s3:ObjectCreated:*"]
     filter_prefix       = "uploads/"
-    filter_suffix       = ".xlsm.json"
+    filter_suffix       = ".xlsm"
   }
 }
 
@@ -266,6 +282,25 @@ module "lambda_function-graphql" {
       actions   = ["secretsmanager:GetSecretValue"]
       resources = [data.aws_ssm_parameter.passage_api_key_secret_arn.value]
     }
+    GeneratePresignedUploadURLs = {
+      effect  = "Allow"
+      actions = ["s3:PutObject"]
+      resources = [
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
+      ]
+    }
+    AllowDownloadXLSMFiles = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:HeadObject",
+      ]
+      resources = [
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
+      ]
+    }
   }
 
   // Artifacts
@@ -277,10 +312,10 @@ module "lambda_function-graphql" {
   }
 
   // Runtime
-  handler       = var.datadog_enabled ? local.datadog_lambda_handler : "graphql.handler"
-  runtime       = var.lambda_runtime
+  handler       = var.datadog_enabled ? local.datadog_lambda_js_handler : "graphql.handler"
+  runtime       = var.lambda_js_runtime
   architectures = [var.lambda_arch]
-  layers        = local.lambda_layer_arns
+  layers        = local.lambda_js_layer_arns
   timeout       = 25  # seconds (API Gateway limit is 30 seconds)
   memory_size   = 512 # MB
   environment_variables = merge(local.lambda_default_environment_variables, {
@@ -311,18 +346,21 @@ module "lambda_function-graphql" {
   }
 }
 
-module "lambda_function-excelToJson" {
+module "lambda_function-processValidationJson" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.5.0"
 
   // Metadata
-  function_name = "${var.namespace}-excelToJson"
-  description   = "Reacts to S3 events and converts Excel files to JSON."
+  function_name = "${var.namespace}-processValidationJson"
+  description   = "Reacts to S3 events and processes uploaded JSON files."
 
   // Networking
-  attach_network_policy  = false
-  vpc_subnet_ids         = null
-  vpc_security_group_ids = null
+  attach_network_policy = true
+  vpc_subnet_ids        = local.private_subnet_ids
+  vpc_security_group_ids = [
+    module.lambda_security_group.id,
+    module.postgres.security_group_id,
+  ]
 
   // Permissions
   role_permissions_boundary         = local.permissions_boundary_arn
@@ -333,44 +371,65 @@ module "lambda_function-excelToJson" {
   policy_jsons                      = local.lambda_default_execution_policies
   attach_policy_statements          = true
   policy_statements = {
-    AllowDownloadExcelObjects = {
+    PostgresIAMAuth = {
+      effect    = "Allow"
+      actions   = ["rds-db:connect"]
+      resources = ["${local.postgres_rds_connect_resource_base_arn}/${module.postgres.cluster_master_username}"]
+    }
+    GetPostgresSecret = {
+      effect    = "Allow"
+      actions   = ["ssm:GetParameters", "ssm:GetParameter"]
+      resources = [aws_ssm_parameter.postgres_master_password.arn]
+    }
+    DecryptPostgresSecret = {
+      effect    = "Allow"
+      actions   = ["kms:Decrypt"]
+      resources = [data.aws_kms_key.ssm.arn]
+    }
+    AllowDownloadAndDeleteJsonObjects = {
       effect = "Allow"
       actions = [
         "s3:GetObject",
         "s3:HeadObject",
+        "s3:DeleteObject",
       ]
       resources = [
-        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsm
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsm",
-      ]
-    }
-    AllowUploadJsonObjects = {
-      effect  = "Allow"
-      actions = ["s3:PutObject"]
-      resources = [
-        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{expenditure_category_code}/{upload_id}/{filename}.xlsm.json
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*/*.xlsm.json",
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm.json
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.json",
       ]
     }
   }
 
   // Artifacts
+  publish        = true
   create_package = false
   s3_existing_package = {
-    bucket = aws_s3_object.lambda_artifact-excelToJson.bucket
-    key    = aws_s3_object.lambda_artifact-excelToJson.key
+    bucket = aws_s3_object.lambda_artifact-processValidationJson.bucket
+    key    = aws_s3_object.lambda_artifact-processValidationJson.key
   }
 
   // Runtime
-  handler       = var.datadog_enabled ? local.datadog_lambda_handler : "excelToJson.handler"
-  runtime       = var.lambda_runtime
+  handler       = var.datadog_enabled ? local.datadog_lambda_js_handler : "processValidationJson.handler"
+  runtime       = var.lambda_js_runtime
   architectures = [var.lambda_arch]
-  publish       = true
-  layers        = local.lambda_layer_arns
+  layers        = local.lambda_js_layer_arns
   timeout       = 300 # 5 minutes, in seconds
   memory_size   = 512 # MB
   environment_variables = merge(local.lambda_default_environment_variables, {
-    DD_LAMBDA_HANDLER = "excelToJson.handler"
+    DATABASE_URL = format(
+      "postgres://%s@%s:%s/%s?%s",
+      module.postgres.cluster_master_username,
+      module.postgres.cluster_endpoint,
+      module.postgres.cluster_port,
+      module.postgres.cluster_database_name,
+      join("&", [
+        "sslmode=verify",
+        "connection_limit=1", // Can be tuned for parallel query performance: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections#serverless-environments-faas
+      ])
+    )
+    DATABASE_SECRET_SOURCE             = "ssm"
+    DATABASE_SECRET_SSM_PARAMETER_PATH = aws_ssm_parameter.postgres_master_password.name
+    DD_LAMBDA_HANDLER                  = "processValidationJson.handler"
   })
 
   // Triggers
@@ -388,7 +447,7 @@ module "lambda_function-cpfValidation" {
 
   // Metadata
   function_name = "${var.namespace}-cpfValidation"
-  description   = "Reacts to S3 events and validates CPF JSON files."
+  description   = "Reacts to S3 events and validates uploaded CPF Excel files."
 
   // Networking
   vpc_subnet_ids         = null
@@ -404,14 +463,24 @@ module "lambda_function-cpfValidation" {
   policy_jsons                      = local.lambda_default_execution_policies
   attach_policy_statements          = true
   policy_statements = {
-    AllowDownloadJSONObjects = {
+    AllowDownloadExcelObjects = {
       effect = "Allow"
       actions = [
         "s3:GetObject",
         "s3:HeadObject",
       ]
       resources = [
-        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/}/{upload_id}/{filename}.xlsm.json
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm.json
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
+      ]
+    }
+    AllowUploadJSONValidationResultObjects = {
+      effect = "Allow"
+      actions = [
+        "s3:PutObject"
+      ]
+      resources = [
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm.json
         "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm.json",
       ]
     }
@@ -421,19 +490,20 @@ module "lambda_function-cpfValidation" {
   publish        = true
   create_package = false
   s3_existing_package = {
-    bucket = aws_s3_object.lambda_artifact-cpfValidation.bucket
-    key    = aws_s3_object.lambda_artifact-cpfValidation.key
+    bucket = aws_s3_object.lambda_artifact-python.bucket
+    key    = aws_s3_object.lambda_artifact-python.key
   }
 
   // Runtime
-  handler       = var.datadog_enabled ? local.datadog_lambda_handler : "cpfValidation.handler"
-  runtime       = var.lambda_runtime
+  handler       = var.datadog_enabled ? local.datadog_lambda_py_handler : "src.functions.validate_workbook.handle"
+  runtime       = var.lambda_py_runtime
   architectures = [var.lambda_arch]
-  layers        = local.lambda_layer_arns
+  layers        = local.lambda_py_layer_arns
   timeout       = 60 # 1 minute, in seconds
   memory_size   = 512
   environment_variables = merge(local.lambda_default_environment_variables, {
-    DD_LAMBDA_HANDLER = "cpfValidation.handler"
+    DD_LAMBDA_HANDLER = "src.functions.validate_workbook.handle"
+    DD_LOGS_INJECTION = "true"
   })
 
   // Triggers

@@ -22,20 +22,11 @@ const UploadValidationButtonGroup = ({
   handleValidate,
 }: UploadValidationButtonGroupProps) => {
   /*
-    If the upload validation is in progress (results are null), renders "Validation in progress...".
     If the upload has been validated, renders "Invalidate" and "Re-validate" buttons
     If the upload has been invalidated, renders the "Validate" button
   */
   const renderValidationButtons = () => {
-    if (!latestValidation) {
-      return null
-    }
-
-    const { passed, results } = latestValidation
-
-    if (results === null) {
-      return <span className="fst-italic">Validation in progress...</span>
-    }
+    const { passed } = latestValidation
 
     return (
       <>
@@ -61,7 +52,7 @@ const UploadValidationButtonGroup = ({
         <Button variant="primary" size="sm" onClick={handleFileDownload}>
           Download file
         </Button>{' '}
-        {renderValidationButtons()}
+        {latestValidation?.results && renderValidationButtons()}
       </div>
     </li>
   )

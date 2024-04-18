@@ -1,107 +1,91 @@
-import type {
-  DeleteUploadMutationVariables,
-  FindUploadById,
-} from 'types/graphql'
-
-import { Link, routes, navigate } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
-import { toast } from '@redwoodjs/web/toast'
 
 import { timeTag } from 'src/lib/formatters'
 
-const DELETE_UPLOAD_MUTATION = gql`
-  mutation DeleteUploadMutation($id: Int!) {
-    deleteUpload(id: $id) {
-      id
-    }
+import UploadValidationButtonGroup from '../UploadValidationButtonGroup/UploadValidationButtonGroup'
+import UploadValidationResultsTable from '../UploadValidationResultsTable/UploadValidationResultsTable'
+import UploadValidationStatus from '../UploadValidationStatus/UploadValidationStatus'
+
+const DOWNLOAD_UPLOAD_FILE = gql`
+  mutation downloadUploadFile($id: Int!) {
+    downloadUploadFile(id: $id)
   }
 `
+const Upload = ({ upload }) => {
+  const hasErrors =
+    upload.latestValidation?.results !== null &&
+    Array.isArray(upload.latestValidation?.results) &&
+    upload.latestValidation?.results.length > 0
 
-interface Props {
-  upload: NonNullable<FindUploadById['upload']>
-}
-
-const Upload = ({ upload }: Props) => {
-  const [deleteUpload] = useMutation(DELETE_UPLOAD_MUTATION, {
-    onCompleted: () => {
-      toast.success('Upload deleted')
-      navigate(routes.uploads())
+  const [downloadUploadFile] = useMutation(DOWNLOAD_UPLOAD_FILE, {
+    onCompleted: ({ downloadUploadFile }) => {
+      console.log(downloadUploadFile)
+      console.log('Opening download file link in new tab..')
+      window.open(downloadUploadFile, '_blank').focus()
     },
     onError: (error) => {
-      toast.error(error.message)
+      console.error('Error downloading upload file', error)
     },
   })
-
-  const onDeleteClick = (id: DeleteUploadMutationVariables['id']) => {
-    if (confirm('Are you sure you want to delete upload ' + id + '?')) {
-      deleteUpload({ variables: { id } })
-    }
+  const handleFileDownload = () => {
+    downloadUploadFile({ variables: { id: upload.id } })
   }
+
+  const handleValidate = () => {}
+  const handleForceInvalidate = () => {}
 
   return (
     <>
-      <div className="rw-segment">
-        <header className="rw-segment-header">
-          <h2 className="rw-heading rw-heading-secondary">
-            Upload {upload.id} Detail
-          </h2>
-        </header>
-        <table className="rw-table">
-          <tbody>
-            <tr>
-              <th>Id</th>
-              <td>{upload.id}</td>
-            </tr>
-            <tr>
-              <th>Filename</th>
-              <td>{upload.filename}</td>
-            </tr>
-            <tr>
-              <th>Uploaded by id</th>
-              <td>{upload.uploadedById}</td>
-            </tr>
-            <tr>
-              <th>Agency id</th>
-              <td>{upload.agencyId}</td>
-            </tr>
-            <tr>
-              <th>Organization id</th>
-              <td>{upload.organizationId}</td>
-            </tr>
-            <tr>
-              <th>Reporting period id</th>
-              <td>{upload.reportingPeriodId}</td>
-            </tr>
-            <tr>
-              <th>Expenditure category id</th>
-              <td>{upload.expenditureCategoryId}</td>
-            </tr>
-            <tr>
-              <th>Created at</th>
-              <td>{timeTag(upload.createdAt)}</td>
-            </tr>
-            <tr>
-              <th>Updated at</th>
-              <td>{timeTag(upload.updatedAt)}</td>
-            </tr>
-          </tbody>
-        </table>
+      {hasErrors && (
+        <UploadValidationResultsTable
+          errors={upload.latestValidation?.results}
+        />
+      )}
+
+      <h3>Upload {upload.id} details</h3>
+      <div className="row">
+        <div className="col">
+          <ul className="list-group">
+            <li className="list-group-item">
+              <span className="fw-bold">Filename: </span>
+              {upload.filename}
+            </li>
+            <li className="list-group-item">
+              <span className="fw-bold">Reporting period: </span>
+              {upload.reportingPeriod?.name}
+            </li>
+            <li className="list-group-item">
+              <span className="fw-bold">Agency: </span>
+              {upload.agency?.code}
+            </li>
+            <li
+              className={`list-group-item ${
+                !upload.expenditureCategory?.code && 'list-group-item-warning'
+              }`}
+            >
+              <span className="fw-bold">EC Code: </span>
+              {upload.expenditureCategory?.code || 'Not set'}
+            </li>
+            <li className="list-group-item">
+              <span className="fw-bold">Created: </span>
+              {timeTag(upload.createdAt)} by {upload.uploadedBy.name}
+            </li>
+            {upload.latestValidation && (
+              <>
+                <UploadValidationStatus
+                  latestValidation={upload.latestValidation}
+                />
+                <UploadValidationButtonGroup
+                  latestValidation={upload.latestValidation}
+                  handleValidate={handleValidate}
+                  handleForceInvalidate={handleForceInvalidate}
+                  handleFileDownload={handleFileDownload}
+                />
+              </>
+            )}
+          </ul>
+        </div>
       </div>
-      <nav className="rw-button-group">
-        <Link
-          to={routes.editUpload({ id: upload.id })}
-          className="rw-button rw-button-blue"
-        >
-          Edit
-        </Link>
-        <button
-          type="button"
-          className="rw-button rw-button-red"
-          onClick={() => onDeleteClick(upload.id)}
-        >
-          Delete
-        </button>
-      </nav>
     </>
   )
 }

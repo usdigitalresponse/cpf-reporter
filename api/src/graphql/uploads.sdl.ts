@@ -6,8 +6,6 @@ export const schema = gql`
     uploadedBy: User!
     agencyId: Int!
     agency: Agency!
-    organizationId: Int!
-    organization: Organization!
     reportingPeriodId: Int!
     reportingPeriod: ReportingPeriod!
     expenditureCategoryId: Int
@@ -16,7 +14,6 @@ export const schema = gql`
     updatedAt: DateTime!
     validations: [UploadValidation]!
     signedUrl: String
-    subrecipients: [Subrecipient]!
     latestValidation: UploadValidation
   }
 
@@ -27,18 +24,14 @@ export const schema = gql`
 
   input CreateUploadInput {
     filename: String!
-    uploadedById: Int!
     agencyId: Int!
-    organizationId: Int!
     reportingPeriodId: Int!
-    expenditureCategoryId: Int
   }
 
   input UpdateUploadInput {
     filename: String
     uploadedById: Int
     agencyId: Int
-    organizationId: Int
     reportingPeriodId: Int
     expenditureCategoryId: Int
   }
@@ -47,5 +40,6 @@ export const schema = gql`
     createUpload(input: CreateUploadInput!): Upload! @requireAuth
     updateUpload(id: Int!, input: UpdateUploadInput!): Upload! @requireAuth
     deleteUpload(id: Int!): Upload! @requireAuth
+    downloadUploadFile(id: Int!): String! @requireAuth
   }
 `
