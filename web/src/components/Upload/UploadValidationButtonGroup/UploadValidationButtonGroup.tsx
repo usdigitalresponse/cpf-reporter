@@ -1,6 +1,6 @@
 import Button from 'react-bootstrap/Button'
 
-interface ValidationResult {
+interface ValidationError {
   message: string
   tab?: string
   row?: string
@@ -8,8 +8,12 @@ interface ValidationResult {
   severity: 'warn' | 'err' | 'info'
 }
 
+interface ValidationResult {
+  errors: ValidationError[]
+}
+
 interface UploadValidationButtonGroupProps {
-  latestValidation?: { passed: boolean; results: ValidationResult[] | null }
+  latestValidation?: { passed: boolean; results: ValidationResult | null }
   handleFileDownload: () => void
   handleForceInvalidate: () => void
   handleValidate: () => void
