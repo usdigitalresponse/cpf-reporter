@@ -47,9 +47,9 @@ const UploadForm = (props: UploadFormProps) => {
     CreateUploadMutation,
     CreateUploadMutationVariables
   >(CREATE_UPLOAD, {
-    onCompleted: () => {
+    onCompleted: ({ createUpload }) => {
       toast.success('Upload created')
-      navigate(routes.uploads())
+      navigate(routes.upload({ id: createUpload?.id }))
     },
     onError: (error) => {
       toast.error(error.message)
