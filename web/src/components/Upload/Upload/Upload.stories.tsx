@@ -29,7 +29,7 @@ export const ValidUpload: Story = {
       },
       latestValidation: {
         passed: true,
-        results: [],
+        results: {},
         createdAt: '2024-04-08T02:45:26.800Z',
         initiatedBy: {
           name: 'Organization Staff',
@@ -60,23 +60,25 @@ export const InvalidUpload: Story = {
       },
       latestValidation: {
         passed: true,
-        results: [
-          {
-            col: 'B',
-            row: '1',
-            tab: 'Logic',
-            message:
-              'Upload template version is older than the latest input template',
-            severity: 'warn',
-          },
-          {
-            col: 'D',
-            row: '2',
-            tab: 'Cover',
-            message: 'EC code must be set',
-            severity: 'err',
-          },
-        ],
+        results: {
+          errors: [
+            {
+              col: 'B',
+              row: '1',
+              tab: 'Logic',
+              message:
+                'Upload template version is older than the latest input template',
+              severity: 'warn',
+            },
+            {
+              col: 'D',
+              row: '2',
+              tab: 'Cover',
+              message: 'EC code must be set',
+              severity: 'err',
+            },
+          ],
+        },
         createdAt: '2024-04-08T02:45:26.800Z',
         initiatedBy: {
           name: 'Organization Staff',

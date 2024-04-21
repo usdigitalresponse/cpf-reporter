@@ -25,9 +25,9 @@ const NewUpload = () => {
     CreateUploadMutation,
     CreateUploadMutationVariables
   >(CREATE_UPLOAD_MUTATION, {
-    onCompleted: () => {
+    onCompleted: ({ createUpload }) => {
       toast.success('Upload created')
-      navigate(routes.uploads())
+      navigate(routes.upload({ id: createUpload?.id }))
     },
     onError: (error) => {
       toast.error(error.message)

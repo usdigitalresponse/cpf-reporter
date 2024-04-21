@@ -24,8 +24,14 @@ def is_empty_row(row_values: Tuple):
 def get_headers(sheet: Worksheet, cell_range: str) -> tuple:
     return tuple(header_cell.value for header_cell in sheet[cell_range][0])
 
+def get_project_use_code(cover_sheet: Worksheet) -> str:
+    cover_header = get_headers(cover_sheet, "A1:B1")
+    cover_row = map(lambda cell: cell.value, cover_sheet[2])
+    row_dict = map_values_to_headers(cover_header, cover_row)
+    return row_dict["Project Use Code"]
 
-def validate(workbook: IO[bytes]) -> Errors:
+
+def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str]]:
     """Validates a given Excel workbook according to CPF validation rules.
 
     Args:
@@ -44,14 +50,16 @@ def validate(workbook: IO[bytes]) -> Errors:
     """
     errors = validate_logic_sheet(wb["Logic"])
     if len(errors) > 0:
-        return errors
+        return errors, None
 
     """
     3. Validate cover sheet and project selection. Pick the appropriate validator for the next step.
     """
     errors, project_schema = validate_cover_sheet(wb["Cover"])
     if len(errors) > 0:
-        return errors
+        return errors, None
+
+    project_use_code = get_project_use_code(wb["Cover"])
 
     """
     4. Ensure all project rows are validated with the schema
@@ -66,7 +74,7 @@ def validate(workbook: IO[bytes]) -> Errors:
     # Close the workbook after reading
     wb.close()
 
-    return project_errors + subrecipient_errors
+    return (project_errors + subrecipient_errors, project_use_code)
 
 
 # Accepts a workbook from openpyxl

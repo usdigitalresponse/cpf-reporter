@@ -13,9 +13,9 @@ const DOWNLOAD_UPLOAD_FILE = gql`
 `
 const Upload = ({ upload }) => {
   const hasErrors =
-    upload.latestValidation?.results !== null &&
-    Array.isArray(upload.latestValidation?.results) &&
-    upload.latestValidation?.results.length > 0
+    upload.latestValidation?.results?.errors !== null &&
+    Array.isArray(upload.latestValidation?.results?.errors) &&
+    upload.latestValidation?.results?.errors.length > 0
 
   const [downloadUploadFile] = useMutation(DOWNLOAD_UPLOAD_FILE, {
     onCompleted: ({ downloadUploadFile }) => {
@@ -38,7 +38,7 @@ const Upload = ({ upload }) => {
     <>
       {hasErrors && (
         <UploadValidationResultsTable
-          errors={upload.latestValidation?.results}
+          errors={upload.latestValidation?.results?.errors}
         />
       )}
 

@@ -1,6 +1,6 @@
 import json
 import tempfile
-from typing import IO
+from typing import IO, List, Union, Dict
 
 import boto3
 import structlog
@@ -11,6 +11,7 @@ from mypy_boto3_s3.client import S3Client
 from src.lib.logging import get_logger, reset_contextvars
 from src.lib.workbook_validator import validate
 
+type ValidationResults = Dict[str, Union[List[str], str, None]]
 
 @reset_contextvars
 def handle(event: S3Event, context: Context):
@@ -35,7 +36,7 @@ def handle(event: S3Event, context: Context):
                 event["Records"][0]["s3"]["object"]["key"],
                 file,
             )
-            results = validate_workbook(file)
+            results: ValidationResults = validate_workbook(file)
 
     # Save results to s3
     save_validation_results(
@@ -65,7 +66,7 @@ def download_workbook(client: S3Client, bucket: str, key: str, destination: IO[b
         raise
 
 
-def validate_workbook(file: IO[bytes]) -> list[str]:
+def validate_workbook(file: IO[bytes]) -> ValidationResults:
     """Wrapper for workbook validation with logging.
 
     Args:
@@ -78,18 +79,22 @@ def validate_workbook(file: IO[bytes]) -> list[str]:
     logger.debug("validating workbook")
 
     try:
-        results = validate(file)
+        errors, project_use_code = validate(file)
     except:
         logger.exception("unhandled exception validating workbook")
         raise
 
     logger.debug(
-        "successfully validated workbook", count_validation_errors=len(results)
+        "successfully validated workbook", count_validation_errors=len(errors)
     )
+    results: ValidationResults = {
+        "errors": errors,
+        "projectUseCode": project_use_code,
+    }
     return results
 
 
-def save_validation_results(client: S3Client, bucket, key: str, results: list[str]):
+def save_validation_results(client: S3Client, bucket, key: str, results: ValidationResults):
     """Persists workbook validation results to S3.
 
     Args:
