@@ -125,7 +125,7 @@ def save_validation_results(client: S3Client, bucket, key: str, results: Validat
     try:
         client.put_object(
             Bucket=bucket,
-            Key=key,
+            Key=unquote_plus(key),
             Body=data,
             ContentEncoding=encoding,
             ServerSideEncryption="AES256",

@@ -82,7 +82,7 @@ export const processRecord = async (
   s3Client: UploadValidationS3Client
 ): Promise<void> => {
   const bucket = record.s3.bucket.name
-  const key = record.s3.object.key
+  const key = decodeURIComponent(record.s3.object.key.replace(/\+/g, ' '))
 
   // Download the JSON errors file from S3
   let getObjectResponse
