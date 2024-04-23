@@ -5,6 +5,7 @@ import type {
   UploadRelationResolvers,
 } from 'types/graphql'
 
+import { hasRole } from 'src/lib/auth'
 import { s3PutSignedUrl } from 'src/lib/aws'
 import aws from 'src/lib/aws'
 import { ROLES } from 'src/lib/constants'
@@ -12,27 +13,27 @@ import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 import { ValidationError } from 'src/lib/validation-error'
 
+interface WhereInputs {
+  agency: { organizationId: number }
+  uploadedBy?: { id: number }
+}
+
 export const uploads: QueryResolvers['uploads'] = () => {
   const currentUser = context.currentUser
 
-  if (currentUser.role === ROLES.ORGANIZATION_STAFF) {
-    return db.upload.findMany({
-      where: {
-        uploadedById: currentUser.id,
-      },
-    })
-  } else if (
-    currentUser.role === ROLES.ORGANIZATION_ADMIN ||
-    currentUser.role === ROLES.USDR_ADMIN
-  ) {
-    return db.upload.findMany({
-      where: {
-        agency: {
-          organizationId: currentUser.agency.organizationId,
-        },
-      },
-    })
+  const whereInputs: WhereInputs = {
+    agency: {
+      organizationId: currentUser.agency.organizationId,
+    },
   }
+
+  if (hasRole(ROLES.ORGANIZATION_STAFF)) {
+    whereInputs.uploadedBy = { id: currentUser.id }
+  }
+
+  return db.upload.findMany({
+    where: whereInputs,
+  })
 }
 
 export const upload: QueryResolvers['upload'] = ({ id }) => {

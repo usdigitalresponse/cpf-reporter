@@ -76,9 +76,14 @@ describe('uploads', () => {
     async (scenario: StandardScenario) => {
       mockCurrentUser(scenario.user.three)
       const result = await uploads()
+      const uploadsBelongToOrg = await uploadsBelongToOrganization(
+        result,
+        scenario.organization.two.id
+      )
 
       expect(result.length).toEqual(1)
       expect(result[0].uploadedById).toEqual(scenario.user.three.id)
+      expect(uploadsBelongToOrg).toBe(true)
     }
   )
 
