@@ -9,11 +9,13 @@ import LoginPage from './LoginPage'
 
 describe('LoginPage', () => {
   it('renders successfully for local auth', () => {
+    process.env.AUTH_PROVIDER = 'local'
     expect(() => {
       render(<LoginPage />)
     }).not.toThrow()
   })
   it('renders a login button for local auth', () => {
+    process.env.AUTH_PROVIDER = 'local'
     render(<LoginPage />)
     expect(screen.getByRole('button', { name: 'Login' })).toBeInTheDocument()
   })
