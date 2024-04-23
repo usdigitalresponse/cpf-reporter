@@ -9,6 +9,7 @@ from src.schemas.latest.schema import (
     LogicSheetVersion,
     SubrecipientRow,
     BaseProjectRow,
+    BaseModel
 )
 
 type Errors = List[WorkbookError]
@@ -47,6 +48,16 @@ def get_project_use_code(cover_sheet: Worksheet) -> str:
     cover_row = map(lambda cell: cell.value, cover_sheet[2])
     row_dict = map_values_to_headers(cover_header, cover_row)
     return row_dict["Project Use Code"]
+
+def get_erroring_column(SheetModelClass: BaseModel, e: ValidationError) -> str:
+    # For some reason getattr doesn't reliably work here, so using __fields__ as a dict instead
+    erroring_field = SheetModelClass.__fields__[e.errors()[0]['loc'][0]]
+    if (erroring_field and erroring_field.json_schema_extra):
+        erroring_column = erroring_field.json_schema_extra["column"]
+    else:
+        erroring_column = "Unknown"
+    return erroring_column
+
 
 def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str]]:
     """Validates a given Excel workbook according to CPF validation rules.
@@ -117,11 +128,7 @@ def validate_cover_sheet(
     try:
         CoverSheetRow(**row_dict)
     except ValidationError as e:
-        erroring_field = CoverSheetRow.__fields__[e.errors()[0]['loc'][0]]
-        if (erroring_field and erroring_field.json_schema_extra):
-            erroring_column = erroring_field.json_schema_extra["column"]
-        else:
-            erroring_column = "Unknown"
+        erroring_column = get_erroring_column(CoverSheetRow, e)
         errors.append(WorkbookError(f"{COVER_SHEET} Sheet: Invalid {e}", f"{row_num}", f"{erroring_column}", COVER_SHEET))
         return (errors, None)
 
@@ -144,13 +151,7 @@ def validate_project_sheet(project_sheet: Worksheet, project_schema, project_use
         try:
             project_schema(**row_dict)
         except ValidationError as e:
-            # For some reason getattr doesn't reliably work here, so using __fields__ as a dict instead
-            #TODO figure out how to get the right row for the project use code
-            erroring_field = BaseProjectRow.__fields__[e.errors()[0]['loc'][0]]
-            if (erroring_field and erroring_field.json_schema_extra):
-                erroring_column = erroring_field.json_schema_extra["column"]
-            else:
-                erroring_column = "Unknown"
+            erroring_column = get_erroring_column(SCHEMA_BY_PROJECT[project_use_code], e)
             errors.append(WorkbookError(f"{PROJECT_SHEET} Sheet: Error {e}", f"{current_row}", f"{erroring_column}", PROJECT_SHEET))
     return errors
 
@@ -169,11 +170,7 @@ def validate_subrecipient_sheet(subrecipient_sheet: Worksheet) -> Errors:
         try:
             SubrecipientRow(**row_dict)
         except ValidationError as e:
-            erroring_field = SubrecipientRow.__fields__[e.errors()[0]['loc'][0]]
-            if (erroring_field and erroring_field.json_schema_extra):
-                erroring_column = erroring_field.json_schema_extra["column"]
-            else:
-                erroring_column = "Unknown"
+            erroring_column = get_erroring_column(SubrecipientRow, e)
             errors.append(WorkbookError(f"{SUBRECIPIENTS_SHEET} Sheet: Error {e}", f"{current_row}", f"{erroring_column}", SUBRECIPIENTS_SHEET))
 
     return errors
