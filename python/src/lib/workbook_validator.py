@@ -49,6 +49,13 @@ def get_project_use_code(cover_sheet: Worksheet) -> str:
     row_dict = map_values_to_headers(cover_header, cover_row)
     return row_dict["Project Use Code"]
 
+"""
+This method maps the thrown error to the impacted column in the spreadsheet.
+It does so by first getting the error's location (the loc property), which is the field name,
+and then grabbing that field off of the relevant model class passed in.
+On the model class, the field definition has a property of json_schema_extra,
+defined in schema.py on a per-field basis, that contains the column for that particular field.
+"""
 def get_erroring_column(SheetModelClass: BaseModel, e: ValidationError) -> str:
     # For some reason getattr doesn't reliably work here, so using __fields__ as a dict instead
     erroring_field = SheetModelClass.__fields__[e.errors()[0]['loc'][0]]
