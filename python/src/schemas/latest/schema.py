@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field, condecimal, conint, validator, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, condecimal, conint, validator
 
 
 class StateAbbreviation(Enum):
