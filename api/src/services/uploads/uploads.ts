@@ -10,9 +10,26 @@ import aws from 'src/lib/aws'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 import { ValidationError } from 'src/lib/validation-error'
+import { ROLES } from 'src/lib/constants'
 
 export const uploads: QueryResolvers['uploads'] = () => {
-  return db.upload.findMany()
+  const currentUser = context.currentUser;
+
+  if (currentUser.role === ROLES.ORGANIZATION_STAFF) {
+    return db.upload.findMany({
+      where: {
+        uploadedById: currentUser.id
+      }
+    });
+  } else if (currentUser.role === ROLES.ORGANIZATION_ADMIN || currentUser.role === ROLES.USDR_ADMIN) {
+    return db.upload.findMany({
+      where: {
+        agency: {
+          organizationId: currentUser.agency.organizationId
+        }
+      }
+    });
+  }
 }
 
 export const upload: QueryResolvers['upload'] = ({ id }) => {

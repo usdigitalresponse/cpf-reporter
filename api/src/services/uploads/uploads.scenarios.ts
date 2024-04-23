@@ -1,4 +1,4 @@
-import type { Prisma, Upload } from '@prisma/client'
+import type { Prisma, Upload, User, Organization, Agency, ReportingPeriod } from '@prisma/client'
 
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
@@ -15,6 +15,11 @@ export const standard = defineScenario<
         name: 'USDR',
       },
     },
+    two: {
+      data: {
+        name: 'Example Organization',
+      },
+    },
   },
   agency: {
     one: (scenario) => ({
@@ -22,6 +27,16 @@ export const standard = defineScenario<
         name: 'Agency1',
         organizationId: scenario.organization.one.id,
         code: 'A1',
+      },
+      include: {
+        organization: true,
+      },
+    }),
+    two: (scenario) => ({
+      data: {
+        name: 'Agency2',
+        organizationId: scenario.organization.two.id,
+        code: 'A2',
       },
       include: {
         organization: true,
@@ -44,8 +59,19 @@ export const standard = defineScenario<
       data: {
         email: 'uniqueemail25@test.com',
         name: 'String',
-        role: 'ORGANIZATION_STAFF',
+        role: 'USDR_ADMIN',
         agencyId: scenario.agency.one.id,
+      },
+      include: {
+        agency: true,
+      },
+    }),
+    three: (scenario) => ({
+      data: {
+        email: 'uniqueemail3@test.com',
+        name: 'String',
+        role: 'ORGANIZATION_STAFF',
+        agencyId: scenario.agency.two.id,
       },
       include: {
         agency: true,
@@ -106,7 +132,7 @@ export const standard = defineScenario<
     two: (scenario) => ({
       data: {
         filename: 'String',
-        uploadedById: scenario.user.one.id,
+        uploadedById: scenario.user.two.id,
         agencyId: scenario.agency.one.id,
         reportingPeriodId: scenario.reportingPeriod.one.id,
         validations: {
@@ -114,13 +140,13 @@ export const standard = defineScenario<
             {
               passed: true,
               results: '{error:false}',
-              initiatedById: scenario.user.one.id,
+              initiatedById: scenario.user.two.id,
               createdAt: '2024-01-29T18:13:25.000Z',
             },
             {
               passed: true,
               results: '{error:false}',
-              initiatedById: scenario.user.one.id,
+              initiatedById: scenario.user.two.id,
               createdAt: '2024-01-29T17:10:22.000Z',
             },
           ],
@@ -129,7 +155,22 @@ export const standard = defineScenario<
         updatedAt: '2024-01-21T18:10:17.000Z',
       },
     }),
+    three: (scenario) => ({
+      data: {
+        filename: 'String',
+        uploadedById: scenario.user.three.id,
+        agencyId: scenario.agency.two.id,
+        reportingPeriodId: scenario.reportingPeriod.one.id,
+        validations: {},
+        createdAt: '2024-01-21T18:10:17.000Z',
+        updatedAt: '2024-01-21T18:10:17.000Z',
+      },
+    }),
   },
 })
 
-export type StandardScenario = ScenarioData<Upload, 'upload'>
+export type StandardScenario = ScenarioData<Upload, 'upload'> &
+  ScenarioData<User, 'user'> &
+  ScenarioData<Organization, 'organization'> &
+  ScenarioData<Agency, 'agency'> &
+  ScenarioData<ReportingPeriod, 'reportingPeriod'>

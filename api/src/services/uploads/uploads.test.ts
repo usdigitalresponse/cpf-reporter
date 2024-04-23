@@ -20,17 +20,47 @@ import type { StandardScenario } from './uploads.scenarios'
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
 describe('uploads', () => {
-  scenario('returns all uploads', async (scenario: StandardScenario) => {
-    const result = await uploads()
-
-    expect(result.length).toEqual(Object.keys(scenario.upload).length)
-  })
-
   scenario('returns a single upload', async (scenario: StandardScenario) => {
     const result = await upload({ id: scenario.upload.one.id })
 
     expect(result).toEqual(scenario.upload.one)
   })
+
+scenario('returns all uploads in their organization for organization admins', async (scenario: StandardScenario) => {
+  mockCurrentUser(scenario.user.one);
+  const result = await uploads();
+  const uploadOrganizationIds = await Promise.all(
+    result.map(async (upload) => {
+      const agency = await db.agency.findUnique({ where: { id: upload.agencyId } });
+      return agency?.organizationId;
+    })
+  );
+  
+  expect(result.length).toEqual(2);
+  expect(uploadOrganizationIds.every((orgId) => orgId === scenario.organization.one.id)).toBe(true);
+});
+
+scenario('returns all uploads in their organization for USDR admins', async (scenario: StandardScenario) => {
+  mockCurrentUser(scenario.user.two);
+  const result = await uploads();
+  
+  const uploadOrganizationIds = await Promise.all(
+    result.map(async (upload) => {
+      const agency = await db.agency.findUnique({ where: { id: upload.agencyId } });
+      return agency?.organizationId;
+    })
+  );
+  
+  expect(result.length).toEqual(2);
+  expect(uploadOrganizationIds.every((orgId) => orgId === scenario.organization.one.id)).toBe(true);
+});
+
+  scenario('returns uploads for organization staff, only their own', async (scenario: StandardScenario) => {
+    mockCurrentUser(scenario.user.three);
+    const result = await uploads();
+    expect(result.length).toEqual(1);
+    expect(result[0].uploadedById).toEqual(scenario.user.three.id);
+  });
 
   scenario('creates an upload', async (scenario: StandardScenario) => {
     mockCurrentUser(scenario.user.one)
@@ -43,7 +73,7 @@ describe('uploads', () => {
     })
 
     expect(result.filename).toEqual('String')
-    expect(result.uploadedById).toEqual(scenario.upload.two.uploadedById)
+    expect(result.uploadedById).toEqual(scenario.upload.one.uploadedById)
     expect(result.agencyId).toEqual(scenario.upload.two.agencyId)
     expect(result.reportingPeriodId).toEqual(
       scenario.upload.two.reportingPeriodId
