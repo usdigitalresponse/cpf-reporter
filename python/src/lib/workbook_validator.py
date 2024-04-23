@@ -99,7 +99,7 @@ def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str]]:
     """
     4. Ensure all project rows are validated with the schema
     """
-    project_errors = validate_project_sheet(wb[PROJECT_SHEET], project_schema, project_use_code)
+    project_errors = validate_project_sheet(wb[PROJECT_SHEET], project_schema)
 
     """
     5. Ensure all subrecipient rows are validated with the schema
@@ -144,7 +144,7 @@ def validate_cover_sheet(
     return (errors, project_schema)
 
 
-def validate_project_sheet(project_sheet: Worksheet, project_schema, project_use_code) -> Errors:
+def validate_project_sheet(project_sheet: Worksheet, project_schema) -> Errors:
     errors = []
     project_headers = get_headers(project_sheet, "C3:DS3")
     current_row = 12
@@ -158,7 +158,7 @@ def validate_project_sheet(project_sheet: Worksheet, project_schema, project_use
         try:
             project_schema(**row_dict)
         except ValidationError as e:
-            erroring_column = get_erroring_column(SCHEMA_BY_PROJECT[project_use_code], e)
+            erroring_column = get_erroring_column(project_schema, e)
             errors.append(WorkbookError(f"{PROJECT_SHEET} Sheet: Error {e}", f"{current_row}", f"{erroring_column}", PROJECT_SHEET))
     return errors
 

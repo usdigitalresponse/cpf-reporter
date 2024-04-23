@@ -66,11 +66,11 @@ class TestValidateCoverSheet:
 
 class TestValidateproject_sheet:
     def test_valid_project_sheet(self, valid_project_sheet: Worksheet):
-        errors = validate_project_sheet(valid_project_sheet, SCHEMA_BY_PROJECT[SAMPLE_PROJECT_USE_CODE], SAMPLE_PROJECT_USE_CODE)
+        errors = validate_project_sheet(valid_project_sheet, SCHEMA_BY_PROJECT[SAMPLE_PROJECT_USE_CODE])
         assert errors == []
 
     def test_invalid_project_sheet(self, invalid_project_sheet: Worksheet):
-        errors = validate_project_sheet(invalid_project_sheet, SCHEMA_BY_PROJECT[SAMPLE_PROJECT_USE_CODE], SAMPLE_PROJECT_USE_CODE)
+        errors = validate_project_sheet(invalid_project_sheet, SCHEMA_BY_PROJECT[SAMPLE_PROJECT_USE_CODE])
         assert errors != []
         error = errors[0]
         assert error.row == "13"
