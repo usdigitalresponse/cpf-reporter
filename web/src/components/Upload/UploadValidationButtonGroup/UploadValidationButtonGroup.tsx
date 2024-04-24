@@ -1,4 +1,6 @@
+import { ROLES } from 'api/src/lib/constants'
 import Button from 'react-bootstrap/Button'
+import { useAuth } from 'web/src/auth'
 
 interface ValidationError {
   message: string
@@ -25,6 +27,8 @@ const UploadValidationButtonGroup = ({
   handleForceInvalidate,
   handleValidate,
 }: UploadValidationButtonGroupProps) => {
+  const { hasRole } = useAuth()
+
   /*
     If the upload has been validated, renders "Invalidate" and "Re-validate" buttons
     If the upload has been invalidated, renders the "Validate" button
@@ -56,7 +60,10 @@ const UploadValidationButtonGroup = ({
         <Button variant="primary" size="sm" onClick={handleFileDownload}>
           Download file
         </Button>{' '}
-        {latestValidation?.results && renderValidationButtons()}
+        {/* TODO: Remove USDR_ADMIN check when ready || 2024-05-13 Milestone */}
+        {hasRole(ROLES.USDR_ADMIN) &&
+          latestValidation?.results &&
+          renderValidationButtons()}
       </div>
     </li>
   )
