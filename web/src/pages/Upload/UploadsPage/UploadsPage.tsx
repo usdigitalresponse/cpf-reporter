@@ -1,6 +1,6 @@
+import { ROLES } from 'api/src/lib/constants'
 import { Button, ButtonGroup } from 'react-bootstrap'
 import { useAuth } from 'web/src/auth'
-import { ROLES } from 'api/src/lib/constants'
 
 import { MetaTags } from '@redwoodjs/web'
 

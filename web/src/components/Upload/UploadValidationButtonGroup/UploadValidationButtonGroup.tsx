@@ -1,6 +1,6 @@
+import { ROLES } from 'api/src/lib/constants'
 import Button from 'react-bootstrap/Button'
 import { useAuth } from 'web/src/auth'
-import { ROLES } from 'api/src/lib/constants'
 
 interface ValidationError {
   message: string
@@ -61,7 +61,9 @@ const UploadValidationButtonGroup = ({
           Download file
         </Button>{' '}
         {/* TODO: Remove USDR_ADMIN check when ready || 2024-05-13 Milestone */}
-        {(hasRole(ROLES.USDR_ADMIN) && latestValidation?.results) && renderValidationButtons()}
+        {hasRole(ROLES.USDR_ADMIN) &&
+          latestValidation?.results &&
+          renderValidationButtons()}
       </div>
     </li>
   )
