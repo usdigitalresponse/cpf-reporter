@@ -2,7 +2,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field, condecimal, conint, validator
+from pydantic import (BaseModel, ConfigDict, Field, condecimal, conint,
+                      validator)
 
 
 class StateAbbreviation(Enum):
@@ -568,6 +569,7 @@ class SubrecipientRow(BaseModel):
 class Version(Enum):
     V2023_12_12 = "v:20231212"
     V2024_01_07 = "v:20240107"
+    V2024_04_04 = "v:20240404"
 
 
 class ProjectType(str, Enum):
