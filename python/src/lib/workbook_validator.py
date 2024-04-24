@@ -24,12 +24,14 @@ class WorkbookError:
     row: str
     col: str
     tab: str
+    field_name: str
 
-    def __init__(self, message: str, row: str, col: str, tab: str):
+    def __init__(self, message: str, row: str, col: str, tab: str, field_name: str):
         self.message = message
         self.row = row
         self.col = col
         self.tab = tab
+        self.field_name = field_name
 
 
 def map_values_to_headers(headers: Tuple, values: Iterable[Any]):
@@ -50,20 +52,37 @@ def get_project_use_code(cover_sheet: Worksheet) -> str:
     return row_dict["Project Use Code"]
 
 """
-This method maps the thrown error to the impacted column in the spreadsheet.
+This function converts a list of ValidationError records for a single row into a list of WorkbookError records. 
+Since each row has many different fields-- there can be multiple errors in a single row.
+It maps the thrown error to the impacted column in the spreadsheet.
 It does so by first getting the error's location (the loc property), which is the field name,
 and then grabbing that field off of the relevant model class passed in.
 On the model class, the field definition has a property of json_schema_extra,
 defined in schema.py on a per-field basis, that contains the column for that particular field.
 """
-def get_erroring_column(SheetModelClass: BaseModel, e: ValidationError) -> str:
-    # For some reason getattr doesn't reliably work here, so using __fields__ as a dict instead
-    erroring_field = SheetModelClass.__fields__[e.errors()[0]['loc'][0]]
-    if (erroring_field and erroring_field.json_schema_extra):
-        erroring_column = erroring_field.json_schema_extra["column"]
-    else:
-        erroring_column = "Unknown"
-    return erroring_column
+def get_workbook_errors_for_row(SheetModelClass: BaseModel, e: ValidationError, row_num: int, sheet_name: str) -> List[WorkbookError]:
+    workbook_errors: List[WorkbookError] = []
+    for error in e.errors():
+        """
+            Sample structure of the variable `e` here-
+            https://docs.pydantic.dev/latest/api/pydantic_core/#pydantic_core.ErrorDetails
+            {
+            'type': 'string_type',
+            'loc': ('Identification_Number__c',),
+            'msg': 'Input should be a valid string',
+            'input': None,
+            'url': 'https://errors.pydantic.dev/2.6/v/string_type'
+            }
+        """
+        erroring_field_name = error['loc'][0]
+        erroring_field = SheetModelClass.__fields__[erroring_field_name]
+        if (erroring_field and erroring_field.json_schema_extra):
+            erroring_column = erroring_field.json_schema_extra["column"]
+        else:
+            erroring_column = "Unknown"
+        message = f'Error in field {erroring_field_name}-{error["msg"]}'
+        workbook_errors.append(WorkbookError(message, f'{row_num}', erroring_column, sheet_name, erroring_field_name))
+    return workbook_errors
 
 
 def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str]]:
@@ -119,7 +138,7 @@ def validate_logic_sheet(logic_sheet: Worksheet) -> Errors:
         # Cell B1 contains the version
         LogicSheetVersion(**{"version": logic_sheet["B1"].value})
     except ValidationError as e:
-        errors.append(WorkbookError(f"{LOGIC_SHEET} Sheet: Invalid {e}", "1", "B", LOGIC_SHEET))
+        errors.append(WorkbookError(f"{LOGIC_SHEET} Sheet: Invalid {e}", "1", "B", LOGIC_SHEET, 'version'))
     return errors
 
 
@@ -135,8 +154,7 @@ def validate_cover_sheet(
     try:
         CoverSheetRow(**row_dict)
     except ValidationError as e:
-        erroring_column = get_erroring_column(CoverSheetRow, e)
-        errors.append(WorkbookError(f"{COVER_SHEET} Sheet: Invalid {e}", f"{row_num}", f"{erroring_column}", COVER_SHEET))
+        errors += get_workbook_errors_for_row(CoverSheetRow, e, row_num, COVER_SHEET)
         return (errors, None)
 
         # This does not need to be a silent failure. This would be a critical error.
@@ -158,8 +176,7 @@ def validate_project_sheet(project_sheet: Worksheet, project_schema) -> Errors:
         try:
             project_schema(**row_dict)
         except ValidationError as e:
-            erroring_column = get_erroring_column(project_schema, e)
-            errors.append(WorkbookError(f"{PROJECT_SHEET} Sheet: Error {e}", f"{current_row}", f"{erroring_column}", PROJECT_SHEET))
+            errors += get_workbook_errors_for_row(project_schema, e, current_row, PROJECT_SHEET)
     return errors
 
 
@@ -177,9 +194,7 @@ def validate_subrecipient_sheet(subrecipient_sheet: Worksheet) -> Errors:
         try:
             SubrecipientRow(**row_dict)
         except ValidationError as e:
-            erroring_column = get_erroring_column(SubrecipientRow, e)
-            errors.append(WorkbookError(f"{SUBRECIPIENTS_SHEET} Sheet: Error {e}", f"{current_row}", f"{erroring_column}", SUBRECIPIENTS_SHEET))
-
+            errors += get_workbook_errors_for_row(SubrecipientRow, e, current_row, SUBRECIPIENTS_SHEET)
     return errors
 
 if __name__ == "__main__":

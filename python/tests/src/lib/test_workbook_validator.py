@@ -75,7 +75,7 @@ class TestValidateproject_sheet:
         error = errors[0]
         assert error.row == "13"
         assert error.col == "D"
-        assert "string_too_long" in error.message
+        assert "Error in field Identification_Number__c-String should have at most 20 characters" in error.message
 
 class TestValidateSubrecipientSheet:
     def test_valid_subrecipient_sheet(self, valid_subrecipientsheet: Worksheet):
