@@ -12,7 +12,7 @@ from mypy_boto3_s3.client import S3Client
 from src.lib.logging import get_logger, reset_contextvars
 from src.lib.workbook_validator import validate
 
-type ValidationResults = Dict[str, Union[List[str], str, None]]
+type ValidationResults = Dict[str, Union[List[Dict[str,str]], str, None]]
 
 @reset_contextvars
 def handle(event: S3Event, context: Context):
@@ -89,7 +89,7 @@ def validate_workbook(file: IO[bytes]) -> ValidationResults:
         "successfully validated workbook", count_validation_errors=len(errors)
     )
     results: ValidationResults = {
-        "errors": errors,
+        "errors": list(map(lambda x: x.__dict__, errors)),
         "projectUseCode": project_use_code,
     }
     return results
