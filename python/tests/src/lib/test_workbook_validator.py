@@ -55,6 +55,12 @@ class TestValidateCoverSheet:
     def test_invalid_cover_sheet(self, invalid_cover_sheet: Worksheet):
         errors, schema = validate_cover_sheet(invalid_cover_sheet)
         assert errors != []
+        error = errors[0]
+        print(error.message)
+        assert "Project use code 'INVALID' is not recognized." in error.message
+        assert error.col == "B"
+        assert error.row == "2"
+        assert error.tab == "Cover"
         assert schema is None
 
 
@@ -66,7 +72,10 @@ class TestValidateproject_sheet:
     def test_invalid_project_sheet(self, invalid_project_sheet: Worksheet):
         errors = validate_project_sheet(invalid_project_sheet, SCHEMA_BY_PROJECT[SAMPLE_PROJECT_USE_CODE])
         assert errors != []
-
+        error = errors[0]
+        assert error.row == "13"
+        assert error.col == "D"
+        assert "Error in field Identification_Number__c-String should have at most 20 characters" in error.message
 
 class TestValidateSubrecipientSheet:
     def test_valid_subrecipient_sheet(self, valid_subrecipientsheet: Worksheet):
@@ -76,6 +85,10 @@ class TestValidateSubrecipientSheet:
     def test_invalid_subrecipient_sheet(self, invalid_subrecipient_sheet: Worksheet):
         errors = validate_subrecipient_sheet(invalid_subrecipient_sheet)
         assert errors != []
+        error = errors[0]
+        assert "String should have at least 9 characters" in error.message
+        assert error.row == "13"
+        assert error.col == "D"
 
 class TestGetProjectUseCode:
     def test_get_project_use_code(self, valid_coversheet: Worksheet):
