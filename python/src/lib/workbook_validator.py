@@ -1,15 +1,14 @@
-from typing import Any, IO, Iterable, List, Optional, Tuple
+from typing import IO, Any, Iterable, List, Optional, Tuple
 
-from openpyxl import load_workbook
+from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import ValidationError
 from src.schemas.latest.schema import (
     SCHEMA_BY_PROJECT,
+    BaseModel,
     CoverSheetRow,
     LogicSheetVersion,
     SubrecipientRow,
-    BaseProjectRow,
-    BaseModel
 )
 
 type Errors = List[WorkbookError]
@@ -97,36 +96,45 @@ def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str]]:
     See: https://openpyxl.readthedocs.io/en/stable/optimized.html
     If there is any trouble loading files from memory please see here: https://stackoverflow.com/questions/20635778/using-openpyxl-to-read-file-from-memory
     """
-    wb = load_workbook(filename=workbook, read_only=True)
+    try:
+        wb = load_workbook(filename=workbook, read_only=True)
+        return validate_workbook(wb)
+    finally:
+        workbook.close()
+
+
+def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
+    """Validates a given Excel workbook according to CPF validation rules.
+
+    Args:
+        workbook: The Excel workbook to validate.
+    """
 
     """
-    2. Validate logic sheet to make sure the sheet has an appropriate version
+    1. Validate logic sheet to make sure the sheet has an appropriate version
     """
-    errors = validate_logic_sheet(wb[LOGIC_SHEET])
+    errors = validate_logic_sheet(workbook[LOGIC_SHEET])
     if len(errors) > 0:
         return errors, None
 
     """
-    3. Validate cover sheet and project selection. Pick the appropriate validator for the next step.
+    2. Validate cover sheet and project selection. Pick the appropriate validator for the next step.
     """
-    errors, project_schema = validate_cover_sheet(wb[COVER_SHEET])
+    errors, project_schema = validate_cover_sheet(workbook[COVER_SHEET])
     if len(errors) > 0:
         return errors, None
-    
-    project_use_code = get_project_use_code(wb[COVER_SHEET])
+
+    project_use_code = get_project_use_code(workbook[COVER_SHEET])
 
     """
-    4. Ensure all project rows are validated with the schema
+    3. Ensure all project rows are validated with the schema
     """
-    project_errors = validate_project_sheet(wb[PROJECT_SHEET], project_schema)
+    project_errors = validate_project_sheet(workbook[PROJECT_SHEET], project_schema)
 
     """
-    5. Ensure all subrecipient rows are validated with the schema
+    4. Ensure all subrecipient rows are validated with the schema
     """
-    subrecipient_errors = validate_subrecipient_sheet(wb[SUBRECIPIENTS_SHEET])
-
-    # Close the workbook after reading
-    wb.close()
+    subrecipient_errors = validate_subrecipient_sheet(workbook[SUBRECIPIENTS_SHEET])
 
     return (project_errors + subrecipient_errors, project_use_code)
 
@@ -212,4 +220,6 @@ if __name__ == "__main__":
             for error in errors:
                 print(error)
         else:
+            print("No errors found")
+            print("No errors found")
             print("No errors found")
