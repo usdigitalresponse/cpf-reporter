@@ -113,30 +113,28 @@ def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
     """
     1. Validate logic sheet to make sure the sheet has an appropriate version
     """
-    errors = validate_logic_sheet(workbook[LOGIC_SHEET])
-    if len(errors) > 0:
-        return errors, None
+    errors: Errors = []
+    errors += validate_logic_sheet(workbook[LOGIC_SHEET])
 
     """
     2. Validate cover sheet and project selection. Pick the appropriate validator for the next step.
     """
-    errors, project_schema = validate_cover_sheet(workbook[COVER_SHEET])
-    if len(errors) > 0:
-        return errors, None
+    cover_errors, project_schema = validate_cover_sheet(workbook[COVER_SHEET])
+    errors += cover_errors
 
     project_use_code = get_project_use_code(workbook[COVER_SHEET])
 
     """
     3. Ensure all project rows are validated with the schema
     """
-    project_errors = validate_project_sheet(workbook[PROJECT_SHEET], project_schema)
+    errors += validate_project_sheet(workbook[PROJECT_SHEET], project_schema)
 
     """
     4. Ensure all subrecipient rows are validated with the schema
     """
-    subrecipient_errors = validate_subrecipient_sheet(workbook[SUBRECIPIENTS_SHEET])
+    errors += validate_subrecipient_sheet(workbook[SUBRECIPIENTS_SHEET])
 
-    return (project_errors + subrecipient_errors, project_use_code)
+    return (errors, project_use_code)
 
 
 # Accepts a workbook from openpyxl
@@ -220,6 +218,7 @@ if __name__ == "__main__":
             for error in errors:
                 print(error)
         else:
+            print("No errors found")
             print("No errors found")
             print("No errors found")
             print("No errors found")

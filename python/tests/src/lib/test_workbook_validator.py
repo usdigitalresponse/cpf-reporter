@@ -1,15 +1,17 @@
 from typing import BinaryIO
 
 import pytest
+from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from src.lib.workbook_validator import (
     SCHEMA_BY_PROJECT,
+    get_project_use_code,
     is_empty_row,
     validate,
     validate_cover_sheet,
     validate_project_sheet,
     validate_subrecipient_sheet,
-    get_project_use_code
+    validate_workbook,
 )
 
 SAMPLE_PROJECT_USE_CODE = "1A"
@@ -44,6 +46,23 @@ class TestValidateWorkbook:
         project_use_code = result[1]
         assert errors == []
         assert project_use_code == SAMPLE_PROJECT_USE_CODE
+
+    def test_multiple_invalid_sheets(self, valid_workbook: Workbook):
+        """
+        Tests that an error in the first sheet doesn't prevent
+        the second sheet from being validated.
+
+        """
+        invalid_cover_sheet = valid_workbook["Logic"]
+        invalid_cover_sheet["B1"] = "INVALID"
+        invalid_project_sheet = valid_workbook["Project"]
+        invalid_project_sheet["D13"] = "X" * 21
+        result = validate_workbook(valid_workbook)
+        errors = result[0]
+        assert errors != []
+        assert len(errors) == 2
+        assert errors[0].tab == "Logic"
+        assert errors[1].tab == "Project"
 
 
 class TestValidateCoverSheet:
@@ -93,4 +112,11 @@ class TestValidateSubrecipientSheet:
 class TestGetProjectUseCode:
     def test_get_project_use_code(self, valid_coversheet: Worksheet):
         project_use_code = get_project_use_code(valid_coversheet)
+        assert project_use_code == SAMPLE_PROJECT_USE_CODE
+        assert project_use_code == SAMPLE_PROJECT_USE_CODE
+        assert project_use_code == SAMPLE_PROJECT_USE_CODE
+        assert project_use_code == SAMPLE_PROJECT_USE_CODE
+        assert project_use_code == SAMPLE_PROJECT_USE_CODE
+        assert project_use_code == SAMPLE_PROJECT_USE_CODE
+        assert project_use_code == SAMPLE_PROJECT_USE_CODE
         assert project_use_code == SAMPLE_PROJECT_USE_CODE
