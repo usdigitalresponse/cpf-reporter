@@ -378,6 +378,7 @@ export type Organization = {
   agencies: Array<Maybe<Agency>>;
   id: Scalars['Int'];
   name: Scalars['String'];
+  preferences?: Maybe<Scalars['JSON']>;
   projects: Array<Maybe<Project>>;
   reportingPeriods: Array<Maybe<ReportingPeriod>>;
   subrecipients: Array<Maybe<Subrecipient>>;

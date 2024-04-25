@@ -28,6 +28,7 @@ model Organization {
   reportingPeriods  ReportingPeriod[]
   subrecipients     Subrecipient[]
   projects          Project[]
+  preferences       Json?
 }
 
 model User {

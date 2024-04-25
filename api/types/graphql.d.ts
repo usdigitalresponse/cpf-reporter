@@ -397,6 +397,7 @@ export type Organization = {
   agencies: Array<Maybe<Agency>>;
   id: Scalars['Int'];
   name: Scalars['String'];
+  preferences?: Maybe<Scalars['JSON']>;
   projects: Array<Maybe<Project>>;
   reportingPeriods: Array<Maybe<ReportingPeriod>>;
   subrecipients: Array<Maybe<Subrecipient>>;
@@ -1077,6 +1078,7 @@ export type OrganizationResolvers<ContextType = RedwoodGraphQLContext, ParentTyp
   agencies: OptArgsResolverFn<Array<Maybe<ResolversTypes['Agency']>>, ParentType, ContextType>;
   id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   name: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  preferences: OptArgsResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   projects: OptArgsResolverFn<Array<Maybe<ResolversTypes['Project']>>, ParentType, ContextType>;
   reportingPeriods: OptArgsResolverFn<Array<Maybe<ResolversTypes['ReportingPeriod']>>, ParentType, ContextType>;
   subrecipients: OptArgsResolverFn<Array<Maybe<ResolversTypes['Subrecipient']>>, ParentType, ContextType>;
@@ -1088,6 +1090,7 @@ export type OrganizationRelationResolvers<ContextType = RedwoodGraphQLContext, P
   agencies?: RequiredResolverFn<Array<Maybe<ResolversTypes['Agency']>>, ParentType, ContextType>;
   id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   name?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
+  preferences?: RequiredResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   projects?: RequiredResolverFn<Array<Maybe<ResolversTypes['Project']>>, ParentType, ContextType>;
   reportingPeriods?: RequiredResolverFn<Array<Maybe<ResolversTypes['ReportingPeriod']>>, ParentType, ContextType>;
   subrecipients?: RequiredResolverFn<Array<Maybe<ResolversTypes['Subrecipient']>>, ParentType, ContextType>;
