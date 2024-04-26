@@ -3,18 +3,15 @@ from typing import BinaryIO
 import pytest
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from src.lib.workbook_validator import (
-    SCHEMA_BY_PROJECT,
-    get_project_use_code,
-    is_empty_row,
-    validate,
-    validate_cover_sheet,
-    validate_project_sheet,
-    validate_subrecipient_sheet,
-    validate_workbook,
-)
+from src.lib.workbook_validator import (SCHEMA_BY_PROJECT,
+                                        get_project_use_code, is_empty_row,
+                                        validate, validate_cover_sheet,
+                                        validate_project_sheet,
+                                        validate_subrecipient_sheet,
+                                        validate_workbook)
 
 SAMPLE_PROJECT_USE_CODE = "1A"
+
 
 class TestIsEmptyRow:
     @pytest.mark.parametrize(
@@ -85,16 +82,24 @@ class TestValidateCoverSheet:
 
 class TestValidateproject_sheet:
     def test_valid_project_sheet(self, valid_project_sheet: Worksheet):
-        errors = validate_project_sheet(valid_project_sheet, SCHEMA_BY_PROJECT[SAMPLE_PROJECT_USE_CODE])
+        errors = validate_project_sheet(
+            valid_project_sheet, SCHEMA_BY_PROJECT[SAMPLE_PROJECT_USE_CODE]
+        )
         assert errors == []
 
     def test_invalid_project_sheet(self, invalid_project_sheet: Worksheet):
-        errors = validate_project_sheet(invalid_project_sheet, SCHEMA_BY_PROJECT[SAMPLE_PROJECT_USE_CODE])
+        errors = validate_project_sheet(
+            invalid_project_sheet, SCHEMA_BY_PROJECT[SAMPLE_PROJECT_USE_CODE]
+        )
         assert errors != []
         error = errors[0]
         assert error.row == "13"
         assert error.col == "D"
-        assert "Error in field Identification_Number__c-String should have at most 20 characters" in error.message
+        assert (
+            "Error in field Identification_Number__c-String should have at most 20 characters"
+            in error.message
+        )
+
 
 class TestValidateSubrecipientSheet:
     def test_valid_subrecipient_sheet(self, valid_subrecipientsheet: Worksheet):
@@ -109,14 +114,8 @@ class TestValidateSubrecipientSheet:
         assert error.row == "13"
         assert error.col == "D"
 
+
 class TestGetProjectUseCode:
     def test_get_project_use_code(self, valid_coversheet: Worksheet):
         project_use_code = get_project_use_code(valid_coversheet)
-        assert project_use_code == SAMPLE_PROJECT_USE_CODE
-        assert project_use_code == SAMPLE_PROJECT_USE_CODE
-        assert project_use_code == SAMPLE_PROJECT_USE_CODE
-        assert project_use_code == SAMPLE_PROJECT_USE_CODE
-        assert project_use_code == SAMPLE_PROJECT_USE_CODE
-        assert project_use_code == SAMPLE_PROJECT_USE_CODE
-        assert project_use_code == SAMPLE_PROJECT_USE_CODE
         assert project_use_code == SAMPLE_PROJECT_USE_CODE
