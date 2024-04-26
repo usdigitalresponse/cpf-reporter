@@ -1,0 +1,224 @@
+name: Deploy to Production
+run-name: Deploy ${{ github.ref }}
+
+on:
+  push:
+    tags:
+      - 'release/**'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  validate:
+    name: Validate commits for deployment
+    permissions:
+      contents: read
+    uses: ./.github/workflows/validate-deployment.yml
+    with:
+      protected-ref: main
+      deployment-ref: ${{ github.ref }}
+
+  build:
+    name: Build deployment artifacts
+    permissions:
+      contents: read
+      packages: write
+    needs:
+      - validate
+    uses: ./.github/workflows/build.yml
+    with:
+      ref: ${{ github.sha }}
+      docker-image-push: true
+      docker-image-args-ref: ${{ github.ref }}
+      docker-image-tag-latest: false
+      docker-image-version: ${{ github.ref_name }}
+      docker-image-tag-release: ${{ github.ref_name }}
+      docker-image-tag-production: true
+      docker-image-upload-attestations: true
+      docker-image-artifacts-retention-days: 90
+      build-api-image: false
+      build-console-image: true
+      build-api-functions: true
+      api-function-artifact-retention-days: 90
+      build-python-functions: true
+      python-function-artifact-retention-days: 90
+      build-web: true
+      web-artifact-retention-days: 90
+      web-dotenv: |
+        API_URL=https://api.cpf.grants.usdigitalresponse.org
+        DD_RUM_ENABLED='true'
+        DD_ENABLED='true'
+        DD_ENV='production'
+        DD_VERSION='${{ github.sha }}'
+
+  aws-auth-plan:
+    name: Configure AWS Credentials
+    permissions:
+      contents: read
+      id-token: write
+    needs:
+      - validate
+    uses: ./.github/workflows/aws-auth.yml
+    with:
+      aws-region: us-west-2
+    secrets:
+      gpg-passphrase: ${{ secrets.PRODUCTION_GPG_PASSPHRASE }}
+      role-to-assume: ${{ secrets.PRODUCTION_ROLE_ARN }}
+
+  tf-plan:
+    name: Plan Terraform
+    permissions:
+      contents: read
+    needs:
+      - validate
+      - aws-auth-plan
+      - build
+    uses: ./.github/workflows/terraform-plan.yml
+    with:
+      ref: ${{ github.sha }}
+      concurrency-group: run_terraform-production
+      api-functions-artifacts-key: ${{needs.build.outputs.api-functions-artifacts-key }}
+      api-functions-artifacts-path: ${{ needs.build.outputs.api-functions-artifacts-path }}
+      console-image: ${{ needs.build.outputs.console-image-full-name }}
+      python-functions-artifacts-key: ${{ needs.build.outputs.python-functions-artifacts-key }}
+      python-functions-artifacts-path: ${{ needs.build.outputs.python-functions-artifacts-path }}
+      web-artifacts-key: ${{ needs.build.outputs.web-artifacts-key }}
+      web-artifacts-path: ${{ needs.build.outputs.web-artifacts-path }}
+      aws-region: us-west-2
+      environment-key: production
+      tf-backend-config-file: production.s3.tfbackend
+      tf-var-file: production.tfvars
+      upload-artifacts: true
+      artifacts-retention-days: 90
+    secrets:
+      aws-access-key-id: ${{ needs.aws-auth-plan.outputs.aws-access-key-id }}
+      aws-secret-access-key: ${{ needs.aws-auth-plan.outputs.aws-secret-access-key }}
+      aws-session-token: ${{ needs.aws-auth-plan.outputs.aws-session-token }}
+      datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
+      datadog-app-key: ${{ secrets.DATADOG_APP_KEY }}
+      gpg-passphrase: ${{ secrets.PRODUCTION_GPG_PASSPHRASE }}
+
+  publish-tf-plan:
+    name: Publish Terraform Plan
+    permissions:
+      contents: read
+      pull-requests: write
+    if: needs.tf-plan.result != 'skipped' || needs.tf-plan.result != 'cancelled'
+    needs:
+      - tf-plan
+    uses: ./.github/workflows/publish-terraform-plan.yml
+    with:
+      write-summary: true
+      write-comment: false
+      tf-fmt-outcome: ${{ needs.tf-plan.outputs.fmt-outcome }}
+      tf-init-outcome: ${{ needs.tf-plan.outputs.init-outcome }}
+      tf-plan-outcome: ${{ needs.tf-plan.outputs.plan-outcome }}
+      tf-plan-output: ${{ needs.tf-plan.outputs.plan-output }}
+      tf-validate-outcome: ${{ needs.tf-plan.outputs.validate-outcome }}
+      tf-validate-output: ${{ needs.tf-plan.outputs.validate-output }}
+
+  aws-auth-apply:
+    name: Configure AWS Credentials
+    permissions:
+      contents: read
+      id-token: write
+    needs:
+      - tf-plan
+    uses: ./.github/workflows/aws-auth.yml
+    with:
+      aws-region: us-west-2
+      environment-name: production
+    secrets:
+      gpg-passphrase: ${{ secrets.PRODUCTION_GPG_PASSPHRASE }}
+      role-to-assume: ${{ secrets.PRODUCTION_ROLE_ARN }}
+
+  tf-apply:
+    name: Deploy to Production
+    needs:
+      - build
+      - tf-plan
+      - aws-auth-apply
+    if: needs.tf-plan.outputs.plan-exitcode == 2
+    uses: ./.github/workflows/terraform-apply.yml
+    with:
+      api-functions-artifacts-key: ${{ needs.build.outputs.api-functions-artifacts-key }}
+      api-functions-artifacts-path: ${{ needs.build.outputs.api-functions-artifacts-path }}
+      python-functions-artifacts-key: ${{ needs.build.outputs.python-functions-artifacts-key }}
+      python-functions-artifacts-path: ${{ needs.build.outputs.python-functions-artifacts-path }}
+      web-artifacts-key: ${{ needs.build.outputs.web-artifacts-key }}
+      web-artifacts-path: ${{ needs.build.outputs.web-artifacts-path }}
+      tf-plan-artifacts-key: ${{ needs.tf-plan.outputs.artifacts-key }}
+      aws-region: us-west-2
+      concurrency-group: run_terraform-staging
+      tf-backend-config-file: staging.s3.tfbackend
+      environment-name: staging
+    secrets:
+      aws-access-key-id: ${{ needs.aws-auth-apply.outputs.aws-access-key-id }}
+      aws-secret-access-key: ${{ needs.aws-auth-apply.outputs.aws-secret-access-key }}
+      aws-session-token: ${{ needs.aws-auth-apply.outputs.aws-session-token }}
+      datadog-api-key: ${{ secrets.DATADOG_API_KEY }}
+      datadog-app-key: ${{ secrets.DATADOG_APP_KEY }}
+      gpg-passphrase: ${{ secrets.PRODUCTION_GPG_PASSPHRASE }}
+
+  update-release:
+    name: Update release
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/release/')
+    permissions:
+      contents: write
+    needs:
+      - build
+      - tf-apply
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ github.ref_name }}
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          disable-sudo: true
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            uploads.github.com:443
+            github.com:443
+      - uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
+      - name: Download website build artifacts
+        uses: actions/download-artifact@9c19ed7fe5d278cd354c7dfd5d3b88589c7e2395 # v4.1.6
+        with:
+          name: ${{ needs.build.outputs.web-artifacts-key }}
+          path: ${{ needs.build.outputs.web-artifacts-path }}
+      - name: Download docker build attestation artifacts for console image
+        uses: actions/download-artifact@9c19ed7fe5d278cd354c7dfd5d3b88589c7e2395 # v4.1.6
+        with:
+          name: ${{ needs.build.outputs.console-attestation-artifacts-key }}
+          path: ${{ needs.build.outputs.console-attestation-artifacts-path }}
+      - name: Upload release assets
+        run: |
+          WEB_TAR_FILE="web-dist.tar.gz"
+          tar -czf "$WEB_TAR_FILE" -C $(dirname "$WEB_DIST_PATH")
+          gh release upload --clobber "$RELEASE_TAG" \
+            "$WEB_TAR_FILE#Client web bundle" \
+            "$PROVENANCE_FILE_CONSOLE#Console Docker image provenance attestations" \
+            "$SBOM_FILE_CONSOLE#Console Docker image SBOM attestations"
+        env:
+          WEB_DIST_PATH: ${{ needs.build.outputs.web-artifacts-path }}
+          PROVENANCE_FILE_CONSOLE: ${{ needs.build.outputs.console-attestation-artifacts-path }}/provenance.json
+          SBOM_FILE_CONSOLE: ${{ needs.build.outputs.console-attestation-artifacts-path }}/sbom.sdpx.json
+      - name: Get release notes
+        id: get
+        continue-on-error: true
+        run: gh release view "$RELEASE_TAG" --json body --jq .body > release_notes.md
+      - name: Add deployment history to release notes
+        if: always() && steps.get.outcome == 'success'
+        run: printf "\n- Deployed at $(date --iso-8601=seconds)\n" >> release_notes.md
+      - name: Update release notes and status
+        if: always() && steps.get.outcome == 'success'
+        run: gh release edit "$RELEASE_TAG" --draft=false --prerelease=false --latest --verify-tag -F release_notes.md
