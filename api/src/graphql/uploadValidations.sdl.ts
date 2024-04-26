@@ -9,6 +9,8 @@ export const schema = gql`
     initiatedBy: User!
     createdAt: DateTime!
     updatedAt: DateTime!
+    validationRulesId: Int
+    validationRules: ValidationRules
   }
 
   type Query {
