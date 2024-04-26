@@ -52,7 +52,7 @@ export const getCurrentUser = async (
       user.roles = [`${user.role}`]
       return user
     } else if (process.env.AUTH_PROVIDER === 'passage') {
-      const passageId = event.requestContext.authorizer.jwt.claims.sub
+      const passageId = event.requestContext.authorizer?.jwt?.claims?.sub
 
       if (!passageId) {
         throw new AuthenticationError('Passage ID not included.')
