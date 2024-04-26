@@ -1,10 +1,13 @@
-import { PassageUser, PassageUserInfo } from '@passageidentity/passage-elements/passage-user'
+import {
+  PassageUser,
+  PassageUserInfo,
+} from '@passageidentity/passage-elements/passage-user'
 
 export interface AuthResult {
-  redirect_url: string;
-  auth_token: string;
-  refresh_token?: string;
-  refresh_token_expiration?: number;
+  redirect_url: string
+  auth_token: string
+  refresh_token?: string
+  refresh_token_expiration?: number
 }
 
 export interface PassageAuthClient {
