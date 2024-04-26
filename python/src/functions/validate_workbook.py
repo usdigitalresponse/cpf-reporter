@@ -1,6 +1,7 @@
 import json
 import tempfile
 from typing import IO, List, Union, Dict
+from urllib.parse import unquote_plus
 
 import boto3
 import structlog
@@ -11,7 +12,7 @@ from mypy_boto3_s3.client import S3Client
 from src.lib.logging import get_logger, reset_contextvars
 from src.lib.workbook_validator import validate
 
-type ValidationResults = Dict[str, Union[List[str], str, None]]
+type ValidationResults = Dict[str, Union[List[Dict[str,str]], str, None]]
 
 @reset_contextvars
 def handle(event: S3Event, context: Context):
@@ -60,7 +61,7 @@ def download_workbook(client: S3Client, bucket: str, key: str, destination: IO[b
     logger.debug("downloading workbook from s3")
 
     try:
-        client.download_fileobj(bucket, key, destination)
+        client.download_fileobj(bucket, unquote_plus(key), destination)
     except:
         logger.exception("failed to download workbook from S3")
         raise
@@ -88,7 +89,7 @@ def validate_workbook(file: IO[bytes]) -> ValidationResults:
         "successfully validated workbook", count_validation_errors=len(errors)
     )
     results: ValidationResults = {
-        "errors": errors,
+        "errors": list(map(lambda x: x.__dict__, errors)),
         "projectUseCode": project_use_code,
     }
     return results
@@ -124,7 +125,7 @@ def save_validation_results(client: S3Client, bucket, key: str, results: Validat
     try:
         client.put_object(
             Bucket=bucket,
-            Key=key,
+            Key=unquote_plus(key),
             Body=data,
             ContentEncoding=encoding,
             ServerSideEncryption="AES256",

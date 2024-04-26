@@ -85,6 +85,7 @@ autolabeler:
     branch:
       - '/^fix\/.+$/i'
       - '/^bug\/.+$/i'
+      - '/^bugfix\/.+$/i'
     title:
       - '/\bfix(es)?\b/i'
       - '/\bbug\b/i'

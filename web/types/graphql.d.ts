@@ -107,10 +107,8 @@ export type CreateSubrecipientInput = {
 
 export type CreateUploadInput = {
   agencyId: Scalars['Int'];
-  expenditureCategoryId?: InputMaybe<Scalars['Int']>;
   filename: Scalars['String'];
   reportingPeriodId: Scalars['Int'];
-  uploadedById: Scalars['Int'];
 };
 
 export type CreateUploadValidationInput = {
@@ -380,6 +378,7 @@ export type Organization = {
   agencies: Array<Maybe<Agency>>;
   id: Scalars['Int'];
   name: Scalars['String'];
+  preferences?: Maybe<Scalars['JSON']>;
   projects: Array<Maybe<Project>>;
   reportingPeriods: Array<Maybe<ReportingPeriod>>;
   subrecipients: Array<Maybe<Subrecipient>>;

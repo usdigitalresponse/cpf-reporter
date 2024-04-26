@@ -1,3 +1,4 @@
+import { APIGatewayEvent } from 'aws-lambda'
 import type { User } from 'types/graphql'
 
 import { Decoded } from '@redwoodjs/api'
@@ -36,36 +37,59 @@ interface CurrentUser extends User {
  */
 export const getCurrentUser = async (
   decoded: Decoded,
-  { token }: { token: string }
+  { token }: { token: string },
+  { event }: { event: APIGatewayEvent }
 ): Promise<CurrentUser | null> => {
-  // Verify that the request is coming from the local development environment
-  // and is only being processed within the local environment
-  if (process.env.AUTH_PROVIDER === 'local') {
-    const user: CurrentUser = await db.user.findFirst({
-      where: { email: token },
-      include: { agency: true },
-    })
-    // Redwood <PrivateSet> and hasRole checks require the roles to be an array
-    user.roles = [`${user.role}`]
-    return user
-  }
+  try {
+    // Verify that the request is coming from the local development environment
+    // and is only being processed within the local environment
+    if (process.env.AUTH_PROVIDER === 'local') {
+      const user: CurrentUser = await db.user.findFirst({
+        where: { email: token },
+        include: { agency: true },
+      })
+      // Redwood <PrivateSet> and hasRole checks require the roles to be an array
+      user.roles = [`${user.role}`]
+      return user
+    } else if (process.env.AUTH_PROVIDER === 'passage') {
+      const passageId = event.requestContext.authorizer.jwt.claims.sub
 
-  return {
-    id: 1,
-    email: 'usdr-admin@usdr.dev',
-    name: 'USDR Admin',
-    role: 'USDR_ADMIN',
-    roles: ['USDR_ADMIN'],
-    agency: {
+      if (!passageId) {
+        throw new AuthenticationError('Passage ID not included.')
+      }
+
+      const user: CurrentUser | null = await db.user.findFirst({
+        where: { passageId },
+        include: { agency: true },
+      })
+
+      if (!user) {
+        return null
+      }
+
+      user.roles = [`${user.role}`]
+      return user
+    }
+
+    return {
       id: 1,
-      name: 'Main Agency',
-      abbreviation: 'MAUSDR',
-      code: 'MAUSDR',
-      organizationId: 1,
-    },
-    agencyId: 1, // TO_DEPRECATE
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+      email: 'usdr-admin@usdr.dev',
+      name: 'USDR Admin',
+      role: 'USDR_ADMIN',
+      roles: ['USDR_ADMIN'],
+      agency: {
+        id: 1,
+        name: 'Main Agency',
+        abbreviation: 'MAUSDR',
+        code: 'MAUSDR',
+        organizationId: 1,
+      },
+      agencyId: 1, // TO_DEPRECATE
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+  } catch (error) {
+    return null
   }
 }
 

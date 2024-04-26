@@ -82,7 +82,7 @@ export const processRecord = async (
   s3Client: UploadValidationS3Client
 ): Promise<void> => {
   const bucket = record.s3.bucket.name
-  const key = record.s3.object.key
+  const key = decodeURIComponent(record.s3.object.key.replace(/\+/g, ' '))
 
   // Download the JSON errors file from S3
   let getObjectResponse
@@ -108,8 +108,9 @@ export const processRecord = async (
 
     const uploadId = extractUploadIdFromKey(key)
 
-    // Verify valid expenditureCategory
-    /*
+    if (result.projectUseCode) {
+      // Verify valid expenditureCategory
+      /*
     The category must be one of the following values:
       {
         name: '1A - Broadband Infrastructure',
@@ -124,21 +125,22 @@ export const processRecord = async (
         code: '1C',
       },
     */
-    const expenditureCategory = await db.expenditureCategory.findFirst({
-      where: { code: result.projectUseCode },
-    })
-    if (!expenditureCategory) {
-      logger.error(
-        `Expenditure category not found: ${result.projectUseCode} - key: ${key}`
-      )
-      throw new Error('Expenditure category not found')
-    }
+      const expenditureCategory = await db.expenditureCategory.findFirst({
+        where: { code: result.projectUseCode },
+      })
+      if (!expenditureCategory) {
+        logger.error(
+          `Expenditure category not found: ${result.projectUseCode} - key: ${key}`
+        )
+        throw new Error('Expenditure category not found')
+      }
 
-    // Update the Upload record with the expenditure category Id
-    await db.upload.update({
-      data: { expenditureCategoryId: expenditureCategory.id },
-      where: { id: uploadId },
-    })
+      // Update the Upload record with the expenditure category Id
+      await db.upload.update({
+        data: { expenditureCategoryId: expenditureCategory.id },
+        where: { id: uploadId },
+      })
+    }
 
     // There should be an existing validation Record in the DB that will need to be updated
     const validationRecord = await db.uploadValidation.findFirst({

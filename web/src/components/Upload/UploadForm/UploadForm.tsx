@@ -47,9 +47,9 @@ const UploadForm = (props: UploadFormProps) => {
     CreateUploadMutation,
     CreateUploadMutationVariables
   >(CREATE_UPLOAD, {
-    onCompleted: () => {
+    onCompleted: ({ createUpload }) => {
       toast.success('Upload created')
-      navigate(routes.uploads())
+      navigate(routes.upload({ id: createUpload?.id }))
     },
     onError: (error) => {
       toast.error(error.message)
@@ -105,7 +105,7 @@ const UploadForm = (props: UploadFormProps) => {
         listClassName="rw-form-error-list"
       />
       <OrganizationPickListsCell id={props.organizationId} />
-      <FileField name="file" validation={{ required: true }} />
+      <FileField name="file" validation={{ required: true }} accept=".xlsm" />
       <FieldError name="file" className="rw-field-error" />
       <div className="rw-button-group">
         <Submit disabled={props.loading} className="rw-button rw-button-blue">
