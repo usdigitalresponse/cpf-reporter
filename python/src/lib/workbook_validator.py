@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import IO, Any, Iterable, List, Optional, Tuple
 
 from openpyxl import Workbook, load_workbook
@@ -18,19 +19,38 @@ SUBRECIPIENTS_SHEET = "Subrecipients"
 _logger = get_logger(__name__)
 
 
+# enum for error level
+# error, warning, info
+# default is error
+class ErrorLevel(Enum):
+    ERR: int = 1
+    WARN: int = 2
+    INFO: int = 3
+
+
 class WorkbookError:
     message: str
     row: str
     col: str
     tab: str
     field_name: str
+    severity: ErrorLevel = ErrorLevel.WARN
 
-    def __init__(self, message: str, row: str, col: str, tab: str, field_name: str):
+    def __init__(
+        self,
+        message: str,
+        row: str,
+        col: str,
+        tab: str,
+        field_name: str,
+        severity: ErrorLevel = ErrorLevel.WARN,
+    ):
         self.message = message
         self.row = row
         self.col = col
         self.tab = tab
         self.field_name = field_name
+        self.severity = severity
 
 
 def map_values_to_headers(headers: Tuple, values: Iterable[Any]):
@@ -88,7 +108,12 @@ def get_workbook_errors_for_row(
         message = f'Error in field {erroring_field_name}-{error["msg"]}'
         workbook_errors.append(
             WorkbookError(
-                message, f"{row_num}", erroring_column, sheet_name, erroring_field_name
+                message,
+                f"{row_num}",
+                erroring_column,
+                sheet_name,
+                erroring_field_name,
+                severity=ErrorLevel.ERR,
             )
         )
     return workbook_errors
@@ -113,7 +138,8 @@ def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str]]:
         _logger.error(f"Unexpected Validation Error: {e}")
         return [
             WorkbookError(
-                "Unable to validate workbook. Please reach out to grants-helpdesk@usdigitalresponse.org"
+                "Unable to validate workbook. Please reach out to grants-helpdesk@usdigitalresponse.org",
+                severity=ErrorLevel.ERR,
             )
         ]
 
@@ -165,7 +191,12 @@ def validate_logic_sheet(logic_sheet: Worksheet) -> Errors:
     except ValidationError as e:
         errors.append(
             WorkbookError(
-                f"{LOGIC_SHEET} Sheet: Invalid {e}", "1", "B", LOGIC_SHEET, "version"
+                f"{LOGIC_SHEET} Sheet: Invalid {e}",
+                "1",
+                "B",
+                LOGIC_SHEET,
+                "version",
+                severity=ErrorLevel.WARN,
             )
         )
     return errors

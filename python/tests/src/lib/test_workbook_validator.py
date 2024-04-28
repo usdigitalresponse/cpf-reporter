@@ -3,7 +3,7 @@ from typing import BinaryIO
 import pytest
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from src.lib.workbook_validator import (SCHEMA_BY_PROJECT,
+from src.lib.workbook_validator import (SCHEMA_BY_PROJECT, ErrorLevel,
                                         get_project_use_code, is_empty_row,
                                         validate, validate_cover_sheet,
                                         validate_project_sheet,
@@ -59,6 +59,7 @@ class TestValidateWorkbook:
         assert errors != []
         assert len(errors) == 2
         assert errors[0].tab == "Logic"
+        assert errors[0].severity == ErrorLevel.WARN
         assert errors[1].tab == "Project"
 
 
@@ -77,6 +78,7 @@ class TestValidateCoverSheet:
         assert error.col == "B"
         assert error.row == "2"
         assert error.tab == "Cover"
+        assert error.severity == ErrorLevel.ERR
         assert schema is None
 
 
@@ -99,6 +101,7 @@ class TestValidateproject_sheet:
             "Error in field Identification_Number__c-String should have at most 20 characters"
             in error.message
         )
+        assert error.severity == ErrorLevel.ERR
 
 
 class TestValidateSubrecipientSheet:
@@ -113,6 +116,7 @@ class TestValidateSubrecipientSheet:
         assert "String should have at least 9 characters" in error.message
         assert error.row == "13"
         assert error.col == "D"
+        assert error.severity == ErrorLevel.ERR
 
 
 class TestGetProjectUseCode:
