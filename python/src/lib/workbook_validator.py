@@ -3,6 +3,7 @@ from typing import IO, Any, Iterable, List, Optional, Tuple
 from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import ValidationError
+from src.lib.logging import get_logger
 from src.schemas.latest.schema import (SCHEMA_BY_PROJECT, BaseModel,
                                        CoverSheetRow, LogicSheetVersion,
                                        SubrecipientRow)
@@ -13,6 +14,8 @@ LOGIC_SHEET = "Logic"
 COVER_SHEET = "Cover"
 PROJECT_SHEET = "Project"
 SUBRECIPIENTS_SHEET = "Subrecipients"
+
+_logger = get_logger(__name__)
 
 
 class WorkbookError:
@@ -106,6 +109,14 @@ def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str]]:
     try:
         wb = load_workbook(filename=workbook, read_only=True)
         return validate_workbook(wb)
+    except Exception as e:
+        _logger.error(f"Unexpected Validation Error: {e}")
+        return [
+            WorkbookError(
+                "Unable to validate workbook. Please reach out to grants-helpdesk@usdigitalresponse.org"
+            )
+        ]
+
     finally:
         workbook.close()
 
@@ -134,7 +145,8 @@ def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
     """
     3. Ensure all project rows are validated with the schema
     """
-    errors += validate_project_sheet(workbook[PROJECT_SHEET], project_schema)
+    if project_schema:
+        errors += validate_project_sheet(workbook[PROJECT_SHEET], project_schema)
 
     """
     4. Ensure all subrecipient rows are validated with the schema
