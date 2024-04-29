@@ -5856,11 +5856,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@passageidentity/passage-elements@npm:^1.17.0":
-  version: 1.17.0
-  resolution: "@passageidentity/passage-elements@npm:1.17.0"
+"@passageidentity/passage-elements@npm:^1.21.4":
+  version: 1.21.4
+  resolution: "@passageidentity/passage-elements@npm:1.21.4"
   dependencies:
-    "@passageidentity/passage-js": 3.11.0
+    "@passageidentity/passage-js": 3.14.4
     dayjs: ^1.11.0
     gridstack: 5.0.0
     intl-tel-input: ^17.0.13
@@ -5869,20 +5869,21 @@ __metadata:
     vue: ^3.3.4
     vue-i18n: ^9.3
     vue-inline-svg: ^3.1.0
-  checksum: b26e7ee5e60cdbc56360006b3ce2b791255efdf5ae1a62c1bac24b8d84edf7875df3c8daf8811feb36bb879ddaea1e85b8d577fadb57dcec10bdc11c2d2065a0
+  checksum: d32b9b9a804694c48586f04d3add7b0739936cc77d345ce95038a91a63527b56d1a8907000bbc9735de511a7c4e76eaf2463851e6073641de5a91e41aa2fd0dd
   languageName: node
   linkType: hard
 
-"@passageidentity/passage-js@npm:3.11.0":
-  version: 3.11.0
-  resolution: "@passageidentity/passage-js@npm:3.11.0"
+"@passageidentity/passage-js@npm:3.14.4":
+  version: 3.14.4
+  resolution: "@passageidentity/passage-js@npm:3.14.4"
   dependencies:
-    "@passageidentity/webauthnutils": 1.1.2
+    "@passageidentity/webauthnutils": 1.1.6
     "@types/node": ^17.0.27
+    async-mutex: ^0.4.1
     js-cookie: ^3.0.1
     jwt-decode: ^3.1.2
     serialize-error: ^11.0.0
-  checksum: 3137dd7e8b72530191574e904c7f7ebce01984381473119f050633c01722f35ffeac348728ee35bdf93bfa06a4f736c8adb5264c3cb5a42d5d70b47b7cb786fe
+  checksum: ae9dc29b16bdb3b4134bbab68efec999a7f1c4b5ab1399522d255775963063a9379fdbefad06578afde8b737cfdbd19f1440caef2f11138ee8ffeaaa89285c87
   languageName: node
   linkType: hard
 
@@ -5896,12 +5897,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@passageidentity/webauthnutils@npm:1.1.2":
-  version: 1.1.2
-  resolution: "@passageidentity/webauthnutils@npm:1.1.2"
+"@passageidentity/webauthnutils@npm:1.1.6":
+  version: 1.1.6
+  resolution: "@passageidentity/webauthnutils@npm:1.1.6"
   dependencies:
     ua-parser-js: ^1.0.34
-  checksum: c0e29e4f320b3ce2cba6a2588782627723afdfc45303193ee24e2ddb1a554a72e6afbc2b9417d12a7216c9d7b323ef0c6480039017dfe96d19adb4fd913f6d43
+  checksum: ce61beed94034a39051b3a7c77fa90f54557ad6cca7d835be3a6b254aba65ec31b350cd8f20380190fb76b13e377f720e251f6c7475d4ed023db2eb85e85cf38
   languageName: node
   linkType: hard
 
@@ -11908,6 +11909,15 @@ __metadata:
   version: 1.0.1
   resolution: "async-limiter@npm:1.0.1"
   checksum: 2b849695b465d93ad44c116220dee29a5aeb63adac16c1088983c339b0de57d76e82533e8e364a93a9f997f28bbfc6a92948cefc120652bd07f3b59f8d75cf2b
+  languageName: node
+  linkType: hard
+
+"async-mutex@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "async-mutex@npm:0.4.1"
+  dependencies:
+    tslib: ^2.4.0
+  checksum: cb529c0d257c8ff8e5b26c81b36127a255e545edee2c42c76247d533b89a7664037d95f33130f964de49b111ad3324ead8dcccd419c47acdfeb7413ed93063a1
   languageName: node
   linkType: hard
 
@@ -27903,7 +27913,7 @@ __metadata:
   resolution: "web@workspace:web"
   dependencies:
     "@datadog/browser-rum": ^5.4.0
-    "@passageidentity/passage-elements": ^1.17.0
+    "@passageidentity/passage-elements": ^1.21.4
     "@redwoodjs/auth": 6.4.2
     "@redwoodjs/forms": 6.4.2
     "@redwoodjs/router": 6.4.2

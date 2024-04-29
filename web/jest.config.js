@@ -8,6 +8,10 @@ const config = {
     'html',
     ['text', { file: 'coverage.txt', path: './' }],
   ],
+  moduleNameMapper: {
+    '@passageidentity/passage-elements/passage-user':
+      '<rootDir>/__mocks__/passage-user.ts',
+  },
 }
 
 module.exports = config
