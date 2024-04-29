@@ -16,7 +16,10 @@ import { users } from 'src/lib/seeds'
 const LoginPage = () => {
   const { logIn } = useAuth()
   const onSuccess = (event: SubmitHandler<LoginEventInterface>) => {
-    if (process.env.AUTH_PROVIDER === 'local') {
+    if (
+      window.APP_CONFIG?.webConfigParams?.auth_provider === 'local' ||
+      process.env.AUTH_PROVIDER === 'local'
+    ) {
       logIn(event)
     } else {
       logIn()
@@ -68,7 +71,12 @@ const LoginPage = () => {
   return (
     <>
       <MetaTags title="Login" description="Login page" />
-      <div>{process.env.AUTH_PROVIDER === 'local' ? localAuth : ''}</div>
+      <div>
+        {window.APP_CONFIG?.webConfigParams?.auth_provider === 'local' ||
+        process.env.AUTH_PROVIDER === 'local'
+          ? localAuth
+          : ''}
+      </div>
     </>
   )
 }
