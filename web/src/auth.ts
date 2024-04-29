@@ -11,12 +11,12 @@ import {
 
 function createAuth() {
   if (
-    window.APP_CONFIG?.webConfigParams?.AUTH_PROVIDER == 'local' ||
-    process.env.AUTH_PROVIDER == 'local'
+    window.APP_CONFIG?.webConfigParams?.auth_provider === 'local' ||
+    process.env.AUTH_PROVIDER === 'local'
   ) {
     const authImplementation = createLocalAuthImplementation(localAuthClient)
     return createAuthentication(authImplementation)
-  } else if (window.APP_CONFIG?.webConfigParams?.AUTH_PROVIDER == 'passage') {
+  } else if (window.APP_CONFIG?.webConfigParams?.auth_provider === 'passage') {
     const authImplementation =
       createPassageAuthImplementation(passageAuthClient)
     return createAuthentication(authImplementation)
