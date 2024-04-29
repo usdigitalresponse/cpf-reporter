@@ -33,8 +33,7 @@ const Upload = ({ upload }) => {
 
   const handleValidate = () => {}
   const handleForceInvalidate = () => {}
-  // test 2
-  // test 3
+
   return (
     <>
       {hasErrors && (
