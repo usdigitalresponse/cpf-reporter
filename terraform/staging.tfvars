@@ -36,8 +36,11 @@ website_domain_name   = "staging.cpf.usdr.dev"
 website_feature_flags = {}
 website_config_params = {
   passage_app_id = "TBD"
-  auth_provider  = "TBD"
+  auth_provider  = "local"
 }
+
+// API Auth Provider
+auth_provider = "local"
 
 // API
 api_domain_name = "api.staging.cpf.usdr.dev"
