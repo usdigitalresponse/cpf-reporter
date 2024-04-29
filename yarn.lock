@@ -28206,7 +28206,10 @@ __metadata:
   resolution: "web@workspace:web"
   dependencies:
     "@datadog/browser-rum": ^5.4.0
+<<<<<<< HEAD
     "@emotion/babel-plugin": ^11.11.0
+=======
+>>>>>>> main
     "@passageidentity/passage-elements": ^1.21.4
     "@redwoodjs/auth": 6.4.2
     "@redwoodjs/forms": 6.4.2
