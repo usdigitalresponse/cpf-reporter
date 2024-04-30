@@ -8,7 +8,8 @@ from src.lib.workbook_validator import (SCHEMA_BY_PROJECT, ErrorLevel,
                                         validate, validate_cover_sheet,
                                         validate_project_sheet,
                                         validate_subrecipient_sheet,
-                                        validate_workbook)
+                                        validate_workbook,
+                                        validate_workbook_sheets)
 
 SAMPLE_PROJECT_USE_CODE = "1A"
 
@@ -62,6 +63,20 @@ class TestValidateWorkbook:
         assert errors[0].severity == ErrorLevel.WARN.name
         assert errors[1].tab == "Project"
 
+class TestWorkbookSheets:
+    def test_valid_set_of_sheets(self, valid_workbook: Workbook):
+        errors = validate_workbook_sheets(valid_workbook)
+        assert errors == []
+    
+    def test_missing_sheets(self, valid_workbook: Workbook):
+        valid_workbook.remove(valid_workbook["Cover"])
+        errors = validate_workbook_sheets(valid_workbook)
+        print(errors[0].message)
+        assert errors != []
+        assert len(errors) == 1
+        assert errors[0].message == "Workbook is missing expected sheet: Cover"
+        assert errors[0].tab == "N/A"
+        assert errors[0].severity == ErrorLevel.ERR.name
 
 class TestValidateCoverSheet:
     def test_valid_cover_sheet(self, valid_coversheet: Worksheet):
