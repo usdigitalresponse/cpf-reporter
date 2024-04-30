@@ -59,27 +59,29 @@ class TestValidateWorkbook:
         assert errors != []
         assert len(errors) == 2
         assert errors[0].tab == "Logic"
-        assert errors[0].severity == ErrorLevel.WARN
+        assert errors[0].severity == ErrorLevel.WARN.name
         assert errors[1].tab == "Project"
 
 
 class TestValidateCoverSheet:
     def test_valid_cover_sheet(self, valid_coversheet: Worksheet):
-        errors, schema = validate_cover_sheet(valid_coversheet)
+        errors, schema, project_use_code = validate_cover_sheet(valid_coversheet)
         assert errors == []
+        assert project_use_code == SAMPLE_PROJECT_USE_CODE
         assert schema == SCHEMA_BY_PROJECT[SAMPLE_PROJECT_USE_CODE]
 
     def test_invalid_cover_sheet(self, invalid_cover_sheet: Worksheet):
-        errors, schema = validate_cover_sheet(invalid_cover_sheet)
+        errors, schema, project_use_code = validate_cover_sheet(invalid_cover_sheet)
         assert errors != []
         error = errors[0]
-        print(error.message)
+        print(error)
         assert "Project use code 'INVALID' is not recognized." in error.message
         assert error.col == "B"
         assert error.row == "2"
         assert error.tab == "Cover"
-        assert error.severity == ErrorLevel.ERR
+        assert error.severity == ErrorLevel.ERR.name
         assert schema is None
+        assert project_use_code is None
 
 
 class TestValidateproject_sheet:
@@ -101,7 +103,7 @@ class TestValidateproject_sheet:
             "Error in field Identification_Number__c-String should have at most 20 characters"
             in error.message
         )
-        assert error.severity == ErrorLevel.ERR
+        assert error.severity == ErrorLevel.ERR.name
 
 
 class TestValidateSubrecipientSheet:
@@ -116,10 +118,14 @@ class TestValidateSubrecipientSheet:
         assert "String should have at least 9 characters" in error.message
         assert error.row == "13"
         assert error.col == "D"
-        assert error.severity == ErrorLevel.ERR
+        assert error.severity == ErrorLevel.ERR.name
 
 
 class TestGetProjectUseCode:
     def test_get_project_use_code(self, valid_coversheet: Worksheet):
         project_use_code = get_project_use_code(valid_coversheet)
         assert project_use_code == SAMPLE_PROJECT_USE_CODE
+
+    def test_get_project_use_code_raises_error(self, invalid_cover_sheet: Worksheet):
+        with pytest.raises(ValueError):
+            get_project_use_code(invalid_cover_sheet)

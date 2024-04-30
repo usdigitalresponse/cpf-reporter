@@ -107,7 +107,11 @@ def get_workbook_errors_for_row(
         """
         erroring_field_name: str = f'{error["loc"][0]}'
         try:
-            erroring_column = SheetModelClass.model_json_schema()['properties'][erroring_field_name]['column']
+            field_instance = SheetModelClass.model_fields[erroring_field_name]
+            if isinstance(field_instance.json_schema_extra, dict):
+                erroring_column = field_instance.json_schema_extra['column']
+            else:
+                raise Exception(f"Issue with schema definition for field {erroring_field_name}.")
         except Exception as exception:
             _logger.error(f"Encountered unexpected exception while getting column for field {erroring_field_name} with error {error}. Details: {exception}")
             erroring_column = "Unknown"
@@ -115,11 +119,11 @@ def get_workbook_errors_for_row(
         message = f'Error in field {erroring_field_name}-{error["msg"]}'
         workbook_errors.append(
             WorkbookError(
-                message,
-                f"{row_num}",
-                erroring_column,
-                sheet_name,
-                erroring_field_name,
+                message=message,
+                row=f"{row_num}",
+                col=f"{erroring_column}",
+                tab=sheet_name,
+                field_name=erroring_field_name,
                 severity=ErrorLevel.ERR.name,
             )
         )
@@ -192,12 +196,12 @@ def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
 
 def validate_workbook_sheets(workbook: Workbook) -> Errors:
     errors = []
-    expected_sheets = {LOGIC_SHEET, COVER_SHEET, PROJECT_SHEET, SUBRECIPIENTS_SHEET}
-    for sheet in workbook.sheetnames:
-        if sheet not in expected_sheets:
+    expected_sheets = [LOGIC_SHEET, COVER_SHEET, PROJECT_SHEET, SUBRECIPIENTS_SHEET]
+    for sheet in expected_sheets:
+        if sheet not in workbook.sheetnames:
             errors.append(
                 WorkbookError(
-                    f"Workbook contains unexpected sheet: {sheet}",
+                    f"Workbook is missing expected sheet: {sheet}",
                     severity=ErrorLevel.ERR.name,
                 )
             )
