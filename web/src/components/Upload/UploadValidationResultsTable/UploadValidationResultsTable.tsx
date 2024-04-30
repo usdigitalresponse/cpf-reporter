@@ -1,9 +1,9 @@
 import Table from 'react-bootstrap/Table'
 
 enum Severity {
-  Error = 'err',
-  Warning = 'warn',
-  Info = 'info',
+  Error = 'ERR',
+  Warning = 'WARN',
+  Info = 'INFO',
 }
 interface Props {
   errors: {
@@ -46,12 +46,12 @@ const UploadValidationResultsTable = ({ errors }: Props) => {
                   <td>{i + 1}</td>
                   <td
                     className={
-                      error.severity === 'err'
+                      error.severity === Severity.Error
                         ? 'table-danger'
                         : 'table-warning'
                     }
                   >
-                    {error.severity === 'err' ? 'Error' : 'Warning'}
+                    {error.severity === Severity.Error ? 'Error' : 'Warning'}
                   </td>
                   <td>{error.message}</td>
                   <td>{error.tab}</td>
