@@ -37,9 +37,11 @@ jobs:
         with:
           disable-sudo: true
           egress-policy: audit
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
         with:
           ref: ${{ env.PROTECTED_REF }}
+          fetch-depth: '0'
+          filter: 'tree:0'
           show-progress: 'false'
           persist-credentials: 'false'
       - name: Count commits in candidate ref that are not in protected ref
@@ -69,7 +71,7 @@ jobs:
           INVALID_CHERRY_COUNT: ${{ steps.missing-cherries.outputs.count }}
           CHERRY_FILE: ${{ steps.all-cherries.outputs.file }}
       - name: Fail validation
-        if: fromJson(steps.missing-cherries.outputs.count) > 0
+        if: success() && fromJson(steps.missing-cherries.outputs.count) > 0
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
         with:
           script: |
