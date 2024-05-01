@@ -204,6 +204,7 @@ jobs:
           TF_CLI_ARGS_plan: "-var-file=${{ inputs.tf-var-file }}"
           TF_VAR_version_identifier: ${{ inputs.ref }}
           TF_VAR_git_commit_sha: ${{ inputs.ref }}
+          TF_VAR_git_repository_url: "${{github.server_url}}/${{ github.repository }}"
           TF_VAR_datadog_api_key: ${{ secrets.datadog-api-key }}
           TF_VAR_datadog_app_key: ${{ secrets.datadog-app-key }}
           TF_VAR_console_container_image: ${{ inputs.console-image }}
