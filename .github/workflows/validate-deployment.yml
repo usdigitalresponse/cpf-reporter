@@ -40,6 +40,8 @@ jobs:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
         with:
           ref: ${{ env.PROTECTED_REF }}
+          fetch-depth: '0'
+          filter: 'tree:0'
           show-progress: 'false'
           persist-credentials: 'false'
       - name: Count commits in candidate ref that are not in protected ref
