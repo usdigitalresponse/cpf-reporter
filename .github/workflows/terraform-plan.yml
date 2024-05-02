@@ -117,11 +117,11 @@ jobs:
       group: ${{ inputs.concurrency-group }}
       cancel-in-progress: false
     steps:
-      - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+      - uses: step-security/harden-runner@a4aa98b93cab29d9b1101a6143fb8bce00e2eac4 # v2.7.1
         with:
           disable-sudo: true
           egress-policy: audit
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
         with:
           ref: ${{ inputs.ref }}
           show-progress: 'false'
@@ -146,14 +146,14 @@ jobs:
           name: ${{ inputs.python-functions-artifacts-key }}
           path: ${{ inputs.python-functions-artifacts-path }}
       - name: Download website artifacts
-        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
+        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
         with:
           name: ${{ inputs.web-artifacts-key }}
           path: ${{ inputs.web-artifacts-path }}
       - name: Get project TF version
         id: get_tf_version
         run: echo "TF_VERSION=$(cat .terraform-version | tr -d '[:space:]')" | tee -a $GITHUB_OUTPUT
-      - uses: hashicorp/setup-terraform@a1502cd9e758c50496cc9ac5308c4843bcd56d36 # v3.0.0
+      - uses: hashicorp/setup-terraform@97f030cf6dc0b4f5e0da352c7bca9cca34579800 # v3.1.0
         with:
           terraform_version: ${{ steps.get_tf_version.outputs.TF_VERSION }}
       - name: Terraform fmt
@@ -240,7 +240,7 @@ jobs:
           rm tfplan
       - name: Store terraform artifacts
         if: success() && inputs.upload-artifacts
-        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
           name: ${{ env.ARTIFACTS_KEY }}
           path: |
@@ -248,3 +248,4 @@ jobs:
             !${{ github.workspace }}/terraform/.terraform
           if-no-files-found: error
           retention-days: ${{ inputs.artifacts-retention-days }}
+          overwrite: true
