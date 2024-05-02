@@ -12,7 +12,7 @@ on:
       tf-plan-outcome:
         type: string
         required: true
-      tf-plan-output:
+      tf-plan-summary:
         type: string
         required: true
       tf-validate-outcome:
@@ -43,20 +43,12 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+      - uses: step-security/harden-runner@a4aa98b93cab29d9b1101a6143fb8bce00e2eac4 # v2.7.1
         with:
           disable-sudo: true
           egress-policy: block
           allowed-endpoints: >
             api.github.com:443
-      - name: Reformat Plan
-        run: |
-          PLAN=$(echo "$PLAN_RAW_OUTPUT" | sed -E 's/^([[:space:]]+)([-+])/\2\1/g')
-          echo "PLAN_REFORMATTED<<EOF" >> $GITHUB_ENV
-          echo "$PLAN" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-        env:
-          PLAN_RAW_OUTPUT: ${{ inputs.tf-plan-output }}
       - name: Write the report markdown file
         run: |
           REPORT_FILE=$(mktemp -t summary.md.XXXXX)
@@ -85,11 +77,9 @@ jobs:
           </details>
 
           <details>
-          <summary>Plan Output</summary>
+          <summary>Plan Summary</summary>
 
-          ```diff
-          ${{ env.TF_PLAN_OUTPUT }}
-          ```
+          ${{ env.TF_PLAN_SUMMARY }}
 
           </details>
 
@@ -101,7 +91,7 @@ jobs:
           TF_VALIDATE_OUTCOME: ${{ inputs.tf-validate-outcome }}
           TF_VALIDATE_OUTPUT: ${{ inputs.tf-validate-output }}
           TF_PLAN_OUTCOME: ${{ inputs.tf-plan-outcome }}
-          TF_PLAN_OUTPUT: ${{ env.PLAN_REFORMATTED }}
+          TF_PLAN_SUMMARY: ${{ inputs.tf-plan-summary }}
           GH_ACTOR: ${{ github.actor }}
           GH_ACTION: ${{ github.event_name }}
           GH_WORKFLOW: ${{ github.workflow }}
@@ -124,14 +114,14 @@ jobs:
       - name: Find previous report comment
         id: find-comment
         if: inputs.write-comment && inputs.pr-number != ''
-        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2.4.0
+        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3.1.0
         with:
           issue-number: ${{ inputs.pr-number }}
           comment-author: 'github-actions[bot]'
           body-includes: Terraform Summary
       - name: Create or update comment
         if: inputs.write-comment && inputs.pr-number != ''
-        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
         with:
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}

@@ -306,3 +306,9 @@ variable "website_config_params" {
     error_message = "Value must be JSON-serializable."
   }
 }
+
+variable "auth_provider" {
+  description = "The authentication provider to use for the API."
+  type        = string
+  default     = ""
+}
