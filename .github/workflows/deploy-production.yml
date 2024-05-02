@@ -156,9 +156,9 @@ jobs:
       web-artifacts-path: ${{ needs.build.outputs.web-artifacts-path }}
       tf-plan-artifacts-key: ${{ needs.tf-plan.outputs.artifacts-key }}
       aws-region: us-west-2
-      concurrency-group: run_terraform-staging
-      tf-backend-config-file: staging.s3.tfbackend
-      environment-name: staging
+      concurrency-group: run_terraform-production
+      tf-backend-config-file: production.s3.tfbackend
+      environment-name: production
     secrets:
       aws-access-key-id: ${{ needs.aws-auth-apply.outputs.aws-access-key-id }}
       aws-secret-access-key: ${{ needs.aws-auth-apply.outputs.aws-secret-access-key }}
