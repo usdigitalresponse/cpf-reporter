@@ -312,3 +312,9 @@ variable "auth_provider" {
   type        = string
   default     = ""
 }
+
+variable "passage_app_id" {
+  description = "The Passage app ID to use for authentication."
+  type        = string
+  default     = ""
+}
