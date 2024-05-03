@@ -13,8 +13,8 @@
     "@opentelemetry/instrumentation": "^0.45.1",
     "@passageidentity/passage-node": "2.9.0",
     "@prisma/instrumentation": "^5.7.0",
-    "@redwoodjs/api": "6.4.2",
-    "@redwoodjs/graphql-server": "6.4.2",
+    "@redwoodjs/api": "7.4.3",
+    "@redwoodjs/graphql-server": "7.4.3",
     "dd-trace": "^4.20.0",
     "exceljs": "^4.4.0"
   }

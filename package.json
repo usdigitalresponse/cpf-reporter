@@ -8,9 +8,9 @@
   },
   "devDependencies": {
     "@netlify/zip-it-and-ship-it": "^9.27.0",
-    "@redwoodjs/auth-custom-setup": "6.4.2",
-    "@redwoodjs/cli-storybook": "6.4.2",
-    "@redwoodjs/core": "6.4.2"
+    "@redwoodjs/auth-custom-setup": "7.4.3",
+    "@redwoodjs/cli-storybook": "7.4.3",
+    "@redwoodjs/core": "7.4.3"
   },
   "eslintConfig": {
     "extends": "@redwoodjs/eslint-config",
