@@ -307,14 +307,7 @@ variable "website_config_params" {
   }
 }
 
-variable "auth_provider" {
-  description = "The authentication provider to use for the API."
-  type        = string
-  default     = ""
-}
-
 variable "passage_app_id" {
   description = "The Passage app ID to use for authentication."
   type        = string
-  default     = ""
 }
