@@ -34,13 +34,9 @@ lambda_arch       = "x86_64"
 // Website
 website_domain_name   = "staging.cpf.usdr.dev"
 website_feature_flags = {}
-website_config_params = {
-  passage_app_id = "OjNe5PvwdKm6rmcFc1WfPIBa"
-  auth_provider  = "passage"
-}
+website_config_params = {}
 
 // API Auth Provider
-auth_provider  = "passage"
 passage_app_id = "OjNe5PvwdKm6rmcFc1WfPIBa"
 
 // API

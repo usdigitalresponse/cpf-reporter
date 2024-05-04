@@ -102,12 +102,14 @@ module "api_gateway" {
 
   integrations = {
     "POST /graphql" = {
-      lambda_arn     = module.lambda_function-graphql.lambda_function_arn
-      authorizer_key = "passage"
+      lambda_arn         = module.lambda_function-graphql.lambda_function_arn
+      authorizer_key     = "passage"
+      authorization_type = "JWT"
     }
     "GET /graphql" = {
-      lambda_arn     = module.lambda_function-graphql.lambda_function_arn
-      authorizer_key = "passage"
+      lambda_arn         = module.lambda_function-graphql.lambda_function_arn
+      authorizer_key     = "passage"
+      authorization_type = "JWT"
     }
   }
 

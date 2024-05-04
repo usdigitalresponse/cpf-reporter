@@ -35,13 +35,10 @@ lambda_arch       = "x86_64"
 // Website
 website_domain_name   = "cpf.grants.usdigitalresponse.org"
 website_feature_flags = {}
-website_config_params = {
-  passage_app_id = "TBD"
-  auth_provider  = "passage"
-}
+website_config_params = {}
 
 // API Auth Provider
-auth_provider = "passage"
+passage_app_id = "TBD" # All auth will fail until this is replaced
 
 // API
 api_domain_name = "api.cpf.grants.usdigitalresponse.org"
