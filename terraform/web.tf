@@ -1,4 +1,5 @@
 module "cloudfront_to_origin_bucket_access_policy" {
+  count   = var.environment == "localstack" ? 0 : 1
   source  = "cloudposse/iam-policy/aws"
   version = "2.0.1"
   context = module.s3_label.context
@@ -17,7 +18,7 @@ module "cloudfront_to_origin_bucket_access_policy" {
         principals = [
           {
             type        = "AWS"
-            identifiers = [aws_cloudfront_origin_access_identity.default.iam_arn]
+            identifiers = [aws_cloudfront_origin_access_identity.default[0].iam_arn]
           },
         ]
       },
@@ -29,7 +30,7 @@ module "cloudfront_to_origin_bucket_access_policy" {
         principals = [
           {
             type        = "AWS"
-            identifiers = [aws_cloudfront_origin_access_identity.default.iam_arn]
+            identifiers = [aws_cloudfront_origin_access_identity.default[0].iam_arn]
           },
         ]
       }
@@ -48,10 +49,7 @@ module "cdn_origin_bucket" {
   sse_algorithm                = "AES256"
   allow_ssl_requests_only      = true
   allow_encrypted_uploads_only = true
-  source_policy_documents = [
-    module.cloudfront_to_origin_bucket_access_policy.json,
-  ]
-
+  source_policy_documents      = var.environment == "localstack" ? [] : [module.cloudfront_to_origin_bucket_access_policy.policy]
   lifecycle_configuration_rules = [
     {
       enabled                                = true
@@ -123,11 +121,13 @@ module "cdn_logs_bucket" {
 }
 
 resource "aws_cloudfront_origin_access_identity" "default" {
+  count   = var.environment == "localstack" ? 0 : 1
   comment = "CPF Reporter website access."
 }
 
 data "aws_cloudfront_cache_policy" "Managed-CachingOptimized" {
-  name = "Managed-CachingOptimized"
+  count = var.environment == "localstack" ? 0 : 1
+  name  = "Managed-CachingOptimized"
 }
 
 locals {
@@ -207,6 +207,8 @@ module "cdn" {
   version             = "3.2.1"
   create_distribution = true
 
+  count = var.environment == "localstack" ? 0 : 1
+
   depends_on = [
     module.cdn_origin_bucket,
     module.cdn_logs_bucket,
@@ -241,7 +243,7 @@ module "cdn" {
       domain_name = module.cdn_origin_bucket.bucket_domain_name
       origin_path = "/${local.website_content_origin_path}"
       s3_origin_config = {
-        cloudfront_access_identity_path = aws_cloudfront_origin_access_identity.default.cloudfront_access_identity_path
+        cloudfront_access_identity_path = aws_cloudfront_origin_access_identity.default[0].cloudfront_access_identity_path
       }
     }
 
@@ -249,7 +251,7 @@ module "cdn" {
       domain_name = module.cdn_origin_bucket.bucket_domain_name
       origin_path = "/${local.website_config_origin_path}"
       s3_origin_config = {
-        cloudfront_access_identity_path = aws_cloudfront_origin_access_identity.default.cloudfront_access_identity_path
+        cloudfront_access_identity_path = aws_cloudfront_origin_access_identity.default[0].cloudfront_access_identity_path
       }
     }
   }
@@ -261,7 +263,7 @@ module "cdn" {
     allowed_methods      = ["GET", "HEAD", "OPTIONS"]
     cached_methods       = ["GET", "HEAD"]
     compress             = true
-    cache_policy_id      = data.aws_cloudfront_cache_policy.Managed-CachingOptimized.id
+    cache_policy_id      = data.aws_cloudfront_cache_policy.Managed-CachingOptimized[0].id
     use_forwarded_values = false
 
     // See https://github.com/aws-samples/amazon-cloudfront-functions/tree/main/url-rewrite-single-page-apps
@@ -277,13 +279,13 @@ module "cdn" {
       allowed_methods      = ["GET", "HEAD", "OPTIONS"]
       cached_methods       = ["GET", "HEAD"]
       compress             = true
-      cache_policy_id      = data.aws_cloudfront_cache_policy.Managed-CachingOptimized.id
+      cache_policy_id      = data.aws_cloudfront_cache_policy.Managed-CachingOptimized[0].id
       use_forwarded_values = false
     },
   ]
 
   viewer_certificate = {
-    acm_certificate_arn      = module.cloudfront_ssl_certificate.arn
+    acm_certificate_arn      = module.cloudfront_ssl_certificate[0].arn
     minimum_protocol_version = "TLSv1.2_2021"
     ssl_support_method       = "sni-only"
   }
@@ -293,15 +295,17 @@ resource "aws_route53_record" "cdn_alias" {
   zone_id = data.aws_ssm_parameter.public_dns_zone_id.value
   name    = var.website_domain_name
   type    = "A"
+  count   = var.environment == "localstack" ? 0 : 1
 
   alias {
-    name                   = module.cdn.cloudfront_distribution_domain_name
-    zone_id                = module.cdn.cloudfront_distribution_hosted_zone_id
+    name                   = module.cdn[0].cloudfront_distribution_domain_name
+    zone_id                = module.cdn[0].cloudfront_distribution_hosted_zone_id
     evaluate_target_health = false
   }
 }
 
 module "cloudfront_ssl_certificate" {
+  count   = var.environment == "localstack" ? 0 : 1
   source  = "cloudposse/acm-request-certificate/aws"
   version = "0.17.0"
   context = module.this.context

@@ -1,15 +1,18 @@
 data "aws_rds_engine_version" "postgres15_4" {
   engine  = "aurora-postgresql"
   version = "15.4"
+  count   = var.environment == "localstack" ? 0 : 1
 }
 
 resource "aws_db_parameter_group" "postgres15" {
+  count       = var.environment == "localstack" ? 0 : 1
   name        = "${var.namespace}-aurora-postgres15-db"
   family      = "aurora-postgresql15"
   description = "RDS Aurora database instance parameter group for ${var.namespace} cluster members."
 }
 
 resource "aws_rds_cluster_parameter_group" "postgres15" {
+  count       = var.environment == "localstack" ? 0 : 1
   name        = "${var.namespace}-aurora-postgres15-cluster"
   family      = "aurora-postgresql15"
   description = "RDS Aurora cluster parameter group for ${var.namespace}."
@@ -39,14 +42,14 @@ resource "aws_ssm_parameter" "postgres_master_password" {
 }
 
 module "postgres" {
-  create  = true
+  count   = var.environment == "localstack" ? 0 : 1
   source  = "terraform-aws-modules/rds-aurora/aws"
   version = "8.5.0"
 
   name                       = "${var.namespace}-postgres"
   cluster_use_name_prefix    = true
-  engine                     = data.aws_rds_engine_version.postgres15_4.engine
-  engine_version             = data.aws_rds_engine_version.postgres15_4.version
+  engine                     = data.aws_rds_engine_version.postgres15_4[0].engine
+  engine_version             = data.aws_rds_engine_version.postgres15_4[0].version
   auto_minor_version_upgrade = true
   engine_mode                = "provisioned"
   storage_encrypted          = true
@@ -67,8 +70,8 @@ module "postgres" {
     }
   }
 
-  db_parameter_group_name         = aws_db_parameter_group.postgres15.id
-  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.postgres15.id
+  db_parameter_group_name         = aws_db_parameter_group.postgres15[0].id
+  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.postgres15[0].id
 
   database_name                       = "cpf_reporter"
   master_username                     = "postgres"
@@ -107,6 +110,6 @@ locals {
     data.aws_region.current.id,
     data.aws_caller_identity.current.account_id,
     "dbuser",
-    module.postgres.cluster_resource_id,
+    var.environment == "localstack" ? "localstack" : module.postgres[0].cluster_resource_id,
   ])
 }

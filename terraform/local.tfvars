@@ -1,0 +1,8 @@
+console_container_image               = "node:18-bookworm-slim"
+environment                           = "localstack"
+namespace                             = "localstack"
+passage_app_id                        = "localstack"
+ssm_deployment_parameters_path_prefix = "/localstack"
+ssm_service_parameters_path_prefix    = "/localstack"
+version_identifier                    = "dev"
+website_domain_name                   = "localhost"

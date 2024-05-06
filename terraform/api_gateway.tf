@@ -3,6 +3,7 @@ locals {
 }
 
 module "api_ssl_certificate" {
+  count   = var.environment == "localstack" ? 0 : 1
   source  = "cloudposse/acm-request-certificate/aws"
   version = "0.17.0"
 
@@ -44,6 +45,7 @@ module "write_api_logs_policy" {
 }
 
 module "api_gateway" {
+  count   = var.environment == "localstack" ? 0 : 1
   source  = "terraform-aws-modules/apigateway-v2/aws"
   version = "2.2.2"
 
@@ -52,7 +54,7 @@ module "api_gateway" {
   protocol_type = "HTTP"
 
   domain_name                 = local.api_domain_name
-  domain_name_certificate_arn = module.api_ssl_certificate.arn
+  domain_name_certificate_arn = module.api_ssl_certificate[0].arn
 
   cors_configuration = {
     allow_methods = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -125,13 +127,14 @@ module "api_gateway" {
 }
 
 resource "aws_route53_record" "apigateway_alias" {
+  count   = var.environment == "localstack" ? 0 : 1
   zone_id = data.aws_ssm_parameter.public_dns_zone_id.value
   name    = local.api_domain_name
   type    = "A"
 
   alias {
-    name                   = module.api_gateway.apigatewayv2_domain_name_target_domain_name
-    zone_id                = module.api_gateway.apigatewayv2_domain_name_hosted_zone_id
+    name                   = module.api_gateway[0].apigatewayv2_domain_name_target_domain_name
+    zone_id                = module.api_gateway[0].apigatewayv2_domain_name_hosted_zone_id
     evaluate_target_health = false
   }
 }

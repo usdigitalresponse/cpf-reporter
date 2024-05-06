@@ -1,6 +1,6 @@
 resource "aws_ecs_cluster" "default" {
-  name = var.namespace
-
+  name  = var.namespace
+  count = var.environment == "localstack" ? 0 : 1
   setting {
     name  = "containerInsights"
     value = var.ecs_cluster_container_insights_enabled ? "enabled" : "disabled"
@@ -14,7 +14,8 @@ resource "aws_ecs_cluster" "default" {
 }
 
 resource "aws_ecs_cluster_capacity_providers" "default" {
-  cluster_name       = aws_ecs_cluster.default.name
+  count              = var.environment == "localstack" ? 0 : 1
+  cluster_name       = aws_ecs_cluster.default[0].name
   capacity_providers = ["FARGATE"]
 }
 

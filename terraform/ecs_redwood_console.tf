@@ -41,6 +41,15 @@ module "ecs_console_container_definition" {
   }
 }
 
+locals {
+  postgres_username          = var.environment == "localstack" ? "hardcoded_username" : module.postgres[0].cluster_master_username
+  postgres_password          = var.environment == "localstack" ? "hardcoded_password" : module.postgres[0].cluster_master_password
+  postgres_endpoint          = var.environment == "localstack" ? "hardcoded_endpoint" : module.postgres[0].cluster_endpoint
+  postgres_port              = var.environment == "localstack" ? "hardcoded_port" : module.postgres[0].cluster_port
+  postgres_database          = var.environment == "localstack" ? "hardcoded_database" : module.postgres[0].cluster_database_name
+  postgres_security_group_id = var.environment == "localstack" ? "sg-a78c6809ebb09d7d0" : module.postgres[0].security_group_id
+}
+
 resource "aws_ssm_parameter" "ecs_console_secret_database_url" {
   name        = "${var.ssm_service_parameters_path_prefix}/postgres/database_url"
   description = "Prisma database URL for connecting the Postgres cluster"
@@ -48,11 +57,11 @@ resource "aws_ssm_parameter" "ecs_console_secret_database_url" {
   key_id      = data.aws_kms_key.ssm.arn
   value = format(
     "postgres://%s:%s@%s:%s/%s?%s",
-    module.postgres.cluster_master_username,
-    module.postgres.cluster_master_password,
-    module.postgres.cluster_endpoint,
-    module.postgres.cluster_port,
-    module.postgres.cluster_database_name,
+    local.postgres_username,
+    local.postgres_password,
+    local.postgres_endpoint,
+    local.postgres_port,
+    local.postgres_database,
     join("&", [
       "sslmode=verify-full",
       "sslrootcert=${urlencode("/home/node/app/api/db/rds-combined-ca-bundle.pem")}",
@@ -140,7 +149,7 @@ data "aws_iam_policy_document" "ecs_console_task" {
     sid       = "PostgresIAMAuth"
     effect    = "Allow"
     actions   = ["rds-db:connect"]
-    resources = ["${local.postgres_rds_connect_resource_base_arn}/${module.postgres.cluster_master_username}"]
+    resources = ["${local.postgres_rds_connect_resource_base_arn}/${local.postgres_username}"]
   }
   statement {
     sid    = "AllowECSExec"
@@ -177,6 +186,7 @@ resource "aws_iam_role_policy" "ecs_console_task" {
 }
 
 resource "aws_ecs_task_definition" "console" {
+  count                    = var.environment == "localstack" ? 0 : 1
   family                   = "${var.namespace}-console"
   execution_role_arn       = aws_iam_role.ecs_console_execution.arn
   task_role_arn            = aws_iam_role.ecs_console_task.arn
@@ -211,9 +221,10 @@ module "ecs_console_security_group" {
 }
 
 resource "aws_ecs_service" "console" {
+  count                  = var.environment == "localstack" ? 0 : 1
   name                   = "${var.namespace}-console"
-  cluster                = aws_ecs_cluster.default.id
-  task_definition        = aws_ecs_task_definition.console.arn
+  cluster                = aws_ecs_cluster.default[0].id
+  task_definition        = aws_ecs_task_definition.console[0].arn
   desired_count          = 1
   launch_type            = "FARGATE"
   enable_execute_command = true
@@ -224,7 +235,7 @@ resource "aws_ecs_service" "console" {
     subnets          = local.private_subnet_ids
     security_groups = [
       module.ecs_console_security_group.id,
-      module.postgres.security_group_id,
+      local.postgres_security_group_id,
     ]
   }
 

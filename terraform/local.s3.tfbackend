@@ -1,0 +1,4 @@
+region         = "us-west-2"
+bucket         = "localstack"
+key            = "usdr/cpfreporter/local/us-west-2/terraform.tfstate"
+encrypt        = true

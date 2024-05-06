@@ -250,7 +250,7 @@ module "lambda_function-graphql" {
   vpc_subnet_ids        = local.private_subnet_ids
   vpc_security_group_ids = [
     module.lambda_security_group.id,
-    module.postgres.security_group_id,
+    local.postgres_security_group_id,
   ]
 
   // Permissions
@@ -265,7 +265,7 @@ module "lambda_function-graphql" {
     PostgresIAMAuth = {
       effect    = "Allow"
       actions   = ["rds-db:connect"]
-      resources = ["${local.postgres_rds_connect_resource_base_arn}/${module.postgres.cluster_master_username}"]
+      resources = ["${local.postgres_rds_connect_resource_base_arn}/${local.postgres_username}"]
     }
     GetPostgresSecret = {
       effect    = "Allow"
@@ -322,10 +322,10 @@ module "lambda_function-graphql" {
     // Function-specific environment variables go here:
     DATABASE_URL = format(
       "postgres://%s@%s:%s/%s?%s",
-      module.postgres.cluster_master_username,
-      module.postgres.cluster_endpoint,
-      module.postgres.cluster_port,
-      module.postgres.cluster_database_name,
+      local.postgres_username,
+      local.postgres_endpoint,
+      local.postgres_port,
+      local.postgres_database,
       join("&", [
         "sslmode=verify",
         "connection_limit=1", // Can be tuned for parallel query performance: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections#serverless-environments-faas
@@ -340,7 +340,7 @@ module "lambda_function-graphql" {
 
   // Triggers
   allowed_triggers = {
-    APIGateway = {
+    APIGateway = var.environment == "localstack" ? null : {
       service    = "apigateway"
       source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*/graphql"
     }
@@ -360,7 +360,7 @@ module "lambda_function-processValidationJson" {
   vpc_subnet_ids        = local.private_subnet_ids
   vpc_security_group_ids = [
     module.lambda_security_group.id,
-    module.postgres.security_group_id,
+    local.postgres_security_group_id,
   ]
 
   // Permissions
@@ -375,7 +375,7 @@ module "lambda_function-processValidationJson" {
     PostgresIAMAuth = {
       effect    = "Allow"
       actions   = ["rds-db:connect"]
-      resources = ["${local.postgres_rds_connect_resource_base_arn}/${module.postgres.cluster_master_username}"]
+      resources = ["${local.postgres_rds_connect_resource_base_arn}/${local.postgres_username}"]
     }
     GetPostgresSecret = {
       effect    = "Allow"
@@ -419,10 +419,10 @@ module "lambda_function-processValidationJson" {
   environment_variables = merge(local.lambda_default_environment_variables, {
     DATABASE_URL = format(
       "postgres://%s@%s:%s/%s?%s",
-      module.postgres.cluster_master_username,
-      module.postgres.cluster_endpoint,
-      module.postgres.cluster_port,
-      module.postgres.cluster_database_name,
+      local.postgres_username,
+      local.postgres_endpoint,
+      local.postgres_port,
+      local.postgres_database,
       join("&", [
         "sslmode=verify",
         "connection_limit=1", // Can be tuned for parallel query performance: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections#serverless-environments-faas
