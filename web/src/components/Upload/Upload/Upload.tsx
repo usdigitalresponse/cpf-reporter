@@ -22,7 +22,7 @@ const Upload = ({ upload, queryResult }) => {
 
   useEffect(() => {
     const pollingTimeout = 120 * 1000
-    const pollingInterval = 5 * 1000
+    const pollingInterval = 3 * 1000
 
     // Start polling if there are no validation results
     if (!upload.latestValidation?.results) {
