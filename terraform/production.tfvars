@@ -28,7 +28,7 @@ postgres_query_logging_enabled     = true
 
 // General Lambda options
 lambda_log_level  = "debug"
-lambda_js_runtime = "nodejs18.x"
+lambda_js_runtime = "nodejs20.x"
 lambda_py_runtime = "python3.12"
 lambda_arch       = "x86_64"
 

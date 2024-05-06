@@ -1,6 +1,6 @@
 # base
 # ------------------------------------------------
-FROM node:18-bookworm-slim as base
+FROM node:20-bookworm-slim as base
 
 RUN apt-get update && apt-get install -y \
     openssl \
@@ -86,7 +86,7 @@ CMD [ "node_modules/.bin/rw-server", "api", "--load-env-files" ]
 
 # serve web
 # ------------------------------------------------
-FROM node:18-bookworm-slim as web_serve
+FROM node:20-bookworm-slim as web_serve
 
 USER node
 WORKDIR /home/node/app

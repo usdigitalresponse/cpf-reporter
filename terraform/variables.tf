@@ -234,7 +234,7 @@ variable "console_container_image" {
 variable "lambda_js_runtime" {
   description = "Lambda runtime for the target Node.js version."
   type        = string
-  default     = "nodejs18.x"
+  default     = "nodejs20.x"
 }
 
 variable "lambda_py_runtime" {
