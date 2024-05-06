@@ -20,6 +20,7 @@ terraform {
     }
   }
 
+  # TODO! This is a workaround for localstack not respecting overrides
   backend "s3" {
     bucket                      = "localstack"
     key                         = "localstack"

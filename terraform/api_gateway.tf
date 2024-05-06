@@ -3,7 +3,7 @@ locals {
 }
 
 module "api_ssl_certificate" {
-  count   = var.environment == "localstack" ? 0 : 1
+  count   = var.is_localstack ? 0 : 1
   source  = "cloudposse/acm-request-certificate/aws"
   version = "0.17.0"
 
@@ -45,7 +45,7 @@ module "write_api_logs_policy" {
 }
 
 module "api_gateway" {
-  count   = var.environment == "localstack" ? 0 : 1
+  count   = var.is_localstack ? 0 : 1
   source  = "terraform-aws-modules/apigateway-v2/aws"
   version = "2.2.2"
 
@@ -127,7 +127,7 @@ module "api_gateway" {
 }
 
 resource "aws_route53_record" "apigateway_alias" {
-  count   = var.environment == "localstack" ? 0 : 1
+  count   = var.is_localstack ? 0 : 1
   zone_id = data.aws_ssm_parameter.public_dns_zone_id.value
   name    = local.api_domain_name
   type    = "A"

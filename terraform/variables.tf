@@ -311,3 +311,9 @@ variable "passage_app_id" {
   description = "The Passage app ID to use for authentication."
   type        = string
 }
+
+variable "is_localstack" {
+  description = "Whether only Localstack-compatible service should be built."
+  type        = bool
+  default     = false
+}

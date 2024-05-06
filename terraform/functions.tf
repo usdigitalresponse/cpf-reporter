@@ -340,7 +340,7 @@ module "lambda_function-graphql" {
 
   // Triggers
   allowed_triggers = {
-    APIGateway = var.environment == "localstack" ? null : {
+    APIGateway = var.is_localstack ? null : {
       service    = "apigateway"
       source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*/graphql"
     }

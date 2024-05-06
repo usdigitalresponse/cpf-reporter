@@ -1,18 +1,18 @@
 data "aws_rds_engine_version" "postgres15_4" {
   engine  = "aurora-postgresql"
   version = "15.4"
-  count   = var.environment == "localstack" ? 0 : 1
+  count   = var.is_localstack ? 0 : 1
 }
 
 resource "aws_db_parameter_group" "postgres15" {
-  count       = var.environment == "localstack" ? 0 : 1
+  count       = var.is_localstack ? 0 : 1
   name        = "${var.namespace}-aurora-postgres15-db"
   family      = "aurora-postgresql15"
   description = "RDS Aurora database instance parameter group for ${var.namespace} cluster members."
 }
 
 resource "aws_rds_cluster_parameter_group" "postgres15" {
-  count       = var.environment == "localstack" ? 0 : 1
+  count       = var.is_localstack ? 0 : 1
   name        = "${var.namespace}-aurora-postgres15-cluster"
   family      = "aurora-postgresql15"
   description = "RDS Aurora cluster parameter group for ${var.namespace}."
@@ -42,7 +42,7 @@ resource "aws_ssm_parameter" "postgres_master_password" {
 }
 
 module "postgres" {
-  count   = var.environment == "localstack" ? 0 : 1
+  count   = var.is_localstack ? 0 : 1
   source  = "terraform-aws-modules/rds-aurora/aws"
   version = "8.5.0"
 
@@ -110,6 +110,6 @@ locals {
     data.aws_region.current.id,
     data.aws_caller_identity.current.account_id,
     "dbuser",
-    var.environment == "localstack" ? "localstack" : module.postgres[0].cluster_resource_id,
+    var.is_localstack ? "localstack" : module.postgres[0].cluster_resource_id,
   ])
 }

@@ -42,12 +42,12 @@ module "ecs_console_container_definition" {
 }
 
 locals {
-  postgres_username          = var.environment == "localstack" ? "hardcoded_username" : module.postgres[0].cluster_master_username
-  postgres_password          = var.environment == "localstack" ? "hardcoded_password" : module.postgres[0].cluster_master_password
-  postgres_endpoint          = var.environment == "localstack" ? "hardcoded_endpoint" : module.postgres[0].cluster_endpoint
-  postgres_port              = var.environment == "localstack" ? "hardcoded_port" : module.postgres[0].cluster_port
-  postgres_database          = var.environment == "localstack" ? "hardcoded_database" : module.postgres[0].cluster_database_name
-  postgres_security_group_id = var.environment == "localstack" ? "sg-a78c6809ebb09d7d0" : module.postgres[0].security_group_id
+  postgres_username          = var.is_localstack ? "hardcoded_username" : module.postgres[0].cluster_master_username
+  postgres_password          = var.is_localstack ? "hardcoded_password" : module.postgres[0].cluster_master_password
+  postgres_endpoint          = var.is_localstack ? "hardcoded_endpoint" : module.postgres[0].cluster_endpoint
+  postgres_port              = var.is_localstack ? "hardcoded_port" : module.postgres[0].cluster_port
+  postgres_database          = var.is_localstack ? "hardcoded_database" : module.postgres[0].cluster_database_name
+  postgres_security_group_id = var.is_localstack ? "sg-a78c6809ebb09d7d0" : module.postgres[0].security_group_id
 }
 
 resource "aws_ssm_parameter" "ecs_console_secret_database_url" {
@@ -186,7 +186,7 @@ resource "aws_iam_role_policy" "ecs_console_task" {
 }
 
 resource "aws_ecs_task_definition" "console" {
-  count                    = var.environment == "localstack" ? 0 : 1
+  count                    = var.is_localstack ? 0 : 1
   family                   = "${var.namespace}-console"
   execution_role_arn       = aws_iam_role.ecs_console_execution.arn
   task_role_arn            = aws_iam_role.ecs_console_task.arn
@@ -221,7 +221,7 @@ module "ecs_console_security_group" {
 }
 
 resource "aws_ecs_service" "console" {
-  count                  = var.environment == "localstack" ? 0 : 1
+  count                  = var.is_localstack ? 0 : 1
   name                   = "${var.namespace}-console"
   cluster                = aws_ecs_cluster.default[0].id
   task_definition        = aws_ecs_task_definition.console[0].arn

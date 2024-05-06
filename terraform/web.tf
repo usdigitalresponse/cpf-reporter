@@ -1,5 +1,5 @@
 module "cloudfront_to_origin_bucket_access_policy" {
-  count   = var.environment == "localstack" ? 0 : 1
+  count   = var.is_localstack ? 0 : 1
   source  = "cloudposse/iam-policy/aws"
   version = "2.0.1"
   context = module.s3_label.context
@@ -49,7 +49,7 @@ module "cdn_origin_bucket" {
   sse_algorithm                = "AES256"
   allow_ssl_requests_only      = true
   allow_encrypted_uploads_only = true
-  source_policy_documents      = var.environment == "localstack" ? [] : [module.cloudfront_to_origin_bucket_access_policy.policy]
+  source_policy_documents      = var.is_localstack ? [] : [module.cloudfront_to_origin_bucket_access_policy.policy]
   lifecycle_configuration_rules = [
     {
       enabled                                = true
@@ -121,12 +121,12 @@ module "cdn_logs_bucket" {
 }
 
 resource "aws_cloudfront_origin_access_identity" "default" {
-  count   = var.environment == "localstack" ? 0 : 1
+  count   = var.is_localstack ? 0 : 1
   comment = "CPF Reporter website access."
 }
 
 data "aws_cloudfront_cache_policy" "Managed-CachingOptimized" {
-  count = var.environment == "localstack" ? 0 : 1
+  count = var.is_localstack ? 0 : 1
   name  = "Managed-CachingOptimized"
 }
 
@@ -207,7 +207,7 @@ module "cdn" {
   version             = "3.2.1"
   create_distribution = true
 
-  count = var.environment == "localstack" ? 0 : 1
+  count = var.is_localstack ? 0 : 1
 
   depends_on = [
     module.cdn_origin_bucket,
@@ -295,7 +295,7 @@ resource "aws_route53_record" "cdn_alias" {
   zone_id = data.aws_ssm_parameter.public_dns_zone_id.value
   name    = var.website_domain_name
   type    = "A"
-  count   = var.environment == "localstack" ? 0 : 1
+  count   = var.is_localstack ? 0 : 1
 
   alias {
     name                   = module.cdn[0].cloudfront_distribution_domain_name
@@ -305,7 +305,7 @@ resource "aws_route53_record" "cdn_alias" {
 }
 
 module "cloudfront_ssl_certificate" {
-  count   = var.environment == "localstack" ? 0 : 1
+  count   = var.is_localstack ? 0 : 1
   source  = "cloudposse/acm-request-certificate/aws"
   version = "0.17.0"
   context = module.this.context
