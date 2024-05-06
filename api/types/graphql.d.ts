@@ -31,6 +31,7 @@ export type Scalars = {
   Int: number;
   Float: number;
   BigInt: number;
+  Byte: Buffer;
   Date: Date | string;
   DateTime: Date | string;
   JSON: Prisma.JsonValue;
@@ -794,6 +795,7 @@ export type ResolversTypes = {
   Agency: ResolverTypeWrapper<MergePrismaWithSdlTypes<PrismaAgency, MakeRelationsOptional<Agency, AllMappedModels>, AllMappedModels>>;
   BigInt: ResolverTypeWrapper<Scalars['BigInt']>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  Byte: ResolverTypeWrapper<Scalars['Byte']>;
   CreateAgencyInput: CreateAgencyInput;
   CreateExpenditureCategoryInput: CreateExpenditureCategoryInput;
   CreateInputTemplateInput: CreateInputTemplateInput;
@@ -846,6 +848,7 @@ export type ResolversParentTypes = {
   Agency: MergePrismaWithSdlTypes<PrismaAgency, MakeRelationsOptional<Agency, AllMappedModels>, AllMappedModels>;
   BigInt: Scalars['BigInt'];
   Boolean: Scalars['Boolean'];
+  Byte: Scalars['Byte'];
   CreateAgencyInput: CreateAgencyInput;
   CreateExpenditureCategoryInput: CreateExpenditureCategoryInput;
   CreateInputTemplateInput: CreateInputTemplateInput;
@@ -922,6 +925,10 @@ export type AgencyRelationResolvers<ContextType = RedwoodGraphQLContext, ParentT
 
 export interface BigIntScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['BigInt'], any> {
   name: 'BigInt';
+}
+
+export interface ByteScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Byte'], any> {
+  name: 'Byte';
 }
 
 export type CreateOrgAgencyAdminPayloadResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['CreateOrgAgencyAdminPayload'] = ResolversParentTypes['CreateOrgAgencyAdminPayload']> = {
@@ -1399,6 +1406,7 @@ export type UserRelationResolvers<ContextType = RedwoodGraphQLContext, ParentTyp
 export type Resolvers<ContextType = RedwoodGraphQLContext> = {
   Agency: AgencyResolvers<ContextType>;
   BigInt: GraphQLScalarType;
+  Byte: GraphQLScalarType;
   CreateOrgAgencyAdminPayload: CreateOrgAgencyAdminPayloadResolvers<ContextType>;
   Date: GraphQLScalarType;
   DateTime: GraphQLScalarType;

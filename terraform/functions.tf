@@ -335,7 +335,7 @@ module "lambda_function-graphql" {
     DATABASE_SECRET_SSM_PARAMETER_PATH = aws_ssm_parameter.postgres_master_password.name
     DD_LAMBDA_HANDLER                  = "graphql.handler"
     PASSAGE_API_KEY_SECRET_ARN         = data.aws_ssm_parameter.passage_api_key_secret_arn.value
-    AUTH_PROVIDER                      = var.auth_provider
+    AUTH_PROVIDER                      = "passage"
   })
 
   // Triggers
