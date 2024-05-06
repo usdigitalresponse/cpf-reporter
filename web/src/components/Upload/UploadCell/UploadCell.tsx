@@ -45,14 +45,16 @@ export const Failure = ({ error }: CellFailureProps) => (
   <div className="rw-cell-error">{error?.message}</div>
 )
 
-export const beforeQuery = (props) => {
+export const beforeQuery = (props: { id: number }) => {
   return {
     variables: props,
     fetchPolicy: 'no-cache',
-    pollInterval: 3000,
   }
 }
 
-export const Success = ({ upload }: CellSuccessProps<FindUploadById>) => {
-  return <Upload upload={upload} />
+export const Success = ({
+  upload,
+  queryResult,
+}: CellSuccessProps<FindUploadById>) => {
+  return <Upload upload={upload} queryResult={queryResult} />
 }
