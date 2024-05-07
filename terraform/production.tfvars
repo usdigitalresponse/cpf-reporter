@@ -38,7 +38,7 @@ website_feature_flags = {}
 website_config_params = {}
 
 // API Auth Provider
-passage_app_id = "TBD" # All auth will fail until this is replaced
+passage_app_id = "ysWup7gbVOMXhRCwzjXmDnQ8" # All auth will fail until this is replaced
 
 // API
 api_domain_name = "api.cpf.grants.usdigitalresponse.org"
