@@ -54,8 +54,8 @@ export const getCurrentUser = async (
       return user
     } else if (process.env.AUTH_PROVIDER === 'passage') {
       logger.info(
-        'Identifying passage authentication user from api-gateway event',
-        event
+        { custom: event },
+        'Identifying passage authentication user from api-gateway event'
       )
       const passageId = event.requestContext.authorizer?.jwt?.claims?.sub
 
