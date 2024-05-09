@@ -91,7 +91,6 @@ describe('getCurrentUser', () => {
     expect(result).toBeNull()
   })
 
-
   it('should throw an error when using api gateway payload v2.0', async () => {
     process.env.AUTH_PROVIDER = 'passage'
 
@@ -103,7 +102,7 @@ describe('getCurrentUser', () => {
             claims: {
               sub: 'passage-user-id',
             },
-          }
+          },
         },
       },
     } as unknown as APIGatewayEvent
