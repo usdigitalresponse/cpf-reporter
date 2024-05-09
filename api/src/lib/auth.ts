@@ -53,11 +53,7 @@ export const getCurrentUser = async (
       user.roles = [`${user.role}`]
       return user
     } else if (process.env.AUTH_PROVIDER === 'passage') {
-      logger.info(
-        { custom: event },
-        'Identifying passage authentication user from api-gateway event'
-      )
-      const passageId = event.requestContext.authorizer?.jwt?.claims?.sub
+      const passageId = event.requestContext.authorizer?.claims?.sub
 
       if (!passageId) {
         throw new AuthenticationError('Passage ID not included.')
