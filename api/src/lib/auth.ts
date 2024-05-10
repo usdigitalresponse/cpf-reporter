@@ -5,6 +5,7 @@ import { Decoded } from '@redwoodjs/api'
 import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
 
 import { db } from 'src/lib/db'
+import { logger } from 'src/lib/logger'
 
 /**
  * Represents the user attributes returned by the decoding the
@@ -52,7 +53,7 @@ export const getCurrentUser = async (
       user.roles = [`${user.role}`]
       return user
     } else if (process.env.AUTH_PROVIDER === 'passage') {
-      const passageId = event.requestContext.authorizer?.jwt?.claims?.sub
+      const passageId = event.requestContext.authorizer?.claims?.sub
 
       if (!passageId) {
         throw new AuthenticationError('Passage ID not included.')
@@ -64,6 +65,7 @@ export const getCurrentUser = async (
       })
 
       if (!user) {
+        logger.error(`User not found for passageId: ${passageId}`, event)
         return null
       }
 
