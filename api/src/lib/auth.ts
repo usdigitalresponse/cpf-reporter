@@ -56,6 +56,7 @@ export const getCurrentUser = async (
       const passageId = event.requestContext.authorizer?.claims?.sub
 
       if (!passageId) {
+        logger.error({ custom: event }, 'Passage ID not included.')
         throw new AuthenticationError('Passage ID not included.')
       }
 
@@ -65,7 +66,7 @@ export const getCurrentUser = async (
       })
 
       if (!user) {
-        logger.error(`User not found for passageId: ${passageId}`, event)
+        logger.error({ custom: event }, 'User not found.')
         return null
       }
 
@@ -101,7 +102,12 @@ export const getCurrentUser = async (
  * @returns {boolean} - If the currentUser is authenticated
  */
 export const isAuthenticated = (): boolean => {
-  return !!context.currentUser
+  if (!context.currentUser) {
+    logger.error({ custom: context.event }, 'User is not authenticated')
+    return false
+  } else {
+    return true
+  }
 }
 
 /**
