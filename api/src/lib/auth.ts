@@ -72,26 +72,12 @@ export const getCurrentUser = async (
 
       user.roles = [`${user.role}`]
       return user
-    }
-
-    return {
-      id: 1,
-      email: 'usdr-admin@usdr.dev',
-      name: 'USDR Admin',
-      role: 'USDR_ADMIN',
-      roles: ['USDR_ADMIN'],
-      agency: {
-        id: 1,
-        name: 'Main Agency',
-        abbreviation: 'MAUSDR',
-        code: 'MAUSDR',
-        organizationId: 1,
-      },
-      agencyId: 1, // TO_DEPRECATE
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+    } else {
+      logger.error({ custom: event }, 'No auth provider found.')
+      throw new AuthenticationError('No auth provider found')
     }
   } catch (error) {
+    logger.error({ custom: { event, error } }, 'Error getting current user.')
     return null
   }
 }
