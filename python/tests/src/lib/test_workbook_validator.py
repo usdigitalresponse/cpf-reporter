@@ -135,6 +135,10 @@ class TestValidateSubrecipientSheet:
         assert error.col == "D"
         assert error.severity == ErrorLevel.ERR.name
 
+    def test_valid_subrecipient_sheet_blank_optional_fields(self, valid_subrecipient_sheet_blank_optional_fields: Worksheet):
+        errors = validate_subrecipient_sheet(valid_subrecipient_sheet_blank_optional_fields)
+        assert errors == []
+
 
 class TestGetProjectUseCode:
     def test_get_project_use_code(self, valid_coversheet: Worksheet):

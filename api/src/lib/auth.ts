@@ -56,6 +56,7 @@ export const getCurrentUser = async (
       const passageId = event.requestContext.authorizer?.claims?.sub
 
       if (!passageId) {
+        logger.error({ custom: event }, 'Passage ID not included.')
         throw new AuthenticationError('Passage ID not included.')
       }
 
@@ -65,32 +66,18 @@ export const getCurrentUser = async (
       })
 
       if (!user) {
-        logger.error(`User not found for passageId: ${passageId}`, event)
+        logger.error({ custom: event }, 'User not found.')
         return null
       }
 
       user.roles = [`${user.role}`]
       return user
-    }
-
-    return {
-      id: 1,
-      email: 'usdr-admin@usdr.dev',
-      name: 'USDR Admin',
-      role: 'USDR_ADMIN',
-      roles: ['USDR_ADMIN'],
-      agency: {
-        id: 1,
-        name: 'Main Agency',
-        abbreviation: 'MAUSDR',
-        code: 'MAUSDR',
-        organizationId: 1,
-      },
-      agencyId: 1, // TO_DEPRECATE
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+    } else {
+      logger.error({ custom: event }, 'No auth provider found.')
+      throw new AuthenticationError('No auth provider found')
     }
   } catch (error) {
+    logger.error({ custom: { event, error } }, 'Error getting current user.')
     return null
   }
 }
@@ -101,7 +88,12 @@ export const getCurrentUser = async (
  * @returns {boolean} - If the currentUser is authenticated
  */
 export const isAuthenticated = (): boolean => {
-  return !!context.currentUser
+  if (!context.currentUser) {
+    logger.error({ custom: context.event }, 'User is not authenticated')
+    return false
+  } else {
+    return true
+  }
 }
 
 /**
