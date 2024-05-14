@@ -45,6 +45,16 @@ export const Failure = ({ error }: CellFailureProps) => (
   <div className="rw-cell-error">{error?.message}</div>
 )
 
-export const Success = ({ upload }: CellSuccessProps<FindUploadById>) => {
-  return <Upload upload={upload} />
+export const beforeQuery = (props: { id: number }) => {
+  return {
+    variables: props,
+    fetchPolicy: 'no-cache',
+  }
+}
+
+export const Success = ({
+  upload,
+  queryResult,
+}: CellSuccessProps<FindUploadById>) => {
+  return <Upload upload={upload} queryResult={queryResult} />
 }
