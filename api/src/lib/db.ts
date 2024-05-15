@@ -62,11 +62,13 @@ async function getPrismaClient() {
 /*
  * Instance of the Prisma Client
  */
-getPrismaClient().then((db) => {
-  logger.info('Prisma Client initialized')
-  module.exports.db = db
-}).catch((error) => {
-  logger.error(error)
-  logger.error('Failed to initialize the Prisma Client. Exiting...')
-  process.exit(1)
-})
+getPrismaClient().then(
+  (db) => {
+    logger.info('Prisma Client initialized')
+    module.exports.db = db
+  }).catch(
+  (error) => {
+    logger.error(error)
+    logger.error('Failed to initialize the Prisma Client. Exiting...')
+    process.exit(1)
+  })
