@@ -35,28 +35,40 @@ async function ssmAuthForURL(databaseURL: string): Promise<string> {
   return url.toString()
 }
 
-/*
- * Instance of the Prisma Client
- */
-export let db: PrismaClient
-async function createPrismaClient() {
+async function getDataSourceURL() {
   let datasourceUrl: string
   if (process.env.DATABASE_SECRET_SOURCE === 'iam') {
     datasourceUrl = await rdsIAMAuthForURL(process.env.DATABASE_URL)
   } else if (process.env.DATABASE_SECRET_SOURCE === 'ssm') {
     datasourceUrl = await ssmAuthForURL(process.env.DATABASE_URL)
   }
-
-  db = new PrismaClient({
-    log: emitLogLevels(['info', 'warn', 'error']),
-    datasourceUrl: datasourceUrl,
-  })
+  return datasourceUrl
 }
 
-createPrismaClient().then(() => {
+async function getPrismaClient() {
+  const datasourceUrl = await getDataSourceURL()
+  const client = new PrismaClient({
+    log: emitLogLevels(['info', 'warn', 'error']),
+    datasourceUrl,
+  })
   handlePrismaLogging({
-    db,
+    db: client,
     logger,
     logLevels: ['info', 'warn', 'error'],
   })
-})
+  return client
+}
+
+/*
+ * Instance of the Prisma Client
+ */
+getPrismaClient()
+  .then((db) => {
+    logger.info('Prisma Client initialized')
+    module.exports.db = db
+  })
+  .catch((error) => {
+    logger.error(error)
+    logger.error('Failed to initialize the Prisma Client. Exiting...')
+    process.exit(1)
+  })
