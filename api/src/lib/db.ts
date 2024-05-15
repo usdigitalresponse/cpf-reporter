@@ -35,27 +35,31 @@ async function ssmAuthForURL(databaseURL: string): Promise<string> {
   return url.toString()
 }
 
-/*
- * Instance of the Prisma Client
- */
-async function createPrismaClient() {
+async function getDataSourceURL() {
   let datasourceUrl: string
   if (process.env.DATABASE_SECRET_SOURCE === 'iam') {
     datasourceUrl = await rdsIAMAuthForURL(process.env.DATABASE_URL)
   } else if (process.env.DATABASE_SECRET_SOURCE === 'ssm') {
     datasourceUrl = await ssmAuthForURL(process.env.DATABASE_URL)
   }
+  return datasourceUrl
+}
 
-  const db = new PrismaClient({
+async function getPrismaClient() {
+  const datasourceUrl = await getDataSourceURL()
+  const client = new PrismaClient({
     log: emitLogLevels(['info', 'warn', 'error']),
-    datasourceUrl: datasourceUrl,
+    datasourceUrl,
   })
   handlePrismaLogging({
-    db,
+    db: client,
     logger,
     logLevels: ['info', 'warn', 'error'],
   })
-  return db
+  return client
 }
 
-export const db: PrismaClient = await createPrismaClient()
+/*
+ * Instance of the Prisma Client
+ */
+export let db: PrismaClient = getPrismaClient()
