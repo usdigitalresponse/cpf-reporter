@@ -45,6 +45,7 @@ export const getCurrentUser = async (
     // Verify that the request is coming from the local development environment
     // and is only being processed within the local environment
     if (process.env.AUTH_PROVIDER === 'local') {
+      logger.info('Local development environment detected.')
       const user: CurrentUser = await db.user.findFirst({
         where: { email: token },
         include: { agency: true },
