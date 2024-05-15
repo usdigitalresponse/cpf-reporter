@@ -77,6 +77,7 @@ export const getCurrentUser = async (
       throw new AuthenticationError('No auth provider found')
     }
   } catch (error) {
+    logger.error(error)
     logger.error({ custom: { event, error } }, 'Error getting current user.')
     return null
   }
