@@ -17,12 +17,8 @@ export const QUERY = gql`
       name
       startDate
       endDate
-      organizationId
-      certifiedAt
-      certifiedById
       inputTemplateId
       outputTemplateId
-      isCurrentPeriod
       createdAt
       updatedAt
     }
@@ -38,12 +34,8 @@ const UPDATE_REPORTING_PERIOD_MUTATION = gql`
       name
       startDate
       endDate
-      organizationId
-      certifiedAt
-      certifiedById
       inputTemplateId
       outputTemplateId
-      isCurrentPeriod
       createdAt
       updatedAt
     }

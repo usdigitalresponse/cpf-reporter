@@ -11,7 +11,6 @@ import {
   TextField,
   DatetimeLocalField,
   NumberField,
-  CheckboxField,
   Submit,
 } from '@redwoodjs/forms'
 import type { RWGqlError } from '@redwoodjs/forms'
@@ -106,59 +105,6 @@ const ReportingPeriodForm = (props: ReportingPeriodFormProps) => {
         <FieldError name="endDate" className="rw-field-error" />
 
         <Label
-          name="organizationId"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Organization id
-        </Label>
-
-        <NumberField
-          name="organizationId"
-          defaultValue={props.reportingPeriod?.organizationId}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
-        />
-
-        <FieldError name="organizationId" className="rw-field-error" />
-
-        <Label
-          name="certifiedAt"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Certified at
-        </Label>
-
-        <DatetimeLocalField
-          name="certifiedAt"
-          defaultValue={formatDatetime(props.reportingPeriod?.certifiedAt)}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-        />
-
-        <FieldError name="certifiedAt" className="rw-field-error" />
-
-        <Label
-          name="certifiedById"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Certified by id
-        </Label>
-
-        <NumberField
-          name="certifiedById"
-          defaultValue={props.reportingPeriod?.certifiedById}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          emptyAs={'undefined'}
-        />
-
-        <FieldError name="certifiedById" className="rw-field-error" />
-
-        <Label
           name="inputTemplateId"
           className="rw-label"
           errorClassName="rw-label rw-label-error"
@@ -193,23 +139,6 @@ const ReportingPeriodForm = (props: ReportingPeriodFormProps) => {
         />
 
         <FieldError name="outputTemplateId" className="rw-field-error" />
-
-        <Label
-          name="isCurrentPeriod"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Is current period
-        </Label>
-
-        <CheckboxField
-          name="isCurrentPeriod"
-          defaultChecked={props.reportingPeriod?.isCurrentPeriod}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-        />
-
-        <FieldError name="isCurrentPeriod" className="rw-field-error" />
 
         <div className="rw-button-group">
           <Submit disabled={props.loading} className="rw-button rw-button-blue">

@@ -931,12 +931,8 @@ export type FindReportingPeriodById = {
     name: string
     startDate: string
     endDate: string
-    organizationId: number
-    certifiedAt?: string | null
-    certifiedById?: number | null
     inputTemplateId: number
     outputTemplateId: number
-    isCurrentPeriod: boolean
     createdAt: string
     updatedAt: string
   } | null
@@ -952,12 +948,8 @@ export type FindReportingPeriods = {
     name: string
     startDate: string
     endDate: string
-    organizationId: number
-    certifiedAt?: string | null
-    certifiedById?: number | null
     inputTemplateId: number
     outputTemplateId: number
-    isCurrentPeriod: boolean
     createdAt: string
     updatedAt: string
   }>

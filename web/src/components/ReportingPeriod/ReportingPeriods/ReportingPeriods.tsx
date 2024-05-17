@@ -53,12 +53,8 @@ const ReportingPeriodsList = ({ reportingPeriods }: FindReportingPeriods) => {
             <th>Name</th>
             <th>Start date</th>
             <th>End date</th>
-            <th>Organization id</th>
-            <th>Certified at</th>
-            <th>Certified by id</th>
             <th>Input template id</th>
             <th>Output template id</th>
-            <th>Is current period</th>
             <th>Created at</th>
             <th>Updated at</th>
             <th>&nbsp;</th>
@@ -71,12 +67,8 @@ const ReportingPeriodsList = ({ reportingPeriods }: FindReportingPeriods) => {
               <td>{truncate(reportingPeriod.name)}</td>
               <td>{timeTag(reportingPeriod.startDate)}</td>
               <td>{timeTag(reportingPeriod.endDate)}</td>
-              <td>{truncate(reportingPeriod.organizationId)}</td>
-              <td>{timeTag(reportingPeriod.certifiedAt)}</td>
-              <td>{truncate(reportingPeriod.certifiedById)}</td>
               <td>{truncate(reportingPeriod.inputTemplateId)}</td>
               <td>{truncate(reportingPeriod.outputTemplateId)}</td>
-              <td>{checkboxInputTag(reportingPeriod.isCurrentPeriod)}</td>
               <td>{timeTag(reportingPeriod.createdAt)}</td>
               <td>{timeTag(reportingPeriod.updatedAt)}</td>
               <td>

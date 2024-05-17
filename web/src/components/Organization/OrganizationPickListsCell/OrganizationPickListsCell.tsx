@@ -10,10 +10,6 @@ export const QUERY = gql`
   query FindOrganizationQuery($id: Int!) {
     organization: organization(id: $id) {
       id
-      reportingPeriods {
-        id
-        name
-      }
       agencies {
         id
         name
@@ -37,20 +33,6 @@ export const Success = ({
 }: CellSuccessProps<FindOrganizationQuery, FindOrganizationQueryVariables>) => {
   return (
     <div>
-      <Label
-        name="reportingPeriodId"
-        className="rw-label"
-        errorClassName="rw-label rw-label-error"
-      >
-        Reporting Period
-      </Label>
-      <SelectField name="reportingPeriodId">
-        {organization.reportingPeriods.map((reportingPeriod) => (
-          <option key={reportingPeriod.id} value={reportingPeriod.id}>
-            {reportingPeriod.name}
-          </option>
-        ))}
-      </SelectField>
       <Label
         name="agencyId"
         className="rw-label"

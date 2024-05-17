@@ -11,12 +11,8 @@ export const QUERY = gql`
       name
       startDate
       endDate
-      organizationId
-      certifiedAt
-      certifiedById
       inputTemplateId
       outputTemplateId
-      isCurrentPeriod
       createdAt
       updatedAt
     }
