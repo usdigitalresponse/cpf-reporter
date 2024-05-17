@@ -8,7 +8,7 @@ import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
 import { QUERY } from 'src/components/ReportingPeriod/ReportingPeriodsCell'
-import { checkboxInputTag, timeTag, truncate } from 'src/lib/formatters'
+import { timeTag, truncate } from 'src/lib/formatters'
 
 const DELETE_REPORTING_PERIOD_MUTATION = gql`
   mutation DeleteReportingPeriodMutation($id: Int!) {

@@ -7,7 +7,7 @@ import { Link, routes, navigate } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
-import { checkboxInputTag, timeTag } from 'src/lib/formatters'
+import { timeTag } from 'src/lib/formatters'
 
 const DELETE_REPORTING_PERIOD_MUTATION = gql`
   mutation DeleteReportingPeriodMutation($id: Int!) {
