@@ -45,6 +45,9 @@ services:
       context: .
       dockerfile: ./Dockerfile
       target: console
+    volumes:
+      - .:/home/node/app
+      - node_modules:/home/node/app/node_modules
     tmpfs:
       - /tmp
     command: "true"
