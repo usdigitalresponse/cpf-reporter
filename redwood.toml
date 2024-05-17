@@ -9,6 +9,7 @@
   bundler = "webpack"
   title = "Redwood App"
   port = 8910
+  host = "0.0.0.0"
   # You can customize graphql and dbauth urls individually too:
   # see https://redwoodjs.com/docs/app-configuration-redwood-toml#api-paths
   apiUrl = "${API_URL:/.redwood/functions}"
@@ -30,6 +31,7 @@
   ]
 
 [api]
+  host = '0.0.0.0'
   port = 8911
 
 [browser]
