@@ -56,6 +56,24 @@ services:
       - TEST_DATABASE_URL=postgresql://redwood:redwood@db:5432/redwood_test
     depends_on:
       - db
+  
+  # docker compose -f ./docker-compose.dev.yml run --rm -it python-console /bin/bash
+  python-console:
+    user: root
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: python-console
+    volumes:
+      - .:/home/node/app
+    tmpfs:
+      - /tmp
+    command: "true"
+    environment:
+      - DATABASE_URL=postgresql://redwood:redwood@db:5432/redwood
+      - TEST_DATABASE_URL=postgresql://redwood:redwood@db:5432/redwood_test
+    depends_on:
+      - db
 
 volumes:
   node_modules:
