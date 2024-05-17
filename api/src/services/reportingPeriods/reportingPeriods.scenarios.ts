@@ -9,7 +9,6 @@ export const standard = defineScenario<Prisma.ReportingPeriodCreateArgs>({
         name: 'String',
         startDate: '2024-01-12T15:48:11.499Z',
         endDate: '2024-01-12T15:48:11.499Z',
-        organization: { create: { name: 'String' } },
         inputTemplate: {
           create: {
             name: 'String',
@@ -31,7 +30,6 @@ export const standard = defineScenario<Prisma.ReportingPeriodCreateArgs>({
         name: 'String',
         startDate: '2024-01-12T15:48:11.499Z',
         endDate: '2024-01-12T15:48:11.499Z',
-        organization: { create: { name: 'String' } },
         inputTemplate: {
           create: {
             name: 'String',

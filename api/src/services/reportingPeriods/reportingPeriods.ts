@@ -39,16 +39,6 @@ export const deleteReportingPeriod: MutationResolvers['deleteReportingPeriod'] =
   }
 
 export const ReportingPeriod: ReportingPeriodRelationResolvers = {
-  organization: (_obj, { root }) => {
-    return db.reportingPeriod
-      .findUnique({ where: { id: root?.id } })
-      .organization()
-  },
-  certifiedBy: (_obj, { root }) => {
-    return db.reportingPeriod
-      .findUnique({ where: { id: root?.id } })
-      .certifiedBy()
-  },
   inputTemplate: (_obj, { root }) => {
     return db.reportingPeriod
       .findUnique({ where: { id: root?.id } })

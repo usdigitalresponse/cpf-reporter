@@ -25,7 +25,6 @@ model Organization {
   id                Int                 @id @default(autoincrement())
   agencies          Agency[]
   name              String
-  reportingPeriods  ReportingPeriod[]
   subrecipients     Subrecipient[]
   projects          Project[]
   preferences       Json?
@@ -42,7 +41,6 @@ model User {
   isActive       Boolean             @default(true)
   passageId      String?
   agency         Agency              @relation(fields: [agencyId], references: [id])
-  certified      ReportingPeriod[]
   uploaded       Upload[]
   initiated      UploadValidation[]
 
@@ -82,16 +80,10 @@ model ReportingPeriod {
   name             String
   startDate        DateTime       @db.Date
   endDate          DateTime       @db.Date
-  organizationId   Int
-  organization     Organization   @relation(fields: [organizationId], references: [id])
-  certifiedAt      DateTime?      @db.Timestamptz(6)
-  certifiedById    Int?
-  certifiedBy      User?          @relation(fields: [certifiedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
   inputTemplateId  Int
   inputTemplate    InputTemplate  @relation(fields: [inputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   outputTemplateId Int
   outputTemplate   OutputTemplate @relation(fields: [outputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  isCurrentPeriod  Boolean        @default(false)
   createdAt        DateTime       @default(now()) @db.Timestamptz(6)
   updatedAt        DateTime       @default(now()) @db.Timestamptz(6)
   uploads          Upload[]
