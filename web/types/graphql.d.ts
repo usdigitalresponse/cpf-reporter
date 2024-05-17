@@ -368,7 +368,6 @@ export type Organization = {
   name: Scalars['String']
   preferences?: Maybe<Scalars['JSON']>
   projects: Array<Maybe<Project>>
-  reportingPeriods: Array<Maybe<ReportingPeriod>>
   subrecipients: Array<Maybe<Subrecipient>>
   users: Array<Maybe<User>>
 }
@@ -677,7 +676,6 @@ export type User = {
   __typename?: 'User'
   agency: Agency
   agencyId: Scalars['Int']
-  certified: Array<Maybe<ReportingPeriod>>
   createdAt: Scalars['DateTime']
   email: Scalars['String']
   id: Scalars['Int']
@@ -876,12 +874,8 @@ export type EditReportingPeriodById = {
     name: string
     startDate: string
     endDate: string
-    organizationId: number
-    certifiedAt?: string | null
-    certifiedById?: number | null
     inputTemplateId: number
     outputTemplateId: number
-    isCurrentPeriod: boolean
     createdAt: string
     updatedAt: string
   } | null
@@ -900,12 +894,8 @@ export type UpdateReportingPeriodMutation = {
     name: string
     startDate: string
     endDate: string
-    organizationId: number
-    certifiedAt?: string | null
-    certifiedById?: number | null
     inputTemplateId: number
     outputTemplateId: number
-    isCurrentPeriod: boolean
     createdAt: string
     updatedAt: string
   }

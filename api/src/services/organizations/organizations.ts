@@ -91,11 +91,6 @@ export const Organization: OrganizationRelationResolvers = {
   users: (_obj, { root }) => {
     return db.organization.findUnique({ where: { id: root?.id } }).users()
   },
-  reportingPeriods: (_obj, { root }) => {
-    return db.organization
-      .findUnique({ where: { id: root?.id } })
-      .reportingPeriods()
-  },
   uploads: (_obj, { root }) => {
     return db.organization.findUnique({ where: { id: root?.id } }).uploads()
   },

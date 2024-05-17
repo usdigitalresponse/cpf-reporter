@@ -417,7 +417,6 @@ export type Organization = {
   name: Scalars['String']
   preferences?: Maybe<Scalars['JSON']>
   projects: Array<Maybe<Project>>
-  reportingPeriods: Array<Maybe<ReportingPeriod>>
   subrecipients: Array<Maybe<Subrecipient>>
   users: Array<Maybe<User>>
 }
@@ -727,7 +726,6 @@ export type User = {
   __typename?: 'User'
   agency: Agency
   agencyId: Scalars['Int']
-  certified: Array<Maybe<ReportingPeriod>>
   createdAt: Scalars['DateTime']
   email: Scalars['String']
   id: Scalars['Int']
@@ -1869,11 +1867,6 @@ export type OrganizationResolvers<
     ParentType,
     ContextType
   >
-  reportingPeriods: OptArgsResolverFn<
-    Array<Maybe<ResolversTypes['ReportingPeriod']>>,
-    ParentType,
-    ContextType
-  >
   subrecipients: OptArgsResolverFn<
     Array<Maybe<ResolversTypes['Subrecipient']>>,
     ParentType,
@@ -1905,11 +1898,6 @@ export type OrganizationRelationResolvers<
   >
   projects?: RequiredResolverFn<
     Array<Maybe<ResolversTypes['Project']>>,
-    ParentType,
-    ContextType
-  >
-  reportingPeriods?: RequiredResolverFn<
-    Array<Maybe<ResolversTypes['ReportingPeriod']>>,
     ParentType,
     ContextType
   >
@@ -2915,11 +2903,6 @@ export type UserResolvers<
 > = {
   agency: OptArgsResolverFn<ResolversTypes['Agency'], ParentType, ContextType>
   agencyId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>
-  certified: OptArgsResolverFn<
-    Array<Maybe<ResolversTypes['ReportingPeriod']>>,
-    ParentType,
-    ContextType
-  >
   createdAt: OptArgsResolverFn<
     ResolversTypes['DateTime'],
     ParentType,
@@ -2948,11 +2931,6 @@ export type UserRelationResolvers<
 > = {
   agency?: RequiredResolverFn<ResolversTypes['Agency'], ParentType, ContextType>
   agencyId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>
-  certified?: RequiredResolverFn<
-    Array<Maybe<ResolversTypes['ReportingPeriod']>>,
-    ParentType,
-    ContextType
-  >
   createdAt?: RequiredResolverFn<
     ResolversTypes['DateTime'],
     ParentType,
