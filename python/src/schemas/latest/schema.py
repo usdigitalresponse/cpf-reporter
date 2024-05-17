@@ -353,32 +353,32 @@ class AddressFields(BaseModel):
     Street_1_Planned__c: str = Field(
         ..., serialization_alias="Street 1 (Planned)", max_length=40, json_schema_extra={"column":"BQ"}
     )
-    Street_2_Planned__c: str = Field(
+    Street_2_Planned__c: Optional[str] = Field(
         default=None, serialization_alias="Street 2 (Planned)", max_length=40, json_schema_extra={"column":"BR"}
     )
-    Same_Address__c: YesNoType = Field(default=None, serialization_alias="Same Address", json_schema_extra={"column":"BS"})
-    Street_1_Actual__c: str = Field(
+    Same_Address__c: Optional[YesNoType] = Field(default=None, serialization_alias="Same Address", json_schema_extra={"column":"BS"})
+    Street_1_Actual__c: Optional[str] = Field(
         default=None, serialization_alias="Street 1 (Actual)", max_length=40, json_schema_extra={"column":"BT"}
     )
-    Street_2_Actual__c: str = Field(
+    Street_2_Actual__c: Optional[str] = Field(
         default=None, serialization_alias="Street 2 (Actual)", max_length=40, json_schema_extra={"column":"BU"}
     )
     City_Planned__c: str = Field(
         ..., serialization_alias="City (Planned)", max_length=40, json_schema_extra={"column":"BV"}
     )
-    City_Actual__c: str = Field(
+    City_Actual__c: Optional[str] = Field(
         default=None, serialization_alias="City (Actual)", max_length=40, json_schema_extra={"column":"BW"}
     )
     State_Planned__c: StateAbbreviation = Field(
         ..., serialization_alias="State (Planned)", json_schema_extra={"column":"BX"}
     )
-    State_Actual__c: StateAbbreviation = Field(
+    State_Actual__c: Optional[StateAbbreviation] = Field(
         default=None, serialization_alias="State (Actual)", json_schema_extra={"column":"BY"}
     )
     Zip_Code_Planned__c: str = Field(
         ..., serialization_alias="Zip Code (Planned)", max_length=5, json_schema_extra={"column":"BZ"}
     )
-    Zip_Code_Actual__c: str = Field(
+    Zip_Code_Actual__c: Optional[str] = Field(
         default=None, serialization_alias="Zip Code (Actual)", max_length=5, json_schema_extra={"column":"CA"}
     )
 
@@ -387,66 +387,66 @@ class Project1BRow(BaseProjectRow, AddressFields):
     Laptops_Planned__c: conint(ge=0, le=9999999999) = Field(
         ..., serialization_alias="Laptops (Planned)", json_schema_extra={"column":"CB"}
     )
-    Laptops_Actual__c: conint(ge=0, le=9999999999) = Field(
+    Laptops_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Laptops (Actual)", json_schema_extra={"column":"CC"}
     )
     Laptops_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = (
         Field(..., serialization_alias="Laptops Expenditure (Planned)", json_schema_extra={"column":"CD"})
     )
-    Laptops_Expenditures_Actual__c: condecimal(max_digits=13, decimal_places=2) = Field(
+    Laptops_Expenditures_Actual__c: Optional[condecimal(max_digits=13, decimal_places=2)] = Field(
         default=None, serialization_alias="Laptops Expenditure (Actual)", json_schema_extra={"column":"CE"}
     )
     Tablets_Planned__c: conint(ge=0, le=9999999999) = Field(
         ..., serialization_alias="Tablets (Planned)", json_schema_extra={"column":"CF"}
     )
-    Tablets_Actual__c: conint(ge=0, le=9999999999) = Field(
+    Tablets_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Tablets (Actual)", json_schema_extra={"column":"CG"}
     )
     Tablet_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = Field(
         ..., serialization_alias="Tablets Expenditure (Planned)", json_schema_extra={"column":"CH"}
     )
-    Tablets_Expenditures_Actual__c: condecimal(max_digits=13, decimal_places=2) = Field(
+    Tablets_Expenditures_Actual__c: Optional[condecimal(max_digits=13, decimal_places=2)] = Field(
         default=None, serialization_alias="Tablets Expenditure (Actual)", json_schema_extra={"column":"CI"}
     )
     Desktop_Computers_Planned__c: conint(ge=0, le=9999999999) = Field(
         ..., serialization_alias="Desktop Computers (Planned)", json_schema_extra={"column":"CJ"}
     )
-    Desktop_Computers_Actual__c: conint(ge=0, le=9999999999) = Field(
+    Desktop_Computers_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Desktop Computers (Actual)", json_schema_extra={"column":"CK"}
     )
     Desktop_Computers_Expenditures_Planned__c: condecimal(
         max_digits=13, decimal_places=2
     ) = Field(..., serialization_alias="Desktop Computers Expenditure (Planned)", json_schema_extra={"column":"CL"})
-    Desktop_Computers_Expenditures_Actual__c: condecimal(
+    Desktop_Computers_Expenditures_Actual__c: Optional[condecimal(
         max_digits=13, decimal_places=2
-    ) = Field(
+    )] = Field(
         default=None, serialization_alias="Desktop Computers Expenditure (Actual)", json_schema_extra={"column":"CM"}
     )
     Public_WiFi_Planned__c: conint(ge=0, le=9999999999) = Field(
         ..., serialization_alias="Public WiFi (Planned)", json_schema_extra={"column":"CN"}
     )
-    Public_WiFi_Actual__c: conint(ge=0, le=9999999999) = Field(
+    Public_WiFi_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Public WiFi (Actual)", json_schema_extra={"column":"CO"}
     )
     Public_WiFi_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = (
         Field(..., serialization_alias="Public Wifi Expenditures (Planned)", json_schema_extra={"column":"CP"})
     )
-    Public_WiFi_Expenditures_Actual__c: condecimal(max_digits=13, decimal_places=2) = (
+    Public_WiFi_Expenditures_Actual__c: Optional[condecimal(max_digits=13, decimal_places=2)] = (
         Field(default=None, serialization_alias="Public Wifi Expenditures (Actual)", json_schema_extra={"column":"CQ"})
     )
     Other_Devices_Planned__c: conint(ge=0, le=9999999999) = Field(
         ..., serialization_alias="Other Devices (Planned)", json_schema_extra={"column":"CR"}
     )
-    Other_Devices_Actual__c: conint(ge=0, le=9999999999) = Field(
+    Other_Devices_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Other Devices (Actual)", json_schema_extra={"column":"CS"}
     )
     Other_Expenditures_Planned__c: condecimal(max_digits=7, decimal_places=2) = Field(
         ..., serialization_alias="Other Expenditures (Planned)", json_schema_extra={"column":"CT"}
     )
-    Other_Expenditures_Actual__c: condecimal(max_digits=7, decimal_places=2) = Field(
+    Other_Expenditures_Actual__c: Optional[condecimal(max_digits=7, decimal_places=2)] = Field(
         default=None, serialization_alias="Other Expenditures (Actual)", json_schema_extra={"column":"CU"}
     )
-    Explanation_of_Other_Expend__c: str = Field(
+    Explanation_of_Other_Expend__c: Optional[str] = Field(
         default=None,
         serialization_alias="Explanation of Other Expenditures",
         max_length=3000,
@@ -455,13 +455,13 @@ class Project1BRow(BaseProjectRow, AddressFields):
     Number_of_Users_Planned__c: conint(ge=0, le=9999999999) = Field(
         ..., serialization_alias="Number of Users (Planned)", json_schema_extra={"column":"CW"}
     )
-    Number_of_Users_Actual__c: conint(ge=0, le=9999999999) = Field(
+    Number_of_Users_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Number of Users (Actual)", json_schema_extra={"column":"CX"}
     )
     Brief_Narrative_Planned__c: str = Field(
         ..., serialization_alias="Brief Narrative (Planned)", max_length=3000, json_schema_extra={"column":"CY"}
     )
-    Brief_Narrative_Actual__c: str = Field(
+    Brief_Narrative_Actual__c: Optional[str] = Field(
         default=None, serialization_alias="Brief Narrative (Actual)", max_length=3000, json_schema_extra={"column":"CZ"}
     )
     Measurement_of_Effectiveness__c: YesNoType = Field(
@@ -470,55 +470,55 @@ class Project1BRow(BaseProjectRow, AddressFields):
 
 
 class Project1CRow(BaseProjectRow, AddressFields):
-    Type_of_Investment__c: str = Field(
+    Type_of_Investment__c: Optional[str] = Field(
         default=None, serialization_alias="Type of Investment", json_schema_extra={"column":"DB"}
     )
-    Additional_Address__c: str = Field(
+    Additional_Address__c: Optional[str] = Field(
         default=None, serialization_alias="Additional Addresses", max_length=32000, json_schema_extra={"column":"DC"}
     )
-    Classrooms_Planned__c: conint(ge=0, le=9999999999) = Field(
+    Classrooms_Planned__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Classrooms (Planned)", json_schema_extra={"column":"DD"}
     )
-    Classrooms_Actual__c: conint(ge=0, le=9999999999) = Field(
+    Classrooms_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Classrooms (Actual)", json_schema_extra={"column":"DE"}
     )
-    Computer_labs_Planned__c: conint(ge=0, le=9999999999) = Field(
+    Computer_labs_Planned__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Computer labs (Planned)", json_schema_extra={"column":"DF"}
     )
-    Computer_labs_Actual__c: conint(ge=0, le=9999999999) = Field(
+    Computer_labs_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Computer labs (Actual)", json_schema_extra={"column":"DG"}
     )
-    Multi_purpose_Spaces_Planned__c: conint(ge=0, le=9999999999) = Field(
+    Multi_purpose_Spaces_Planned__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Multi-purpose Spaces (Planned)", json_schema_extra={"column":"DH"}
     )
-    Multi_purpose_Spaces_Actual__c: conint(ge=0, le=9999999999) = Field(
+    Multi_purpose_Spaces_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Multi-purpose Spaces (Actual)", json_schema_extra={"column":"DI"}
     )
-    Telemedicine_Rooms_Planned__c: conint(ge=0, le=9999999999) = Field(
+    Telemedicine_Rooms_Planned__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Telemedicine Rooms (Planned)", json_schema_extra={"column":"DJ"}
     )
-    Telemedicine_Rooms_Actual__c: conint(ge=0, le=9999999999) = Field(
+    Telemedicine_Rooms_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Telemedicine Rooms (Actual)", json_schema_extra={"column":"DK"}
     )
-    Other_Capital_Assets_Planned__c: conint(ge=0, le=9999999999) = Field(
+    Other_Capital_Assets_Planned__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Other Capital Assets (Planned)", json_schema_extra={"column":"DL"}
     )
-    Other_Capital_Assets_Actual__c: conint(ge=0, le=9999999999) = Field(
+    Other_Capital_Assets_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Other Capital Assets (Actual)", json_schema_extra={"column":"DM"}
     )
-    Type_and_Features__c: str = Field(
+    Type_and_Features__c: Optional[str] = Field(
         default=None, serialization_alias="Type and Features", max_length=3000, json_schema_extra={"column":"DN"}
     )
-    Total_square_footage_Planned__c: conint(ge=0, le=9999999999) = Field(
+    Total_square_footage_Planned__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Total square footage (Planned)", json_schema_extra={"column":"DO"}
     )
-    Total_square_footage_Actual__c: conint(ge=0, le=9999999999) = Field(
+    Total_square_footage_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Total square footage (Actual)", json_schema_extra={"column":"DP"}
     )
-    Total_Number_of_Users_Actual__c: conint(ge=0, le=9999999999) = Field(
+    Total_Number_of_Users_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Total Number of Users (Actual)", json_schema_extra={"column":"DQ"}
     )
-    Further_Explanation__c: str = Field(
+    Further_Explanation__c: Optional[str] = Field(
         default=None, serialization_alias="Further Explanation", max_length=2000, json_schema_extra={"column":"DR"}
     )
     Access_to_Public_Transit__c: YesNoType = Field(
@@ -552,12 +552,12 @@ class SubrecipientRow(BaseModel):
         ..., serialization_alias="POC Email Address", max_length=80, json_schema_extra={"column":"H"}
     )
     Zip__c: str = Field(..., serialization_alias="Zip5", max_length=5, json_schema_extra={"column":"I"})
-    Zip_4__c: str = Field(default=None, serialization_alias="Zip4", max_length=4, json_schema_extra={"column":"J"})
+    Zip_4__c: Optional[str] = Field(default=None, serialization_alias="Zip4", max_length=4, json_schema_extra={"column":"J"})
     Address__c: str = Field(..., serialization_alias="Address Line 1", max_length=40, json_schema_extra={"column":"K"})
-    Address_2__c: str = Field(
+    Address_2__c: Optional[str] = Field(
         default=None, serialization_alias="Address Line 2", max_length=40, json_schema_extra={"column":"L"}
     )
-    Address_3__c: str = Field(
+    Address_3__c: Optional[str] = Field(
         default=None, serialization_alias="Address Line 3", max_length=40, json_schema_extra={"column":"M"}
     )
     City__c: str = Field(..., serialization_alias="City", max_length=100, json_schema_extra={"column":"N"})
@@ -576,6 +576,13 @@ class ProjectType(str, Enum):
     _1A = "1A"
     _1B = "1B"
     _1C = "1C"
+
+    @classmethod
+    def from_project_name(cls, project_name: str) -> "ProjectType":
+        for project_type in cls:
+            if project_type.value == project_name:
+                return project_type
+        raise ValueError(f"Project name '{project_name}' is not a recognized project type.")
 
 
 SCHEMA_BY_PROJECT = {

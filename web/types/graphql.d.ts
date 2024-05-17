@@ -18,6 +18,7 @@ export type Scalars = {
   Int: number
   Float: number
   BigInt: number
+  Byte: Buffer
   Date: string
   DateTime: string
   JSON: Prisma.JsonValue

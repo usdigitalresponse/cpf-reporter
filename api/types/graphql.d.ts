@@ -67,6 +67,7 @@ export type Scalars = {
   Int: number
   Float: number
   BigInt: number
+  Byte: Buffer
   Date: Date | string
   DateTime: Date | string
   JSON: Prisma.JsonValue
@@ -886,6 +887,7 @@ export type ResolversTypes = {
   >
   BigInt: ResolverTypeWrapper<Scalars['BigInt']>
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>
+  Byte: ResolverTypeWrapper<Scalars['Byte']>
   CreateAgencyInput: CreateAgencyInput
   CreateExpenditureCategoryInput: CreateExpenditureCategoryInput
   CreateInputTemplateInput: CreateInputTemplateInput
@@ -1018,6 +1020,7 @@ export type ResolversParentTypes = {
   >
   BigInt: Scalars['BigInt']
   Boolean: Scalars['Boolean']
+  Byte: Scalars['Byte']
   CreateAgencyInput: CreateAgencyInput
   CreateExpenditureCategoryInput: CreateExpenditureCategoryInput
   CreateInputTemplateInput: CreateInputTemplateInput
@@ -1122,12 +1125,32 @@ export type requireAuthDirectiveArgs = {
   roles?: Maybe<Array<Maybe<Scalars['String']>>>
 }
 
-export type requireAuthDirectiveResolver<
-  Result,
-  Parent,
+export interface ByteScalarConfig
+  extends GraphQLScalarTypeConfig<ResolversTypes['Byte'], any> {
+  name: 'Byte'
+}
+
+export type CreateOrgAgencyAdminPayloadResolvers<
   ContextType = RedwoodGraphQLContext,
-  Args = requireAuthDirectiveArgs
-> = DirectiveResolverFn<Result, Parent, ContextType, Args>
+  ParentType extends ResolversParentTypes['CreateOrgAgencyAdminPayload'] = ResolversParentTypes['CreateOrgAgencyAdminPayload']
+> = {
+  agency: OptArgsResolverFn<
+    Maybe<ResolversTypes['Agency']>,
+    ParentType,
+    ContextType
+  >
+  organization: OptArgsResolverFn<
+    Maybe<ResolversTypes['Organization']>,
+    ParentType,
+    ContextType
+  >
+  user: OptArgsResolverFn<
+    Maybe<ResolversTypes['User']>,
+    ParentType,
+    ContextType
+  >
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
 
 export type skipAuthDirectiveArgs = {}
 
@@ -3085,6 +3108,7 @@ export type ValidationRulesRelationResolvers<
 export type Resolvers<ContextType = RedwoodGraphQLContext> = {
   Agency: AgencyResolvers<ContextType>
   BigInt: GraphQLScalarType
+  Byte: GraphQLScalarType
   CreateOrgAgencyAdminPayload: CreateOrgAgencyAdminPayloadResolvers<ContextType>
   Date: GraphQLScalarType
   DateTime: GraphQLScalarType

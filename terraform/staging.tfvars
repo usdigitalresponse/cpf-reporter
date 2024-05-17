@@ -27,17 +27,17 @@ postgres_query_logging_enabled     = true
 
 // General Lambda options
 lambda_log_level  = "debug"
-lambda_js_runtime = "nodejs18.x"
+lambda_js_runtime = "nodejs20.x"
 lambda_py_runtime = "python3.12"
 lambda_arch       = "x86_64"
 
 // Website
 website_domain_name   = "staging.cpf.usdr.dev"
 website_feature_flags = {}
-website_config_params = {
-  passage_app_id = "TBD"
-  auth_provider  = "TBD"
-}
+website_config_params = {}
+
+// API Auth Provider
+passage_app_id = "OjNe5PvwdKm6rmcFc1WfPIBa"
 
 // API
 api_domain_name = "api.staging.cpf.usdr.dev"

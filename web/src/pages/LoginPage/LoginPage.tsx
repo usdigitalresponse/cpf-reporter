@@ -1,3 +1,8 @@
+import { useEffect, useRef } from 'react'
+
+import '@passageidentity/passage-elements/passage-login'
+import { PassageElement } from '@passageidentity/passage-elements'
+
 import {
   Form,
   EmailField,
@@ -5,23 +10,35 @@ import {
   FieldError,
   Label,
   SelectField,
-  SubmitHandler,
 } from '@redwoodjs/forms'
 import { MetaTags } from '@redwoodjs/web'
 
 import { useAuth } from 'src/auth'
-import { LoginEventInterface } from 'src/auth/localAuth'
 import { users } from 'src/lib/seeds'
 
 const LoginPage = () => {
+  const ref = useRef<PassageElement>()
   const { logIn } = useAuth()
-  const onSuccess = (event: SubmitHandler<LoginEventInterface>) => {
-    if (process.env.AUTH_PROVIDER === 'local') {
-      logIn(event)
-    } else {
-      logIn()
-    }
+
+  const onSuccess = (event) => {
+    logIn(event)
   }
+
+  useEffect(() => {
+    if (window.APP_CONFIG?.webConfigParams?.auth_provider === 'passage') {
+      const { current } = ref
+      current.onSuccess = onSuccess
+      return () => {}
+    }
+  })
+
+  const passageAuth = (
+    <passage-login
+      ref={ref}
+      app-id={window.APP_CONFIG?.webConfigParams?.passage_app_id}
+    />
+  )
+
   const localAuth = (
     <>
       <div className="rw-segment-main">
@@ -68,7 +85,15 @@ const LoginPage = () => {
   return (
     <>
       <MetaTags title="Login" description="Login page" />
-      <div>{process.env.AUTH_PROVIDER === 'local' ? localAuth : ''}</div>
+      <div>
+        {window.APP_CONFIG?.webConfigParams?.auth_provider === 'local' ||
+        process.env.AUTH_PROVIDER === 'local'
+          ? localAuth
+          : ''}
+        {window.APP_CONFIG?.webConfigParams?.auth_provider === 'passage'
+          ? passageAuth
+          : ''}
+      </div>
     </>
   )
 }

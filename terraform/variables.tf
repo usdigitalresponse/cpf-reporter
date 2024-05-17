@@ -234,7 +234,7 @@ variable "console_container_image" {
 variable "lambda_js_runtime" {
   description = "Lambda runtime for the target Node.js version."
   type        = string
-  default     = "nodejs18.x"
+  default     = "nodejs20.x"
 }
 
 variable "lambda_py_runtime" {
@@ -305,4 +305,9 @@ variable "website_config_params" {
     condition     = can(jsonencode(var.website_config_params))
     error_message = "Value must be JSON-serializable."
   }
+}
+
+variable "passage_app_id" {
+  description = "The Passage app ID to use for authentication."
+  type        = string
 }

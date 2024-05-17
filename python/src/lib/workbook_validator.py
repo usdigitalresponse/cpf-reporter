@@ -1,16 +1,13 @@
-from typing import Any, IO, Iterable, List, Optional, Tuple
+from enum import Enum
+from typing import IO, Any, Iterable, List, Optional, Tuple, Union, Type, Dict
 
-from openpyxl import load_workbook
+from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import ValidationError
-from src.schemas.latest.schema import (
-    SCHEMA_BY_PROJECT,
-    CoverSheetRow,
-    LogicSheetVersion,
-    SubrecipientRow,
-    BaseProjectRow,
-    BaseModel
-)
+from src.lib.logging import get_logger
+from src.schemas.latest.schema import (SCHEMA_BY_PROJECT, BaseModel,
+                                       CoverSheetRow, LogicSheetVersion, ProjectType,
+                                       SubrecipientRow, Project1ARow, Project1BRow, Project1CRow)
 
 type Errors = List[WorkbookError]
 
@@ -19,19 +16,41 @@ COVER_SHEET = "Cover"
 PROJECT_SHEET = "Project"
 SUBRECIPIENTS_SHEET = "Subrecipients"
 
+_logger = get_logger(__name__)
+
+
+# enum for error level
+# error, warning, info
+# default is error
+class ErrorLevel(Enum):
+    ERR: int = 1
+    WARN: int = 2
+    INFO: int = 3
+
+
 class WorkbookError:
     message: str
     row: str
     col: str
     tab: str
     field_name: str
+    severity: str = ErrorLevel.WARN.name
 
-    def __init__(self, message: str, row: str, col: str, tab: str, field_name: str):
+    def __init__(
+        self,
+        message: str,
+        row: str = 'N/A',
+        col: str = 'N/A',
+        tab: str = 'N/A',
+        field_name: str = 'N/A',
+        severity: str = ErrorLevel.WARN.name,
+    ):
         self.message = message
         self.row = row
         self.col = col
         self.tab = tab
         self.field_name = field_name
+        self.severity = severity
 
 
 def map_values_to_headers(headers: Tuple, values: Iterable[Any]):
@@ -45,11 +64,19 @@ def is_empty_row(row_values: Tuple):
 def get_headers(sheet: Worksheet, cell_range: str) -> tuple:
     return tuple(header_cell.value for header_cell in sheet[cell_range][0])
 
-def get_project_use_code(cover_sheet: Worksheet) -> str:
-    cover_header = get_headers(cover_sheet, "A1:B1")
-    cover_row = map(lambda cell: cell.value, cover_sheet[2])
-    row_dict = map_values_to_headers(cover_header, cover_row)
-    return row_dict["Project Use Code"]
+
+"""
+This function gets the Project Use Code from the cover sheet or uses the row provided.
+If the project use code is not found or if it does not match any of the ProjectType values, it raises an error.
+"""
+def get_project_use_code(cover_sheet: Worksheet, row_dict: Optional[Dict[str,str]] = None) -> ProjectType:
+    if not row_dict:
+        cover_header = get_headers(cover_sheet, "A1:B1")
+        cover_row = map(lambda cell: cell.value, cover_sheet[2])
+        row_dict = map_values_to_headers(cover_header, cover_row)
+    code = row_dict["Project Use Code"]
+    return ProjectType.from_project_name(code)
+
 
 """
 This function converts a list of ValidationError records for a single row into a list of WorkbookError records. 
@@ -60,7 +87,11 @@ and then grabbing that field off of the relevant model class passed in.
 On the model class, the field definition has a property of json_schema_extra,
 defined in schema.py on a per-field basis, that contains the column for that particular field.
 """
-def get_workbook_errors_for_row(SheetModelClass: BaseModel, e: ValidationError, row_num: int, sheet_name: str) -> List[WorkbookError]:
+
+
+def get_workbook_errors_for_row(
+    SheetModelClass: Type[Union[CoverSheetRow, Project1ARow, Project1BRow, Project1CRow, SubrecipientRow]], e: ValidationError, row_num: int, sheet_name: str
+) -> List[WorkbookError]:
     workbook_errors: List[WorkbookError] = []
     for error in e.errors():
         """
@@ -74,14 +105,28 @@ def get_workbook_errors_for_row(SheetModelClass: BaseModel, e: ValidationError, 
             'url': 'https://errors.pydantic.dev/2.6/v/string_type'
             }
         """
-        erroring_field_name = error['loc'][0]
-        erroring_field = SheetModelClass.__fields__[erroring_field_name]
-        if (erroring_field and erroring_field.json_schema_extra):
-            erroring_column = erroring_field.json_schema_extra["column"]
-        else:
+        erroring_field_name: str = f'{error["loc"][0]}'
+        try:
+            field_instance = SheetModelClass.model_fields[erroring_field_name]
+            if isinstance(field_instance.json_schema_extra, dict):
+                erroring_column = field_instance.json_schema_extra['column']
+            else:
+                raise Exception(f"Issue with schema definition for field {erroring_field_name}.")
+        except Exception as exception:
+            _logger.error(f"Encountered unexpected exception while getting column for field {erroring_field_name} with error {error}. Details: {exception}")
             erroring_column = "Unknown"
+
         message = f'Error in field {erroring_field_name}-{error["msg"]}'
-        workbook_errors.append(WorkbookError(message, f'{row_num}', erroring_column, sheet_name, erroring_field_name))
+        workbook_errors.append(
+            WorkbookError(
+                message=message,
+                row=f"{row_num}",
+                col=f"{erroring_column}",
+                tab=sheet_name,
+                field_name=erroring_field_name,
+                severity=ErrorLevel.ERR.name,
+            )
+        )
     return workbook_errors
 
 
@@ -97,38 +142,70 @@ def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str]]:
     See: https://openpyxl.readthedocs.io/en/stable/optimized.html
     If there is any trouble loading files from memory please see here: https://stackoverflow.com/questions/20635778/using-openpyxl-to-read-file-from-memory
     """
-    wb = load_workbook(filename=workbook, read_only=True)
+    try:
+        wb = load_workbook(filename=workbook, read_only=True)
+        return validate_workbook(wb)
+    except Exception as e:
+        _logger.error(f"Unexpected Validation Error: {e}")
+        return ([
+            WorkbookError(
+                "Unable to validate workbook. Please reach out to grants-helpdesk@usdigitalresponse.org",
+                severity=ErrorLevel.ERR.name,
+            )
+        ], 'Unkown')
+
+    finally:
+        workbook.close()
+
+
+def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
+    """Validates a given Excel workbook according to CPF validation rules.
+
+    Args:
+        workbook: The Excel workbook to validate.
+    """
+    """
+    0. Validate that the workbook has all the appropriate sheets
+    """
+    errors: Errors = []
+    errors += validate_workbook_sheets(workbook)
 
     """
-    2. Validate logic sheet to make sure the sheet has an appropriate version
+    1. Validate logic sheet to make sure the sheet has an appropriate version
     """
-    errors = validate_logic_sheet(wb[LOGIC_SHEET])
-    if len(errors) > 0:
-        return errors, None
+    errors += validate_logic_sheet(workbook[LOGIC_SHEET])
 
     """
-    3. Validate cover sheet and project selection. Pick the appropriate validator for the next step.
+    2. Validate cover sheet and project selection. Pick the appropriate validator for the next step.
     """
-    errors, project_schema = validate_cover_sheet(wb[COVER_SHEET])
-    if len(errors) > 0:
-        return errors, None
-    
-    project_use_code = get_project_use_code(wb[COVER_SHEET])
+    cover_errors, project_schema, project_use_code = validate_cover_sheet(workbook[COVER_SHEET])
+    errors += cover_errors
 
     """
-    4. Ensure all project rows are validated with the schema
+    3. Ensure all project rows are validated with the schema
     """
-    project_errors = validate_project_sheet(wb[PROJECT_SHEET], project_schema)
+    if project_schema:
+        errors += validate_project_sheet(workbook[PROJECT_SHEET], project_schema)
 
     """
-    5. Ensure all subrecipient rows are validated with the schema
+    4. Ensure all subrecipient rows are validated with the schema
     """
-    subrecipient_errors = validate_subrecipient_sheet(wb[SUBRECIPIENTS_SHEET])
+    errors += validate_subrecipient_sheet(workbook[SUBRECIPIENTS_SHEET])
 
-    # Close the workbook after reading
-    wb.close()
+    return (errors, project_use_code)
 
-    return (project_errors + subrecipient_errors, project_use_code)
+def validate_workbook_sheets(workbook: Workbook) -> Errors:
+    errors = []
+    expected_sheets = [LOGIC_SHEET, COVER_SHEET, PROJECT_SHEET, SUBRECIPIENTS_SHEET]
+    for sheet in expected_sheets:
+        if sheet not in workbook.sheetnames:
+            errors.append(
+                WorkbookError(
+                    f"Workbook is missing expected sheet: {sheet}",
+                    severity=ErrorLevel.ERR.name,
+                )
+            )
+    return errors
 
 
 # Accepts a workbook from openpyxl
@@ -138,13 +215,22 @@ def validate_logic_sheet(logic_sheet: Worksheet) -> Errors:
         # Cell B1 contains the version
         LogicSheetVersion(**{"version": logic_sheet["B1"].value})
     except ValidationError as e:
-        errors.append(WorkbookError(f"{LOGIC_SHEET} Sheet: Invalid {e}", "1", "B", LOGIC_SHEET, 'version'))
+        errors.append(
+            WorkbookError(
+                f"{LOGIC_SHEET} Sheet: Invalid {e}",
+                "1",
+                "B",
+                LOGIC_SHEET,
+                "version",
+                severity=ErrorLevel.WARN.name,
+            )
+        )
     return errors
 
 
 def validate_cover_sheet(
     cover_sheet: Worksheet,
-) -> Tuple[Errors, Optional[Any]]:
+) -> Tuple[Errors, Optional[Type[Union[Project1ARow, Project1BRow, Project1CRow]]], Optional[ProjectType]]:
     errors = []
     project_schema = None
     cover_header = get_headers(cover_sheet, "A1:B1")
@@ -155,14 +241,29 @@ def validate_cover_sheet(
         CoverSheetRow(**row_dict)
     except ValidationError as e:
         errors += get_workbook_errors_for_row(CoverSheetRow, e, row_num, COVER_SHEET)
-        return (errors, None)
+        return (errors, None, None)
 
-        # This does not need to be a silent failure. This would be a critical error.
-    project_schema = SCHEMA_BY_PROJECT[row_dict["Project Use Code"]]
-    return (errors, project_schema)
+    try:
+        project_use_code: ProjectType = get_project_use_code(cover_sheet, row_dict)
+    except Exception as e:
+        _logger.error(f"Unrecognized project use code: {e}")
+        errors.append(
+            WorkbookError(
+                f"{COVER_SHEET} Sheet: Project Use Code is not recognized",
+                "2",
+                "B",
+                COVER_SHEET,
+                "Project Use Code",
+                severity=ErrorLevel.ERR.name,
+            )
+        )
+        return (errors, None, None)
+
+    project_schema = SCHEMA_BY_PROJECT[project_use_code]
+    return (errors, project_schema, project_use_code)
 
 
-def validate_project_sheet(project_sheet: Worksheet, project_schema) -> Errors:
+def validate_project_sheet(project_sheet: Worksheet, project_schema: Type[Union[Project1ARow, Project1BRow, Project1CRow]]) -> Errors:
     errors = []
     project_headers = get_headers(project_sheet, "C3:DS3")
     current_row = 12
@@ -176,7 +277,9 @@ def validate_project_sheet(project_sheet: Worksheet, project_schema) -> Errors:
         try:
             project_schema(**row_dict)
         except ValidationError as e:
-            errors += get_workbook_errors_for_row(project_schema, e, current_row, PROJECT_SHEET)
+            errors += get_workbook_errors_for_row(
+                project_schema, e, current_row, PROJECT_SHEET
+            )
     return errors
 
 
@@ -194,8 +297,11 @@ def validate_subrecipient_sheet(subrecipient_sheet: Worksheet) -> Errors:
         try:
             SubrecipientRow(**row_dict)
         except ValidationError as e:
-            errors += get_workbook_errors_for_row(SubrecipientRow, e, current_row, SUBRECIPIENTS_SHEET)
+            errors += get_workbook_errors_for_row(
+                SubrecipientRow, e, current_row, SUBRECIPIENTS_SHEET
+            )
     return errors
+
 
 if __name__ == "__main__":
     """

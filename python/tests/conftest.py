@@ -5,7 +5,6 @@ import pytest
 
 _SAMPLE_VALID_XLSM = "tests/data/sample_valid.xlsm"
 
-
 @pytest.fixture
 def valid_file() -> BinaryIO:
     file_path = _SAMPLE_VALID_XLSM
@@ -47,4 +46,11 @@ def invalid_project_sheet(valid_project_sheet):
 @pytest.fixture
 def invalid_subrecipient_sheet(valid_subrecipientsheet):
     valid_subrecipientsheet["D13"] = "INVALID"
+    return valid_subrecipientsheet
+
+@pytest.fixture
+def valid_subrecipient_sheet_blank_optional_fields(valid_subrecipientsheet):
+    valid_subrecipientsheet["J13"] = None
+    valid_subrecipientsheet["L13"] = None
+    valid_subrecipientsheet["M13"] = None
     return valid_subrecipientsheet
