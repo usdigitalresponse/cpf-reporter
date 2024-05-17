@@ -86,12 +86,11 @@ export const standard = defineScenario<
     }),
   },
   reportingPeriod: {
-    one: (scenario) => ({
+    one: () => ({
       data: {
         name: 'String',
         startDate: '2024-01-26T15:11:27.688Z',
         endDate: '2024-01-26T15:11:27.688Z',
-        organization: { connect: { id: scenario.organization.one.id } },
         inputTemplate: {
           create: {
             name: 'String',
