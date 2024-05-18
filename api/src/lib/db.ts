@@ -64,6 +64,8 @@ export async function getPrismaClient() {
   return client
 }
 
+export default getPrismaClient
+
 /*
  * Instance of the Prisma Client
  */
