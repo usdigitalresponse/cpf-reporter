@@ -1,9 +1,9 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import (BaseModel, ConfigDict, Field, condecimal, conint,
-                      validator)
+                      ValidationInfo, field_validator)
 
 
 class StateAbbreviation(Enum):
@@ -230,22 +230,44 @@ class BaseProjectRow(BaseModel):
         json_schema_extra={"column":"AQ"}
     )
 
-    @validator(
+    @field_validator(
         "Projected_Con_Start_Date__c",
         "Projected_Con_Completion__c",
         "Projected_Init_of_Operations__c",
         "Actual_Con_Start_Date__c",
         "Actual_Con_Completion__c",
         "Actual_operations_date__c",
-        pre=True,
     )
-    def parse_mm_dd_yyyy_dates(cls, value):
-        if isinstance(value, str):
+    @classmethod
+    def parse_mm_dd_yyyy_dates(cls, v):
+        if isinstance(v, str):
             try:
-                return datetime.strptime(value, "%m/%d/%Y")
+                return datetime.strptime(v, "%m/%d/%Y")
             except ValueError:
-                raise ValueError(f"Date {value} is not in 'mm/dd/yyyy' format.")
-        return value
+                raise ValueError(f"Date {v} is not in 'mm/dd/yyyy' format.")
+        return v
+
+    @field_validator(
+        "Project_Name__c",
+        "Identification_Number__c",
+        "Project_Description__c",
+        "Capital_Asset_Ownership_Type__c",
+        "Total_CPF_Funding_for_Project__c",
+        "Total_from_all_funding_sources__c",
+        "Current_Period_Obligation__c",
+        "Current_Period_Expenditure__c",
+        "Cumulative_Obligation__c",
+        "Cumulative_Expenditure__c",
+        "Cost_Overview__c",
+        "Project_Status__c",
+    )
+    @classmethod
+    def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
+        if isinstance(v, str) and v.strip == "":
+            raise ValueError(
+                f"Value is required for {info.field_name}"
+            )
+        return v
 
 
 class Project1ARow(BaseProjectRow):
@@ -347,7 +369,27 @@ class Project1ARow(BaseProjectRow):
     Affordable_Connectivity_Program_ACP__c: YesNoType = Field(
         ..., serialization_alias="Affordable Connectivity Program (ACP)?", json_schema_extra={"column":"BP"}
     )
-
+    @field_validator(
+        "Technology_Type_Planned__c",
+        "Total_Miles_Planned__c",
+        "Locations_Served_Planned__c",
+        "X25_3_Mbps_or_below_Planned__c",
+        "X25_3_Mbps_and_100_20_Mbps_Planned__c",
+        "Minimum_100_100_Mbps_Planned__c",
+        "X100_20_Mbps_to_100_100_Mbps_Planned__c",
+        "Number_of_Locations_Planned__c",
+        "Housing_Units_Planned__c",
+        "Number_of_Bus_Locations_Planned__c",
+        "Number_of_CAI_Planned__c",
+        "Affordable_Connectivity_Program_ACP__c",
+    )
+    @classmethod
+    def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
+        if isinstance(v, str) and v.strip == "":
+            raise ValueError(
+                f"Value is required for {info.field_name}"
+            )
+        return v
 
 class AddressFields(BaseModel):
     Street_1_Planned__c: str = Field(
@@ -381,7 +423,18 @@ class AddressFields(BaseModel):
     Zip_Code_Actual__c: Optional[str] = Field(
         default=None, serialization_alias="Zip Code (Actual)", max_length=5, json_schema_extra={"column":"CA"}
     )
-
+    @field_validator(
+        "Street_1_Planned__c",
+        "City_Planned__c",
+        "Zip_Code_Planned__c",
+    )
+    @classmethod
+    def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
+        if isinstance(v, str) and v.strip == "":
+            raise ValueError(
+                f"Value is required for {info.field_name}"
+            )
+        return v
 
 class Project1BRow(BaseProjectRow, AddressFields):
     Laptops_Planned__c: conint(ge=0, le=9999999999) = Field(
@@ -467,7 +520,28 @@ class Project1BRow(BaseProjectRow, AddressFields):
     Measurement_of_Effectiveness__c: YesNoType = Field(
         ..., serialization_alias="Measurement of Effectiveness?", json_schema_extra={"column":"DA"}
     )
-
+    @field_validator(
+        "Laptops_Planned__c",
+        "Laptops_Expenditures_Planned__c",
+        "Tablets_Planned__c",
+        "Tablet_Expenditures_Planned__c",
+        "Desktop_Computers_Planned__c",
+        "Desktop_Computers_Expenditures_Planned__c",
+        "Public_WiFi_Planned__c",
+        "Public_WiFi_Expenditures_Planned__c",
+        "Other_Devices_Planned__c",
+        "Other_Expenditures_Planned__c",
+        "Number_of_Users_Planned__c",
+        "Brief_Narrative_Planned__c",
+        "Measurement_of_Effectiveness__c",
+    )
+    @classmethod
+    def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
+        if isinstance(v, str) and v.strip == "":
+            raise ValueError(
+                f"Value is required for {info.field_name}"
+            )
+        return v
 
 class Project1CRow(BaseProjectRow, AddressFields):
     Type_of_Investment__c: Optional[str] = Field(
@@ -524,7 +598,16 @@ class Project1CRow(BaseProjectRow, AddressFields):
     Access_to_Public_Transit__c: YesNoType = Field(
         ..., serialization_alias="Access to Public Transit?", json_schema_extra={"column":"DS"}
     )
-
+    @field_validator(
+        "Access_to_Public_Transit__c"
+    )
+    @classmethod
+    def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
+        if isinstance(v, str) and v.strip == "":
+            raise ValueError(
+                f"Value is required for {info.field_name}"
+            )
+        return v
 
 class SubrecipientRow(BaseModel):
     model_config = ConfigDict(coerce_numbers_to_str=True, loc_by_alias=False)
@@ -564,7 +647,25 @@ class SubrecipientRow(BaseModel):
     State_Abbreviated__c: StateAbbreviation = Field(
         ..., serialization_alias="State Abbreviated", json_schema_extra={"column":"O"}
     )
-
+    @field_validator(
+        "Name",
+        "EIN__c",
+        "Unique_Entity_Identifier__c",
+        "POC_Name__c",
+        "POC_Phone_Number__c",
+        "POC_Email_Address__c",
+        "Zip__c",
+        "Address__c",
+        "City__c",
+        "State_Abbreviated__c",
+    )
+    @classmethod
+    def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
+        if isinstance(v, str) and v.strip == "":
+            raise ValueError(
+                f"Value is required for {info.field_name}"
+            )
+        return v
 
 class Version(Enum):
     V2023_12_12 = "v:20231212"
@@ -631,9 +732,23 @@ class CoverSheetRow(BaseModel):
     project_use_code: str = Field(..., alias="Project Use Code", json_schema_extra={"column":"A"})
     project_use_name: str = Field(..., alias="Project Use Name", json_schema_extra={"column":"B"})
 
-    @validator("project_use_name")
-    def validate_code_name_pair(cls, v, values, **kwargs):
-        project_use_code = values.get("project_use_code")
+    @field_validator("project_use_code")
+    @classmethod
+    def validate_code(cls, v: Any, info: ValidationInfo, **kwargs):
+        if v is None or v.strip() == "":
+            raise ValueError(
+                f"EC code must be set"
+            )
+        elif v not in ProjectType:
+            raise ValueError(
+                f"EC code '{v}' is not recognized."
+            )
+        return v
+
+    @field_validator("project_use_name")
+    @classmethod
+    def validate_code_name_pair(cls, v: Any, info: ValidationInfo, **kwargs):
+        project_use_code = info.data.get("project_use_code")
         expected_name = NAME_BY_PROJECT.get(project_use_code)
 
         if not expected_name:
