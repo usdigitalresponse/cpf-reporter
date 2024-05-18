@@ -90,8 +90,8 @@ class TestValidateCoverSheet:
         assert errors != []
         error = errors[0]
         print(error)
-        assert "Project use code 'INVALID' is not recognized." in error.message
-        assert error.col == "B"
+        assert "EC code 'INVALID' is not recognized." in error.message
+        assert error.col == "A"
         assert error.row == "2"
         assert error.tab == "Cover"
         assert error.severity == ErrorLevel.ERR.name
@@ -115,7 +115,7 @@ class TestValidateproject_sheet:
         assert error.row == "13"
         assert error.col == "D"
         assert (
-            "Error in field Identification_Number__c-String should have at most 20 characters"
+            "Identification_Number__c should have at most 20 characters"
             in error.message
         )
         assert error.severity == ErrorLevel.ERR.name
@@ -130,7 +130,7 @@ class TestValidateSubrecipientSheet:
         errors = validate_subrecipient_sheet(invalid_subrecipient_sheet)
         assert errors != []
         error = errors[0]
-        assert "String should have at least 9 characters" in error.message
+        assert "EIN__c should have at least 9 characters" in error.message
         assert error.row == "13"
         assert error.col == "D"
         assert error.severity == ErrorLevel.ERR.name
