@@ -8,6 +8,7 @@ const config = {
     'html',
     ['text', { file: 'coverage.txt', path: './' }],
   ],
+  setupFilesAfterEnv: ['<rootDir>/api/setup-jest.ts'],
 }
 
 module.exports = config
