@@ -3,61 +3,177 @@
 # Returns a list of messages that contain differences between latest set of files and previous set of files.
 import re
 import zipfile
-from typing import List
+from collections import defaultdict
+from dataclasses import dataclass, field
+from typing import Dict, List, Set
 
 from openpyxl import load_workbook
 
 HEADER_ROW_INDEX = 4
 
+@dataclass
+class CPFDiffReport:
+    new_sheets: Dict[str, List[str]] = field(default_factory=dict)
+    removed_sheets: Dict[str, List[str]] = field(default_factory=dict)
+    row_count_changed: Dict[str, List[str]] = field(default_factory=dict)
+    column_count_changed: Dict[str, List[str]] = field(default_factory=dict)
+    column_differences: Dict[str, List[str]] = field(default_factory=dict)
+    cell_value_changed: Dict[str, List[str]] = field(default_factory=dict)
+    new_files: List[str] = field(default_factory=list)
+    removed_files: List[str] = field(default_factory=list)
 
-# TODO - typing
+    def __post_init__(self):
+        self.new_sheets = defaultdict(list)
+        self.removed_sheets = defaultdict(list)
+        self.row_count_changed = defaultdict(list)
+        self.column_count_changed = defaultdict(list)
+        self.column_differences = defaultdict(list)
+        self.cell_value_changed = defaultdict(list)
+
+    def summary_report(self):
+        return f"""
+        New sheets: {self.new_sheets}
+        Removed sheets: {self.removed_sheets}
+        Row count changed: {self.row_count_changed}
+        Column count changed: {self.column_count_changed}
+        Column differences: {self.column_differences}
+        Cell value changed: {self.cell_value_changed}
+        New files: {self.new_files}
+        Removed files: {self.removed_files}
+        """
+
+    def tabular_report(self):
+        report = []
+        report.append("New sheets:")
+        for file, sheets in self.new_sheets.items():
+            report.append(f"{file}: {', '.join(sheets)}")
+        report.append("Removed sheets:")
+        for file, sheets in self.removed_sheets.items():
+            report.append(f"{file}: {', '.join(sheets)}")
+        report.append("Row count changed:")
+        for file, message in self.row_count_changed.items():
+            report.append(f"{file}: {message}")
+        report.append("Column count changed:")
+        for file, message in self.column_count_changed.items():
+            report.append(f"{file}: {message}")
+        report.append("Column differences:")
+        for file, messages in self.column_differences.items():
+            report.append(f"{file}: {', '.join(messages)}")
+        report.append("Cell value changed:")
+        for file, messages in self.cell_value_changed.items():
+            report.append(f"{file}: {', '.join(messages)}")
+        report.append("New files:")
+        report.append(", ".join(self.new_files))
+        report.append("Removed files:")
+        report.append(", ".join(self.removed_files))
+        return "\n".join(report)
+
+
+class CPFFileArchive:
+    """
+    Class to represent a CPF file archive
+    """
+
+    _zip_file: zipfile.ZipFile
+    _file_name_map: dict
+
+    def __init__(self, zip_file: zipfile.ZipFile):
+        self._zip_file = zip_file
+        self._normalize_names()
+
+    def normalized_file_names(self) -> Set[str]:
+        """
+        Returns a dictionary of normalized file names
+        """
+        return set(self._file_name_map.keys())
+
+    def file_by_name(self, name) -> zipfile.ZipExtFile:
+        """
+        Returns a file object by name
+        """
+        return self._zip_file.open(self._file_name_map[name])
+
+    def _normalize_names(self):
+        """
+        Normalizes file names
+        """
+        suffix_regex = r"\s\(\d+\)"
+        normalized_files = {}
+        for file in self._zip_file.namelist():
+            normalized_filename = re.sub(suffix_regex, "", file.split("/")[-1])
+            normalized_files[normalized_filename] = file
+        self._file_name_map = normalized_files
+
+
+def compare_workbooks(
+    latest_archive: CPFFileArchive, previous_archive: CPFFileArchive
+) -> tuple:
+    latest_files = latest_archive.normalized_file_names()
+    previous_files = previous_archive.normalized_file_names()
+    new_files = latest_files - previous_files
+    removed_files = previous_files - latest_files
+    common_files = latest_files & previous_files
+    return common_files, new_files, removed_files
+
+
+def compare_sheet_columns(previous_sheet, latest_sheet):
+    previous_column_headers = [
+        previous_sheet.cell(row=HEADER_ROW_INDEX, column=column).value
+        for column in range(1, previous_sheet.max_column + 1)
+    ]
+    latest_column_headers = [
+        latest_sheet.cell(row=HEADER_ROW_INDEX, column=column).value
+        for column in range(1, latest_sheet.max_column + 1)
+    ]
+
+    added_columns = set(latest_column_headers) - set(previous_column_headers)
+    removed_columns = set(previous_column_headers) - set(latest_column_headers)
+    columns_in_both = set(latest_column_headers) & set(previous_column_headers)
+    # build a dict of key column header, value two-tuple of previous and latest column values
+    header_map = {
+        header: (
+            previous_column_headers.index(header) + 1,
+            latest_column_headers.index(header) + 1,
+        )
+        for header in columns_in_both
+    }
+    return added_columns, removed_columns, header_map
+
+
+def compare_cell_values(previous_sheet, latest_sheet, header_map):
+    differences = []
+    for row in range(HEADER_ROW_INDEX, latest_sheet.max_row + 1):
+        for header, (previous_column, latest_column) in header_map.items():
+            previous_value = previous_sheet.cell(row=row, column=previous_column).value
+            latest_value = latest_sheet.cell(row=row, column=latest_column).value
+            if previous_value != latest_value:
+                differences.append(
+                    f"{header} - Row {row} - Previous: {previous_value}, Latest: {latest_value}"
+                )
+    return differences
+
+
 def compare(
     latest_zip_files: zipfile.ZipFile, previous_zip_files: zipfile.ZipFile
 ) -> List[str]:
     # read the files from the zip files
     # compare the files
     # return the differences
-    differences = {
-        "new_files": [],
-        "removed_files": [],
-        "new_sheets": [],
-        "removed_sheets": [],
-        "row_count_changed": [],
-        "column_count_changed": [],
-        "column_differences": [],
-        "cell_value_changed": [],
-    }
+    differences = CPFDiffReport()
 
     # first find any files that are in the latest set that are not in the previous set
-    latest_files = latest_zip_files.namelist()
-    previous_files = previous_zip_files.namelist()
-    # need to normalize file names without parent directories and any number suffixes
-    latest_file_map = {}
-    previous_file_map = {}
+    latest_archive = CPFFileArchive(latest_zip_files)
+    previous_archive = CPFFileArchive(previous_zip_files)
 
-    suffix_regex = r"\s\(\d+\)"
-    for file in latest_files:
-        normalized_filename = re.sub(suffix_regex, "", file.split("/")[-1])
-        latest_file_map[normalized_filename] = file
-    for file in previous_files:
-        normalized_filename = re.sub(suffix_regex, "", file.split("/")[-1])
-        previous_file_map[normalized_filename] = file
+    common_files, new_files, removed_files = compare_workbooks(
+        latest_archive, previous_archive
+    )
+    differences.new_files += list(new_files)
+    differences.removed_files += list(removed_files)
 
-    latest_files = set(latest_file_map.keys())
-    previous_files = set(previous_file_map.keys())
-    new_files = latest_files - previous_files
-    for file in new_files:
-        differences["new_files"].append(file)
-
-    removed_files = previous_files - latest_files
-    for file in removed_files:
-        differences["removed_files"].append(file)
-
-    # finally, compare the files that are in both sets
-    common_files = latest_files & previous_files
     for file in common_files:
-        latest_file = latest_zip_files.open(latest_file_map[file])
-        previous_file = previous_zip_files.open(previous_file_map[file])
+        latest_file = latest_archive.file_by_name(file)
+        previous_file = previous_archive.file_by_name(file)
 
         latest_workbook = load_workbook(latest_file)
         previous_workbook = load_workbook(previous_file)
@@ -67,11 +183,11 @@ def compare(
 
         new_sheets = set(latest_sheets) - set(previous_sheets)
         for sheet in new_sheets:
-            differences["new_sheets"].append(f"New sheet in {file}: {sheet}")
+            differences.new_sheets[file].append(sheet)
 
         removed_sheets = set(previous_sheets) - set(latest_sheets)
         for sheet in removed_sheets:
-            differences["removed_sheets"].append(f"Removed sheet in {file}: {sheet}")
+            differences.removed_sheets[file].append(sheet)
 
         common_sheets = set(latest_sheets) & set(previous_sheets)
         for sheet in common_sheets:
@@ -79,52 +195,28 @@ def compare(
             previous_sheet = previous_workbook[sheet]
 
             if latest_sheet.max_row != previous_sheet.max_row:
-                differences["row_count_changed"].append(
-                    f"Row count changed in {file} {sheet}"
+                differences.row_count_changed[f"{file}: {sheet}"] = (
+                    f"{latest_sheet.max_row} rows in latest, {previous_sheet.max_row} rows in previous"
                 )
 
             if latest_sheet.max_column != previous_sheet.max_column:
-                differences["column_count_changed"].append(
-                    f"Column count changed in {file} {sheet} - {latest_sheet.max_column} columns in latest, {previous_sheet.max_column} columns in previous"
+                differences.column_count_changed[f"{file}: {sheet}"] = (
+                    f"{latest_sheet.max_column} columns in latest, {previous_sheet.max_column} columns in previous"
                 )
-            # read the first row as column headers of each sheet
-            previous_column_headers = [
-                previous_sheet.cell(row=HEADER_ROW_INDEX, column=column).value
-                for column in range(1, previous_sheet.max_column + 1)
-            ]
-            latest_column_headers = [
-                latest_sheet.cell(row=HEADER_ROW_INDEX, column=column).value
-                for column in range(1, latest_sheet.max_column + 1)
+
+            added_columns, removed_columns, header_map = compare_sheet_columns(
+                previous_sheet, latest_sheet
+            )
+            differences.column_differences[f"{file}: {sheet}"] += [
+                f"Added columns: {', '.join(added_columns)}",
+                f"Removed columns: {', '.join(removed_columns)}",
             ]
 
-            added_columns = set(latest_column_headers) - set(previous_column_headers)
-            removed_columns = set(previous_column_headers) - set(latest_column_headers)
-            if added_columns or removed_columns:
-                differences["column_differences"].append(
-                    f"added columns: {added_columns or 'None'}, removed columns: {removed_columns or 'None'}"
-                )
-            columns_in_both = set(latest_column_headers) & set(previous_column_headers)
-            # build a dict of key column header, value two-tuple of previous and latest column values
-            header_map = {
-                header: (
-                    previous_column_headers.index(header) + 1,
-                    latest_column_headers.index(header) + 1,
-                )
-                for header in columns_in_both
-            }
+            cell_value_differences = compare_cell_values(
+                previous_sheet, latest_sheet, header_map
+            )
+            differences.cell_value_changed[f"{file}: {sheet}"] += cell_value_differences
 
-            for row in range(HEADER_ROW_INDEX, latest_sheet.max_row + 1):
-                for header, (previous_column, latest_column) in header_map.items():
-                    previous_value = previous_sheet.cell(
-                        row=row, column=previous_column
-                    ).value
-                    latest_value = latest_sheet.cell(
-                        row=row, column=latest_column
-                    ).value
-                    if previous_value != latest_value:
-                        differences["cell_value_changed"].append(
-                            f"{file} {sheet} - {header}:{row} -- {previous_value} to {latest_value}"
-                        )
     return differences
 
 
@@ -161,7 +253,7 @@ if __name__ == "__main__":
     if differences:
         import pprint
 
-        pprint.pprint(differences)
+        pprint.pprint(differences.summary_report())
     else:
         print("No differences found")
         print("No differences found")
