@@ -245,4 +245,3 @@ if __name__ == "__main__":
         print(differences.summary_report())
     else:
         print("No differences found")
-        print("No differences found")
