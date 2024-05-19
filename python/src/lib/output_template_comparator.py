@@ -32,41 +32,24 @@ class CPFDiffReport:
 
     def summary_report(self):
         return f"""
-        New sheets: {self.new_sheets}
-        Removed sheets: {self.removed_sheets}
-        Row count changed: {self.row_count_changed}
-        Column count changed: {self.column_count_changed}
-        Column differences: {self.column_differences}
-        Cell value changed: {self.cell_value_changed}
-        New files: {self.new_files}
-        Removed files: {self.removed_files}
+        New files: {self._format_item(self.new_files)}
+        Removed files: {self._format_item(self.removed_files)}
+        New sheets: {self._format_item(self.new_sheets)}
+        Removed sheets: {self._format_item(self.removed_sheets)}
+        Row count changed: {self._format_item(self.row_count_changed)}
+        Column count changed: {self._format_item(self.column_count_changed)}
+        Column differences: {self._format_item(self.column_differences)}
+        Cell value changed: {self._format_item(self.cell_value_changed)}
         """
 
-    def tabular_report(self):
-        report = []
-        report.append("New sheets:")
-        for file, sheets in self.new_sheets.items():
-            report.append(f"{file}: {', '.join(sheets)}")
-        report.append("Removed sheets:")
-        for file, sheets in self.removed_sheets.items():
-            report.append(f"{file}: {', '.join(sheets)}")
-        report.append("Row count changed:")
-        for file, message in self.row_count_changed.items():
-            report.append(f"{file}: {message}")
-        report.append("Column count changed:")
-        for file, message in self.column_count_changed.items():
-            report.append(f"{file}: {message}")
-        report.append("Column differences:")
-        for file, messages in self.column_differences.items():
-            report.append(f"{file}: {', '.join(messages)}")
-        report.append("Cell value changed:")
-        for file, messages in self.cell_value_changed.items():
-            report.append(f"{file}: {', '.join(messages)}")
-        report.append("New files:")
-        report.append(", ".join(self.new_files))
-        report.append("Removed files:")
-        report.append(", ".join(self.removed_files))
-        return "\n".join(report)
+    @staticmethod
+    def _format_item(item: any):
+        if isinstance(item, list):
+            return "\n".join(item)
+        elif isinstance(item, dict):
+            return "\n".join([f"{k}: {v}" for k, v in item.items()])
+        else:
+            return item
 
 
 class CPFFileArchive:
@@ -207,15 +190,22 @@ def compare(
             added_columns, removed_columns, header_map = compare_sheet_columns(
                 previous_sheet, latest_sheet
             )
-            differences.column_differences[f"{file}: {sheet}"] += [
-                f"Added columns: {', '.join(added_columns)}",
-                f"Removed columns: {', '.join(removed_columns)}",
-            ]
+            if added_columns:
+                differences.column_differences[f"{file}: {sheet}"] += [
+                    f"Added columns: {', '.join(added_columns)}"
+                ]
+            if removed_columns:
+                differences.column_differences[f"{file}: {sheet}"] += [
+                    f"Removed columns: {', '.join(removed_columns)}"
+                ]
 
             cell_value_differences = compare_cell_values(
                 previous_sheet, latest_sheet, header_map
             )
-            differences.cell_value_changed[f"{file}: {sheet}"] += cell_value_differences
+            if cell_value_differences:
+                differences.cell_value_changed[f"{file}: {sheet}"] += (
+                    cell_value_differences
+                )
 
     return differences
 
@@ -251,9 +241,7 @@ if __name__ == "__main__":
     differences = compare(latest_zip_file, previous_zip_file)
 
     if differences:
-        import pprint
-
-        pprint.pprint(differences.summary_report())
+        print(differences.summary_report())
     else:
         print("No differences found")
         print("No differences found")

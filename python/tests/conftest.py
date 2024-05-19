@@ -1,7 +1,10 @@
+import zipfile
 from typing import BinaryIO
 
 import openpyxl
 import pytest
+
+from src.lib.output_template_comparator import CPFFileArchive
 
 _SAMPLE_VALID_XLSM = "tests/data/sample_valid.xlsm"
 
@@ -54,3 +57,17 @@ def valid_subrecipient_sheet_blank_optional_fields(valid_subrecipientsheet):
     valid_subrecipientsheet["L13"] = None
     valid_subrecipientsheet["M13"] = None
     return valid_subrecipientsheet
+
+@pytest.fixture
+def cpf_file_archive(valid_file):
+    cpf_archive_file = zipfile.ZipFile("test.zip", "w")
+    cpf_archive_file.writestr("2024-05-19/TestFile.xlsx", valid_file.read())
+    return CPFFileArchive(cpf_archive_file)
+
+
+@pytest.fixture
+def cpf_file_archive_two(valid_file):
+    cpf_archive_file = zipfile.ZipFile("test.zip", "w")
+    cpf_archive_file.writestr("2024-05-19/TestFile.xlsx", valid_file.read())
+    cpf_archive_file.writestr("2024-05-19/TestFile2.xlsx", valid_file.read())
+    return CPFFileArchive(cpf_archive_file)
