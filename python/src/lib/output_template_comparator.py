@@ -241,7 +241,4 @@ if __name__ == "__main__":
     previous_zip_file = load_files(previous_zip_path)
     differences = compare(latest_zip_file, previous_zip_file)
 
-    if differences:
-        print(differences.summary_report())
-    else:
-        print("No differences found")
+    print(differences.summary_report())
