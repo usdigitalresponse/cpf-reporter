@@ -11,6 +11,7 @@ from openpyxl import load_workbook
 
 HEADER_ROW_INDEX = 4
 
+
 @dataclass
 class CPFDiffReport:
     new_sheets: Dict[str, List[str]] = field(default_factory=dict)
@@ -54,7 +55,7 @@ class CPFDiffReport:
 
 class CPFFileArchive:
     """
-    Class to represent a CPF file archive
+    Class for working with a CPF file archive
     """
 
     _zip_file: zipfile.ZipFile
@@ -203,9 +204,9 @@ def compare(
                 previous_sheet, latest_sheet, header_map
             )
             if cell_value_differences:
-                differences.cell_value_changed[f"{file}: {sheet}"] += (
-                    cell_value_differences
-                )
+                differences.cell_value_changed[
+                    f"{file}: {sheet}"
+                ] += cell_value_differences
 
     return differences
 
@@ -224,11 +225,11 @@ def load_files(zip_path) -> zipfile.ZipFile:
 
 if __name__ == "__main__":
     """
-        Main function to test comparator function
-        Accepts two arguments. First argument is the "latest" template. Second argument is the previous template.
-        Returns a list of changes that are in the latest template that are different from the previous template.
+    Main function to test comparator function
+    Accepts two arguments. First argument is the "latest" template. Second argument is the previous template.
+    Returns a list of changes that are in the latest template that are different from the previous template.
 
-        Run with `poetry run python -m src.lib.output_template_comparator 2024_05_16.zip 2024_04_26.zip`
+    Run with `poetry run python -m src.lib.output_template_comparator 2024_05_16.zip 2024_04_26.zip`
 
     """
     import sys
