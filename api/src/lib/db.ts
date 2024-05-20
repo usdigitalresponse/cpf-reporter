@@ -45,7 +45,11 @@ async function getDataSourceURL() {
   return datasourceUrl
 }
 
-async function getPrismaClient() {
+export async function getPrismaClient() {
+  if (db !== undefined) {
+    return db
+  }
+  logger.info('Initializing Prisma Client')
   const datasourceUrl = await getDataSourceURL()
   const client = new PrismaClient({
     log: emitLogLevels(['info', 'warn', 'error']),
@@ -56,12 +60,17 @@ async function getPrismaClient() {
     logger,
     logLevels: ['info', 'warn', 'error'],
   })
+  db = client
   return client
 }
+
+export default getPrismaClient
 
 /*
  * Instance of the Prisma Client
  */
+export let db: PrismaClient
+/*
 getPrismaClient()
   .then((db) => {
     logger.info('Prisma Client initialized')
@@ -72,3 +81,4 @@ getPrismaClient()
     logger.error('Failed to initialize the Prisma Client. Exiting...')
     process.exit(1)
   })
+*/

@@ -8,6 +8,7 @@ jest.mock('src/lib/db', () => ({
     user: {
       findFirst: jest.fn(),
     },
+    $disconnect: jest.fn(),
   },
 }))
 
