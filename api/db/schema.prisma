@@ -76,18 +76,20 @@ model OutputTemplate {
 }
 
 model ReportingPeriod {
-  id               Int            @id @default(autoincrement())
-  name             String
-  startDate        DateTime       @db.Date
-  endDate          DateTime       @db.Date
-  inputTemplateId  Int
-  inputTemplate    InputTemplate  @relation(fields: [inputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  outputTemplateId Int
-  outputTemplate   OutputTemplate @relation(fields: [outputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  createdAt        DateTime       @default(now()) @db.Timestamptz(6)
-  updatedAt        DateTime       @default(now()) @db.Timestamptz(6)
-  uploads          Upload[]
-  projects         Project[]
+  id                Int            @id @default(autoincrement())
+  name              String
+  startDate         DateTime       @db.Date
+  endDate           DateTime       @db.Date
+  inputTemplateId   Int
+  inputTemplate     InputTemplate  @relation(fields: [inputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  outputTemplateId  Int
+  outputTemplate    OutputTemplate @relation(fields: [outputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  validationRulesId Int?
+  validationRules   ValidationRules? @relation(fields: [validationRulesId], references: [id])
+  createdAt         DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime       @default(now()) @db.Timestamptz(6)
+  uploads           Upload[]
+  projects          Project[]
 }
 
 model ExpenditureCategory {
@@ -169,4 +171,5 @@ model ValidationRules {
   createdAt           DateTime        @default(now()) @db.Timestamptz(6)
   updatedAt           DateTime        @default(now()) @db.Timestamptz(6)
   validations         UploadValidation[]
+  reportingPeriods    ReportingPeriod[]
 }
