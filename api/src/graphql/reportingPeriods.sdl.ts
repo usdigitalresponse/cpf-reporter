@@ -12,6 +12,8 @@ export const schema = gql`
     updatedAt: DateTime!
     uploads: [Upload]!
     projects: [Project]!
+    validationRulesId: Int
+    validationRules: ValidationRules
   }
 
   type Query {

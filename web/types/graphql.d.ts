@@ -533,6 +533,8 @@ export type ReportingPeriod = {
   startDate: Scalars['DateTime']
   updatedAt: Scalars['DateTime']
   uploads: Array<Maybe<Upload>>
+  validationRules: Maybe<ValidationRules>
+  validationRulesId: Maybe<'Int'>
 }
 
 export type RoleEnum =
@@ -692,6 +694,7 @@ export type ValidationRules = {
   updatedAt: Scalars['DateTime']
   validations: Array<Maybe<UploadValidation>>
   versionId: Version
+  reportingPeriods: Array<Maybe<ReportingPeriod>>
 }
 
 export type Version = 'V2023_12_12' | 'V2024_01_07' | 'V2024_04_01'

@@ -2494,6 +2494,16 @@ export type ReportingPeriodResolvers<
     ParentType,
     ContextType
   >
+  validationRules: OptArgsResolverFn<
+    Maybe<ResolversTypes['ValidationRules']>,
+    ParentType,
+    ContextType
+  >
+  validationRulesId: OptArgsResolverFn<
+    Maybe<ResolversTypes['Int']>,
+    ParentType,
+    ContextType
+  >
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2550,6 +2560,16 @@ export type ReportingPeriodRelationResolvers<
   >
   uploads?: RequiredResolverFn<
     Array<Maybe<ResolversTypes['Upload']>>,
+    ParentType,
+    ContextType
+  >
+  validationRulesId?: RequiredResolverFn<
+    Maybe<ResolversTypes['Int']>,
+    ParentType,
+    ContextType
+  >
+  validationRules?: RequiredResolverFn<
+    Maybe<ResolversTypes['ValidationRules']>,
     ParentType,
     ContextType
   >
@@ -2973,6 +2993,11 @@ export type ValidationRulesResolvers<
     ParentType,
     ContextType
   >
+  reportingPeriods: OptArgsResolverFn<
+    Array<Maybe<ResolversTypes['ReportingPeriod']>>,
+    ParentType,
+    ContextType
+  >
   versionId: OptArgsResolverFn<
     ResolversTypes['Version'],
     ParentType,
@@ -2998,6 +3023,11 @@ export type ValidationRulesRelationResolvers<
   >
   validations?: RequiredResolverFn<
     Array<Maybe<ResolversTypes['UploadValidation']>>,
+    ParentType,
+    ContextType
+  >
+  reportingPeriods?: RequiredResolverFn<
+    Array<Maybe<ResolversTypes['ReportingPeriod']>>,
     ParentType,
     ContextType
   >

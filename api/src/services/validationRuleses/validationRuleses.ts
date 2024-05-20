@@ -44,4 +44,9 @@ export const ValidationRules: ValidationRulesRelationResolvers = {
       .findUnique({ where: { id: root?.id } })
       .validations()
   },
+  reportingPeriods: (_obj, { root }) => {
+    return db.validationRules
+      .findUnique({ where: { id: root?.id } })
+      .reportingPeriods()
+  }
 }
