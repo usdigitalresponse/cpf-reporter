@@ -7,7 +7,12 @@ Certain things (including this README) are currently a work-in-progress.*
 
 ## What's this?
 
-TODO
+This repository contains both IaC (terraform) and runtime code for the CPF Reporter service and web application.
+The purpose of this service is to provide a web application through which users can upload, validate, and manage financial reporting data for projects funded by federal grants made available through the CPF funding program.
+Users download Microsoft Excel templates that are used for data input and initial validation.
+These files are then regularly uploaded to CPF Reporter for validation and long-term management.
+Users can also download reports to submit to the U.S. Treasury Department for financial reporting,
+as well as audit reports to assist in responding to a Treasury audit.
 
 ## Architecture
 
