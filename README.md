@@ -11,7 +11,23 @@ TODO
 
 ## Architecture
 
-TODO
+This service consists of a static web site which provides a single-page client application (SPA).
+The client application primarily interacts with the GraphQL API,
+for which requests are handled by an AWS Lambda function backed by a PostgresQL database.
+When users (via the client application) upload files to S3,
+an event-driven workflow is initiated that validates the contents of the upload
+and stores the validation results in the PostgresQL database.
+
+The client web application is hosted in a CloudFront distribution that serves static assets
+built from the RedwoodJS `web`-side source code and uploaded to the distribution's origin bucket.
+Lambda function are built from RedwoodJS `api`-side and Python source code,
+which comprise the server-side compute components of the service.
+
+<details>
+  <summary>Component-level architecture</summary>
+  <img src="docs/component-level-architecture.png"/>
+</details>
+
 
 ## Code Organization
 
