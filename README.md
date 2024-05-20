@@ -31,20 +31,37 @@ which comprise the server-side compute components of the service.
 
 ## Code Organization
 
-Code for this service can generally be considered under three categories:
+Code for this service can generally be considered under four categories:
+
+1. Web-side TypeScript code, located under `web/`, which is used to build the single-page application (SPA) that runs in users' browsers.
+2. API-side TypeScript code, located under `api/`, which powers the GraphQL API consumed by the SPA.
+The GraphQL server provided by this code runs in AWS Lambda and is accessed via API Gateway.
+3. Event-driven Python code for data processing, located under `python/`.
+This code also runs in AWS Lambda and is executed in reaction to data write events.
+4. Terraform infrastructure-as-code (IaC), located under `terraform/`.
+This code describes infrastructure components and is executed during deployment rather than at runtime.
 
 ### IaC
 
 Infrastructure-as-code (IaC) used to provision the target environment, which is written with Terraform, and normally run during deployment.
-The main Terraform project is located in the `terraform/` directory.
+The main Terraform project is located under the `terraform/` directory.
 
-### Runtime - API Side
+### Runtime - API side
 
-TODO
+TypeScript code built on the RedwoodJS framework, located under the `api/` directory.
+This code powers the GraphQL API consumed by the SPA.
+The GraphQL server provided by this code runs in AWS Lambda and is accessed via API Gateway.
 
-## Runtime - Web Side
+### Runtime - Data processing
 
-TODO
+Event-driven Python code for data processing, located under the `python/` directory.
+This code also runs in AWS Lambda and is executed in reaction to data events.
+
+## Runtime - Web side
+
+TypeScript code built on the RedwoodJS framework using React, located under the `web/` directory.
+This code is used to build the single-page application (SPA) that runs in users' browsers.
+Build artifacts are uploaded to AWS S3 and served through a CloudFormation CDN distribution.
 
 ## Development
 
