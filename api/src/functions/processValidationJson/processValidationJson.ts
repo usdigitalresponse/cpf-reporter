@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client'
 import { S3Handler, S3ObjectCreatedNotificationEvent } from 'aws-lambda'
 
 import aws from 'src/lib/aws'
-import { db } from 'src/lib/db'
+import { db, getPrismaClient } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 
 type UploadValidationRecord = {
@@ -62,6 +62,7 @@ export const handler: S3Handler = async (
     */
     event = event.queryStringParameters
   }
+  await getPrismaClient()
   await Promise.all(
     event.Records.map(async (record) => {
       try {
