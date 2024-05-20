@@ -8,11 +8,16 @@ import sdls from 'src/graphql/**/*.sdl.{js,ts}'
 import services from 'src/services/**/*.{js,ts}'
 
 import { getCurrentUser } from 'src/lib/auth'
-import { db } from 'src/lib/db'
+import { db, getPrismaClient } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 
+async function wrappedGetCurrentUser(decoded, { token }, { event }) {
+  await getPrismaClient()
+  return getCurrentUser(decoded, { token }, { event })
+}
+
 export const handler = createGraphQLHandler({
-  getCurrentUser,
+  getCurrentUser: wrappedGetCurrentUser,
   loggerConfig: { logger, options: { requestId: true, operationName: true } },
   directives,
   sdls,
