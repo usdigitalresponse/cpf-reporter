@@ -5,6 +5,7 @@ import type {
 } from 'types/graphql'
 
 import { db } from 'src/lib/db'
+import { logger } from 'src/lib/logger'
 
 export const organizations: QueryResolvers['organizations'] = () => {
   return db.organization.findMany()
@@ -22,6 +23,26 @@ export const createOrganization: MutationResolvers['createOrganization'] = ({
   return db.organization.create({
     data: input,
   })
+}
+
+export const getOrCreateOrganization = async (orgName) => {
+  let orgRecord
+  const existingOrganization = await db.organization.findFirst({
+    where: { name: orgName },
+  })
+  if (existingOrganization) {
+    logger.info(`Organization ${orgName} already exists`)
+    orgRecord = existingOrganization
+  } else {
+    logger.info(`Creating ${orgName}`)
+    const data: Prisma.OrganizationCreateArgs['data'] = {
+      name: orgName,
+    }
+    orgRecord = await db.organization.create({
+      data,
+    })
+  }
+  return orgRecord
 }
 
 export const createOrganizationAgencyAdmin: MutationResolvers['createOrganizationAgencyAdmin'] =

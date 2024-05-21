@@ -1,6 +1,7 @@
 import type { QueryResolvers, MutationResolvers } from 'types/graphql'
 
 import { db } from 'src/lib/db'
+import { logger } from 'src/lib/logger'
 
 export const agencies: QueryResolvers['agencies'] = () => {
   return db.agency.findMany()
@@ -32,6 +33,40 @@ export const deleteAgency: MutationResolvers['deleteAgency'] = ({ id }) => {
   return db.agency.delete({
     where: { id },
   })
+}
+
+export const getOrCreateAgencies = async (organization, agencyData) => {
+  const agencies = []
+  /*
+  {
+    name: 'Sample Name',
+    abbreviation: SAMPLEABBR,
+    code: SAMPLECODE,
+  }
+  */
+  for (const agency of agencyData) {
+    try {
+      logger.info(`Processing agency ${agency.name}`)
+      const existingAgency = await db.agency.findFirst({
+        where: { name: agency.name, organizationId: organization.id }
+      })
+      if (existingAgency) {
+        logger.info(`${agency.name} exists for organization ${organization.name}`)
+        agencies.push(existingAgency)
+      } else {
+        logger.info(`Creating ${agency.name}`)
+        agency.organizationId = organization.id
+        const newAgency = await db.agency.create({ data: agency })
+        agencies.push(newAgency)
+      }
+    } catch (error) {
+      logger.error(`Error processing agency ${agency.name}`)
+      logger.error(error)
+      continue
+    }
+  }
+  logger.info(`Agencies processed: ${agencies.length}`)
+  return agencies
 }
 
 export const agenciesByOrganization: QueryResolvers['agenciesByOrganization'] =

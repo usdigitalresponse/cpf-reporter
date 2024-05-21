@@ -16,6 +16,7 @@ import { AuthenticationError } from '@redwoodjs/graphql-server'
 import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
+import { createPassageUser } from 'src/services/passage/passage'
 
 export const currentUserIsUSDRAdmin = (): boolean => {
   return context.currentUser?.roles?.includes(ROLES.USDR_ADMIN)
@@ -228,6 +229,70 @@ export const usersByOrganization: QueryResolvers['usersByOrganization'] =
       return []
     }
   }
+
+export const getOrCreateUsers = async (users, organization) => {
+  /*
+  Users are sent in the following Array format
+  {
+    name: 'Sample Name',
+    email: 'sample@example.com',
+    role: 'ORGANIZATION_STAFF',
+    agencyName: 'Sample Name',
+    passageId: '1234', // Optional
+  }
+  */
+  const orgAgencies = await db.agency.findMany({
+    where: { organizationId: organization.id }
+  })
+  const agenciesByName = {}
+  for (const agency of orgAgencies) {
+    agenciesByName[agency.name] = agency
+  }
+  const userRecords = []
+  for (const user of users) {
+    try {
+      logger.info(`Processing user ${user.email}`)
+      let agency;
+      if (agenciesByName[user.agencyName]) {
+        agency = agenciesByName[user.agencyName]
+      } else {
+        logger.info(`Agency ${user.agencyName} not found for organization ${organization.name}`)
+        continue
+      }
+      const userData: Prisma.UserCreateArgs['data'] = {
+        email: user.email,
+        name: user.name,
+        agencyId: agenciesByName[user.agencyName].id,
+        role: user.role,
+        isActive: true,
+      }
+      const existingUser = await db.user.findFirst({
+        where: { email: userData.email }
+      })
+      if (existingUser) {
+        logger.info(`User ${userData.email} already exists`)
+        userRecords.push(existingUser)
+        continue
+      }
+      else {
+        if (process.env.AUTH_PROVIDER === 'passage' && !userData.passageId) {
+          logger.info(`Creating Passage user for ${userData.email}`)
+          const passageUser = await createPassageUser(userData.email)
+          userData.passageId = passageUser.id
+        }
+        const record = await db.user.create({ data: userData })
+        logger.info(`User ${userData.email} created`)
+        logger.info(record)
+        userRecords.push(record)
+      }
+    } catch (error) {
+      logger.error(`Error processing user ${user.email}`)
+      logger.error(error)
+      continue
+    }
+  }
+  return userRecords
+}
 
 export const User: UserRelationResolvers = {
   agency: (_obj, { root }) => {
