@@ -21,16 +21,19 @@ async function addOrgAgencyUsers(orgName, agencyInfo, userInfo) {
 
 export default async ({ args }) => {
   /*
-  yarn redwood exec onboardOrganization \
-    --orgName 'Sample Org' \
-    --agencyInfo '[
-      {"name": "Sample Agency", "abbreviation": "SA", "code": "SA"},
-      {"name": "Sample Agency 2", "abbreviation": "SA2", "code": "SA2"}
-    ]' \
-    --userInfo '[
-      {"name": "Sample User", "email": "sample@example.com", "role": "ORGANIZATION_STAFF", "agencyName": "Sample Agency"},
-      {"name": "Sample User 2", "email": "sample2@example.com", "role": "ORGANIZATION_ADMIN", "agencyName": "Sample Agency 2"}
-    ]'
+  Useful to create a new organization, agencies, and users.
+
+  Example:
+    yarn redwood exec onboardOrganization \
+      --orgName 'Sample Org' \
+      --agencyInfo '[
+        {"name": "Sample Agency", "abbreviation": "SA", "code": "SA"},
+        {"name": "Sample Agency 2", "abbreviation": "SA2", "code": "SA2"}
+      ]' \
+      --userInfo '[
+        {"name": "Sample User", "email": "sample@example.com", "role": "ORGANIZATION_STAFF", "agencyName": "Sample Agency"},
+        {"name": "Sample User 2", "email": "sample2@example.com", "role": "ORGANIZATION_ADMIN", "agencyName": "Sample Agency 2"}
+      ]'
   */
   await getPrismaClient()
   console.log(':: Executing script with args ::')
