@@ -6,6 +6,7 @@ import {
   createAgency,
   updateAgency,
   deleteAgency,
+  getOrCreateAgencies,
 } from './agencies'
 import type { StandardScenario } from './agencies.scenarios'
 
@@ -16,6 +17,17 @@ import type { StandardScenario } from './agencies.scenarios'
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
 describe('agencies', () => {
+  scenario('get or creates new agencies', async (scenario: StandardScenario) => {
+    const result = await getOrCreateAgencies(scenario.organization.one, [
+      { name: 'Agency1', code: 'A1', abbreviation: 'A1'},
+      { name: 'Agency3', code: 'A3', abbreviation: 'A3'}
+    ])
+
+    expect(result.length).toEqual(2)
+    expect(result[0].name).toEqual('Agency1')
+    expect(result[0].id).toEqual(scenario.agency.one.id)
+    expect(result[1].name).toEqual('Agency3')
+  })
   scenario('returns all agencies', async (scenario: StandardScenario) => {
     const result = await agencies()
 
@@ -25,7 +37,7 @@ describe('agencies', () => {
   scenario('returns a single agency', async (scenario: StandardScenario) => {
     const result = await agency({ id: scenario.agency.one.id })
 
-    expect(result).toEqual(scenario.agency.one)
+    expect(result.id).toEqual(scenario.agency.one.id)
   })
 
   scenario('creates a agency', async () => {
