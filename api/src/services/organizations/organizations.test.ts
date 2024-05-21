@@ -18,17 +18,19 @@ import type { StandardScenario } from './organizations.scenarios'
 
 describe('organizations', () => {
   scenario('creates or gets an organization', async (scenario: StandardScenario) => {
-    const resultGet = await getOrCreateOrganization('USDR1')
-    const resultCreate = await getOrCreateOrganization('USDR3')
+    const resultGet = await getOrCreateOrganization('USDR1', 'Reporting Period 1')
+    const resultCreate = await getOrCreateOrganization('USDR3', 'Reporting Period 1')
+    const resultError = await getOrCreateOrganization('USDR5', 'NO PERIOD')
 
     expect(resultGet.id).toEqual(scenario.organization.one.id)
     expect(resultCreate.name).toEqual('USDR3')
     expect([scenario.organization.one.id, scenario.organization.two.id].includes(resultCreate.id)).toBe(false)
+    expect(resultError).toBe(undefined)
   })
   scenario('returns all organizations', async (scenario: StandardScenario) => {
     const result = await organizations()
 
-    expect(result.length).toEqual(Object.keys(scenario.organization).length)
+    expect(result.length).toEqual(3)
   })
 
   scenario(

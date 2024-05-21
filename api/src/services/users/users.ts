@@ -230,7 +230,7 @@ export const usersByOrganization: QueryResolvers['usersByOrganization'] =
     }
   }
 
-export const getOrCreateUsers = async (users, organization) => {
+export const getOrCreateUsers = async (users, orgName) => {
   /*
   Users are sent in the following Array format
   {
@@ -241,23 +241,26 @@ export const getOrCreateUsers = async (users, organization) => {
     passageId: '1234', // Optional
   }
   */
+  const organization = await db.organization.findFirst({
+    where: { name: orgName },
+  })
+  if (!organization) {
+    logger.error(`Organization ${orgName} not found`)
+    return
+  }
   const orgAgencies = await db.agency.findMany({
     where: { organizationId: organization.id }
   })
   const agenciesByName = {}
   for (const agency of orgAgencies) {
-    logger.info(`Agency ${agency.name} found for organization ${organization.name}`)
     agenciesByName[agency.name] = agency
   }
   const userRecords = []
   for (const user of users) {
     try {
       logger.info(`Processing user ${user.email}`)
-      let agency;
-      if (agenciesByName[user.agencyName]) {
-        agency = agenciesByName[user.agencyName]
-      } else {
-        logger.info(`Agency ${user.agencyName} not found for organization ${organization.name}`)
+      if (!agenciesByName[user.agencyName]) {
+        logger.error(`Agency ${user.agencyName} not found for organization ${organization.name}`)
         continue
       }
       const userData: Prisma.UserCreateArgs['data'] = {

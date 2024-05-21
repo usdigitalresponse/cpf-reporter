@@ -18,7 +18,7 @@ import type { StandardScenario } from './agencies.scenarios'
 
 describe('agencies', () => {
   scenario('get or creates new agencies', async (scenario: StandardScenario) => {
-    const result = await getOrCreateAgencies(scenario.organization.one, [
+    const result = await getOrCreateAgencies(scenario.organization.one.name, [
       { name: 'Agency1', code: 'A1', abbreviation: 'A1'},
       { name: 'Agency3', code: 'A3', abbreviation: 'A3'}
     ])

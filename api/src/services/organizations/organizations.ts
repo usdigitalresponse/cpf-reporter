@@ -25,24 +25,42 @@ export const createOrganization: MutationResolvers['createOrganization'] = ({
   })
 }
 
-export const getOrCreateOrganization = async (orgName) => {
-  let orgRecord
-  const existingOrganization = await db.organization.findFirst({
-    where: { name: orgName },
-  })
-  if (existingOrganization) {
-    logger.info(`Organization ${orgName} already exists`)
-    orgRecord = existingOrganization
-  } else {
-    logger.info(`Creating ${orgName}`)
-    const data: Prisma.OrganizationCreateArgs['data'] = {
-      name: orgName,
-    }
-    orgRecord = await db.organization.create({
-      data,
+export const getOrCreateOrganization = async (orgName, reportingPeriodName) => {
+  try {
+    let orgRecord
+
+    const existingOrganization = await db.organization.findFirst({
+      where: { name: orgName },
     })
+    if (existingOrganization) {
+      logger.info(`Organization ${orgName} already exists`)
+      orgRecord = existingOrganization
+    } else {
+      logger.info(`Creating ${orgName}`)
+      const data: Prisma.OrganizationCreateArgs['data'] = {
+        name: orgName,
+      }
+      const reportingPeriod = await db.reportingPeriod.findFirst({
+        where: { name: reportingPeriodName },
+      })
+      if (!reportingPeriod) {
+        logger.error(
+          `Reporting period ${reportingPeriodName} does not exist. Cannot create organization.`
+        )
+        return
+      }
+      data.preferences = {
+        current_reporting_period_id: reportingPeriod.id,
+      }
+      orgRecord = await db.organization.create({
+        data,
+      })
+    }
+    return orgRecord
+  } catch (error) {
+    logger.error(`Error creating organization: ${orgName}`)
+    logger.error(error)
   }
-  return orgRecord
 }
 
 export const createOrganizationAgencyAdmin: MutationResolvers['createOrganizationAgencyAdmin'] =

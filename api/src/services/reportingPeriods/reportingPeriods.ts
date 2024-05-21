@@ -5,6 +5,7 @@ import type {
 } from 'types/graphql'
 
 import { db } from 'src/lib/db'
+import { logger } from 'src/lib/logger'
 
 export const reportingPeriods: QueryResolvers['reportingPeriods'] = () => {
   return db.reportingPeriod.findMany()
@@ -14,6 +15,28 @@ export const reportingPeriod: QueryResolvers['reportingPeriod'] = ({ id }) => {
   return db.reportingPeriod.findUnique({
     where: { id },
   })
+}
+
+export const getOrCreateReportingPeriod = async (periodInfo) => {
+  try {
+    let reportingPeriodRecord
+
+    const existingReportingPeriod = await db.reportingPeriod.findFirst({
+      where: { name: periodInfo.name },
+    })
+    if (existingReportingPeriod) {
+      reportingPeriodRecord = existingReportingPeriod
+    } else {
+      const data = periodInfo
+      reportingPeriodRecord = await db.reportingPeriod.create({
+        data,
+      })
+    }
+    return reportingPeriodRecord
+  } catch (error) {
+    logger.error(`Error creating reporting period ${periodInfo.name}`)
+    logger.error(error)
+  }
 }
 
 export const createReportingPeriod: MutationResolvers['createReportingPeriod'] =

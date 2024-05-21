@@ -40,7 +40,7 @@ describe('user queries', () => {
         role: 'ORGANIZATION_STAFF',
         agencyName: scenario.agency.two.name,
       }
-    ], scenario.organization.one)
+    ], scenario.organization.one.name)
     expect(result.length).toEqual(2)
     expect(result[0].id).toEqual(scenario.user.one.id)
     expect(result[1].email).toEqual('newuser99@example.com')

@@ -35,7 +35,7 @@ export const deleteAgency: MutationResolvers['deleteAgency'] = ({ id }) => {
   })
 }
 
-export const getOrCreateAgencies = async (organization, agencyData) => {
+export const getOrCreateAgencies = async (orgName, agencyData) => {
   const agencies = []
   /*
   {
@@ -44,6 +44,9 @@ export const getOrCreateAgencies = async (organization, agencyData) => {
     code: SAMPLECODE,
   }
   */
+  const organization = await db.organization.findFirst({
+    where: { name: orgName },
+  })
   for (const agency of agencyData) {
     try {
       logger.info(`Processing agency ${agency.name}`)
