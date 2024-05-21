@@ -3,13 +3,14 @@ import type {
   FindOrganizationQueryVariables,
 } from 'types/graphql'
 
-import { Label, SelectField } from '@redwoodjs/forms'
+import { Label, SelectField, HiddenField } from '@redwoodjs/forms'
 import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 
 export const QUERY = gql`
   query FindOrganizationQuery($id: Int!) {
     organization: organization(id: $id) {
       id
+      preferences
       reportingPeriods {
         id
         name
@@ -37,20 +38,7 @@ export const Success = ({
 }: CellSuccessProps<FindOrganizationQuery, FindOrganizationQueryVariables>) => {
   return (
     <div>
-      <Label
-        name="reportingPeriodId"
-        className="rw-label"
-        errorClassName="rw-label rw-label-error"
-      >
-        Reporting Period
-      </Label>
-      <SelectField name="reportingPeriodId">
-        {organization.reportingPeriods.map((reportingPeriod) => (
-          <option key={reportingPeriod.id} value={reportingPeriod.id}>
-            {reportingPeriod.name}
-          </option>
-        ))}
-      </SelectField>
+      <HiddenField name="reportingPeriodId" value={organization.preferences.current_reporting_period_id} />
       <Label
         name="agencyId"
         className="rw-label"
