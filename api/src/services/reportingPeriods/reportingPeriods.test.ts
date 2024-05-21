@@ -47,7 +47,6 @@ describe('reportingPeriods', () => {
         organizationId: scenario.reportingPeriod.two.organizationId,
         inputTemplateId: scenario.reportingPeriod.two.inputTemplateId,
         outputTemplateId: scenario.reportingPeriod.two.outputTemplateId,
-        isCurrentPeriod: true,
       },
     })
 
