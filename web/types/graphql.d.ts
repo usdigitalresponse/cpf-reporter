@@ -92,11 +92,8 @@ export type CreateProjectInput = {
 }
 
 export type CreateReportingPeriodInput = {
-  certifiedAt?: InputMaybe<Scalars['DateTime']>
-  certifiedById?: InputMaybe<Scalars['Int']>
   endDate: Scalars['DateTime']
   inputTemplateId: Scalars['Int']
-  isCurrentPeriod: Scalars['Boolean']
   name: Scalars['String']
   organizationId: Scalars['Int']
   outputTemplateId: Scalars['Int']
@@ -526,15 +523,11 @@ export type Redwood = {
 
 export type ReportingPeriod = {
   __typename?: 'ReportingPeriod'
-  certifiedAt?: Maybe<Scalars['DateTime']>
-  certifiedBy?: Maybe<User>
-  certifiedById?: Maybe<Scalars['Int']>
   createdAt: Scalars['DateTime']
   endDate: Scalars['DateTime']
   id: Scalars['Int']
   inputTemplate: InputTemplate
   inputTemplateId: Scalars['Int']
-  isCurrentPeriod: Scalars['Boolean']
   name: Scalars['String']
   organization: Organization
   organizationId: Scalars['Int']
@@ -544,6 +537,8 @@ export type ReportingPeriod = {
   startDate: Scalars['DateTime']
   updatedAt: Scalars['DateTime']
   uploads: Array<Maybe<Upload>>
+  validationRules: Maybe<ValidationRules>
+  validationRulesId: Maybe<['Int']>
 }
 
 export type RoleEnum =
@@ -607,11 +602,8 @@ export type UpdateProjectInput = {
 }
 
 export type UpdateReportingPeriodInput = {
-  certifiedAt?: InputMaybe<Scalars['DateTime']>
-  certifiedById?: InputMaybe<Scalars['Int']>
   endDate?: InputMaybe<Scalars['DateTime']>
   inputTemplateId?: InputMaybe<Scalars['Int']>
-  isCurrentPeriod?: InputMaybe<Scalars['Boolean']>
   name?: InputMaybe<Scalars['String']>
   organizationId?: InputMaybe<Scalars['Int']>
   outputTemplateId?: InputMaybe<Scalars['Int']>
@@ -691,7 +683,6 @@ export type User = {
   __typename?: 'User'
   agency: Agency
   agencyId: Scalars['Int']
-  certified: Array<Maybe<ReportingPeriod>>
   createdAt: Scalars['DateTime']
   email: Scalars['String']
   id: Scalars['Int']
@@ -708,6 +699,7 @@ export type ValidationRules = {
   updatedAt: Scalars['DateTime']
   validations: Array<Maybe<UploadValidation>>
   versionId: Version
+  reportingPeriods: Array<Maybe<ReportingPeriod>>
 }
 
 export type Version = 'V2023_12_12' | 'V2024_01_07' | 'V2024_04_01'
@@ -891,11 +883,8 @@ export type EditReportingPeriodById = {
     startDate: string
     endDate: string
     organizationId: number
-    certifiedAt?: string | null
-    certifiedById?: number | null
     inputTemplateId: number
     outputTemplateId: number
-    isCurrentPeriod: boolean
     createdAt: string
     updatedAt: string
   } | null
@@ -956,11 +945,8 @@ export type FindReportingPeriodById = {
     startDate: string
     endDate: string
     organizationId: number
-    certifiedAt?: string | null
-    certifiedById?: number | null
     inputTemplateId: number
     outputTemplateId: number
-    isCurrentPeriod: boolean
     createdAt: string
     updatedAt: string
   } | null
@@ -977,11 +963,8 @@ export type FindReportingPeriods = {
     startDate: string
     endDate: string
     organizationId: number
-    certifiedAt?: string | null
-    certifiedById?: number | null
     inputTemplateId: number
     outputTemplateId: number
-    isCurrentPeriod: boolean
     createdAt: string
     updatedAt: string
   }>
@@ -996,9 +979,6 @@ export type ReportingPeriodsQuery = {
     id: number
     startDate: string
     endDate: string
-    isCurrentPeriod: boolean
-    certifiedAt?: string | null
-    certifiedBy?: { __typename?: 'User'; email: string } | null
     inputTemplate: { __typename?: 'InputTemplate'; name: string }
   }>
 }

@@ -44,11 +44,6 @@ export const ReportingPeriod: ReportingPeriodRelationResolvers = {
       .findUnique({ where: { id: root?.id } })
       .organization()
   },
-  certifiedBy: (_obj, { root }) => {
-    return db.reportingPeriod
-      .findUnique({ where: { id: root?.id } })
-      .certifiedBy()
-  },
   inputTemplate: (_obj, { root }) => {
     return db.reportingPeriod
       .findUnique({ where: { id: root?.id } })
@@ -64,5 +59,10 @@ export const ReportingPeriod: ReportingPeriodRelationResolvers = {
   },
   projects: (_obj, { root }) => {
     return db.reportingPeriod.findUnique({ where: { id: root?.id } }).projects()
+  },
+  validationRules: (_obj, { root }) => {
+    return db.reportingPeriod
+      .findUnique({ where: { id: root?.id } })
+      .outputTemplate()
   },
 }

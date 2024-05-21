@@ -6,18 +6,16 @@ export const schema = gql`
     endDate: DateTime!
     organizationId: Int!
     organization: Organization!
-    certifiedAt: DateTime
-    certifiedById: Int
-    certifiedBy: User
     inputTemplateId: Int!
     inputTemplate: InputTemplate!
     outputTemplateId: Int!
     outputTemplate: OutputTemplate!
-    isCurrentPeriod: Boolean!
     createdAt: DateTime!
     updatedAt: DateTime!
     uploads: [Upload]!
     projects: [Project]!
+    validationRulesId: Int
+    validationRules: ValidationRules
   }
 
   type Query {
@@ -30,11 +28,8 @@ export const schema = gql`
     startDate: DateTime!
     endDate: DateTime!
     organizationId: Int!
-    certifiedAt: DateTime
-    certifiedById: Int
     inputTemplateId: Int!
     outputTemplateId: Int!
-    isCurrentPeriod: Boolean!
   }
 
   input UpdateReportingPeriodInput {
@@ -42,11 +37,8 @@ export const schema = gql`
     startDate: DateTime
     endDate: DateTime
     organizationId: Int
-    certifiedAt: DateTime
-    certifiedById: Int
     inputTemplateId: Int
     outputTemplateId: Int
-    isCurrentPeriod: Boolean
   }
 
   type Mutation {

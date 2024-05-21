@@ -14,7 +14,6 @@ export const schema = gql`
     updatedAt: DateTime!
     agency: Agency!
     role: RoleEnum!
-    certified: [ReportingPeriod]!
     uploaded: [Upload]!
   }
 
