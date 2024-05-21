@@ -6,6 +6,7 @@ import {
   createOrganization,
   updateOrganization,
   deleteOrganization,
+  getOrCreateOrganization,
 } from './organizations'
 import type { StandardScenario } from './organizations.scenarios'
 
@@ -16,6 +17,14 @@ import type { StandardScenario } from './organizations.scenarios'
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
 describe('organizations', () => {
+  scenario('creates or gets an organization', async (scenario: StandardScenario) => {
+    const resultGet = await getOrCreateOrganization('USDR1')
+    const resultCreate = await getOrCreateOrganization('USDR3')
+
+    expect(resultGet.id).toEqual(scenario.organization.one.id)
+    expect(resultCreate.name).toEqual('USDR3')
+    expect([scenario.organization.one.id, scenario.organization.two.id].includes(resultCreate.id)).toBe(false)
+  })
   scenario('returns all organizations', async (scenario: StandardScenario) => {
     const result = await organizations()
 
