@@ -5,6 +5,7 @@ export const schema = gql`
     createdAt: DateTime!
     updatedAt: DateTime!
     validations: [UploadValidation]!
+    reportingPeriods: [ReportingPeriod]!
   }
 
   enum Version {

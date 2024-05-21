@@ -302,9 +302,6 @@ export const User: UserRelationResolvers = {
   agency: (_obj, { root }) => {
     return db.user.findUnique({ where: { id: root?.id } }).agency()
   },
-  certified: (_obj, { root }) => {
-    return db.user.findUnique({ where: { id: root?.id } }).certified()
-  },
   uploaded: (_obj, { root }) => {
     return db.user.findUnique({ where: { id: root?.id } }).uploaded()
   },
