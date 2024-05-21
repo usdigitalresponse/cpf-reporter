@@ -246,6 +246,7 @@ export const getOrCreateUsers = async (users, organization) => {
   })
   const agenciesByName = {}
   for (const agency of orgAgencies) {
+    logger.info(`Agency ${agency.name} found for organization ${organization.name}`)
     agenciesByName[agency.name] = agency
   }
   const userRecords = []
