@@ -6,6 +6,7 @@ import {
   createExpenditureCategory,
   updateExpenditureCategory,
   deleteExpenditureCategory,
+  createOrSkipInitialExpenditureCategories,
 } from './expenditureCategories'
 import type { StandardScenario } from './expenditureCategories.scenarios'
 
@@ -16,6 +17,16 @@ import type { StandardScenario } from './expenditureCategories.scenarios'
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
 describe('expenditureCategories', () => {
+  scenario('creates initial expenditure categories', async () => {
+    const categoriesBefore = await expenditureCategories()
+    const result = await createOrSkipInitialExpenditureCategories()
+    const categoriesAfter = await expenditureCategories()
+
+    expect(result).toEqual(undefined)
+    expect(categoriesBefore.length).toEqual(2)
+    expect(categoriesAfter.length).toEqual(5)
+  })
+
   scenario(
     'returns all expenditureCategories',
     async (scenario: StandardScenario) => {

@@ -6,6 +6,7 @@ import {
   createReportingPeriod,
   updateReportingPeriod,
   deleteReportingPeriod,
+  getOrCreateReportingPeriod,
 } from './reportingPeriods'
 import type { StandardScenario } from './reportingPeriods.scenarios'
 
@@ -16,6 +17,37 @@ import type { StandardScenario } from './reportingPeriods.scenarios'
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
 describe('reportingPeriods', () => {
+  scenario('gets or creates reporting period', async () => {
+    const result = await getOrCreateReportingPeriod({
+      name: 'NEW PERIOD',
+      startDate: '2023-12-07T18:38:12.341Z',
+      endDate: '2023-12-07T18:38:12.341Z',
+
+      // previously existing input and output templates
+      inputTemplateName: 'INPUT TEMPLATE ONE',
+      outputTemplateName: 'OUTPUT TEMPLATE ONE',
+    })
+
+    expect(result.name).toEqual('NEW PERIOD')
+    expect(result.startDate).toEqual(new Date('2023-12-07T00:00:00.000Z'))
+    expect(result.endDate).toEqual(new Date('2023-12-07T00:00:00.000Z'))
+    expect(result.updatedAt).toBeDefined()
+  })
+
+  scenario('get or create returns null', async () => {
+    const result = await getOrCreateReportingPeriod({
+      name: 'NEW PERIOD',
+      startDate: '2023-12-07T18:38:12.341Z',
+      endDate: '2023-12-07T18:38:12.341Z',
+
+      // previously non existing input and output templates
+      inputTemplateName: 'NONEXISTENT INPUT TEMPLATE',
+      outputTemplateName: 'NONEXISTENT OUTPUT TEMPLATE',
+    })
+
+    expect(result).toEqual(undefined)
+  })
+
   scenario(
     'returns all reportingPeriods',
     async (scenario: StandardScenario) => {

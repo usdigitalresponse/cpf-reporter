@@ -15,7 +15,7 @@ const getPassageClient = async () => {
 
     return new Passage(passageConfig)
   } catch (error) {
-    logger.error('Error getting Passage client:', error)
+    logger.error(error, 'Error getting Passage client')
     throw new Error('Error getting Passage client')
   }
 }
@@ -27,7 +27,7 @@ export const createPassageUser = async (email: string) => {
     const activatedUser = await passage.user.activate(newUser.id)
     return activatedUser
   } catch (error) {
-    logger.error('Failed to create Passage user', error)
+    logger.error(error, 'Failed to create Passage user')
     throw new Error('Failed to create Passage user', error)
   }
 }
@@ -37,7 +37,7 @@ export const deletePassageUser = async (userId: string) => {
     const passage = await getPassageClient()
     return await passage.user.delete(userId)
   } catch (error) {
-    logger.error('Failed to delete Passage user', error)
+    logger.error(error, 'Failed to delete Passage user')
     throw new Error('Failed to delete Passage user')
   }
 }

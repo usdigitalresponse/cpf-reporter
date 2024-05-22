@@ -45,9 +45,7 @@ export const Success = ({
             <tr key={item.id}>
               <td>{item.startDate}</td>
               <td>{item.endDate}</td>
-              <td>
-                {item.inputTemplate?.name}
-              </td>
+              <td>{item.inputTemplate?.name}</td>
               <td>
                 <nav>
                   <Link

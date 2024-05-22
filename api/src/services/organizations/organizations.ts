@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import type {
   QueryResolvers,
   MutationResolvers,
@@ -5,6 +6,7 @@ import type {
 } from 'types/graphql'
 
 import { db } from 'src/lib/db'
+import { logger } from 'src/lib/logger'
 
 export const organizations: QueryResolvers['organizations'] = () => {
   return db.organization.findMany()
@@ -22,6 +24,54 @@ export const createOrganization: MutationResolvers['createOrganization'] = ({
   return db.organization.create({
     data: input,
   })
+}
+
+export const getOrCreateOrganization = async (orgName, reportingPeriodName) => {
+  // This function is used to create initial expenditure categories
+  // It is intended to only be called via the `onboardOrganization` script
+  // Hence, we hard-return if we detect a non-empty context
+  if (context && Object.keys(context).length > 0) {
+    logger.error(
+      { custom: context },
+      `This function is intended to be called via the onboardOrganization script and not via GraphQL API. Skipping...`
+    )
+    return
+  }
+
+  try {
+    let orgRecord
+
+    const existingOrganization = await db.organization.findFirst({
+      where: { name: orgName },
+    })
+    if (existingOrganization) {
+      logger.info(`Organization ${orgName} already exists`)
+      orgRecord = existingOrganization
+    } else {
+      logger.info(`Creating ${orgName}`)
+      const data: Prisma.OrganizationCreateArgs['data'] = {
+        name: orgName,
+      }
+      const reportingPeriod = await db.reportingPeriod.findFirst({
+        where: { name: reportingPeriodName },
+      })
+      if (!reportingPeriod) {
+        logger.error(
+          `Reporting period ${reportingPeriodName} does not exist. Cannot create organization.`
+        )
+        return
+      }
+      data.preferences = {
+        current_reporting_period_id: reportingPeriod.id,
+      }
+      orgRecord = await db.organization.create({
+        data,
+      })
+    }
+    return orgRecord
+  } catch (error) {
+    logger.error(error, `Error getting or creating organization: ${orgName}`)
+  }
 }
 
 export const createOrganizationAgencyAdmin: MutationResolvers['createOrganizationAgencyAdmin'] =
