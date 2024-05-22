@@ -12,6 +12,7 @@ import { getOrCreateUsers } from 'api/src/services/users/users'
 import { getOrCreateReportingPeriod } from 'api/src/services/reportingPeriods/reportingPeriods'
 import { getOrCreateInputTemplate } from 'api/src/services/inputTemplates/inputTemplates'
 import { getOrCreateOutputTemplate } from 'api/src/services/outputTemplates/outputTemplates'
+import { createOrSkipInitialExpenditureCategories } from 'api/src/services/expenditureCategories/expenditureCategories'
 
 export default async ({ args }) => {
   /*
@@ -20,6 +21,7 @@ export default async ({ args }) => {
   Example:
     yarn redwood exec onboardOrganization \
       --orgName 'Sample Org' \
+      --initializeExpenditureCategories true \
       --inputTemplateInfo '{
         "name": "Input Template 1",
         "version": "1.0.0",
@@ -53,6 +55,11 @@ export default async ({ args }) => {
 
   if (!args.orgName) {
     throw new Error('Organization name is required')
+  }
+
+  if (args.initializeExpenditureCategories) {
+    console.log('Initializing expenditure categories')
+    await createOrSkipInitialExpenditureCategories()
   }
 
   if (args.inputTemplateInfo) {
