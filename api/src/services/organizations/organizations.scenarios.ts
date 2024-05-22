@@ -2,7 +2,9 @@ import type { Prisma, Organization } from '@prisma/client'
 
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
-export const standard = defineScenario<Prisma.OrganizationCreateArgs | Prisma.ReportingPeriodCreateArgs>({
+export const standard = defineScenario<
+  Prisma.OrganizationCreateArgs | Prisma.ReportingPeriodCreateArgs
+>({
   reportingPeriod: {
     one: {
       data: {
@@ -28,8 +30,22 @@ export const standard = defineScenario<Prisma.OrganizationCreateArgs | Prisma.Re
     },
   },
   organization: {
-    one: (scenario) => ({ data: { name: 'USDR1', preferences: { current_reporting_period_id: scenario.reportingPeriod.one.id } } }),
-    two: (scenario) => ({ data: { name: 'USDR2', preferences: { current_reporting_period_id: scenario.reportingPeriod.one.id } } }),
+    one: (scenario) => ({
+      data: {
+        name: 'USDR1',
+        preferences: {
+          current_reporting_period_id: scenario.reportingPeriod.one.id,
+        },
+      },
+    }),
+    two: (scenario) => ({
+      data: {
+        name: 'USDR2',
+        preferences: {
+          current_reporting_period_id: scenario.reportingPeriod.one.id,
+        },
+      },
+    }),
   },
 })
 

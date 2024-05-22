@@ -51,10 +51,12 @@ export const getOrCreateAgencies = async (orgName, agencyData) => {
     try {
       logger.info(`Processing agency ${agency.name}`)
       const existingAgency = await db.agency.findFirst({
-        where: { name: agency.name, organizationId: organization.id }
+        where: { name: agency.name, organizationId: organization.id },
       })
       if (existingAgency) {
-        logger.info(`${agency.name} exists for organization ${organization.name}`)
+        logger.info(
+          `${agency.name} exists for organization ${organization.name}`
+        )
         agencies.push(existingAgency)
       } else {
         logger.info(`Creating ${agency.name}`)

@@ -1,10 +1,10 @@
-import type { Prisma, agency } from '@prisma/client'
+import type { Prisma } from '@prisma/client'
 
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
 export const standard = defineScenario<
-| Prisma.OrganizationCreateArgs
-| Prisma.AgencyCreateArgs>({
+  Prisma.OrganizationCreateArgs | Prisma.AgencyCreateArgs
+>({
   organization: {
     one: {
       data: {
@@ -17,7 +17,7 @@ export const standard = defineScenario<
       },
     },
   },
-  agency:{
+  agency: {
     one: (scenario) => ({
       data: {
         name: 'Agency1',

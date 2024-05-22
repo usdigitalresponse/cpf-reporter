@@ -249,7 +249,7 @@ export const getOrCreateUsers = async (users, orgName) => {
     return
   }
   const orgAgencies = await db.agency.findMany({
-    where: { organizationId: organization.id }
+    where: { organizationId: organization.id },
   })
   const agenciesByName = {}
   for (const agency of orgAgencies) {
@@ -260,7 +260,9 @@ export const getOrCreateUsers = async (users, orgName) => {
     try {
       logger.info(`Processing user ${user.email}`)
       if (!agenciesByName[user.agencyName]) {
-        logger.error(`Agency ${user.agencyName} not found for organization ${organization.name}`)
+        logger.error(
+          `Agency ${user.agencyName} not found for organization ${organization.name}`
+        )
         continue
       }
       const userData: Prisma.UserCreateArgs['data'] = {
@@ -271,14 +273,13 @@ export const getOrCreateUsers = async (users, orgName) => {
         isActive: true,
       }
       const existingUser = await db.user.findFirst({
-        where: { email: userData.email }
+        where: { email: userData.email },
       })
       if (existingUser) {
         logger.info(`User ${userData.email} already exists`)
         userRecords.push(existingUser)
         continue
-      }
-      else {
+      } else {
         if (process.env.AUTH_PROVIDER === 'passage' && !userData.passageId) {
           logger.info(`Creating Passage user for ${userData.email}`)
           const passageUser = await createPassageUser(userData.email)

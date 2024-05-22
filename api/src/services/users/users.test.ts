@@ -27,20 +27,23 @@ import type { StandardScenario } from './users.scenarios'
 
 describe('user queries', () => {
   scenario('gets or creates a user', async (scenario: StandardScenario) => {
-    const result = await getOrCreateUsers([
-      {
-        email: 'uniqueemail1@test.com',
-        name: 'String',
-        role: 'ORGANIZATION_ADMIN',
-        agencyName: scenario.agency.one.name,
-      },
-      {
-        email: 'newuser99@example.com',
-        name: 'String',
-        role: 'ORGANIZATION_STAFF',
-        agencyName: scenario.agency.two.name,
-      }
-    ], scenario.organization.one.name)
+    const result = await getOrCreateUsers(
+      [
+        {
+          email: 'uniqueemail1@test.com',
+          name: 'String',
+          role: 'ORGANIZATION_ADMIN',
+          agencyName: scenario.agency.one.name,
+        },
+        {
+          email: 'newuser99@example.com',
+          name: 'String',
+          role: 'ORGANIZATION_STAFF',
+          agencyName: scenario.agency.two.name,
+        },
+      ],
+      scenario.organization.one.name
+    )
     expect(result.length).toEqual(2)
     expect(result[0].id).toEqual(scenario.user.one.id)
     expect(result[1].email).toEqual('newuser99@example.com')
