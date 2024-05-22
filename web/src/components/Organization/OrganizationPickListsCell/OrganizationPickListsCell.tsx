@@ -38,6 +38,10 @@ export const Success = ({
 }: CellSuccessProps<FindOrganizationQuery, FindOrganizationQueryVariables>) => {
   return (
     <div>
+      {/* Hard-coding the reporting period name temporarily. Will be resolved by issue #79 */}
+      <Label name="reportingPeriodId" className="rw-label">
+        Reporting Period - April 1st to June 30th - Q2 2024
+      </Label>
       <HiddenField name="reportingPeriodId" value={organization.preferences.current_reporting_period_id} />
       <Label
         name="agencyId"
