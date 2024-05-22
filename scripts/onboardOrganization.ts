@@ -19,6 +19,7 @@ export default async ({ args }) => {
 
   Example:
     yarn redwood exec onboardOrganization \
+      --orgName 'Sample Org' \
       --inputTemplateInfo '{
         "name": "Input Template 1",
         "version": "1.0.0",
@@ -35,9 +36,8 @@ export default async ({ args }) => {
         "startDate": "2024-04-01T00:00:00.000Z",
         "endDate": "2024-06-30T23:59:59.999Z",
         "inputTemplateName": "Input Template 1",
-        "outputTemplateName": "Output Template 1",
+        "outputTemplateName": "Output Template 1"
       }' \
-      --orgName 'Sample Org' \
       --agencyInfo '[
         {"name": "Sample Agency", "abbreviation": "SA", "code": "SA"},
         {"name": "Sample Agency 2", "abbreviation": "SA2", "code": "SA2"}
@@ -49,44 +49,52 @@ export default async ({ args }) => {
   */
   await getPrismaClient()
   console.log(':: Executing script with args ::')
-  console.log(args)
-  console.log(JSON.parse(args.inputTemplateInfo))
-  console.log(JSON.parse(args.outputTemplateInfo))
-  console.log(args.currentPeriodName)
-  console.log(args.orgName)
-  console.log(JSON.parse(args.agencyInfo))
-  console.log(JSON.parse(args.userInfo))
-  console.log(':: Script executed ::')
+  console.log(`Received following arguments: ${Object.keys(args)}`)
+
   if (!args.orgName) {
     throw new Error('Organization name is required')
   }
 
   if (args.inputTemplateInfo) {
+    console.log('get or create input template')
+    console.log(JSON.parse(args.inputTemplateInfo))
     const parsedInputTemplateInfo = JSON.parse(args.inputTemplateInfo)
     await getOrCreateInputTemplate(parsedInputTemplateInfo)
   }
 
   if (args.outputTemplateInfo) {
+    console.log('get or create output template')
+    console.log(JSON.parse(args.outputTemplateInfo))
     const parsedOutputTemplateInfo = JSON.parse(args.outputTemplateInfo)
     await getOrCreateOutputTemplate(parsedOutputTemplateInfo)
   }
 
   if (args.periodInfo) {
+    console.log('get or create reporting period')
+    console.log(JSON.parse(args.periodInfo))
     const parsedPeriodInfo = JSON.parse(args.periodInfo)
     await getOrCreateReportingPeriod(parsedPeriodInfo)
   }
 
   if (args.orgName && args.currentPeriodName) {
+    console.log('Get or create Organization')
+    console.log(args.orgName)
+    console.log(args.currentPeriodName)
     await getOrCreateOrganization(args.orgName, args.currentPeriodName)
   }
 
   if (args.agencyInfo) {
+    console.log('Get or create Agencies')
+    console.log(JSON.parse(args.agencyInfo))
     const parsedAgencyInfo = JSON.parse(args.agencyInfo)
     await getOrCreateAgencies(args.orgName, parsedAgencyInfo)
   }
 
   if (args.userInfo) {
+    console.log('Get or create Users')
+    console.log(JSON.parse(args.userInfo))
     const parsedUserInfo = JSON.parse(args.userInfo)
-    getOrCreateUsers(parsedUserInfo, args.orgName)
+    await getOrCreateUsers(parsedUserInfo, args.orgName)
   }
+  console.log(':: Script executed ::')
 }

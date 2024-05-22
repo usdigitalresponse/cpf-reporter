@@ -25,8 +25,10 @@ export const getOrCreateOutputTemplate = async (outputTemplateInfo) => {
       where: { name: outputTemplateInfo.name },
     })
     if (existingOutputTemplate) {
+      logger.info(`Output template ${outputTemplateInfo.name} already exists`)
       outputTemplateRecord = existingOutputTemplate
     } else {
+      logger.info(`Creating ${outputTemplateInfo.name}`)
       const data = outputTemplateInfo
       outputTemplateRecord = await db.outputTemplate.create({
         data,

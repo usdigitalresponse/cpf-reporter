@@ -25,8 +25,10 @@ export const getOrCreateInputTemplate = async (inputTemplateInfo) => {
       where: { name: inputTemplateInfo.name },
     })
     if (existingInputTemplate) {
+      logger.info(`Input template ${inputTemplateInfo.name} already exists`)
       inputTemplateRecord = existingInputTemplate
     } else {
+      logger.info(`Creating ${inputTemplateInfo.name}`)
       const data = inputTemplateInfo
       inputTemplateRecord = await db.inputTemplate.create({
         data,

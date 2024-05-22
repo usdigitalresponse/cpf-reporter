@@ -25,6 +25,7 @@ export const getOrCreateReportingPeriod = async (periodInfo) => {
       where: { name: periodInfo.name },
     })
     if (existingReportingPeriod) {
+      logger.info(`Reporting period ${periodInfo.name} already exists`)
       reportingPeriodRecord = existingReportingPeriod
     } else {
       const outputTemplate = await db.outputTemplate.findFirst({
@@ -45,6 +46,7 @@ export const getOrCreateReportingPeriod = async (periodInfo) => {
         )
         return
       }
+      logger.info(`Creating ${periodInfo.name}`)
       const data = {
         name: periodInfo.name,
         startDate: periodInfo.startDate,
