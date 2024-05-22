@@ -81,8 +81,8 @@ model ReportingPeriod {
   name              String
   startDate         DateTime       @db.Date
   endDate           DateTime       @db.Date
-  organizationId    Int
-  organization      Organization   @relation(fields: [organizationId], references: [id])
+  organizationId    Int?
+  organization      Organization?   @relation(fields: [organizationId], references: [id])
   inputTemplateId   Int
   inputTemplate     InputTemplate  @relation(fields: [inputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   outputTemplateId  Int
