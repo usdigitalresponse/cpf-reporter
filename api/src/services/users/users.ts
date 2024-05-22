@@ -235,7 +235,8 @@ export const getOrCreateUsers = async (users, orgName) => {
   // It is intended to only be called via the `onboardOrganization` script
   // Hence, we hard-return if we detect a non-empty context
   if (context && Object.keys(context).length > 0) {
-    logger.error({ custom: context },
+    logger.error(
+      { custom: context },
       `This function is intended to be called via the onboardOrganization script and not via GraphQL API. Skipping...`
     )
     return
@@ -308,7 +309,10 @@ export const getOrCreateUsers = async (users, orgName) => {
     }
     return userRecords
   } catch (error) {
-    logger.error(error, `Error getting or creating users for organization ${orgName}`)
+    logger.error(
+      error,
+      `Error getting or creating users for organization ${orgName}`
+    )
   }
 }
 
