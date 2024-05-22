@@ -231,72 +231,85 @@ export const usersByOrganization: QueryResolvers['usersByOrganization'] =
   }
 
 export const getOrCreateUsers = async (users, orgName) => {
-  /*
-  Users are sent in the following Array format
-  {
-    name: 'Sample Name',
-    email: 'sample@example.com',
-    role: 'ORGANIZATION_STAFF',
-    agencyName: 'Sample Name',
-    passageId: '1234', // Optional
-  }
-  */
-  const organization = await db.organization.findFirst({
-    where: { name: orgName },
-  })
-  if (!organization) {
-    logger.error(`Organization ${orgName} not found`)
+  // This function is used to create initial expenditure categories
+  // It is intended to only be called via the `onboardOrganization` script
+  // Hence, we hard-return if we detect a non-empty context
+  if (context && Object.keys(context).length > 0) {
+    logger.error({ custom: context },
+      `This function is intended to be called via the onboardOrganization script and not via GraphQL API. Skipping...`
+    )
     return
   }
-  const orgAgencies = await db.agency.findMany({
-    where: { organizationId: organization.id },
-  })
-  const agenciesByName = {}
-  for (const agency of orgAgencies) {
-    agenciesByName[agency.name] = agency
-  }
-  const userRecords = []
-  for (const user of users) {
-    try {
-      logger.info(`Processing user ${user.email}`)
-      if (!agenciesByName[user.agencyName]) {
-        logger.error(
-          `Agency ${user.agencyName} not found for organization ${organization.name}`
-        )
-        continue
-      }
-      const userData: Prisma.UserCreateArgs['data'] = {
-        email: user.email,
-        name: user.name,
-        agencyId: agenciesByName[user.agencyName].id,
-        role: user.role,
-        isActive: true,
-      }
-      const existingUser = await db.user.findFirst({
-        where: { email: userData.email },
-      })
-      if (existingUser) {
-        logger.info(`User ${userData.email} already exists`)
-        userRecords.push(existingUser)
-        continue
-      } else {
-        if (process.env.AUTH_PROVIDER === 'passage' && !userData.passageId) {
-          logger.info(`Creating Passage user for ${userData.email}`)
-          const passageUser = await createPassageUser(userData.email)
-          userData.passageId = passageUser.id
-        }
-        const record = await db.user.create({ data: userData })
-        logger.info(`User ${userData.email} created`)
-        logger.info(record)
-        userRecords.push(record)
-      }
-    } catch (error) {
-      logger.error(`Error processing user ${user.email}`)
-      logger.error(error)
-      continue
+
+  try {
+    /*
+    Users are sent in the following Array format
+    {
+      name: 'Sample Name',
+      email: 'sample@example.com',
+      role: 'ORGANIZATION_STAFF',
+      agencyName: 'Sample Name',
+      passageId: '1234', // Optional
     }
+    */
+    const organization = await db.organization.findFirst({
+      where: { name: orgName },
+    })
+    if (!organization) {
+      logger.error(`Organization ${orgName} not found`)
+      return
+    }
+    const orgAgencies = await db.agency.findMany({
+      where: { organizationId: organization.id },
+    })
+    const agenciesByName = {}
+    for (const agency of orgAgencies) {
+      agenciesByName[agency.name] = agency
+    }
+    const userRecords = []
+    for (const user of users) {
+      try {
+        logger.info(`Processing user ${user.email}`)
+        if (!agenciesByName[user.agencyName]) {
+          logger.error(
+            `Agency ${user.agencyName} not found for organization ${organization.name}`
+          )
+          continue
+        }
+        const userData: Prisma.UserCreateArgs['data'] = {
+          email: user.email,
+          name: user.name,
+          agencyId: agenciesByName[user.agencyName].id,
+          role: user.role,
+          isActive: true,
+        }
+        const existingUser = await db.user.findFirst({
+          where: { email: userData.email },
+        })
+        if (existingUser) {
+          logger.info(`User ${userData.email} already exists`)
+          userRecords.push(existingUser)
+          continue
+        } else {
+          if (process.env.AUTH_PROVIDER === 'passage' && !userData.passageId) {
+            logger.info(`Creating Passage user for ${userData.email}`)
+            const passageUser = await createPassageUser(userData.email)
+            userData.passageId = passageUser.id
+          }
+          const record = await db.user.create({ data: userData })
+          logger.info(`User ${userData.email} created`)
+          logger.info(record)
+          userRecords.push(record)
+        }
+      } catch (error) {
+        logger.error(error, `Error processing user ${user.email}`)
+        continue
+      }
+    }
+    return userRecords
+  } catch (error) {
+    logger.error(error, `Error getting or creating users for organization ${orgName}`)
   }
-  return userRecords
 }
 
 export const User: UserRelationResolvers = {

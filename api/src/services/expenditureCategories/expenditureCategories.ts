@@ -7,6 +7,7 @@ import type {
 
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
+import { EXPENDITURE_CATEGORIES } from 'src/lib/constants'
 
 export const expenditureCategories: QueryResolvers['expenditureCategories'] =
   () => {
@@ -22,36 +23,39 @@ export const expenditureCategory: QueryResolvers['expenditureCategory'] = ({
 }
 
 export const createOrSkipInitialExpenditureCategories = async () => {
-  const expendtitureCategoriesData = [
-    {
-      name: '1A - Broadband Infrastructure',
-      code: '1A',
-    },
-    {
-      name: '1B - Digital Connectivity Technology',
-      code: '1B',
-    },
-    {
-      name: '1C - Multi-Purpose Community Facility',
-      code: '1C',
-    },
-  ]
-  await Promise.all(
-    expendtitureCategoriesData.map(
-      async (data: Prisma.ExpenditureCategoryCreateArgs['data']) => {
-        const existingExpenditureCategory =
-          await db.expenditureCategory.findFirst({ where: { name: data.name } })
-        if (existingExpenditureCategory) {
-          logger.info(
-            `Expenditure category ${data.name} already exists. Skipping...`
-          )
-          return
-        }
-        const record = await db.expenditureCategory.create({ data })
-        logger.info(`Created expenditure category ${record.name}`)
-      }
+  // This function is used to create initial expenditure categories
+  // It is intended to only be called via the `onboardOrganization` script
+  // Hence, we hard-return if we detect a non-empty context
+  if (context && Object.keys(context).length > 0) {
+    logger.error({ custom: context },
+      `This function is intended to be called via the onboardOrganization script and not via GraphQL API. Skipping...`
     )
-  )
+    return
+  }
+
+  try {
+    const expenditureCategoriesData = Object.entries(EXPENDITURE_CATEGORIES).map(
+      ([code, name]) => ({ code, name })
+    )
+    await Promise.all(
+      expenditureCategoriesData.map(
+        async (data: Prisma.ExpenditureCategoryCreateArgs['data']) => {
+          const existingExpenditureCategory =
+            await db.expenditureCategory.findFirst({ where: { name: data.name } })
+          if (existingExpenditureCategory) {
+            logger.info(
+              `Expenditure category ${data.name} already exists. Skipping...`
+            )
+            return
+          }
+          const record = await db.expenditureCategory.create({ data })
+          logger.info(`Created expenditure category ${record.name}`)
+        }
+      )
+    )
+  } catch (error) {
+    logger.error(error, 'Error creating or skipping initial expenditure categories')
+  }
 }
 
 export const createExpenditureCategory: MutationResolvers['createExpenditureCategory'] =
