@@ -6,6 +6,7 @@ import type {
 
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
+import { getOrCreateOutputTemplate } from '../outputTemplates/outputTemplates'
 
 export const reportingPeriods: QueryResolvers['reportingPeriods'] = () => {
   return db.reportingPeriod.findMany()
@@ -27,7 +28,31 @@ export const getOrCreateReportingPeriod = async (periodInfo) => {
     if (existingReportingPeriod) {
       reportingPeriodRecord = existingReportingPeriod
     } else {
-      const data = periodInfo
+      const outputTemplate = await db.outputTemplate.findFirst({
+        where: { name: periodInfo.outputTemplateName },
+      })
+      if (!outputTemplate) {
+        logger.error(
+          `Output template ${periodInfo.outputTemplateName} does not exist. Cannot create reporting period.`
+        )
+        return
+      }
+      const inputTemplate = await db.inputTemplate.findFirst({
+        where: { name: periodInfo.inputTemplateName },
+      })
+      if (!inputTemplate) {
+        logger.error(
+          `Input template ${periodInfo.inputTemplateName} does not exist. Cannot create reporting period.`
+        )
+        return
+      }
+      const data = {
+        name: periodInfo.name,
+        startDate: periodInfo.startDate,
+        endDate: periodInfo.endDate,
+        inputTemplateId: inputTemplate.id,
+        outputTemplateId: outputTemplate.id,
+      }
       reportingPeriodRecord = await db.reportingPeriod.create({
         data,
       })

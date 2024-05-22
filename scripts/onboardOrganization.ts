@@ -10,13 +10,8 @@ import {
 } from 'api/src/services/agencies/agencies'
 import { getOrCreateUsers } from 'api/src/services/users/users'
 import { getOrCreateReportingPeriod } from 'api/src/services/reportingPeriods/reportingPeriods'
-
-async function addOrgAgencyUsers(currentPeriodName, orgName, agencyInfo, userInfo) {
-  const reportingPeriod = await getOrCreateReportingPeriod(currentPeriodName)
-  const organizationRecord = await getOrCreateOrganization(orgName, currentPeriodName)
-  await getOrCreateAgencies(orgName, agencyInfo)
-  getOrCreateUsers(userInfo, orgName)
-}
+import { getOrCreateInputTemplate } from 'api/src/services/inputTemplates/inputTemplates'
+import { getOrCreateOutputTemplate } from 'api/src/services/outputTemplates/outputTemplates'
 
 export default async ({ args }) => {
   /*
@@ -61,6 +56,37 @@ export default async ({ args }) => {
   console.log(args.orgName)
   console.log(JSON.parse(args.agencyInfo))
   console.log(JSON.parse(args.userInfo))
-  await addOrgAgencyUsers(args.currentPeriodName, args.orgName, JSON.parse(args.agencyInfo), JSON.parse(args.userInfo))
   console.log(':: Script executed ::')
+  if (!args.orgName) {
+    throw new Error('Organization name is required')
+  }
+
+  if (args.inputTemplateInfo) {
+    const parsedInputTemplateInfo = JSON.parse(args.inputTemplateInfo)
+    await getOrCreateInputTemplate(parsedInputTemplateInfo)
+  }
+
+  if (args.outputTemplateInfo) {
+    const parsedOutputTemplateInfo = JSON.parse(args.outputTemplateInfo)
+    await getOrCreateOutputTemplate(parsedOutputTemplateInfo)
+  }
+
+  if (args.periodInfo) {
+    const parsedPeriodInfo = JSON.parse(args.periodInfo)
+    await getOrCreateReportingPeriod(parsedPeriodInfo)
+  }
+
+  if (args.orgName && args.currentPeriodName) {
+    await getOrCreateOrganization(args.orgName, args.currentPeriodName)
+  }
+
+  if (args.agencyInfo) {
+    const parsedAgencyInfo = JSON.parse(args.agencyInfo)
+    await getOrCreateAgencies(args.orgName, parsedAgencyInfo)
+  }
+
+  if (args.userInfo) {
+    const parsedUserInfo = JSON.parse(args.userInfo)
+    getOrCreateUsers(parsedUserInfo, args.orgName)
+  }
 }
