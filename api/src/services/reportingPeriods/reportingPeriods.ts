@@ -6,7 +6,6 @@ import type {
 
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
-import { getOrCreateOutputTemplate } from '../outputTemplates/outputTemplates'
 
 export const reportingPeriods: QueryResolvers['reportingPeriods'] = () => {
   return db.reportingPeriod.findMany()
