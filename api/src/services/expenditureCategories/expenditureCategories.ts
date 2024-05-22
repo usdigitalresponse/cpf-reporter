@@ -1,9 +1,9 @@
+import type { Prisma } from '@prisma/client'
 import type {
   QueryResolvers,
   MutationResolvers,
   ExpenditureCategoryRelationResolvers,
 } from 'types/graphql'
-import type { Prisma } from '@prisma/client'
 
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
@@ -39,9 +39,8 @@ export const createOrSkipInitialExpenditureCategories = async () => {
   await Promise.all(
     expendtitureCategoriesData.map(
       async (data: Prisma.ExpenditureCategoryCreateArgs['data']) => {
-        const existingExpenditureCategory = await db.expenditureCategory.findFirst(
-          { where: { name: data.name } }
-        )
+        const existingExpenditureCategory =
+          await db.expenditureCategory.findFirst({ where: { name: data.name } })
         if (existingExpenditureCategory) {
           logger.info(
             `Expenditure category ${data.name} already exists. Skipping...`
