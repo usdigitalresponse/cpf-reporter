@@ -141,11 +141,8 @@ export type CreateProjectInput = {
 }
 
 export type CreateReportingPeriodInput = {
-  certifiedAt?: InputMaybe<Scalars['DateTime']>
-  certifiedById?: InputMaybe<Scalars['Int']>
   endDate: Scalars['DateTime']
   inputTemplateId: Scalars['Int']
-  isCurrentPeriod: Scalars['Boolean']
   name: Scalars['String']
   organizationId: Scalars['Int']
   outputTemplateId: Scalars['Int']
@@ -575,15 +572,11 @@ export type Redwood = {
 
 export type ReportingPeriod = {
   __typename?: 'ReportingPeriod'
-  certifiedAt?: Maybe<Scalars['DateTime']>
-  certifiedBy?: Maybe<User>
-  certifiedById?: Maybe<Scalars['Int']>
   createdAt: Scalars['DateTime']
   endDate: Scalars['DateTime']
   id: Scalars['Int']
   inputTemplate: InputTemplate
   inputTemplateId: Scalars['Int']
-  isCurrentPeriod: Scalars['Boolean']
   name: Scalars['String']
   organization: Organization
   organizationId: Scalars['Int']
@@ -593,6 +586,8 @@ export type ReportingPeriod = {
   startDate: Scalars['DateTime']
   updatedAt: Scalars['DateTime']
   uploads: Array<Maybe<Upload>>
+  validationRulesId: Maybe<Scalars['Int']>
+  validationRules: Maybe<ValidationRules>
 }
 
 export type RoleEnum =
@@ -656,11 +651,8 @@ export type UpdateProjectInput = {
 }
 
 export type UpdateReportingPeriodInput = {
-  certifiedAt?: InputMaybe<Scalars['DateTime']>
-  certifiedById?: InputMaybe<Scalars['Int']>
   endDate?: InputMaybe<Scalars['DateTime']>
   inputTemplateId?: InputMaybe<Scalars['Int']>
-  isCurrentPeriod?: InputMaybe<Scalars['Boolean']>
   name?: InputMaybe<Scalars['String']>
   organizationId?: InputMaybe<Scalars['Int']>
   outputTemplateId?: InputMaybe<Scalars['Int']>
@@ -741,7 +733,6 @@ export type User = {
   __typename?: 'User'
   agency: Agency
   agencyId: Scalars['Int']
-  certified: Array<Maybe<ReportingPeriod>>
   createdAt: Scalars['DateTime']
   email: Scalars['String']
   id: Scalars['Int']
@@ -2468,21 +2459,6 @@ export type ReportingPeriodResolvers<
   ContextType = RedwoodGraphQLContext,
   ParentType extends ResolversParentTypes['ReportingPeriod'] = ResolversParentTypes['ReportingPeriod']
 > = {
-  certifiedAt: OptArgsResolverFn<
-    Maybe<ResolversTypes['DateTime']>,
-    ParentType,
-    ContextType
-  >
-  certifiedBy: OptArgsResolverFn<
-    Maybe<ResolversTypes['User']>,
-    ParentType,
-    ContextType
-  >
-  certifiedById: OptArgsResolverFn<
-    Maybe<ResolversTypes['Int']>,
-    ParentType,
-    ContextType
-  >
   createdAt: OptArgsResolverFn<
     ResolversTypes['DateTime'],
     ParentType,
@@ -2501,11 +2477,6 @@ export type ReportingPeriodResolvers<
   >
   inputTemplateId: OptArgsResolverFn<
     ResolversTypes['Int'],
-    ParentType,
-    ContextType
-  >
-  isCurrentPeriod: OptArgsResolverFn<
-    ResolversTypes['Boolean'],
     ParentType,
     ContextType
   >
@@ -2550,6 +2521,16 @@ export type ReportingPeriodResolvers<
     ParentType,
     ContextType
   >
+  validationRules: OptArgsResolverFn<
+  Maybe<ResolversTypes['ValidationRules']>,
+  ParentType,
+  ContextType
+>
+validationRulesId: OptArgsResolverFn<
+  Maybe<ResolversTypes['Int']>,
+  ParentType,
+  ContextType
+>
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2557,21 +2538,6 @@ export type ReportingPeriodRelationResolvers<
   ContextType = RedwoodGraphQLContext,
   ParentType extends ResolversParentTypes['ReportingPeriod'] = ResolversParentTypes['ReportingPeriod']
 > = {
-  certifiedAt?: RequiredResolverFn<
-    Maybe<ResolversTypes['DateTime']>,
-    ParentType,
-    ContextType
-  >
-  certifiedBy?: RequiredResolverFn<
-    Maybe<ResolversTypes['User']>,
-    ParentType,
-    ContextType
-  >
-  certifiedById?: RequiredResolverFn<
-    Maybe<ResolversTypes['Int']>,
-    ParentType,
-    ContextType
-  >
   createdAt?: RequiredResolverFn<
     ResolversTypes['DateTime'],
     ParentType,
@@ -2590,11 +2556,6 @@ export type ReportingPeriodRelationResolvers<
   >
   inputTemplateId?: RequiredResolverFn<
     ResolversTypes['Int'],
-    ParentType,
-    ContextType
-  >
-  isCurrentPeriod?: RequiredResolverFn<
-    ResolversTypes['Boolean'],
     ParentType,
     ContextType
   >
@@ -2636,6 +2597,16 @@ export type ReportingPeriodRelationResolvers<
   >
   uploads?: RequiredResolverFn<
     Array<Maybe<ResolversTypes['Upload']>>,
+    ParentType,
+    ContextType
+  >
+  validationRules?: RequiredResolverFn<
+    Maybe<ResolversTypes['ValidationRules']>,
+    ParentType,
+    ContextType
+  >
+  validationRulesId?: RequiredResolverFn<
+    Maybe<ResolversTypes['Int']>,
     ParentType,
     ContextType
   >
@@ -2989,11 +2960,6 @@ export type UserResolvers<
 > = {
   agency: OptArgsResolverFn<ResolversTypes['Agency'], ParentType, ContextType>
   agencyId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>
-  certified: OptArgsResolverFn<
-    Array<Maybe<ResolversTypes['ReportingPeriod']>>,
-    ParentType,
-    ContextType
-  >
   createdAt: OptArgsResolverFn<
     ResolversTypes['DateTime'],
     ParentType,
@@ -3022,11 +2988,6 @@ export type UserRelationResolvers<
 > = {
   agency?: RequiredResolverFn<ResolversTypes['Agency'], ParentType, ContextType>
   agencyId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>
-  certified?: RequiredResolverFn<
-    Array<Maybe<ResolversTypes['ReportingPeriod']>>,
-    ParentType,
-    ContextType
-  >
   createdAt?: RequiredResolverFn<
     ResolversTypes['DateTime'],
     ParentType,
@@ -3069,6 +3030,11 @@ export type ValidationRulesResolvers<
     ParentType,
     ContextType
   >
+  reportingPeriods: OptArgsResolverFn<
+    Array<Maybe<ResolversTypes['ReportingPeriod']>>,
+    ParentType,
+    ContextType
+  >
   versionId: OptArgsResolverFn<
     ResolversTypes['Version'],
     ParentType,
@@ -3097,6 +3063,11 @@ export type ValidationRulesRelationResolvers<
     ParentType,
     ContextType
   >
+  reportingPeriods?: RequiredResolverFn<
+    Array<Maybe<ResolversTypes['ReportingPeriod']>>,
+    ParentType,
+    ContextType
+  > 
   versionId?: RequiredResolverFn<
     ResolversTypes['Version'],
     ParentType,

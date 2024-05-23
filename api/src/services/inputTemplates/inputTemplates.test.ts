@@ -6,6 +6,7 @@ import {
   createInputTemplate,
   updateInputTemplate,
   deleteInputTemplate,
+  getOrCreateInputTemplate,
 } from './inputTemplates'
 import type { StandardScenario } from './inputTemplates.scenarios'
 
@@ -16,6 +17,19 @@ import type { StandardScenario } from './inputTemplates.scenarios'
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
 describe('inputTemplates', () => {
+  scenario('gets or creates input template', async () => {
+    const result = await getOrCreateInputTemplate({
+      name: 'NEW TEMPLATE',
+      version: '1.0.0',
+      effectiveDate: '2023-12-07T18:17:24.374Z',
+    })
+
+    expect(result.name).toEqual('NEW TEMPLATE')
+    expect(result.version).toEqual('1.0.0')
+    expect(result.effectiveDate).toEqual(new Date('2023-12-07T00:00:00.000Z'))
+    expect(result.updatedAt).toBeDefined()
+  })
+
   scenario('returns all inputTemplates', async (scenario: StandardScenario) => {
     const result = await inputTemplates()
 

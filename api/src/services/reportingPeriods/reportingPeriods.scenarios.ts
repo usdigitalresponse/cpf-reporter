@@ -12,14 +12,14 @@ export const standard = defineScenario<Prisma.ReportingPeriodCreateArgs>({
         organization: { create: { name: 'String' } },
         inputTemplate: {
           create: {
-            name: 'String',
+            name: 'INPUT TEMPLATE ONE',
             version: 'String',
             effectiveDate: '2024-01-12T15:48:11.499Z',
           },
         },
         outputTemplate: {
           create: {
-            name: 'String',
+            name: 'OUTPUT TEMPLATE ONE',
             version: 'String',
             effectiveDate: '2024-01-12T15:48:11.499Z',
           },
@@ -34,14 +34,14 @@ export const standard = defineScenario<Prisma.ReportingPeriodCreateArgs>({
         organization: { create: { name: 'String' } },
         inputTemplate: {
           create: {
-            name: 'String',
+            name: 'INPUT TEMPLATE TWO',
             version: 'String',
             effectiveDate: '2024-01-12T15:48:11.499Z',
           },
         },
         outputTemplate: {
           create: {
-            name: 'String',
+            name: 'OUTPUT TEMPLATE TWO',
             version: 'String',
             effectiveDate: '2024-01-12T15:48:11.499Z',
           },

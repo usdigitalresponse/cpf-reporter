@@ -43,8 +43,32 @@ def invalid_cover_sheet(valid_coversheet):
 
 
 @pytest.fixture
+def invalid_cover_sheet_missing_code(valid_coversheet):
+    valid_coversheet["A2"] = None
+    return valid_coversheet
+
+
+@pytest.fixture
+def invalid_cover_sheet_empty_code(valid_coversheet):
+    valid_coversheet["A2"] = "  "
+    return valid_coversheet
+
+
+@pytest.fixture
 def invalid_project_sheet(valid_project_sheet):
     valid_project_sheet["D13"] = "X" * 21
+    return valid_project_sheet
+
+
+@pytest.fixture
+def invalid_project_sheet_missing_field(valid_project_sheet):
+    valid_project_sheet["D13"] = None
+    return valid_project_sheet
+
+
+@pytest.fixture
+def invalid_project_sheet_empty_field(valid_project_sheet):
+    valid_project_sheet["D13"] = "    "
     return valid_project_sheet
 
 
