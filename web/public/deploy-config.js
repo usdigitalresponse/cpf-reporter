@@ -9,8 +9,8 @@ window.APP_CONFIG.featureFlags = {}
 // For local development only. Register feature flags for Staging and Production by
 //  configuring the `website_config_params` input variable in Terraform (see `terraform/*.tfvars`).
 window.APP_CONFIG.webConfigParams = {
-  passage_app_id: 'TBD',
-  auth_provider: 'TBD',
+  passage_app_id: 'local',
+  auth_provider: 'local',
 }
 
 window.APP_CONFIG.overrideFeatureFlag = (flagName, overrideValue) => {
