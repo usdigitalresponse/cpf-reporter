@@ -161,6 +161,20 @@ class TestValidateproject_sheet:
             in error.message
         )
         assert error.severity == ErrorLevel.ERR.name
+    
+    def test_invalid_project_sheet_empty_field(self, invalid_project_sheet_empty_field: Worksheet):
+        errors = validate_project_sheet(
+            invalid_project_sheet_empty_field, SCHEMA_BY_PROJECT[SAMPLE_PROJECT_USE_CODE]
+        )
+        assert errors != []
+        error = errors[0]
+        assert error.row == "13"
+        assert error.col == "D"
+        assert (
+            "Value is required for Identification_Number__c"
+            in error.message
+        )
+        assert error.severity == ErrorLevel.ERR.name
 
 
 class TestValidateSubrecipientSheet:
