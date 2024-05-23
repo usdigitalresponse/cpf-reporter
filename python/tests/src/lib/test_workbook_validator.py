@@ -90,8 +90,36 @@ class TestValidateCoverSheet:
         assert errors != []
         error = errors[0]
         print(error)
-        assert "Project use code 'INVALID' is not recognized." in error.message
-        assert error.col == "B"
+        assert "EC code 'INVALID' is not recognized." in error.message
+        assert error.col == "A"
+        assert error.row == "2"
+        assert error.tab == "Cover"
+        assert error.severity == ErrorLevel.ERR.name
+        assert schema is None
+        assert project_use_code is None
+    
+    
+    def test_invalid_cover_sheet_missing_code(self, invalid_cover_sheet_missing_code: Worksheet):
+        errors, schema, project_use_code = validate_cover_sheet(invalid_cover_sheet_missing_code)
+        assert errors != []
+        error = errors[0]
+        print(error)
+        assert "EC code must be set" in error.message
+        assert error.col == "A"
+        assert error.row == "2"
+        assert error.tab == "Cover"
+        assert error.severity == ErrorLevel.ERR.name
+        assert schema is None
+        assert project_use_code is None
+    
+    
+    def test_invalid_cover_sheet_empty_code(self, invalid_cover_sheet_empty_code: Worksheet):
+        errors, schema, project_use_code = validate_cover_sheet(invalid_cover_sheet_empty_code)
+        assert errors != []
+        error = errors[0]
+        print(error)
+        assert "EC code must be set" in error.message
+        assert error.col == "A"
         assert error.row == "2"
         assert error.tab == "Cover"
         assert error.severity == ErrorLevel.ERR.name
@@ -115,7 +143,21 @@ class TestValidateproject_sheet:
         assert error.row == "13"
         assert error.col == "D"
         assert (
-            "Error in field Identification_Number__c-String should have at most 20 characters"
+            "Identification_Number__c should have at most 20 characters"
+            in error.message
+        )
+        assert error.severity == ErrorLevel.ERR.name
+    
+    def test_invalid_project_sheet_missing_field(self, invalid_project_sheet_missing_field: Worksheet):
+        errors = validate_project_sheet(
+            invalid_project_sheet_missing_field, SCHEMA_BY_PROJECT[SAMPLE_PROJECT_USE_CODE]
+        )
+        assert errors != []
+        error = errors[0]
+        assert error.row == "13"
+        assert error.col == "D"
+        assert (
+            "Value is required for Identification_Number__c"
             in error.message
         )
         assert error.severity == ErrorLevel.ERR.name
@@ -130,7 +172,7 @@ class TestValidateSubrecipientSheet:
         errors = validate_subrecipient_sheet(invalid_subrecipient_sheet)
         assert errors != []
         error = errors[0]
-        assert "String should have at least 9 characters" in error.message
+        assert "EIN__c should have at least 9 characters" in error.message
         assert error.row == "13"
         assert error.col == "D"
         assert error.severity == ErrorLevel.ERR.name
