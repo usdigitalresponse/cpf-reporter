@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Optional
 
-from pydantic import (BaseModel, ConfigDict, Field, condecimal, conint,
+from pydantic import (BaseModel, ConfigDict, Field, condecimal, conint, constr,
                       ValidationInfo, field_validator)
 
 
@@ -96,14 +96,14 @@ class ProjectInvestmentType(str, Enum):
 class BaseProjectRow(BaseModel):
     model_config = ConfigDict(coerce_numbers_to_str=True, loc_by_alias=False)
 
-    Project_Name__c: str = Field(
-        ..., serialization_alias="Project Name", max_length=100, json_schema_extra={"column":"C"}
+    Project_Name__c: constr(strip_whitespace=True, min_length=1, max_length=100) = Field(
+        ..., serialization_alias="Project Name", json_schema_extra={"column":"C"}
     )
-    Identification_Number__c: str = Field(
-        ..., serialization_alias="Identification Number", max_length=20, json_schema_extra={"column":"D"}
+    Identification_Number__c: constr(strip_whitespace=True, min_length=1, max_length=20) = Field(
+        ..., serialization_alias="Identification Number", json_schema_extra={"column":"D"}
     )
-    Project_Description__c: str = Field(
-        ..., serialization_alias="Project Description", max_length=3000, json_schema_extra={"column":"E"}
+    Project_Description__c: constr(strip_whitespace=True, min_length=1, max_length=3000) = Field(
+        ..., serialization_alias="Project Description", json_schema_extra={"column":"E"}
     )
     Capital_Asset_Ownership_Type__c: CapitalAssetOwnershipType = Field(
         ..., serialization_alias="Capital Asset Owenership Type", json_schema_extra={"column":"F"}
@@ -129,8 +129,8 @@ class BaseProjectRow(BaseModel):
     Cumulative_Expenditure__c: condecimal(max_digits=12, decimal_places=2) = Field(
         ..., serialization_alias="Cumulative Expenditure", json_schema_extra={"column":"M"}
     )
-    Cost_Overview__c: str = Field(
-        ..., serialization_alias="Cost Overview", max_length=3000, json_schema_extra={"column":"N"}
+    Cost_Overview__c: constr(strip_whitespace=True, min_length=1, max_length=3000) = Field(
+        ..., serialization_alias="Cost Overview", json_schema_extra={"column":"N"}
     )
     Project_Status__c: ProjectStatusType = Field(
         ..., serialization_alias="Project Status", json_schema_extra={"column":"O"}
@@ -392,8 +392,8 @@ class Project1ARow(BaseProjectRow):
         return v
 
 class AddressFields(BaseModel):
-    Street_1_Planned__c: str = Field(
-        ..., serialization_alias="Street 1 (Planned)", max_length=40, json_schema_extra={"column":"BQ"}
+    Street_1_Planned__c: constr(strip_whitespace=True, min_length=1, max_length=40) = Field(
+        ..., serialization_alias="Street 1 (Planned)", json_schema_extra={"column":"BQ"}
     )
     Street_2_Planned__c: Optional[str] = Field(
         default=None, serialization_alias="Street 2 (Planned)", max_length=40, json_schema_extra={"column":"BR"}
@@ -405,8 +405,8 @@ class AddressFields(BaseModel):
     Street_2_Actual__c: Optional[str] = Field(
         default=None, serialization_alias="Street 2 (Actual)", max_length=40, json_schema_extra={"column":"BU"}
     )
-    City_Planned__c: str = Field(
-        ..., serialization_alias="City (Planned)", max_length=40, json_schema_extra={"column":"BV"}
+    City_Planned__c: constr(strip_whitespace=True, min_length=1, max_length=40) = Field(
+        ..., serialization_alias="City (Planned)", json_schema_extra={"column":"BV"}
     )
     City_Actual__c: Optional[str] = Field(
         default=None, serialization_alias="City (Actual)", max_length=40, json_schema_extra={"column":"BW"}
@@ -417,8 +417,8 @@ class AddressFields(BaseModel):
     State_Actual__c: Optional[StateAbbreviation] = Field(
         default=None, serialization_alias="State (Actual)", json_schema_extra={"column":"BY"}
     )
-    Zip_Code_Planned__c: str = Field(
-        ..., serialization_alias="Zip Code (Planned)", max_length=5, json_schema_extra={"column":"BZ"}
+    Zip_Code_Planned__c: constr(strip_whitespace=True, min_length=1, max_length=5) = Field(
+        ..., serialization_alias="Zip Code (Planned)", json_schema_extra={"column":"BZ"}
     )
     Zip_Code_Actual__c: Optional[str] = Field(
         default=None, serialization_alias="Zip Code (Actual)", max_length=5, json_schema_extra={"column":"CA"}
@@ -467,13 +467,15 @@ class Project1BRow(BaseProjectRow, AddressFields):
     Desktop_Computers_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Desktop Computers (Actual)", json_schema_extra={"column":"CK"}
     )
-    Desktop_Computers_Expenditures_Planned__c: condecimal(
-        max_digits=13, decimal_places=2
-    ) = Field(..., serialization_alias="Desktop Computers Expenditure (Planned)", json_schema_extra={"column":"CL"})
-    Desktop_Computers_Expenditures_Actual__c: Optional[condecimal(
-        max_digits=13, decimal_places=2
-    )] = Field(
-        default=None, serialization_alias="Desktop Computers Expenditure (Actual)", json_schema_extra={"column":"CM"}
+    Desktop_Computers_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = Field(
+        ...,
+        serialization_alias="Desktop Computers Expenditure (Planned)",
+        json_schema_extra={"column":"CL"}
+    )
+    Desktop_Computers_Expenditures_Actual__c: Optional[condecimal(max_digits=13, decimal_places=2)] = Field(
+        default=None,
+        serialization_alias="Desktop Computers Expenditure (Actual)",
+        json_schema_extra={"column":"CM"}
     )
     Public_WiFi_Planned__c: conint(ge=0, le=9999999999) = Field(
         ..., serialization_alias="Public WiFi (Planned)", json_schema_extra={"column":"CN"}
@@ -511,11 +513,14 @@ class Project1BRow(BaseProjectRow, AddressFields):
     Number_of_Users_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None, serialization_alias="Number of Users (Actual)", json_schema_extra={"column":"CX"}
     )
-    Brief_Narrative_Planned__c: str = Field(
-        ..., serialization_alias="Brief Narrative (Planned)", max_length=3000, json_schema_extra={"column":"CY"}
+    Brief_Narrative_Planned__c: constr(strip_whitespace=True, min_length=1, max_length=3000) = Field(
+        ..., serialization_alias="Brief Narrative (Planned)", json_schema_extra={"column":"CY"}
     )
     Brief_Narrative_Actual__c: Optional[str] = Field(
-        default=None, serialization_alias="Brief Narrative (Actual)", max_length=3000, json_schema_extra={"column":"CZ"}
+        default=None,
+        serialization_alias="Brief Narrative (Actual)",
+        max_length=3000,
+        json_schema_extra={"column":"CZ"}
     )
     Measurement_of_Effectiveness__c: YesNoType = Field(
         ..., serialization_alias="Measurement of Effectiveness?", json_schema_extra={"column":"DA"}
@@ -612,38 +617,52 @@ class Project1CRow(BaseProjectRow, AddressFields):
 class SubrecipientRow(BaseModel):
     model_config = ConfigDict(coerce_numbers_to_str=True, loc_by_alias=False)
 
-    Name: str = Field(..., serialization_alias="Subrecipient Name", max_length=80, json_schema_extra={"column":"C"})
-    EIN__c: str = Field(
+    Name: constr(strip_whitespace=True, min_length=1, max_length=80) = Field(
+        ...,
+        serialization_alias="Subrecipient Name",
+        json_schema_extra={"column":"C"}
+    )
+    EIN__c: constr(strip_whitespace=True, min_length=9, max_length=9) = Field(
         ...,
         serialization_alias="Subrecipient Tax ID Number (TIN)",
-        min_length=9,
-        max_length=9,
         json_schema_extra={"column":"D"}
     )
-    Unique_Entity_Identifier__c: str = Field(
+    Unique_Entity_Identifier__c: constr(strip_whitespace=True, min_length=12, max_length=12) = Field(
         ...,
         serialization_alias="Unique Entity Identifier (UEI)",
-        min_length=12,
-        max_length=12,
         json_schema_extra={"column":"E"}
     )
-    POC_Name__c: str = Field(..., serialization_alias="POC Name", max_length=100, json_schema_extra={"column":"F"})
-    POC_Phone_Number__c: str = Field(
-        ..., serialization_alias="POC Phone Number", max_length=10, json_schema_extra={"column":"G"}
+    POC_Name__c: constr(strip_whitespace=True, min_length=1, max_length=100) = Field(
+        ...,
+        serialization_alias="POC Name",
+        json_schema_extra={"column":"F"}
     )
-    POC_Email_Address__c: str = Field(
-        ..., serialization_alias="POC Email Address", max_length=80, json_schema_extra={"column":"H"}
+    POC_Phone_Number__c: constr(strip_whitespace=True, min_length=1, max_length=10) = Field(
+        ..., serialization_alias="POC Phone Number", json_schema_extra={"column":"G"}
     )
-    Zip__c: str = Field(..., serialization_alias="Zip5", max_length=5, json_schema_extra={"column":"I"})
+    POC_Email_Address__c: constr(strip_whitespace=True, min_length=1, max_length=80) = Field(
+        ..., serialization_alias="POC Email Address", json_schema_extra={"column":"H"}
+    )
+    Zip__c: constr(strip_whitespace=True, min_length=1, max_length=5) = Field(
+        ...,
+        serialization_alias="Zip5",
+        json_schema_extra={"column":"I"}
+    )
     Zip_4__c: Optional[str] = Field(default=None, serialization_alias="Zip4", max_length=4, json_schema_extra={"column":"J"})
-    Address__c: str = Field(..., serialization_alias="Address Line 1", max_length=40, json_schema_extra={"column":"K"})
+    Address__c: constr(strip_whitespace=True, min_length=1, max_length=40) = Field(
+        ...,
+        serialization_alias="Address Line 1",
+        json_schema_extra={"column":"K"}
+    )
     Address_2__c: Optional[str] = Field(
         default=None, serialization_alias="Address Line 2", max_length=40, json_schema_extra={"column":"L"}
     )
     Address_3__c: Optional[str] = Field(
         default=None, serialization_alias="Address Line 3", max_length=40, json_schema_extra={"column":"M"}
     )
-    City__c: str = Field(..., serialization_alias="City", max_length=100, json_schema_extra={"column":"N"})
+    City__c: constr(strip_whitespace=True, min_length=1, max_length=100) = Field(
+        ..., serialization_alias="City", json_schema_extra={"column":"N"}
+    )
     State_Abbreviated__c: StateAbbreviation = Field(
         ..., serialization_alias="State Abbreviated", json_schema_extra={"column":"O"}
     )
@@ -729,8 +748,15 @@ class LogicSheetVersion(BaseModel):
 class CoverSheetRow(BaseModel):
     model_config = ConfigDict(loc_by_alias=False)
 
-    project_use_code: str = Field(..., alias="Project Use Code", json_schema_extra={"column":"A"})
-    project_use_name: str = Field(..., alias="Project Use Name", json_schema_extra={"column":"B"})
+    project_use_code: constr(strip_whitespace=True, min_length=1) = Field(
+        ...,
+        alias="Project Use Code", json_schema_extra={"column":"A"}
+    )
+    project_use_name: constr(strip_whitespace=True, min_length=1) = Field(
+        ...,
+        alias="Project Use Name",
+        json_schema_extra={"column":"B"}
+    )
 
     @field_validator("project_use_code")
     @classmethod

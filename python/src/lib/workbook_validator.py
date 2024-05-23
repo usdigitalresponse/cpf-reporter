@@ -96,6 +96,8 @@ def generate_error_text(
 ) -> str:
     error_type = error["type"]
     input = error["input"]
+    if isinstance(input, str):
+        input = input.strip()
     if error_type == 'missing' or input in [None, ""]:
         if field_name == "project_use_code":
             return f"EC code must be set"

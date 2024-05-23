@@ -67,6 +67,12 @@ def invalid_project_sheet_missing_field(valid_project_sheet):
 
 
 @pytest.fixture
+def invalid_project_sheet_empty_field(valid_project_sheet):
+    valid_project_sheet["D13"] = "    "
+    return valid_project_sheet
+
+
+@pytest.fixture
 def invalid_subrecipient_sheet(valid_subrecipientsheet):
     valid_subrecipientsheet["D13"] = "INVALID"
     return valid_subrecipientsheet
