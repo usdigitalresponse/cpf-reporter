@@ -20,6 +20,8 @@ services:
       - SESSION_SECRET=super_secret_session_key_change_me_in_production_please
       - CI=
       - NODE_ENV=development
+      - LOCALSTACK_HOSTNAME=localstack
+      - EDGE_PORT=4566
 
   db:
     image: postgres:15-bookworm
@@ -31,6 +33,22 @@ services:
       - "5432:5432"
     volumes:
       - postgres:/var/lib/postgresql/data
+
+  localstack:
+    container_name: "cpf-reporter-localstack-main"
+    image: localstack/localstack
+    ports:
+      - "4566:4566"           # LocalStack Gateway
+      - "4510-4559:4510-4559"  # external services port range
+    environment:
+      - DEBUG=${DEBUG-}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - AWS_DEFAULT_REGION=${AWS_REGION:-us-west-2}
+      - REPORTING_DATA_BUCKET_NAME=bucket
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./entrypoint/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh"
 
   # After starting with `docker compose -f ./docker-compose.dev.yml up`,
   # use the console to run commands in the container:
