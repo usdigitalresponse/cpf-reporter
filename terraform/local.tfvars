@@ -7,3 +7,4 @@ ssm_service_parameters_path_prefix    = "/localstack"
 version_identifier                    = "dev"
 website_domain_name                   = "localhost"
 is_localstack                         = true
+datadog_enabled                       = false
