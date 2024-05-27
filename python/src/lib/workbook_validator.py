@@ -8,6 +8,7 @@ from src.lib.logging import get_logger
 from src.schemas.latest.schema import (SCHEMA_BY_PROJECT, BaseModel,
                                        CoverSheetRow, LogicSheetVersion, ProjectType,
                                        SubrecipientRow, Project1ARow, Project1BRow, Project1CRow)
+from pydantic_core import ErrorDetails
 
 type Errors = List[WorkbookError]
 
@@ -15,6 +16,7 @@ LOGIC_SHEET = "Logic"
 COVER_SHEET = "Cover"
 PROJECT_SHEET = "Project"
 SUBRECIPIENTS_SHEET = "Subrecipients"
+INITIAL_STARTING_ROW = 12
 
 _logger = get_logger(__name__)
 
@@ -88,6 +90,28 @@ On the model class, the field definition has a property of json_schema_extra,
 defined in schema.py on a per-field basis, that contains the column for that particular field.
 """
 
+def generate_error_text(
+    field_name: str,
+    error: ErrorDetails,
+) -> str:
+    error_type = error["type"]
+    input = error["input"]
+    if isinstance(input, str):
+        input = input.strip()
+    if error_type == 'missing' or input in [None, ""]:
+        if field_name == "project_use_code":
+            return f"EC code must be set"
+        else:
+            return f"Value is required for {field_name}"
+    elif error_type == 'string_too_long' or error_type == 'string_too_short':
+        return error["msg"].replace("String", field_name, 1)
+    elif error_type in ['decimal_whole_digits', 'decimal_max_places', 'decimal_type']:
+        return error["msg"].replace("Decimal", field_name, 1)
+    elif error_type in ['int_type', 'string_type', 'datetime_from_date_parsing', 'decimal_parsing', 'int_parsing']:
+        return error["msg"].replace("Input", field_name, 1)
+    else:
+        return f'Error in field {field_name}-{error["msg"]}' 
+
 
 def get_workbook_errors_for_row(
     SheetModelClass: Type[Union[CoverSheetRow, Project1ARow, Project1BRow, Project1CRow, SubrecipientRow]], e: ValidationError, row_num: int, sheet_name: str
@@ -116,7 +140,7 @@ def get_workbook_errors_for_row(
             _logger.error(f"Encountered unexpected exception while getting column for field {erroring_field_name} with error {error}. Details: {exception}")
             erroring_column = "Unknown"
 
-        message = f'Error in field {erroring_field_name}-{error["msg"]}'
+        message = generate_error_text(erroring_field_name, error)
         workbook_errors.append(
             WorkbookError(
                 message=message,
@@ -266,13 +290,15 @@ def validate_cover_sheet(
 def validate_project_sheet(project_sheet: Worksheet, project_schema: Type[Union[Project1ARow, Project1BRow, Project1CRow]]) -> Errors:
     errors = []
     project_headers = get_headers(project_sheet, "C3:DS3")
-    current_row = 12
+    current_row = INITIAL_STARTING_ROW
+    sheet_has_data = False
     for project_row in project_sheet.iter_rows(
         min_row=13, min_col=3, max_col=123, values_only=True
     ):
         current_row += 1
         if is_empty_row(project_row):
             continue
+        sheet_has_data = True
         row_dict = map_values_to_headers(project_headers, project_row)
         try:
             project_schema(**row_dict)
@@ -280,13 +306,24 @@ def validate_project_sheet(project_sheet: Worksheet, project_schema: Type[Union[
             errors += get_workbook_errors_for_row(
                 project_schema, e, current_row, PROJECT_SHEET
             )
+
+    if not sheet_has_data:
+        errors += [WorkbookError(
+            message="Upload doesn’t include any project records.",
+            row=INITIAL_STARTING_ROW,
+            col=0,
+            tab=PROJECT_SHEET,
+            field_name="",
+            severity=ErrorLevel.ERR.name,
+        )]
+
     return errors
 
 
 def validate_subrecipient_sheet(subrecipient_sheet: Worksheet) -> Errors:
     errors = []
     subrecipient_headers = get_headers(subrecipient_sheet, "C3:O3")
-    current_row = 12
+    current_row = INITIAL_STARTING_ROW
     for subrecipient_row in subrecipient_sheet.iter_rows(
         min_row=13, min_col=3, max_col=16, values_only=True
     ):

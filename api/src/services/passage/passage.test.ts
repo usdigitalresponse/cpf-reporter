@@ -59,8 +59,8 @@ describe('Passage User Management', () => {
       )
 
       expect(mockedLogger.error).toHaveBeenCalledWith(
-        'Failed to create Passage user',
-        error
+        error,
+        'Failed to create Passage user'
       )
     })
   })
@@ -88,8 +88,8 @@ describe('Passage User Management', () => {
       )
 
       expect(mockedLogger.error).toHaveBeenCalledWith(
-        'Failed to delete Passage user',
-        error
+        error,
+        'Failed to delete Passage user'
       )
     })
   })

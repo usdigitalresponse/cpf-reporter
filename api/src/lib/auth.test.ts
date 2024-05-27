@@ -8,6 +8,7 @@ jest.mock('src/lib/db', () => ({
     user: {
       findFirst: jest.fn(),
     },
+    $disconnect: jest.fn(),
   },
 }))
 
@@ -42,7 +43,7 @@ describe('getCurrentUser', () => {
     })
   })
 
-  it('should return the user when AUTH_PROVIDER is "passage"', async () => {
+  it('should return the user when AUTH_PROVIDER is "passage" and using api gateway v1.0', async () => {
     process.env.AUTH_PROVIDER = 'passage'
     const mockUser = {
       id: 1,
@@ -55,10 +56,8 @@ describe('getCurrentUser', () => {
     const event = {
       requestContext: {
         authorizer: {
-          jwt: {
-            claims: {
-              sub: 'passage-user-id',
-            },
+          claims: {
+            sub: 'passage-user-id',
           },
         },
       },
@@ -82,8 +81,28 @@ describe('getCurrentUser', () => {
     const event = {
       requestContext: {
         authorizer: {
+          claims: {},
+        },
+      },
+    } as unknown as APIGatewayEvent
+
+    const result = await getCurrentUser(null, { token: '' }, { event })
+
+    expect(db.user.findFirst).not.toHaveBeenCalled()
+    expect(result).toBeNull()
+  })
+
+  it('should throw an error when using api gateway payload v2.0', async () => {
+    process.env.AUTH_PROVIDER = 'passage'
+
+    // version 2.0 structure of the API gateway should fail even if the passageId is present
+    const event = {
+      requestContext: {
+        authorizer: {
           jwt: {
-            claims: {},
+            claims: {
+              sub: 'passage-user-id',
+            },
           },
         },
       },

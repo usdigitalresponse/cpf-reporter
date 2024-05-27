@@ -151,3 +151,38 @@ COPY --chown=node:node web web
 COPY --chown=node:node scripts scripts
 
 CMD sleep infinity
+
+# python-console
+# ------------------------------------------------
+FROM python:3.12.3-slim-bullseye as python-console
+
+RUN apt-get update && apt-get install -y \
+    openssl curl gnupg gnupg2 gnupg1 groff postgresql-client unzip \
+    && pip install poetry
+
+WORKDIR /home/node/app
+
+COPY python python
+COPY .env.defaults .env.defaults
+
+WORKDIR /home/node/app/python
+RUN poetry install --no-interaction --no-ansi
+WORKDIR /home/node/app
+
+RUN addgroup --system --gid 1000 node && \
+    adduser --system --uid 1000 node --ingroup node
+RUN chown -R node:node /home/node/app
+
+# Install awscli
+RUN mkdir -p /tmp/awscli
+COPY aws-public-key.gpg /tmp/awscli/key.gpg
+RUN gpg --import /tmp/awscli/key.gpg
+RUN sh -c 'curl -o "/tmp/awscli/awscliv2.sig" https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip.sig'
+RUN sh -c 'curl -o "/tmp/awscli/awscliv2.zip" "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m).zip"'
+RUN gpg --verify /tmp/awscli/awscliv2.sig /tmp/awscli/awscliv2.zip
+RUN unzip -u -d /tmp/awscli/ /tmp/awscli/awscliv2.zip
+RUN /tmp/awscli/aws/install
+RUN aws --version
+RUN rm -rf /tmp/awscli
+
+CMD sleep infinity

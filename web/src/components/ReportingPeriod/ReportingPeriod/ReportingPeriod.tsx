@@ -7,7 +7,7 @@ import { Link, routes, navigate } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
-import { checkboxInputTag, timeTag } from 'src/lib/formatters'
+import { timeTag } from 'src/lib/formatters'
 
 const DELETE_REPORTING_PERIOD_MUTATION = gql`
   mutation DeleteReportingPeriodMutation($id: Int!) {
@@ -74,24 +74,12 @@ const ReportingPeriod = ({ reportingPeriod }: Props) => {
               <td>{reportingPeriod.organizationId}</td>
             </tr>
             <tr>
-              <th>Certified at</th>
-              <td>{timeTag(reportingPeriod.certifiedAt)}</td>
-            </tr>
-            <tr>
-              <th>Certified by id</th>
-              <td>{reportingPeriod.certifiedById}</td>
-            </tr>
-            <tr>
               <th>Input template id</th>
               <td>{reportingPeriod.inputTemplateId}</td>
             </tr>
             <tr>
               <th>Output template id</th>
               <td>{reportingPeriod.outputTemplateId}</td>
-            </tr>
-            <tr>
-              <th>Is current period</th>
-              <td>{checkboxInputTag(reportingPeriod.isCurrentPeriod)}</td>
             </tr>
             <tr>
               <th>Created at</th>

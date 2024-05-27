@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useMutation } from '@redwoodjs/web'
 
 import { timeTag } from 'src/lib/formatters'
@@ -11,11 +13,33 @@ const DOWNLOAD_UPLOAD_FILE = gql`
     downloadUploadFile(id: $id)
   }
 `
-const Upload = ({ upload }) => {
+const Upload = ({ upload, queryResult }) => {
+  const { startPolling, stopPolling } = queryResult
   const hasErrors =
     upload.latestValidation?.results?.errors !== null &&
     Array.isArray(upload.latestValidation?.results?.errors) &&
     upload.latestValidation?.results?.errors.length > 0
+
+  useEffect(() => {
+    const pollingTimeout = 120 * 1000
+    const pollingInterval = 3 * 1000
+
+    // Start polling if there are no validation results
+    if (!upload.latestValidation?.results) {
+      startPolling(pollingInterval)
+
+      setTimeout(() => {
+        stopPolling()
+      }, pollingTimeout)
+    } else {
+      stopPolling()
+    }
+
+    // Stops polling when the component unmounts
+    return () => {
+      stopPolling()
+    }
+  }, [upload.latestValidation, startPolling, stopPolling])
 
   const [downloadUploadFile] = useMutation(DOWNLOAD_UPLOAD_FILE, {
     onCompleted: ({ downloadUploadFile }) => {

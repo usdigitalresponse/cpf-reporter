@@ -1,6 +1,6 @@
 generator client {
   provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
   previewFeatures = ["metrics", "tracing"]
 }
 
@@ -42,7 +42,6 @@ model User {
   isActive       Boolean             @default(true)
   passageId      String?
   agency         Agency              @relation(fields: [agencyId], references: [id])
-  certified      ReportingPeriod[]
   uploaded       Upload[]
   initiated      UploadValidation[]
 
@@ -78,24 +77,22 @@ model OutputTemplate {
 }
 
 model ReportingPeriod {
-  id               Int            @id @default(autoincrement())
-  name             String
-  startDate        DateTime       @db.Date
-  endDate          DateTime       @db.Date
-  organizationId   Int
-  organization     Organization   @relation(fields: [organizationId], references: [id])
-  certifiedAt      DateTime?      @db.Timestamptz(6)
-  certifiedById    Int?
-  certifiedBy      User?          @relation(fields: [certifiedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  inputTemplateId  Int
-  inputTemplate    InputTemplate  @relation(fields: [inputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  outputTemplateId Int
-  outputTemplate   OutputTemplate @relation(fields: [outputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  isCurrentPeriod  Boolean        @default(false)
-  createdAt        DateTime       @default(now()) @db.Timestamptz(6)
-  updatedAt        DateTime       @default(now()) @db.Timestamptz(6)
-  uploads          Upload[]
-  projects         Project[]
+  id                Int            @id @default(autoincrement())
+  name              String
+  startDate         DateTime       @db.Date
+  endDate           DateTime       @db.Date
+  organizationId    Int?
+  organization      Organization?   @relation(fields: [organizationId], references: [id])
+  inputTemplateId   Int
+  inputTemplate     InputTemplate  @relation(fields: [inputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  outputTemplateId  Int
+  outputTemplate    OutputTemplate @relation(fields: [outputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  validationRulesId Int?
+  validationRules   ValidationRules? @relation(fields: [validationRulesId], references: [id])
+  createdAt         DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime       @default(now()) @db.Timestamptz(6)
+  uploads           Upload[]
+  projects          Project[]
 }
 
 model ExpenditureCategory {
@@ -133,6 +130,8 @@ model UploadValidation {
   initiatedBy         User          @relation(fields: [initiatedById], references: [id])
   createdAt           DateTime      @default(now()) @db.Timestamptz(6)
   updatedAt           DateTime      @default(now()) @db.Timestamptz(6)
+  validationRulesId   Int?
+  validationRules     ValidationRules? @relation(fields: [validationRulesId], references:[id])
 }
 
 model Subrecipient {
@@ -161,4 +160,19 @@ model Project {
   originationPeriod   ReportingPeriod @relation(fields: [originationPeriodId], references: [id])
   createdAt           DateTime        @default(now()) @db.Timestamptz(6)
   updatedAt           DateTime        @default(now()) @db.Timestamptz(6)
+}
+
+enum Version {
+  V2023_12_12
+  V2024_01_07
+  V2024_04_01
+}
+
+model ValidationRules {
+  id                  Int               @id @default(autoincrement())
+  versionId           Version
+  createdAt           DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime        @default(now()) @db.Timestamptz(6)
+  validations         UploadValidation[]
+  reportingPeriods    ReportingPeriod[]
 }

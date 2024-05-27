@@ -11,11 +11,6 @@ export const QUERY = gql`
       id
       startDate
       endDate
-      isCurrentPeriod
-      certifiedAt
-      certifiedBy {
-        email
-      }
       inputTemplate {
         name
       }
@@ -41,7 +36,6 @@ export const Success = ({
           <th>Start Date</th>
           <th>End Date</th>
           <th>Template</th>
-          <th>Certified At</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -51,28 +45,7 @@ export const Success = ({
             <tr key={item.id}>
               <td>{item.startDate}</td>
               <td>{item.endDate}</td>
-              <td>
-                {item.inputTemplate?.name}
-                {!item.certifiedAt && (
-                  <span>
-                    {' '}
-                    <Link to={routes.uploadTemplate({ id: item.id })}>
-                      Upload Template
-                    </Link>
-                  </span>
-                )}
-              </td>
-              <td>
-                {item.isCurrentPeriod ? (
-                  <Button size="sm">Certify Reporting Period</Button>
-                ) : (
-                  item.certifiedAt && (
-                    <span>
-                      {item.certifiedAt} by {item.certifiedBy?.email}
-                    </span>
-                  )
-                )}
-              </td>
+              <td>{item.inputTemplate?.name}</td>
               <td>
                 <nav>
                   <Link

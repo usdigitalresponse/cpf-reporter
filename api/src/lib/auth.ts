@@ -5,6 +5,7 @@ import { Decoded } from '@redwoodjs/api'
 import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
 
 import { db } from 'src/lib/db'
+import { logger } from 'src/lib/logger'
 
 /**
  * Represents the user attributes returned by the decoding the
@@ -44,6 +45,7 @@ export const getCurrentUser = async (
     // Verify that the request is coming from the local development environment
     // and is only being processed within the local environment
     if (process.env.AUTH_PROVIDER === 'local') {
+      logger.info('Local development environment detected.')
       const user: CurrentUser = await db.user.findFirst({
         where: { email: token },
         include: { agency: true },
@@ -52,9 +54,10 @@ export const getCurrentUser = async (
       user.roles = [`${user.role}`]
       return user
     } else if (process.env.AUTH_PROVIDER === 'passage') {
-      const passageId = event.requestContext.authorizer?.jwt?.claims?.sub
+      const passageId = event.requestContext.authorizer?.claims?.sub
 
       if (!passageId) {
+        logger.error({ custom: event }, 'Passage ID not included.')
         throw new AuthenticationError('Passage ID not included.')
       }
 
@@ -64,31 +67,19 @@ export const getCurrentUser = async (
       })
 
       if (!user) {
+        logger.error({ custom: event }, 'User not found.')
         return null
       }
 
       user.roles = [`${user.role}`]
       return user
-    }
-
-    return {
-      id: 1,
-      email: 'usdr-admin@usdr.dev',
-      name: 'USDR Admin',
-      role: 'USDR_ADMIN',
-      roles: ['USDR_ADMIN'],
-      agency: {
-        id: 1,
-        name: 'Main Agency',
-        abbreviation: 'MAUSDR',
-        code: 'MAUSDR',
-        organizationId: 1,
-      },
-      agencyId: 1, // TO_DEPRECATE
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+    } else {
+      logger.error({ custom: event }, 'No auth provider found.')
+      throw new AuthenticationError('No auth provider found')
     }
   } catch (error) {
+    logger.error(error)
+    logger.error({ custom: { event, error } }, 'Error getting current user.')
     return null
   }
 }
@@ -99,7 +90,12 @@ export const getCurrentUser = async (
  * @returns {boolean} - If the currentUser is authenticated
  */
 export const isAuthenticated = (): boolean => {
-  return !!context.currentUser
+  if (!context.currentUser) {
+    logger.error({ custom: context.event }, 'User is not authenticated')
+    return false
+  } else {
+    return true
+  }
 }
 
 /**
