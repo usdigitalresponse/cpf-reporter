@@ -72,6 +72,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://redwood:redwood@db:5432/redwood
       - TEST_DATABASE_URL=postgresql://redwood:redwood@db:5432/redwood_test
+      - LOCALSTACK_HOSTNAME=localstack
     depends_on:
       - db
   
@@ -90,6 +91,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://redwood:redwood@db:5432/redwood
       - TEST_DATABASE_URL=postgresql://redwood:redwood@db:5432/redwood_test
+      - LOCALSTACK_HOSTNAME=localstack
     depends_on:
       - db
 
