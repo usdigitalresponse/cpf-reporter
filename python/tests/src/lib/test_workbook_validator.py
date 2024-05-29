@@ -12,8 +12,8 @@ from src.lib.workbook_validator import (ErrorLevel,
                                         validate_workbook_sheets)
 from src.schemas.schema_versions import getSchemaByProject
 
-SAMPLE_PROJECT_USE_CODE = "1A"
-VERSION_STRING = "v:20231212"
+SAMPLE_EXPENDITURE_CATEGORY_GROUP = "1A"
+V2024_05_24_VERSION_STRING = "v:20240524"
 
 
 class TestIsEmptyRow:
@@ -44,9 +44,8 @@ class TestValidateWorkbook:
         result = validate(valid_file)
         errors = result[0]
         project_use_code = result[1]
-        print(error.message for error in errors)
         assert errors == []
-        assert project_use_code == SAMPLE_PROJECT_USE_CODE
+        assert project_use_code == SAMPLE_EXPENDITURE_CATEGORY_GROUP
 
     def test_multiple_invalid_sheets(self, valid_workbook: Workbook):
         """
@@ -74,7 +73,6 @@ class TestWorkbookSheets:
     def test_missing_sheets(self, valid_workbook: Workbook):
         valid_workbook.remove(valid_workbook["Cover"])
         errors = validate_workbook_sheets(valid_workbook)
-        print(errors[0].message)
         assert errors != []
         assert len(errors) == 1
         assert errors[0].message == "Workbook is missing expected sheet: Cover"
@@ -83,16 +81,15 @@ class TestWorkbookSheets:
 
 class TestValidateCoverSheet:
     def test_valid_cover_sheet(self, valid_coversheet: Worksheet):
-        errors, schema, project_use_code = validate_cover_sheet(valid_coversheet, VERSION_STRING)
+        errors, schema, project_use_code = validate_cover_sheet(valid_coversheet, V2024_05_24_VERSION_STRING)
         assert errors == []
-        assert project_use_code == SAMPLE_PROJECT_USE_CODE
-        assert schema == getSchemaByProject(VERSION_STRING, SAMPLE_PROJECT_USE_CODE)
+        assert project_use_code == SAMPLE_EXPENDITURE_CATEGORY_GROUP
+        assert schema == getSchemaByProject(V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP)
 
     def test_invalid_cover_sheet(self, invalid_cover_sheet: Worksheet):
-        errors, schema, project_use_code = validate_cover_sheet(invalid_cover_sheet, VERSION_STRING)
+        errors, schema, project_use_code = validate_cover_sheet(invalid_cover_sheet, V2024_05_24_VERSION_STRING)
         assert errors != []
         error = errors[0]
-        print(error)
         assert "EC code 'INVALID' is not recognized." in error.message
         assert error.col == "A"
         assert error.row == "2"
@@ -103,10 +100,9 @@ class TestValidateCoverSheet:
     
     
     def test_invalid_cover_sheet_missing_code(self, invalid_cover_sheet_missing_code: Worksheet):
-        errors, schema, project_use_code = validate_cover_sheet(invalid_cover_sheet_missing_code, VERSION_STRING)
+        errors, schema, project_use_code = validate_cover_sheet(invalid_cover_sheet_missing_code, V2024_05_24_VERSION_STRING)
         assert errors != []
         error = errors[0]
-        print(error)
         assert "EC code must be set" in error.message
         assert error.col == "A"
         assert error.row == "2"
@@ -117,10 +113,9 @@ class TestValidateCoverSheet:
     
     
     def test_invalid_cover_sheet_empty_code(self, invalid_cover_sheet_empty_code: Worksheet):
-        errors, schema, project_use_code = validate_cover_sheet(invalid_cover_sheet_empty_code, VERSION_STRING)
+        errors, schema, project_use_code = validate_cover_sheet(invalid_cover_sheet_empty_code, V2024_05_24_VERSION_STRING)
         assert errors != []
         error = errors[0]
-        print(error)
         assert "EC code must be set" in error.message
         assert error.col == "A"
         assert error.row == "2"
@@ -134,14 +129,14 @@ class TestValidateproject_sheet:
     def test_valid_project_sheet(self, valid_project_sheet: Worksheet):
         errors = validate_project_sheet(
             valid_project_sheet, 
-            getSchemaByProject(VERSION_STRING, SAMPLE_PROJECT_USE_CODE)
+            getSchemaByProject(V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP)
         )
         assert errors == []
 
     def test_invalid_project_sheet(self, invalid_project_sheet: Worksheet):
         errors = validate_project_sheet(
             invalid_project_sheet,
-            getSchemaByProject(VERSION_STRING, SAMPLE_PROJECT_USE_CODE)
+            getSchemaByProject(V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP)
         )
         assert errors != []
         error = errors[0]
@@ -156,7 +151,7 @@ class TestValidateproject_sheet:
     def test_invalid_project_sheet_missing_field(self, invalid_project_sheet_missing_field: Worksheet):
         errors = validate_project_sheet(
             invalid_project_sheet_missing_field,
-            getSchemaByProject(VERSION_STRING, SAMPLE_PROJECT_USE_CODE)
+            getSchemaByProject(V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP)
         )
         assert errors != []
         error = errors[0]
@@ -171,7 +166,7 @@ class TestValidateproject_sheet:
     def test_invalid_project_sheet_empty_field(self, invalid_project_sheet_empty_field: Worksheet):
         errors = validate_project_sheet(
             invalid_project_sheet_empty_field,
-            getSchemaByProject(VERSION_STRING, SAMPLE_PROJECT_USE_CODE)
+            getSchemaByProject(V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP)
         )
         assert errors != []
         error = errors[0]
@@ -186,28 +181,28 @@ class TestValidateproject_sheet:
 
 class TestValidateSubrecipientSheet:
     def test_valid_subrecipient_sheet(self, valid_subrecipientsheet: Worksheet):
-        errors = validate_subrecipient_sheet(valid_subrecipientsheet, VERSION_STRING)
+        errors = validate_subrecipient_sheet(valid_subrecipientsheet, V2024_05_24_VERSION_STRING)
         assert errors == []
 
     def test_invalid_subrecipient_sheet(self, invalid_subrecipient_sheet: Worksheet):
-        errors = validate_subrecipient_sheet(invalid_subrecipient_sheet, VERSION_STRING)
+        errors = validate_subrecipient_sheet(invalid_subrecipient_sheet, V2024_05_24_VERSION_STRING)
         assert errors != []
         error = errors[0]
         assert "EIN__c should have at least 9 characters" in error.message
         assert error.row == "13"
-        assert error.col == "D"
+        assert error.col == "E"
         assert error.severity == ErrorLevel.ERR.name
 
     def test_valid_subrecipient_sheet_blank_optional_fields(self, valid_subrecipient_sheet_blank_optional_fields: Worksheet):
-        errors = validate_subrecipient_sheet(valid_subrecipient_sheet_blank_optional_fields, VERSION_STRING)
+        errors = validate_subrecipient_sheet(valid_subrecipient_sheet_blank_optional_fields, V2024_05_24_VERSION_STRING)
         assert errors == []
 
 
 class TestGetProjectUseCode:
     def test_get_project_use_code(self, valid_coversheet: Worksheet):
-        project_use_code = get_project_use_code(valid_coversheet)
-        assert project_use_code == SAMPLE_PROJECT_USE_CODE
+        expenditure_category_group = get_project_use_code(valid_coversheet, V2024_05_24_VERSION_STRING)
+        assert expenditure_category_group == SAMPLE_EXPENDITURE_CATEGORY_GROUP
 
     def test_get_project_use_code_raises_error(self, invalid_cover_sheet: Worksheet):
         with pytest.raises(ValueError):
-            get_project_use_code(invalid_cover_sheet)
+            get_project_use_code(invalid_cover_sheet, V2024_05_24_VERSION_STRING)

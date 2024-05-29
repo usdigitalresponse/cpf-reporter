@@ -6,25 +6,25 @@ import pytest
 from src.lib.output_template_comparator import CPFFileArchive
 
 _SAMPLE_VALID_XLSM = "tests/data/sample_valid.xlsm"
+_SAMPLE_VALID_XLSM_V2024_05_24 = "tests/data/sample_valid_V2024_05_24.xlsm"
 _SAMPLE_TEMPLATE = "tests/data/sample_template.xlsx"
 _SAMPLE_TEMPLATE_2 = "tests/data/sample_template_2.xlsx"
 
 
 @pytest.fixture
 def valid_file() -> BinaryIO:
-    file_path = _SAMPLE_VALID_XLSM
+    file_path = _SAMPLE_VALID_XLSM_V2024_05_24
     return open(file_path, "rb")
 
 
 @pytest.fixture
 def valid_workbook() -> openpyxl.Workbook:
-    return openpyxl.load_workbook(_SAMPLE_VALID_XLSM)
+    return openpyxl.load_workbook(_SAMPLE_VALID_XLSM_V2024_05_24)
 
 
 @pytest.fixture
 def valid_coversheet(valid_workbook) -> openpyxl.worksheet.worksheet.Worksheet:
     return valid_workbook["Cover"]
-
 
 @pytest.fixture
 def valid_project_sheet(valid_workbook) -> openpyxl.worksheet.worksheet.Worksheet:
@@ -74,15 +74,15 @@ def invalid_project_sheet_empty_field(valid_project_sheet):
 
 @pytest.fixture
 def invalid_subrecipient_sheet(valid_subrecipientsheet):
-    valid_subrecipientsheet["D13"] = "INVALID"
+    valid_subrecipientsheet["E13"] = "INVALID"
     return valid_subrecipientsheet
 
 
 @pytest.fixture
 def valid_subrecipient_sheet_blank_optional_fields(valid_subrecipientsheet):
-    valid_subrecipientsheet["J13"] = None
-    valid_subrecipientsheet["L13"] = None
+    valid_subrecipientsheet["K13"] = None
     valid_subrecipientsheet["M13"] = None
+    valid_subrecipientsheet["N13"] = None
     return valid_subrecipientsheet
 
 

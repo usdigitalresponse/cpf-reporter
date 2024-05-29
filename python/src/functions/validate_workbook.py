@@ -80,7 +80,7 @@ def validate_workbook(file: IO[bytes]) -> ValidationResults:
     logger.debug("validating workbook")
 
     try:
-        errors, project_use_code = validate(file)
+        errors, expenditure_category_group = validate(file)
     except:
         logger.exception("unhandled exception validating workbook")
         raise

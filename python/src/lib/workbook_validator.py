@@ -9,7 +9,7 @@ from src.schemas.schema_versions import (LogicSheetVersion,
                                          getSubrecipientRowClass, SubrecipientRow, 
                                          getCoverSheetRowClass, CoverSheetRow, 
                                          Project1ARow, Project1BRow, Project1CRow, 
-                                         getSchemaByProject)
+                                         getSchemaByProject, Version, getVersionFromString)
 from src.schemas.project_types import ProjectType
 from pydantic_core import ErrorDetails
 
@@ -71,15 +71,19 @@ def get_headers(sheet: Worksheet, cell_range: str) -> tuple:
 
 
 """
-This function gets the Project Use Code from the cover sheet or uses the row provided.
+This function gets the Project Use Code / Expenditure Category Group (depending on version) from the cover sheet or uses the row provided.
 If the project use code is not found or if it does not match any of the ProjectType values, it raises an error.
 """
-def get_project_use_code(cover_sheet: Worksheet, row_dict: Optional[Dict[str,str]] = None) -> ProjectType:
+def get_project_use_code(cover_sheet: Worksheet, version_string: str, row_dict: Optional[Dict[str,str]] = None) -> ProjectType:
     if not row_dict:
         cover_header = get_headers(cover_sheet, "A1:B1")
         cover_row = map(lambda cell: cell.value, cover_sheet[2])
         row_dict = map_values_to_headers(cover_header, cover_row)
-    code = row_dict["Project Use Code"]
+    version = getVersionFromString(version_string)
+    codeKey = "Expenditure Category Group"
+    if version != Version.V2024_05_24:
+        version = "Project Use Code"
+    code = row_dict[codeKey]
     return ProjectType.from_project_name(code)
 
 
@@ -102,7 +106,7 @@ def generate_error_text(
     if isinstance(input, str):
         input = input.strip()
     if error_type == 'missing' or input in [None, ""]:
-        if field_name == "project_use_code":
+        if field_name == "project_use_code" or field_name == "expenditure_category_group":
             return f"EC code must be set"
         else:
             return f"Value is required for {field_name}"
@@ -275,7 +279,7 @@ def validate_cover_sheet(
         return (errors, None, None)
 
     try:
-        project_use_code: ProjectType = get_project_use_code(cover_sheet, row_dict)
+        project_use_code: ProjectType = get_project_use_code(cover_sheet, version_string, row_dict)
     except Exception as e:
         _logger.error(f"Unrecognized project use code: {e}")
         errors.append(
@@ -329,7 +333,7 @@ def validate_project_sheet(project_sheet: Worksheet, project_schema: Type[Union[
 
 def validate_subrecipient_sheet(subrecipient_sheet: Worksheet, version_string: str) -> Errors:
     errors = []
-    subrecipient_headers = get_headers(subrecipient_sheet, "C3:O3")
+    subrecipient_headers = get_headers(subrecipient_sheet, "C3:P3")
     current_row = INITIAL_STARTING_ROW
     SubrecipientRowClass = getSubrecipientRowClass(version_string)
     for subrecipient_row in subrecipient_sheet.iter_rows(
