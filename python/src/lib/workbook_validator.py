@@ -9,7 +9,8 @@ from src.schemas.schema_versions import (LogicSheetVersion,
                                          getSubrecipientRowClass, SubrecipientRow, 
                                          getCoverSheetRowClass, CoverSheetRow, 
                                          Project1ARow, Project1BRow, Project1CRow, 
-                                         ProjectType, getSchemaByProject)
+                                         getSchemaByProject)
+from src.schemas.project_types import ProjectType
 from pydantic_core import ErrorDetails
 
 type Errors = List[WorkbookError]

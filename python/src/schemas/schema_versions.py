@@ -13,6 +13,7 @@ from src.schemas.schema_V2024_05_24 import (
     Project1ARow as V2024_05_24_Project1ARow,
     Project1BRow as V2024_05_24_Project1BRow,
     Project1CRow as V2024_05_24_Project1CRow)
+from src.schemas.project_types import ProjectType
 
 """
 These are meant to be the canonical "type" for the various rows given whatever versions we have
@@ -35,18 +36,6 @@ class LogicSheetVersion(BaseModel):
     version: Version = Field(...)
 
     # TODO add validator for field
-
-class ProjectType(str, Enum):
-    _1A = "1A"
-    _1B = "1B"
-    _1C = "1C"
-
-    @classmethod
-    def from_project_name(cls, project_name: str) -> "ProjectType":
-        for project_type in cls:
-            if project_type.value == project_name:
-                return project_type
-        raise ValueError(f"Project name '{project_name}' is not a recognized project type.")
 
 
 def getVersionFromString(version_string: str) -> Version:
