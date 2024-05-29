@@ -102,6 +102,7 @@ class BaseProjectRow(BaseModel):
     Identification_Number__c: constr(strip_whitespace=True, min_length=1, max_length=20) = Field(
         ..., serialization_alias="Identification Number", json_schema_extra={"column":"D"}
     )
+    
     Project_Description__c: constr(strip_whitespace=True, min_length=1, max_length=3000) = Field(
         ..., serialization_alias="Project Description", json_schema_extra={"column":"E"}
     )
@@ -686,11 +687,6 @@ class SubrecipientRow(BaseModel):
             )
         return v
 
-class Version(Enum):
-    V2023_12_12 = "v:20231212"
-    V2024_01_07 = "v:20240107"
-    V2024_04_01 = "v:20240401"
-
 
 class ProjectType(str, Enum):
     _1A = "1A"
@@ -739,10 +735,6 @@ METADATA_BY_SHEET = {
         "max_col": 123,
     },
 }
-
-
-class LogicSheetVersion(BaseModel):
-    version: Version = Field(...)
 
 
 class CoverSheetRow(BaseModel):
