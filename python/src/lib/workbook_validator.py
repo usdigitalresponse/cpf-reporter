@@ -244,6 +244,7 @@ def validate_workbook_sheets(workbook: Workbook) -> Errors:
 def validate_logic_sheet(logic_sheet: Worksheet) -> Tuple[Errors, str]:
     errors = []
     version_string = logic_sheet["B1"].value
+    print(version_string)
     try:
         # Cell B1 contains the version
         LogicSheetVersion(**{"version": version_string})

@@ -1,6 +1,6 @@
 from enum import Enum
-from typing import Union, Type
-from pydantic import (BaseModel, Field)
+from typing import Union, Type, Any
+from pydantic import (BaseModel, Field, field_validator, ValidationInfo)
 from src.schemas.schema_V2024_04_01 import (
     SubrecipientRow as V2024_04_01_SubrecipientRow, 
     CoverSheetRow as V2024_04_01_CoverSheetRow,
@@ -35,7 +35,18 @@ class Version(Enum):
 class LogicSheetVersion(BaseModel):
     version: Version = Field(...)
 
-    # TODO add validator for field
+    @field_validator(
+        "version"
+    )
+    @classmethod
+    def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
+        print("MADE IT TO VERSION VALIDATOR")
+        print(v)
+        if v != Version.V2024_05_24:
+            raise ValueError(
+                f"Using outdated version of template. Please update to {Version.V2024_05_24}."
+            )
+        return v
 
 
 def getVersionFromString(version_string: str) -> Version:
