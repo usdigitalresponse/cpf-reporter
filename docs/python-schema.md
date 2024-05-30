@@ -37,6 +37,6 @@ Any substantive updates to the schema (e.g. adding new columns, or making a prev
     - Update each method that returns a tab class (e.g. `SubrecipientRow`, `Project1ARow`, etc.) by adding a case for your new version.
     - Update the `METADATA` dict header ranges to include the new columns you added, if any
 4. Update `test_workbook_validator.py` to use your new version:
-    - Add a sample file with valid data in `xlsm` format to `python/tests/data`
+    - Add a sample file with valid data in `xlsm` format to `python/tests/data` (NOTE: On a Mac, the easiest way to do this that I have found is to upload the   template to Google Sheets, add valid data there, download as xlsm and paste directly into your IDE)
     - Update `conftest.py` by adding a path to your new sample data and changing `valid_file()` and `valid_workbook()` to read from it
     - Update `test_workbook_validator` by adding a new string for your new version, and using it as default in method calls
