@@ -809,7 +809,6 @@ class CoverSheetRow(BaseModel):
     @classmethod
     def validate_code(cls, v: Any, info: ValidationInfo, **kwargs):
         if v is None or v.strip() == "":
-            print("WE ARE IN THE ERROR BLOCK " + v)
             raise ValueError(
                 f"EC code must be set"
             )
