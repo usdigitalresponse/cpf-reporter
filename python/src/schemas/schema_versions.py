@@ -6,13 +6,15 @@ from src.schemas.schema_V2024_04_01 import (
     CoverSheetRow as V2024_04_01_CoverSheetRow,
     Project1ARow as V2024_04_01_Project1ARow,
     Project1BRow as V2024_04_01_Project1BRow,
-    Project1CRow as V2024_04_01_Project1CRow)
+    Project1CRow as V2024_04_01_Project1CRow,
+    METADATA_BY_SHEET as V2024_04_01_Metadata)
 from src.schemas.schema_V2024_05_24 import (
     SubrecipientRow as V2024_05_24_SubrecipientRow, 
     CoverSheetRow as V2024_05_24_CoverSheetRow,
     Project1ARow as V2024_05_24_Project1ARow,
     Project1BRow as V2024_05_24_Project1BRow,
-    Project1CRow as V2024_05_24_Project1CRow)
+    Project1CRow as V2024_05_24_Project1CRow,
+    METADATA_BY_SHEET as V2024_05_24_Metadata)
 from src.schemas.project_types import ProjectType
 
 """
@@ -40,8 +42,6 @@ class LogicSheetVersion(BaseModel):
     )
     @classmethod
     def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
-        print("MADE IT TO VERSION VALIDATOR")
-        print(v)
         if v != Version.V2024_05_24:
             raise ValueError(
                 f"Using outdated version of template. Please update to {Version.V2024_05_24}."
@@ -111,5 +111,13 @@ def getProject1CRow(version: Version) -> Project1CRow:
             return V2024_05_24_Project1CRow
         case _:
             return V2024_04_01_Project1CRow
+        
+def getSchemaMetadata(version_string: str) -> dict:
+    version = getVersionFromString(version_string)
+    match version:
+        case Version.V2024_05_24:
+            return V2024_05_24_Metadata
+        case _:
+            return V2024_04_01_Metadata
     
     

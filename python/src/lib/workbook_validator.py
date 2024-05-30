@@ -9,7 +9,8 @@ from src.schemas.schema_versions import (LogicSheetVersion,
                                          getSubrecipientRowClass, SubrecipientRow, 
                                          getCoverSheetRowClass, CoverSheetRow, 
                                          Project1ARow, Project1BRow, Project1CRow, 
-                                         getSchemaByProject, Version, getVersionFromString)
+                                         getSchemaByProject, Version, getVersionFromString,
+                                         getSchemaMetadata)
 from src.schemas.project_types import ProjectType
 from pydantic_core import ErrorDetails
 
@@ -75,8 +76,9 @@ This function gets the Project Use Code / Expenditure Category Group (depending 
 If the project use code is not found or if it does not match any of the ProjectType values, it raises an error.
 """
 def get_project_use_code(cover_sheet: Worksheet, version_string: str, row_dict: Optional[Dict[str,str]] = None) -> ProjectType:
+    metadata = getSchemaMetadata(version_string)
     if not row_dict:
-        cover_header = get_headers(cover_sheet, "A1:B1")
+        cover_header = get_headers(cover_sheet, metadata["Cover"]["header_range"])
         cover_row = map(lambda cell: cell.value, cover_sheet[2])
         row_dict = map_values_to_headers(cover_header, cover_row)
     version = getVersionFromString(version_string)
@@ -217,7 +219,7 @@ def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
     3. Ensure all project rows are validated with the schema
     """
     if project_schema:
-        errors += validate_project_sheet(workbook[PROJECT_SHEET], project_schema)
+        errors += validate_project_sheet(workbook[PROJECT_SHEET], project_schema, version_string)
 
     """
     4. Ensure all subrecipient rows are validated with the schema
@@ -268,7 +270,8 @@ def validate_cover_sheet(
 ) -> Tuple[Errors, Optional[Type[Union[Project1ARow, Project1BRow, Project1CRow]]], Optional[ProjectType]]:
     errors = []
     project_schema = None
-    cover_header = get_headers(cover_sheet, "A1:B1")
+    metadata = getSchemaMetadata(version_string)
+    cover_header = get_headers(cover_sheet, metadata["Cover"]["header_range"])
     row_num = 2
     cover_row = map(lambda cell: cell.value, cover_sheet[row_num])
     row_dict = map_values_to_headers(cover_header, cover_row)
@@ -299,9 +302,10 @@ def validate_cover_sheet(
     return (errors, project_schema, project_use_code)
 
 
-def validate_project_sheet(project_sheet: Worksheet, project_schema: Type[Union[Project1ARow, Project1BRow, Project1CRow]]) -> Errors:
+def validate_project_sheet(project_sheet: Worksheet, project_schema: Type[Union[Project1ARow, Project1BRow, Project1CRow]], version_string: str) -> Errors:
     errors = []
-    project_headers = get_headers(project_sheet, "C3:DS3")
+    metadata = getSchemaMetadata(version_string)
+    project_headers = get_headers(project_sheet, metadata["Project"]["header_range"])
     current_row = INITIAL_STARTING_ROW
     sheet_has_data = False
     for project_row in project_sheet.iter_rows(
@@ -334,7 +338,8 @@ def validate_project_sheet(project_sheet: Worksheet, project_schema: Type[Union[
 
 def validate_subrecipient_sheet(subrecipient_sheet: Worksheet, version_string: str) -> Errors:
     errors = []
-    subrecipient_headers = get_headers(subrecipient_sheet, "C3:P3")
+    metadata = getSchemaMetadata(version_string)
+    subrecipient_headers = get_headers(subrecipient_sheet, metadata["Subrecipients"]["header_range"])
     current_row = INITIAL_STARTING_ROW
     SubrecipientRowClass = getSubrecipientRowClass(version_string)
     for subrecipient_row in subrecipient_sheet.iter_rows(

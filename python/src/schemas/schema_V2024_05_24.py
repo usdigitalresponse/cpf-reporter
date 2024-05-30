@@ -776,14 +776,14 @@ METADATA_BY_SHEET = {
         "max_col": 2,
     },
     "Subrecipients": {
-        "header_range": "C3:O3",
+        "header_range": "C3:P3",
         "min_row": 13,
         "max_row": None,
         "min_col": 3,
         "max_col": 16,
     },
     "Project": {
-        "header_range": "C3:DS3",
+        "header_range": "C3:EB3",
         "min_row": 13,
         "max_row": None,
         "min_col": 3,

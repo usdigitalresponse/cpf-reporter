@@ -136,14 +136,16 @@ class TestValidateproject_sheet:
     def test_valid_project_sheet(self, valid_project_sheet: Worksheet):
         errors = validate_project_sheet(
             valid_project_sheet, 
-            getSchemaByProject(V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP)
+            getSchemaByProject(V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP),
+            V2024_05_24_VERSION_STRING
         )
         assert errors == []
 
     def test_invalid_project_sheet(self, invalid_project_sheet: Worksheet):
         errors = validate_project_sheet(
             invalid_project_sheet,
-            getSchemaByProject(V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP)
+            getSchemaByProject(V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP),
+            V2024_05_24_VERSION_STRING
         )
         assert errors != []
         error = errors[0]
@@ -158,7 +160,8 @@ class TestValidateproject_sheet:
     def test_invalid_project_sheet_missing_field(self, invalid_project_sheet_missing_field: Worksheet):
         errors = validate_project_sheet(
             invalid_project_sheet_missing_field,
-            getSchemaByProject(V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP)
+            getSchemaByProject(V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP),
+            V2024_05_24_VERSION_STRING
         )
         assert errors != []
         error = errors[0]
@@ -173,7 +176,8 @@ class TestValidateproject_sheet:
     def test_invalid_project_sheet_empty_field(self, invalid_project_sheet_empty_field: Worksheet):
         errors = validate_project_sheet(
             invalid_project_sheet_empty_field,
-            getSchemaByProject(V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP)
+            getSchemaByProject(V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP),
+            V2024_05_24_VERSION_STRING
         )
         assert errors != []
         error = errors[0]
