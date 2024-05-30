@@ -2,13 +2,30 @@ import { ROLES } from 'api/src/lib/constants'
 import { Button, ButtonGroup } from 'react-bootstrap'
 import { useAuth } from 'web/src/auth'
 
+import { useMutation } from '@redwoodjs/web'
 import { MetaTags } from '@redwoodjs/web'
 
 import UploadsCell from 'src/components/Upload/UploadsCell'
 
+const SEND_TREASURY_REPORT = gql`
+  mutation sendTreasuryReport {
+    sendTreasuryReport
+  }
+`
 const UploadsPage = () => {
   const { hasRole } = useAuth()
+  const [sendTreasuryReport] = useMutation(SEND_TREASURY_REPORT, {
+    onCompleted: () => {
+      console.log('Treasury Report sent by email')
+    },
+    onError: (error) => {
+      console.error('Error sending Treasury Report by email', error)
+    },
+  })
 
+  const handleSendTreasuryReportByEmail = () => {
+    sendTreasuryReport()
+  }
   return (
     <>
       <MetaTags title="Uploads Page" description="Uploads page" />
@@ -32,8 +49,13 @@ const UploadsPage = () => {
         </Button>
         {/* TODO: Remove USDR_ADMIN check when ready || 2024-05-13 Milestone */}
         {hasRole(ROLES.USDR_ADMIN) && (
-          <Button size="sm" variant="" className="btn-outline-primary">
-            Send Treasury and/ Audit Reports by Email
+          <Button
+            size="sm"
+            variant=""
+            className="btn-outline-primary"
+            onClick={handleSendTreasuryReportByEmail}
+          >
+            Send Treasury Report By Email
           </Button>
         )}
       </ButtonGroup>

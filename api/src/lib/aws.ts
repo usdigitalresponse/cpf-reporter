@@ -6,6 +6,7 @@ import {
   PutObjectCommandInput,
   S3Client,
 } from '@aws-sdk/client-s3'
+import { SFNClient, StartExecutionCommand } from '@aws-sdk/client-sfn' // ES Modules import
 import {
   ReceiveMessageCommand,
   SendMessageCommand,
@@ -14,6 +15,8 @@ import {
 import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { StreamingBlobPayloadInputTypes } from '@smithy/types'
 import { CreateUploadInput } from 'types/graphql'
+
+import { logger } from './logger'
 
 const REPORTING_DATA_BUCKET_NAME = `${process.env.REPORTING_DATA_BUCKET_NAME}`
 
@@ -81,6 +84,10 @@ export function getTemplateRules(inputTemplateId: number) {
   )
 }
 
+export async function getS3UploadFileKey(organizationId, upload) {
+  return `uploads/${organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.id}/${upload.filename}`
+}
+
 async function sendHeadObjectToS3Bucket(bucketName: string, key: string) {
   const s3 = getS3Client()
   const uploadParams: HeadObjectCommandInput = {
@@ -144,6 +151,38 @@ async function sendSqsMessage(queueUrl: string, messageBody: unknown) {
       MessageBody: JSON.stringify(messageBody),
     })
   )
+}
+
+// start execution for amazon step functions
+export async function startStepFunctionExecution(
+  organization,
+  email,
+  uploadsByExpenditureCategory
+): Promise<void> {
+  let client
+  if (process.env.LOCALSTACK_HOSTNAME) {
+    logger.info('------------ USING LOCALSTACK FOR SFN ------------')
+    const endpoint = `http://${process.env.LOCALSTACK_HOSTNAME}:${
+      process.env.EDGE_PORT || 4566
+    }`
+    client = new SFNClient({ endpoint, region: process.env.AWS_DEFAULT_REGION })
+  } else {
+    client = new SFNClient()
+  }
+  logger.info(`${JSON.stringify(client)}`)
+  const input = {
+    // StartExecutionInput
+    stateMachineArn: process.env.TREASURY_STEP_FUNCTION_ARN, // required
+    name: `${organization.id}-${email}-${new Date().toISOString()}`,
+    input: JSON.stringify({
+      organization,
+      email,
+      uploadsByExpenditureCategory,
+    }),
+  }
+  const command = new StartExecutionCommand(input)
+
+  return await client.send(command)
 }
 
 async function receiveSqsMessage(queueUrl: string) {

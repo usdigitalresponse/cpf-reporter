@@ -13,6 +13,7 @@ import {
 } from '@redwoodjs/api'
 import { AuthenticationError } from '@redwoodjs/graphql-server'
 
+import { getS3UploadFileKey, startStepFunctionExecution } from 'src/lib/aws'
 import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
@@ -315,6 +316,167 @@ export const getOrCreateUsers = async (users, orgName) => {
     )
   }
 }
+
+const getUploadsByExpenditureCategory = async () => {
+  const organization = await db.organization.findFirst({
+    where: { id: context.currentUser.agency.organizationId },
+  })
+
+  const reportingPeriod = await db.reportingPeriod.findFirst({
+    where: { id: organization.preferences.current_reporting_period_id },
+  })
+
+  // valid upload validations
+  const validUploadIds = await db.uploadValidation.findMany({
+    where: {
+      passed: true,
+      upload: { agency: { organizationId: organization.id } },
+    },
+    select: {
+      uploadId: true,
+    },
+    distinct: ['uploadId'],
+  })
+
+  const uploadsForPeriod = await db.upload.findMany({
+    where: {
+      reportingPeriodId: reportingPeriod.id,
+      agency: { organizationId: organization.id },
+      id: { in: validUploadIds.map((v) => v.uploadId) },
+    },
+    include: { expenditureCategory: true },
+  })
+
+  const uploadsByExpenditureCategory = {}
+
+  // Get the most recent upload for each expenditure category and agency and set the S3 Object key
+  for (const upload of uploadsForPeriod) {
+    // Set the S3 Object key
+    const objectKey = await getS3UploadFileKey(organization.id, upload)
+    upload.objectKey = objectKey
+
+    // Filter the uploads by expenditure category of the current upload.
+    const uploadsByAgency =
+      uploadsByExpenditureCategory[upload.expenditureCategory.code]
+
+    if (!uploadsByAgency) {
+      // The EC code was never added. This is the time to initialize it.
+      uploadsByExpenditureCategory[upload.expenditureCategory.code] = {}
+
+      // Set the upload for this agency
+      uploadsByExpenditureCategory[upload.expenditureCategory.code][
+        upload.agencyId
+      ] = upload
+    } else {
+      if (!uploadsByAgency[upload.agencyId]) {
+        // The agency was never added. This is the time to initialize it.
+        uploadsByExpenditureCategory[upload.expenditureCategory.code][
+          upload.agencyId
+        ] = upload
+      } else {
+        // If the current upload is newer than the one stored, replace it
+        if (upload.createdAt > uploadsByAgency[upload.agencyId].createdAt) {
+          uploadsByExpenditureCategory[upload.expenditureCategory.code][
+            upload.agencyId
+          ] = upload
+        }
+      }
+    }
+  }
+
+  return uploadsByExpenditureCategory
+}
+
+export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
+  async () => {
+    const organization = await db.organization.findFirst({
+      where: { id: context.currentUser.agency.organizationId },
+    })
+    const reportingPeriod = await db.reportingPeriod.findFirst({
+      where: { id: organization.preferences.current_reporting_period_id },
+    })
+
+    // valid upload validations
+    const validUploadIds = await db.uploadValidation.findMany({
+      where: {
+        passed: true,
+        upload: { agency: { organizationId: organization.id } },
+      },
+      select: {
+        uploadId: true,
+      },
+      distinct: ['uploadId'],
+    })
+
+    const uploadsForPeriod = await db.upload.findMany({
+      where: {
+        reportingPeriodId: reportingPeriod.id,
+        agency: { organizationId: organization.id },
+        id: { in: validUploadIds.map((v) => v.uploadId) },
+      },
+      include: { expenditureCategory: true },
+    })
+    const uploadsByExpenditureCategory = {}
+
+    // Get the most recent upload for each expenditure category and agency and set the S3 Object key
+    for (const upload of uploadsForPeriod) {
+      // Set the S3 Object key
+      const objectKey = await getS3UploadFileKey(organization.id, upload)
+      upload.objectKey = objectKey
+
+      // Filter the uploads by expenditure category of the current upload.
+      const uploadsByAgency =
+        uploadsByExpenditureCategory[upload.expenditureCategory.code]
+
+      if (!uploadsByAgency) {
+        // The EC code was never added. This is the time to initialize it.
+        uploadsByExpenditureCategory[upload.expenditureCategory.code] = {}
+
+        // Set the upload for this agency
+        uploadsByExpenditureCategory[upload.expenditureCategory.code][
+          upload.agencyId
+        ] = upload
+      } else {
+        if (!uploadsByAgency[upload.agencyId]) {
+          // The agency was never added. This is the time to initialize it.
+          uploadsByExpenditureCategory[upload.expenditureCategory.code][
+            upload.agencyId
+          ] = upload
+        } else {
+          // If the current upload is newer than the one stored, replace it
+          if (upload.createdAt > uploadsByAgency[upload.agencyId].createdAt) {
+            uploadsByExpenditureCategory[upload.expenditureCategory.code][
+              upload.agencyId
+            ] = upload
+          }
+        }
+      }
+    }
+
+    try {
+      // Send the Treasury Report
+      // For now, we just log that we're sending the report
+      // Call amazon step function with the following parameters:
+      /*
+      {
+        "reportingPeriod": reportingPeriod.name,
+        "organization": organization.name,
+        "email": context.currentUser.email,
+        "uploadsByExpenditureCategory": uploadsByExpenditureCategory
+      }
+      */
+      logger.info('Sending Treasury Report')
+      startStepFunctionExecution(
+        organization,
+        context.currentUser.email,
+        uploadsByExpenditureCategory
+      )
+      return true
+    } catch (error) {
+      logger.error(error, 'Error sending Treasury Report')
+      return false
+    }
+  }
 
 export const User: UserRelationResolvers = {
   agency: (_obj, { root }) => {

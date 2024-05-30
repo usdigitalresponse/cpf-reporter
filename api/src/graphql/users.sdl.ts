@@ -40,6 +40,7 @@ export const schema = gql`
   }
 
   type Mutation {
+    sendTreasuryReport: Boolean! @requireAuth
     createUser(input: CreateUserInput!): User!
       @requireAuth(roles: ["USDR_ADMIN", "ORGANIZATION_ADMIN"])
     updateUser(id: Int!, input: UpdateUserInput!): User!
