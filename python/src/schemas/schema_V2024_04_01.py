@@ -4,6 +4,7 @@ from typing import Any, Optional
 
 from pydantic import (BaseModel, ConfigDict, Field, condecimal, conint, constr,
                       ValidationInfo, field_validator)
+from src.schemas.project_types import ProjectType, NAME_BY_PROJECT
 
 
 class StateAbbreviation(Enum):
@@ -102,6 +103,7 @@ class BaseProjectRow(BaseModel):
     Identification_Number__c: constr(strip_whitespace=True, min_length=1, max_length=20) = Field(
         ..., serialization_alias="Identification Number", json_schema_extra={"column":"D"}
     )
+    
     Project_Description__c: constr(strip_whitespace=True, min_length=1, max_length=3000) = Field(
         ..., serialization_alias="Project Description", json_schema_extra={"column":"E"}
     )
@@ -686,36 +688,6 @@ class SubrecipientRow(BaseModel):
             )
         return v
 
-class Version(Enum):
-    V2023_12_12 = "v:20231212"
-    V2024_01_07 = "v:20240107"
-    V2024_04_01 = "v:20240401"
-
-
-class ProjectType(str, Enum):
-    _1A = "1A"
-    _1B = "1B"
-    _1C = "1C"
-
-    @classmethod
-    def from_project_name(cls, project_name: str) -> "ProjectType":
-        for project_type in cls:
-            if project_type.value == project_name:
-                return project_type
-        raise ValueError(f"Project name '{project_name}' is not a recognized project type.")
-
-
-SCHEMA_BY_PROJECT = {
-    ProjectType._1A: Project1ARow,
-    ProjectType._1B: Project1BRow,
-    ProjectType._1C: Project1CRow,
-}
-NAME_BY_PROJECT = {
-    ProjectType._1A: "1A-Broadband Infrastructure",
-    ProjectType._1B: "1B-Digital Connectivity Technology",
-    ProjectType._1C: "1C-Multi-Purpose Community Facility",
-}
-
 METADATA_BY_SHEET = {
     "Cover": {
         "header_range": "A1:B1",
@@ -739,10 +711,6 @@ METADATA_BY_SHEET = {
         "max_col": 123,
     },
 }
-
-
-class LogicSheetVersion(BaseModel):
-    version: Version = Field(...)
 
 
 class CoverSheetRow(BaseModel):

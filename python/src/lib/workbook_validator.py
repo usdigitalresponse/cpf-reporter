@@ -5,9 +5,13 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import ValidationError
 from src.lib.logging import get_logger
-from src.schemas.latest.schema import (SCHEMA_BY_PROJECT, BaseModel,
-                                       CoverSheetRow, LogicSheetVersion, ProjectType,
-                                       SubrecipientRow, Project1ARow, Project1BRow, Project1CRow)
+from src.schemas.schema_versions import (LogicSheetVersion, 
+                                         getSubrecipientRowClass, SubrecipientRow, 
+                                         getCoverSheetRowClass, CoverSheetRow, 
+                                         Project1ARow, Project1BRow, Project1CRow, 
+                                         getSchemaByProject, Version, getVersionFromString,
+                                         getSchemaMetadata)
+from src.schemas.project_types import ProjectType
 from pydantic_core import ErrorDetails
 
 type Errors = List[WorkbookError]
@@ -68,15 +72,20 @@ def get_headers(sheet: Worksheet, cell_range: str) -> tuple:
 
 
 """
-This function gets the Project Use Code from the cover sheet or uses the row provided.
+This function gets the Project Use Code / Expenditure Category Group (depending on version) from the cover sheet or uses the row provided.
 If the project use code is not found or if it does not match any of the ProjectType values, it raises an error.
 """
-def get_project_use_code(cover_sheet: Worksheet, row_dict: Optional[Dict[str,str]] = None) -> ProjectType:
+def get_project_use_code(cover_sheet: Worksheet, version_string: str, row_dict: Optional[Dict[str,str]] = None) -> ProjectType:
+    metadata = getSchemaMetadata(version_string)
     if not row_dict:
-        cover_header = get_headers(cover_sheet, "A1:B1")
+        cover_header = get_headers(cover_sheet, metadata["Cover"]["header_range"])
         cover_row = map(lambda cell: cell.value, cover_sheet[2])
         row_dict = map_values_to_headers(cover_header, cover_row)
-    code = row_dict["Project Use Code"]
+    version = getVersionFromString(version_string)
+    codeKey = "Expenditure Category Group"
+    if version != Version.V2024_05_24:
+        version = "Project Use Code"
+    code = row_dict[codeKey]
     return ProjectType.from_project_name(code)
 
 
@@ -99,7 +108,7 @@ def generate_error_text(
     if isinstance(input, str):
         input = input.strip()
     if error_type == 'missing' or input in [None, ""]:
-        if field_name == "project_use_code":
+        if field_name == "project_use_code" or field_name == "expenditure_category_group":
             return f"EC code must be set"
         else:
             return f"Value is required for {field_name}"
@@ -197,24 +206,25 @@ def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
     """
     1. Validate logic sheet to make sure the sheet has an appropriate version
     """
-    errors += validate_logic_sheet(workbook[LOGIC_SHEET])
+    logic_errors, version_string = validate_logic_sheet(workbook[LOGIC_SHEET])
+    errors += logic_errors
 
     """
     2. Validate cover sheet and project selection. Pick the appropriate validator for the next step.
     """
-    cover_errors, project_schema, project_use_code = validate_cover_sheet(workbook[COVER_SHEET])
+    cover_errors, project_schema, project_use_code = validate_cover_sheet(workbook[COVER_SHEET], version_string)
     errors += cover_errors
 
     """
     3. Ensure all project rows are validated with the schema
     """
     if project_schema:
-        errors += validate_project_sheet(workbook[PROJECT_SHEET], project_schema)
+        errors += validate_project_sheet(workbook[PROJECT_SHEET], project_schema, version_string)
 
     """
     4. Ensure all subrecipient rows are validated with the schema
     """
-    errors += validate_subrecipient_sheet(workbook[SUBRECIPIENTS_SHEET])
+    errors += validate_subrecipient_sheet(workbook[SUBRECIPIENTS_SHEET], version_string)
 
     return (errors, project_use_code)
 
@@ -233,11 +243,12 @@ def validate_workbook_sheets(workbook: Workbook) -> Errors:
 
 
 # Accepts a workbook from openpyxl
-def validate_logic_sheet(logic_sheet: Worksheet) -> Errors:
+def validate_logic_sheet(logic_sheet: Worksheet) -> Tuple[Errors, str]:
     errors = []
+    version_string = logic_sheet["B1"].value
     try:
         # Cell B1 contains the version
-        LogicSheetVersion(**{"version": logic_sheet["B1"].value})
+        LogicSheetVersion(**{"version": version_string})
     except ValidationError as e:
         errors.append(
             WorkbookError(
@@ -249,26 +260,29 @@ def validate_logic_sheet(logic_sheet: Worksheet) -> Errors:
                 severity=ErrorLevel.WARN.name,
             )
         )
-    return errors
+    return errors, version_string
 
 
 def validate_cover_sheet(
     cover_sheet: Worksheet,
+    version_string: str
 ) -> Tuple[Errors, Optional[Type[Union[Project1ARow, Project1BRow, Project1CRow]]], Optional[ProjectType]]:
     errors = []
     project_schema = None
-    cover_header = get_headers(cover_sheet, "A1:B1")
+    metadata = getSchemaMetadata(version_string)
+    cover_header = get_headers(cover_sheet, metadata["Cover"]["header_range"])
     row_num = 2
     cover_row = map(lambda cell: cell.value, cover_sheet[row_num])
     row_dict = map_values_to_headers(cover_header, cover_row)
+    CoverSheetRowClass = getCoverSheetRowClass(version_string)
     try:
-        CoverSheetRow(**row_dict)
+        CoverSheetRowClass(**row_dict)
     except ValidationError as e:
-        errors += get_workbook_errors_for_row(CoverSheetRow, e, row_num, COVER_SHEET)
+        errors += get_workbook_errors_for_row(CoverSheetRowClass, e, row_num, COVER_SHEET)
         return (errors, None, None)
 
     try:
-        project_use_code: ProjectType = get_project_use_code(cover_sheet, row_dict)
+        project_use_code: ProjectType = get_project_use_code(cover_sheet, version_string, row_dict)
     except Exception as e:
         _logger.error(f"Unrecognized project use code: {e}")
         errors.append(
@@ -283,13 +297,14 @@ def validate_cover_sheet(
         )
         return (errors, None, None)
 
-    project_schema = SCHEMA_BY_PROJECT[project_use_code]
+    project_schema = getSchemaByProject(version_string, project_use_code)
     return (errors, project_schema, project_use_code)
 
 
-def validate_project_sheet(project_sheet: Worksheet, project_schema: Type[Union[Project1ARow, Project1BRow, Project1CRow]]) -> Errors:
+def validate_project_sheet(project_sheet: Worksheet, project_schema: Type[Union[Project1ARow, Project1BRow, Project1CRow]], version_string: str) -> Errors:
     errors = []
-    project_headers = get_headers(project_sheet, "C3:DS3")
+    metadata = getSchemaMetadata(version_string)
+    project_headers = get_headers(project_sheet, metadata["Project"]["header_range"])
     current_row = INITIAL_STARTING_ROW
     sheet_has_data = False
     for project_row in project_sheet.iter_rows(
@@ -320,10 +335,12 @@ def validate_project_sheet(project_sheet: Worksheet, project_schema: Type[Union[
     return errors
 
 
-def validate_subrecipient_sheet(subrecipient_sheet: Worksheet) -> Errors:
+def validate_subrecipient_sheet(subrecipient_sheet: Worksheet, version_string: str) -> Errors:
     errors = []
-    subrecipient_headers = get_headers(subrecipient_sheet, "C3:O3")
+    metadata = getSchemaMetadata(version_string)
+    subrecipient_headers = get_headers(subrecipient_sheet, metadata["Subrecipients"]["header_range"])
     current_row = INITIAL_STARTING_ROW
+    SubrecipientRowClass = getSubrecipientRowClass(version_string)
     for subrecipient_row in subrecipient_sheet.iter_rows(
         min_row=13, min_col=3, max_col=16, values_only=True
     ):
@@ -332,10 +349,10 @@ def validate_subrecipient_sheet(subrecipient_sheet: Worksheet) -> Errors:
             continue
         row_dict = map_values_to_headers(subrecipient_headers, subrecipient_row)
         try:
-            SubrecipientRow(**row_dict)
+            SubrecipientRowClass(**row_dict)
         except ValidationError as e:
             errors += get_workbook_errors_for_row(
-                SubrecipientRow, e, current_row, SUBRECIPIENTS_SHEET
+                SubrecipientRowClass, e, current_row, SUBRECIPIENTS_SHEET
             )
     return errors
 
