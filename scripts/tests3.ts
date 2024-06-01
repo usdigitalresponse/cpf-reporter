@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid"
 import {
   CreateBucketCommand,
   GetObjectCommand,
@@ -15,7 +16,7 @@ import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { getPrismaClient } from 'api/src/lib/db'
 import AWS from 'api/src/lib/aws'
 
-const REPORTING_DATA_BUCKET_NAME = `${process.env.REPORTING_DATA_BUCKET_NAME}`
+const REPORTING_DATA_BUCKET_NAME = `test-${process.env.REPORTING_DATA_BUCKET_NAME}-${uuidv4()}`
 
 export default async () => {
   const s3 = AWS.getS3Client()
@@ -68,7 +69,7 @@ export default async () => {
       Bucket: REPORTING_DATA_BUCKET_NAME,
       Key: key,
     }
-    await s3.send(new DeleteObjectCommand(headParams))
+    await s3.send(new DeleteObjectCommand(deleteParams))
     console.log("-- file deleted")
   } catch (error) {
     console.warn('Failed to test s3.')
