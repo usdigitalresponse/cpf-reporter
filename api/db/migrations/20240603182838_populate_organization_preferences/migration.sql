@@ -1,4 +1,3 @@
--- This is an empty migration.
 BEGIN;
 
 CREATE OR REPLACE FUNCTION populate_organization_preferences()
