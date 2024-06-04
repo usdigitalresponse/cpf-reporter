@@ -76,6 +76,25 @@ def invalid_project_sheet_empty_field(valid_project_sheet):
 
 
 @pytest.fixture
+def invalid_project_sheet_unmatching_subrecipient_tin_field(valid_workbook):
+    valid_workbook["Subrecipients"]["E13"] = "123123124"
+    return valid_workbook
+
+
+@pytest.fixture
+def invalid_project_sheet_unmatching_subrecipient_uei_field(valid_workbook):
+    valid_workbook["Subrecipients"]["F13"] = "123412341235"
+    return valid_workbook
+
+
+@pytest.fixture
+def invalid_project_sheet_unmatching_subrecipient_tin_uei_field(valid_workbook):
+    valid_workbook["Subrecipients"]["E13"] = "123123124"
+    valid_workbook["Subrecipients"]["F13"] = "123412341235"
+    return valid_workbook
+
+
+@pytest.fixture
 def invalid_subrecipient_sheet(valid_subrecipientsheet):
     valid_subrecipientsheet["E13"] = "INVALID"
     return valid_subrecipientsheet
