@@ -21,13 +21,16 @@ def valid_file() -> BinaryIO:
 def valid_workbook() -> openpyxl.Workbook:
     return openpyxl.load_workbook(_SAMPLE_VALID_XLSM_V2024_05_24)
 
+
 @pytest.fixture
 def valid_workbook_old_schema() -> openpyxl.Workbook:
     return openpyxl.load_workbook(_SAMPLE_VALID_XLSM)
 
+
 @pytest.fixture
 def valid_coversheet(valid_workbook) -> openpyxl.worksheet.worksheet.Worksheet:
     return valid_workbook["Cover"]
+
 
 @pytest.fixture
 def valid_project_sheet(valid_workbook) -> openpyxl.worksheet.worksheet.Worksheet:

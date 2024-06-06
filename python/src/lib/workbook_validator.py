@@ -5,12 +5,20 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import ValidationError
 from src.lib.logging import get_logger
-from src.schemas.schema_versions import (LogicSheetVersion, 
-                                         getSubrecipientRowClass, SubrecipientRow, 
-                                         getCoverSheetRowClass, CoverSheetRow, 
-                                         Project1ARow, Project1BRow, Project1CRow, 
-                                         getSchemaByProject, Version, getVersionFromString,
-                                         getSchemaMetadata)
+from src.schemas.schema_versions import (
+    LogicSheetVersion,
+    getSubrecipientRowClass,
+    SubrecipientRow,
+    getCoverSheetRowClass,
+    CoverSheetRow,
+    Project1ARow,
+    Project1BRow,
+    Project1CRow,
+    getSchemaByProject,
+    Version,
+    getVersionFromString,
+    getSchemaMetadata,
+)
 from src.schemas.project_types import ProjectType
 from pydantic_core import ErrorDetails
 
@@ -45,10 +53,10 @@ class WorkbookError:
     def __init__(
         self,
         message: str,
-        row: str = 'N/A',
-        col: str = 'N/A',
-        tab: str = 'N/A',
-        field_name: str = 'N/A',
+        row: str = "N/A",
+        col: str = "N/A",
+        tab: str = "N/A",
+        field_name: str = "N/A",
         severity: str = ErrorLevel.WARN.name,
     ):
         self.message = message
@@ -75,7 +83,13 @@ def get_headers(sheet: Worksheet, cell_range: str) -> tuple:
 This function gets the Project Use Code / Expenditure Category Group (depending on version) from the cover sheet or uses the row provided.
 If the project use code is not found or if it does not match any of the ProjectType values, it raises an error.
 """
-def get_project_use_code(cover_sheet: Worksheet, version_string: str, row_dict: Optional[Dict[str,str]] = None) -> ProjectType:
+
+
+def get_project_use_code(
+    cover_sheet: Worksheet,
+    version_string: str,
+    row_dict: Optional[Dict[str, str]] = None,
+) -> ProjectType:
     metadata = getSchemaMetadata(version_string)
     if not row_dict:
         cover_header = get_headers(cover_sheet, metadata["Cover"]["header_range"])
@@ -99,6 +113,7 @@ On the model class, the field definition has a property of json_schema_extra,
 defined in schema.py on a per-field basis, that contains the column for that particular field.
 """
 
+
 def generate_error_text(
     field_name: str,
     error: ErrorDetails,
@@ -107,23 +122,37 @@ def generate_error_text(
     input = error["input"]
     if isinstance(input, str):
         input = input.strip()
-    if error_type == 'missing' or input in [None, ""]:
-        if field_name == "project_use_code" or field_name == "expenditure_category_group":
+    if error_type == "missing" or input in [None, ""]:
+        if (
+            field_name == "project_use_code"
+            or field_name == "expenditure_category_group"
+        ):
             return f"EC code must be set"
         else:
             return f"Value is required for {field_name}"
-    elif error_type == 'string_too_long' or error_type == 'string_too_short':
+    elif error_type == "string_too_long" or error_type == "string_too_short":
         return error["msg"].replace("String", field_name, 1)
-    elif error_type in ['decimal_whole_digits', 'decimal_max_places', 'decimal_type']:
+    elif error_type in ["decimal_whole_digits", "decimal_max_places", "decimal_type"]:
         return error["msg"].replace("Decimal", field_name, 1)
-    elif error_type in ['int_type', 'string_type', 'datetime_from_date_parsing', 'decimal_parsing', 'int_parsing']:
+    elif error_type in [
+        "int_type",
+        "string_type",
+        "datetime_from_date_parsing",
+        "decimal_parsing",
+        "int_parsing",
+    ]:
         return error["msg"].replace("Input", field_name, 1)
     else:
-        return f'Error in field {field_name}-{error["msg"]}' 
+        return f'Error in field {field_name}-{error["msg"]}'
 
 
 def get_workbook_errors_for_row(
-    SheetModelClass: Type[Union[CoverSheetRow, Project1ARow, Project1BRow, Project1CRow, SubrecipientRow]], e: ValidationError, row_num: int, sheet_name: str
+    SheetModelClass: Type[
+        Union[CoverSheetRow, Project1ARow, Project1BRow, Project1CRow, SubrecipientRow]
+    ],
+    e: ValidationError,
+    row_num: int,
+    sheet_name: str,
 ) -> List[WorkbookError]:
     workbook_errors: List[WorkbookError] = []
     for error in e.errors():
@@ -142,11 +171,15 @@ def get_workbook_errors_for_row(
         try:
             field_instance = SheetModelClass.model_fields[erroring_field_name]
             if isinstance(field_instance.json_schema_extra, dict):
-                erroring_column = field_instance.json_schema_extra['column']
+                erroring_column = field_instance.json_schema_extra["column"]
             else:
-                raise Exception(f"Issue with schema definition for field {erroring_field_name}.")
+                raise Exception(
+                    f"Issue with schema definition for field {erroring_field_name}."
+                )
         except Exception as exception:
-            _logger.error(f"Encountered unexpected exception while getting column for field {erroring_field_name} with error {error}. Details: {exception}")
+            _logger.error(
+                f"Encountered unexpected exception while getting column for field {erroring_field_name} with error {error}. Details: {exception}"
+            )
             erroring_column = "Unknown"
 
         message = generate_error_text(erroring_field_name, error)
@@ -180,12 +213,15 @@ def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str]]:
         return validate_workbook(wb)
     except Exception as e:
         _logger.error(f"Unexpected Validation Error: {e}")
-        return ([
-            WorkbookError(
-                "Unable to validate workbook. Please reach out to grants-helpdesk@usdigitalresponse.org",
-                severity=ErrorLevel.ERR.name,
-            )
-        ], 'Unkown')
+        return (
+            [
+                WorkbookError(
+                    "Unable to validate workbook. Please reach out to grants-helpdesk@usdigitalresponse.org",
+                    severity=ErrorLevel.ERR.name,
+                )
+            ],
+            "Unkown",
+        )
 
     finally:
         workbook.close()
@@ -212,14 +248,18 @@ def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
     """
     2. Validate cover sheet and project selection. Pick the appropriate validator for the next step.
     """
-    cover_errors, project_schema, project_use_code = validate_cover_sheet(workbook[COVER_SHEET], version_string)
+    cover_errors, project_schema, project_use_code = validate_cover_sheet(
+        workbook[COVER_SHEET], version_string
+    )
     errors += cover_errors
 
     """
     3. Ensure all project rows are validated with the schema
     """
     if project_schema:
-        errors += validate_project_sheet(workbook[PROJECT_SHEET], project_schema, version_string)
+        errors += validate_project_sheet(
+            workbook[PROJECT_SHEET], project_schema, version_string
+        )
 
     """
     4. Ensure all subrecipient rows are validated with the schema
@@ -227,6 +267,7 @@ def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
     errors += validate_subrecipient_sheet(workbook[SUBRECIPIENTS_SHEET], version_string)
 
     return (errors, project_use_code)
+
 
 def validate_workbook_sheets(workbook: Workbook) -> Errors:
     errors = []
@@ -264,9 +305,12 @@ def validate_logic_sheet(logic_sheet: Worksheet) -> Tuple[Errors, str]:
 
 
 def validate_cover_sheet(
-    cover_sheet: Worksheet,
-    version_string: str
-) -> Tuple[Errors, Optional[Type[Union[Project1ARow, Project1BRow, Project1CRow]]], Optional[ProjectType]]:
+    cover_sheet: Worksheet, version_string: str
+) -> Tuple[
+    Errors,
+    Optional[Type[Union[Project1ARow, Project1BRow, Project1CRow]]],
+    Optional[ProjectType],
+]:
     errors = []
     project_schema = None
     metadata = getSchemaMetadata(version_string)
@@ -278,11 +322,15 @@ def validate_cover_sheet(
     try:
         CoverSheetRowClass(**row_dict)
     except ValidationError as e:
-        errors += get_workbook_errors_for_row(CoverSheetRowClass, e, row_num, COVER_SHEET)
+        errors += get_workbook_errors_for_row(
+            CoverSheetRowClass, e, row_num, COVER_SHEET
+        )
         return (errors, None, None)
 
     try:
-        project_use_code: ProjectType = get_project_use_code(cover_sheet, version_string, row_dict)
+        project_use_code: ProjectType = get_project_use_code(
+            cover_sheet, version_string, row_dict
+        )
     except Exception as e:
         _logger.error(f"Unrecognized project use code: {e}")
         errors.append(
@@ -301,7 +349,11 @@ def validate_cover_sheet(
     return (errors, project_schema, project_use_code)
 
 
-def validate_project_sheet(project_sheet: Worksheet, project_schema: Type[Union[Project1ARow, Project1BRow, Project1CRow]], version_string: str) -> Errors:
+def validate_project_sheet(
+    project_sheet: Worksheet,
+    project_schema: Type[Union[Project1ARow, Project1BRow, Project1CRow]],
+    version_string: str,
+) -> Errors:
     errors = []
     metadata = getSchemaMetadata(version_string)
     project_headers = get_headers(project_sheet, metadata["Project"]["header_range"])
@@ -323,22 +375,28 @@ def validate_project_sheet(project_sheet: Worksheet, project_schema: Type[Union[
             )
 
     if not sheet_has_data:
-        errors += [WorkbookError(
-            message="Upload doesn’t include any project records.",
-            row=INITIAL_STARTING_ROW,
-            col=0,
-            tab=PROJECT_SHEET,
-            field_name="",
-            severity=ErrorLevel.ERR.name,
-        )]
+        errors += [
+            WorkbookError(
+                message="Upload doesn’t include any project records.",
+                row=INITIAL_STARTING_ROW,
+                col=0,
+                tab=PROJECT_SHEET,
+                field_name="",
+                severity=ErrorLevel.ERR.name,
+            )
+        ]
 
     return errors
 
 
-def validate_subrecipient_sheet(subrecipient_sheet: Worksheet, version_string: str) -> Errors:
+def validate_subrecipient_sheet(
+    subrecipient_sheet: Worksheet, version_string: str
+) -> Errors:
     errors = []
     metadata = getSchemaMetadata(version_string)
-    subrecipient_headers = get_headers(subrecipient_sheet, metadata["Subrecipients"]["header_range"])
+    subrecipient_headers = get_headers(
+        subrecipient_sheet, metadata["Subrecipients"]["header_range"]
+    )
     current_row = INITIAL_STARTING_ROW
     SubrecipientRowClass = getSubrecipientRowClass(version_string)
     for subrecipient_row in subrecipient_sheet.iter_rows(

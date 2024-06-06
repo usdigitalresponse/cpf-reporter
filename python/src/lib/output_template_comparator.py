@@ -204,9 +204,9 @@ def compare(
                 previous_sheet, latest_sheet, header_map
             )
             if cell_value_differences:
-                differences.cell_value_changed[
-                    f"{file}: {sheet}"
-                ] += cell_value_differences
+                differences.cell_value_changed[f"{file}: {sheet}"] += (
+                    cell_value_differences
+                )
 
     return differences
 
