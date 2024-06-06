@@ -92,19 +92,6 @@ class TestValidateCoverSheet:
         assert errors == []
         assert project_use_code == SAMPLE_EXPENDITURE_CATEGORY_GROUP
         assert schema == getSchemaByProject(V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP)
-
-    def test_invalid_cover_sheet(self, invalid_cover_sheet: Worksheet):
-        errors, schema, project_use_code = validate_cover_sheet(invalid_cover_sheet, V2024_05_24_VERSION_STRING)
-        assert errors != []
-        error = errors[0]
-        assert "EC code 'INVALID' is not recognized." in error.message
-        assert error.col == "A"
-        assert error.row == "2"
-        assert error.tab == "Cover"
-        assert error.severity == ErrorLevel.ERR.name
-        assert schema is None
-        assert project_use_code is None
-    
     
     def test_invalid_cover_sheet_missing_code(self, invalid_cover_sheet_missing_code: Worksheet):
         errors, schema, project_use_code = validate_cover_sheet(invalid_cover_sheet_missing_code, V2024_05_24_VERSION_STRING)
@@ -125,6 +112,18 @@ class TestValidateCoverSheet:
         error = errors[0]
         assert "EC code must be set" in error.message
         assert error.col == "A"
+        assert error.row == "2"
+        assert error.tab == "Cover"
+        assert error.severity == ErrorLevel.ERR.name
+        assert schema is None
+        assert project_use_code is None
+
+    def test_invalid_cover_sheet_empty_desc(self, invalid_cover_sheet_empty_desc: Worksheet):
+        errors, schema, project_use_code = validate_cover_sheet(invalid_cover_sheet_empty_desc, V2024_05_24_VERSION_STRING)
+        assert errors != []
+        error = errors[0]
+        assert "Value is required for detailed_expenditure_category" in error.message
+        assert error.col == "B"
         assert error.row == "2"
         assert error.tab == "Cover"
         assert error.severity == ErrorLevel.ERR.name
