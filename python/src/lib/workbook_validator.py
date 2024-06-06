@@ -127,7 +127,7 @@ def generate_error_text(
             field_name == "project_use_code"
             or field_name == "expenditure_category_group"
         ):
-            return f"EC code must be set"
+            return "EC code must be set"
         else:
             return f"Value is required for {field_name}"
     elif error_type == "string_too_long" or error_type == "string_too_short":

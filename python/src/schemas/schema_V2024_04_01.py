@@ -990,7 +990,7 @@ class CoverSheetRow(BaseModel):
     @classmethod
     def validate_code(cls, v: Any, info: ValidationInfo, **kwargs):
         if v is None or v.strip() == "":
-            raise ValueError(f"EC code must be set")
+            raise ValueError("EC code must be set")
         elif v not in ProjectType:
             raise ValueError(f"EC code '{v}' is not recognized.")
         return v
