@@ -72,7 +72,7 @@ describe('uploads', () => {
   )
 
   scenario(
-    'returns uploads for organization staff, only their own',
+    'returns all uploads in their agency for organization staff',
     async (scenario: StandardScenario) => {
       mockCurrentUser(scenario.user.three)
       const result = await uploads()
@@ -80,9 +80,12 @@ describe('uploads', () => {
         result,
         scenario.organization.two.id
       )
+      const uploadsBelongToAgency = result.every(async (upload) => {
+        return upload.agencyId === scenario.user.three.agencyId
+      })
 
-      expect(result.length).toEqual(1)
-      expect(result[0].uploadedById).toEqual(scenario.user.three.id)
+      expect(result.length).toEqual(2)
+      expect(uploadsBelongToAgency).toEqual(true)
       expect(uploadsBelongToOrg).toBe(true)
     }
   )
