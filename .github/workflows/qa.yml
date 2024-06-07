@@ -209,6 +209,9 @@ jobs:
       - name: Run linter for web side
         if: ${{ !cancelled() }}
         run: yarn eslint web/src
+      - name: Run linter for scripts
+        if: ${{ !cancelled() }}
+        run: yarn eslint scripts
 
   ruff:
     name: Lint python
