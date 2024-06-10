@@ -6,13 +6,14 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    ValidationInfo,
     condecimal,
     conint,
     constr,
-    ValidationInfo,
     field_validator,
 )
-from src.schemas.project_types import ProjectType, NAME_BY_PROJECT
+
+from src.schemas.project_types import NAME_BY_PROJECT
 
 
 class StateAbbreviation(Enum):
@@ -990,9 +991,9 @@ class CoverSheetRow(BaseModel):
     @classmethod
     def validate_code(cls, v: Any, info: ValidationInfo, **kwargs):
         if v is None or v.strip() == "":
-            raise ValueError("EC code must be set")
-        elif v not in ProjectType:
-            raise ValueError(f"EC code '{v}' is not recognized.")
+            raise ValueError(
+                "EC code must be set"
+            )
         return v
 
     @field_validator("project_use_name")

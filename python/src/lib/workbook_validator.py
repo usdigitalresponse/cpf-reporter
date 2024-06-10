@@ -1,26 +1,27 @@
 from enum import Enum
-from typing import IO, Any, Iterable, List, Optional, Tuple, Union, Type, Dict
+from typing import IO, Any, Dict, Iterable, List, Optional, Tuple, Type, Union
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import ValidationError
+from pydantic_core import ErrorDetails
+
 from src.lib.logging import get_logger
+from src.schemas.project_types import ProjectType
 from src.schemas.schema_versions import (
-    LogicSheetVersion,
-    getSubrecipientRowClass,
-    SubrecipientRow,
-    getCoverSheetRowClass,
     CoverSheetRow,
+    LogicSheetVersion,
     Project1ARow,
     Project1BRow,
     Project1CRow,
-    getSchemaByProject,
+    SubrecipientRow,
     Version,
-    getVersionFromString,
+    getCoverSheetRowClass,
+    getSchemaByProject,
     getSchemaMetadata,
+    getSubrecipientRowClass,
+    getVersionFromString,
 )
-from src.schemas.project_types import ProjectType
-from pydantic_core import ErrorDetails
 
 type Errors = List[WorkbookError]
 
@@ -104,7 +105,7 @@ def get_project_use_code(
 
 
 """
-This function converts a list of ValidationError records for a single row into a list of WorkbookError records. 
+This function converts a list of ValidationError records for a single row into a list of WorkbookError records.
 Since each row has many different fields-- there can be multiple errors in a single row.
 It maps the thrown error to the impacted column in the spreadsheet.
 It does so by first getting the error's location (the loc property), which is the field name,
@@ -375,16 +376,14 @@ def validate_project_sheet(
             )
 
     if not sheet_has_data:
-        errors += [
-            WorkbookError(
-                message="Upload doesn’t include any project records.",
-                row=INITIAL_STARTING_ROW,
-                col=0,
-                tab=PROJECT_SHEET,
-                field_name="",
-                severity=ErrorLevel.ERR.name,
-            )
-        ]
+        errors += [WorkbookError(
+            message="Upload doesn’t include any project records.",
+            row=INITIAL_STARTING_ROW + 1,
+            col=0,
+            tab=PROJECT_SHEET,
+            field_name="",
+            severity=ErrorLevel.ERR.name,
+        )]
 
     return errors
 
