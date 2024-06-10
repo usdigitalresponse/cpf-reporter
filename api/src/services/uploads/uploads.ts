@@ -14,8 +14,7 @@ import { logger } from 'src/lib/logger'
 import { ValidationError } from 'src/lib/validation-error'
 
 interface WhereInputs {
-  agency: { organizationId: number }
-  uploadedBy?: { id: number }
+  agency: { id?: number; organizationId: number }
 }
 
 export const uploads: QueryResolvers['uploads'] = () => {
@@ -28,7 +27,7 @@ export const uploads: QueryResolvers['uploads'] = () => {
   }
 
   if (hasRole(ROLES.ORGANIZATION_STAFF)) {
-    whereInputs.uploadedBy = { id: currentUser.id }
+    whereInputs.agency = { ...whereInputs.agency, id: currentUser.agency.id }
   }
 
   return db.upload.findMany({

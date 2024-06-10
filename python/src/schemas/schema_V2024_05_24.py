@@ -815,10 +815,6 @@ class CoverSheetRow(BaseModel):
             raise ValueError(
                 f"EC code must be set"
             )
-        elif v not in ProjectType:
-            raise ValueError(
-                f"EC code '{v}' is not recognized."
-            )
         return v
 
     @field_validator("detailed_expenditure_category")

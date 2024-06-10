@@ -58,6 +58,12 @@ def invalid_cover_sheet_empty_code(valid_coversheet):
 
 
 @pytest.fixture
+def invalid_cover_sheet_empty_desc(valid_coversheet):
+    valid_coversheet["B2"] = "  "
+    return valid_coversheet
+
+
+@pytest.fixture
 def invalid_project_sheet(valid_project_sheet):
     valid_project_sheet["D13"] = "X" * 21
     return valid_project_sheet
