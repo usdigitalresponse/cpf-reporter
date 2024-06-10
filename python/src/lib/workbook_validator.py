@@ -325,7 +325,7 @@ def validate_project_sheet(project_sheet: Worksheet, project_schema: Type[Union[
     if not sheet_has_data:
         errors += [WorkbookError(
             message="Upload doesn’t include any project records.",
-            row=INITIAL_STARTING_ROW,
+            row=INITIAL_STARTING_ROW + 1,
             col=0,
             tab=PROJECT_SHEET,
             field_name="",
