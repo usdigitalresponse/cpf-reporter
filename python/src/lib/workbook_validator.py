@@ -80,17 +80,16 @@ def get_headers(sheet: Worksheet, cell_range: str) -> tuple:
     return tuple(header_cell.value for header_cell in sheet[cell_range][0])
 
 
-"""
-This function gets the Project Use Code / Expenditure Category Group (depending on version) from the cover sheet or uses the row provided.
-If the project use code is not found or if it does not match any of the ProjectType values, it raises an error.
-"""
-
-
 def get_project_use_code(
     cover_sheet: Worksheet,
     version_string: str,
     row_dict: Optional[Dict[str, str]] = None,
 ) -> ProjectType:
+    """This function gets the Project Use Code / Expenditure Category Group
+    (depending on version) from the cover sheet or uses the row provided.
+    If the project use code is not found or if it does not match any of the ProjectType
+    values, it raises an error.
+    """
     metadata = getSchemaMetadata(version_string)
     if not row_dict:
         cover_header = get_headers(cover_sheet, metadata["Cover"]["header_range"])
@@ -104,21 +103,23 @@ def get_project_use_code(
     return ProjectType.from_project_name(code)
 
 
-"""
-This function converts a list of ValidationError records for a single row into a list of WorkbookError records.
-Since each row has many different fields-- there can be multiple errors in a single row.
-It maps the thrown error to the impacted column in the spreadsheet.
-It does so by first getting the error's location (the loc property), which is the field name,
-and then grabbing that field off of the relevant model class passed in.
-On the model class, the field definition has a property of json_schema_extra,
-defined in schema.py on a per-field basis, that contains the column for that particular field.
-"""
-
-
 def generate_error_text(
     field_name: str,
     error: ErrorDetails,
 ) -> str:
+    """This function converts a list of ValidationError records for a single row
+    into a list of WorkbookError records.
+
+    Since each row has many different fields and there can be multiple errors in
+    a single row, it maps the thrown error to the impacted column in the spreadsheet.
+    It does so by first getting the error's location (the loc property), which is
+    the field name, and then grabbing that field off of the relevant model class
+    passed in.
+
+    On the model class, the field definition has a property of `json_schema_extra`,
+    defined in the schema on a per-field basis, which contains the column for that
+    particular field.
+    """
     error_type = error["type"]
     input = error["input"]
     if isinstance(input, str):
@@ -158,14 +159,14 @@ def get_workbook_errors_for_row(
     workbook_errors: List[WorkbookError] = []
     for error in e.errors():
         """
-            Sample structure of the variable `e` here-
+            Sample structure of the variable `e` here:
             https://docs.pydantic.dev/latest/api/pydantic_core/#pydantic_core.ErrorDetails
             {
-            'type': 'string_type',
-            'loc': ('Identification_Number__c',),
-            'msg': 'Input should be a valid string',
-            'input': None,
-            'url': 'https://errors.pydantic.dev/2.6/v/string_type'
+                'type': 'string_type',
+                'loc': ('Identification_Number__c',),
+                'msg': 'Input should be a valid string',
+                'input': None,
+                'url': 'https://errors.pydantic.dev/2.6/v/string_type'
             }
         """
         erroring_field_name: str = f'{error["loc"][0]}'
@@ -417,9 +418,9 @@ def validate_subrecipient_sheet(
 
 
 if __name__ == "__main__":
-    """
-        Main function to test validate function
-        Run with `poetry run python -m src.lib.workbook_validator upload.xlsm`
+    """Main block to test validate function
+
+    Run with `poetry run python -m src.lib.workbook_validator upload.xlsm`
     """
     import sys
 
