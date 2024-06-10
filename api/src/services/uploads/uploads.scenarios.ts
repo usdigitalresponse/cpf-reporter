@@ -84,6 +84,17 @@ export const standard = defineScenario<
         agency: true,
       },
     }),
+    four: (scenario) => ({
+      data: {
+        email: 'uniqueemail4@test.com',
+        name: 'String',
+        role: 'ORGANIZATION_STAFF',
+        agencyId: scenario.agency.two.id,
+      },
+      include: {
+        agency: true,
+      },
+    }),
   },
   reportingPeriod: {
     one: (scenario) => ({
@@ -166,6 +177,17 @@ export const standard = defineScenario<
       data: {
         filename: 'String',
         uploadedById: scenario.user.three.id,
+        agencyId: scenario.agency.two.id,
+        reportingPeriodId: scenario.reportingPeriod.one.id,
+        validations: {},
+        createdAt: '2024-01-21T18:10:17.000Z',
+        updatedAt: '2024-01-21T18:10:17.000Z',
+      },
+    }),
+    four: (scenario) => ({
+      data: {
+        filename: 'String',
+        uploadedById: scenario.user.four.id,
         agencyId: scenario.agency.two.id,
         reportingPeriodId: scenario.reportingPeriod.one.id,
         validations: {},
