@@ -97,6 +97,9 @@ class ProjectInvestmentType(str, Enum):
 class BaseProjectRow(BaseModel):
     model_config = ConfigDict(coerce_numbers_to_str=True, loc_by_alias=False)
 
+    row_num: conint(ge=1) = Field(
+        default=1, serialization_alias="Row Number", json_schema_extra={"column":"NONE"}
+    )
     Project_Name__c: constr(strip_whitespace=True, min_length=1, max_length=100) = Field(
         ..., serialization_alias="Project Name", json_schema_extra={"column":"C"}
     )
@@ -811,10 +814,6 @@ class CoverSheetRow(BaseModel):
         if v is None or v.strip() == "":
             raise ValueError(
                 f"EC code must be set"
-            )
-        elif v not in ProjectType:
-            raise ValueError(
-                f"EC code '{v}' is not recognized."
             )
         return v
 
