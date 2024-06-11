@@ -16,7 +16,7 @@ const UploadValidationStatus = ({ latestValidation }) => {
     }
 
     const { passed, createdAt, initiatedBy } = latestValidation
-    const statusText = passed ? 'Validated' : 'Invalidated'
+    const statusText = passed ? 'Validated' : 'Did not pass validation'
     const statusClass = passed ? 'text-success' : 'text-danger'
 
     return (
