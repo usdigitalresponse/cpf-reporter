@@ -2,7 +2,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 
 import { Link, routes } from '@redwoodjs/router'
 
-import { formatDateString } from '../../../utils/index'
+import { formatDateString } from 'src/utils'
 
 const columnHelper = createColumnHelper()
 
@@ -31,7 +31,11 @@ function validationDisplay(row) {
   const formattedDate = formatDateString(createdAt)
 
   if (!passed) {
-    return <span className="text-danger">Invalidated at {formattedDate}</span>
+    return (
+      <span className="text-danger">
+        Did not pass validation on {formattedDate}
+      </span>
+    )
   }
 
   return formattedDate
