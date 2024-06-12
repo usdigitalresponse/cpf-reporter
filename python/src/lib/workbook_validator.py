@@ -221,6 +221,8 @@ def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
     if project_schema:
         project_errors, projects = validate_project_sheet(workbook[PROJECT_SHEET], project_schema, version_string)
         errors += project_errors
+    else:
+        projects = None
 
     """
     4. Ensure all subrecipient rows are validated with the schema
