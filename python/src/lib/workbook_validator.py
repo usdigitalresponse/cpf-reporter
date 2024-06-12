@@ -231,7 +231,8 @@ def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
     """
     5. Ensure all projects are mapped to a valid subrecipient
     """
-    errors += validate_projects_subrecipients(projects, subrecipients)
+    if projects:
+        errors += validate_projects_subrecipients(projects, subrecipients)
 
     return (errors, project_use_code)
 
