@@ -140,7 +140,7 @@ class TestValidateproject_sheet:
         )
         assert errors == []
         assert len(projects) == 1
-        assert projects[0].row_num == 1
+        assert projects[0].row_num == 13
         assert projects[0].Subrecipient_UEI__c == "123412341234"
         assert projects[0].Subrecipient_TIN__c == "123123123"
 
@@ -221,7 +221,7 @@ class TestValidateMatchingSubrecipientSheet:
         assert errors != []
         error = errors[0]
         assert "You must submit a subrecipient" in error.message
-        assert error.row == 1
+        assert error.row == 13
         assert error.col == "E, F"
         assert error.severity == ErrorLevel.ERR.name
 
@@ -230,7 +230,7 @@ class TestValidateMatchingSubrecipientSheet:
         assert errors != []
         error = errors[0]
         assert "You must submit a subrecipient" in error.message
-        assert error.row == 1
+        assert error.row == 13
         assert error.col == "E, F"
         assert error.severity == ErrorLevel.ERR.name
     
@@ -239,7 +239,7 @@ class TestValidateMatchingSubrecipientSheet:
         assert errors != []
         error = errors[0]
         assert "You must submit a subrecipient" in error.message
-        assert error.row == 1
+        assert error.row == 13
         assert error.col == "E, F"
         assert error.severity == ErrorLevel.ERR.name
 
