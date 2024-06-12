@@ -699,7 +699,7 @@ class SubrecipientRow(BaseModel):
     Name: constr(strip_whitespace=True, min_length=1, max_length=80) = Field(
         ...,
         serialization_alias="Subrecipient Name",
-        json_schema_extra={"column":"C"}
+        json_schema_extra={"column":"C", "output_column": "B"}
     )
     Recipient_Profile_ID__c: Optional[constr(strip_whitespace=True, min_length=1, max_length=100)] = Field(
         default=None,
@@ -709,46 +709,46 @@ class SubrecipientRow(BaseModel):
     EIN__c: constr(strip_whitespace=True, min_length=9, max_length=9) = Field(
         ...,
         serialization_alias="Subrecipient Tax ID Number (TIN)",
-        json_schema_extra={"column":"E"}
+        json_schema_extra={"column":"E", "output_column": "C"}
     )
     Unique_Entity_Identifier__c: constr(strip_whitespace=True, min_length=12, max_length=12) = Field(
         ...,
         serialization_alias="Unique Entity Identifier (UEI)",
-        json_schema_extra={"column":"F"}
+        json_schema_extra={"column":"F", "output_column": "D"}
     )
     POC_Name__c: constr(strip_whitespace=True, min_length=1, max_length=100) = Field(
         ...,
         serialization_alias="POC Name",
-        json_schema_extra={"column":"G"}
+        json_schema_extra={"column":"G", "output_column": "E"}
     )
     POC_Phone_Number__c: constr(strip_whitespace=True, min_length=1, max_length=10) = Field(
-        ..., serialization_alias="POC Phone Number", json_schema_extra={"column":"H"}
+        ..., serialization_alias="POC Phone Number", json_schema_extra={"column":"H", "output_column": "F"}
     )
     POC_Email_Address__c: constr(strip_whitespace=True, min_length=1, max_length=80) = Field(
-        ..., serialization_alias="POC Email Address", json_schema_extra={"column":"I"}
+        ..., serialization_alias="POC Email Address", json_schema_extra={"column":"I", "output_column": "G"}
     )
     Zip__c: constr(strip_whitespace=True, min_length=1, max_length=5) = Field(
         ...,
         serialization_alias="Zip5",
-        json_schema_extra={"column":"J"}
+        json_schema_extra={"column":"J", "output_column": "H"}
     )
-    Zip_4__c: Optional[str] = Field(default=None, serialization_alias="Zip4", max_length=4, json_schema_extra={"column":"K"})
+    Zip_4__c: Optional[str] = Field(default=None, serialization_alias="Zip4", max_length=4, json_schema_extra={"column":"K", "output_column": "I"})
     Address__c: constr(strip_whitespace=True, min_length=1, max_length=40) = Field(
         ...,
         serialization_alias="Address Line 1",
-        json_schema_extra={"column":"L"}
+        json_schema_extra={"column":"L", "output_column": "J"}
     )
     Address_2__c: Optional[str] = Field(
-        default=None, serialization_alias="Address Line 2", max_length=40, json_schema_extra={"column":"M"}
+        default=None, serialization_alias="Address Line 2", max_length=40, json_schema_extra={"column":"M", "output_column": "K"}
     )
     Address_3__c: Optional[str] = Field(
-        default=None, serialization_alias="Address Line 3", max_length=40, json_schema_extra={"column":"N"}
+        default=None, serialization_alias="Address Line 3", max_length=40, json_schema_extra={"column":"N", "output_column": "L"}
     )
     City__c: constr(strip_whitespace=True, min_length=1, max_length=100) = Field(
-        ..., serialization_alias="City", json_schema_extra={"column":"O"}
+        ..., serialization_alias="City", json_schema_extra={"column":"O", "output_column": "M"}
     )
     State_Abbreviated__c: StateAbbreviation = Field(
-        ..., serialization_alias="State Abbreviated", json_schema_extra={"column":"P"}
+        ..., serialization_alias="State Abbreviated", json_schema_extra={"column":"P", "output_column": "N"}
     )
     @field_validator(
         "Name",
