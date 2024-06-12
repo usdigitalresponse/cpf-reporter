@@ -328,7 +328,7 @@ def validate_project_sheet(
         row_dict = map_values_to_headers(project_headers, project_row)
         try:
             # Note: we will need to set row number here on the project in order to display a meaningful error message.
-            row_dict["Row Number"] = current_row
+            row_dict["row_num"] = current_row
 
             projects.append(project_schema(**row_dict))
         except ValidationError as e:
@@ -393,7 +393,7 @@ def validate_projects_subrecipients(
                     message="You must submit a subrecipient record with the same UEI & TIN numbers entered for this project",
                     row=project.row_num,
                     col=f"{col_name_uei}, {col_name_tin}",
-                    tab="projects",
+                    tab="Project",
                     field_name="Subrecipient_TIN__c and Subrecipient_UEI__c",
                     severity=ErrorLevel.ERR.name,
                 )
