@@ -2,7 +2,6 @@ import { navigate, routes } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
-import { useAuth } from 'src/auth'
 import UploadForm from 'src/components/Upload/UploadForm'
 
 const CREATE_UPLOAD_MUTATION = gql`
@@ -33,8 +32,6 @@ const NewUpload = () => {
       toast.error(error.message)
     },
   })
-  const { currentUser } = useAuth()
-
   return (
     <div className="rw-segment">
       <header className="rw-segment-header">
@@ -42,8 +39,6 @@ const NewUpload = () => {
       </header>
       <div className="rw-segment-main">
         <UploadForm
-          userId={currentUser.id}
-          organizationId={currentUser.agency.organizationId}
           loading={loading}
           error={error}
         />

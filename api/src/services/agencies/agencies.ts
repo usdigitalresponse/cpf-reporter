@@ -35,6 +35,35 @@ export const deleteAgency: MutationResolvers['deleteAgency'] = ({ id }) => {
   })
 }
 
+export const getAgenciesByUserRole = async (organizationId) => { 
+  try {
+    const agencies = []
+    const user = await db.user.findFirst({
+      where: { id: context.currentUser.id },
+    })
+
+    if (!user) {
+      logger.error(`User not found`)
+      return
+    }
+
+    // for staff users, return only their own agency
+    if (user.role === 'ORGANIZATION_STAFF') {
+      const agency = await db.agency.findFirst({
+        where: { id: user.agencyId },
+      })
+      agencies.push(agency)
+      return agencies
+    } else {
+      const allAgenciesUnderOrganization = agenciesByOrganization(organizationId)
+      return allAgenciesUnderOrganization
+    }
+
+  } catch (error) {
+    logger.error(error, `Error getting agencies by user role`)
+  }
+}
+
 export const getOrCreateAgencies = async (orgName, agencyData) => {
   // This function is used to create initial expenditure categories
   // It is intended to only be called via the `onboardOrganization` script
