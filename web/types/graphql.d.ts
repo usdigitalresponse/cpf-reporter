@@ -95,12 +95,8 @@ export type CreateReportingPeriodInput = {
 };
 
 export type CreateSubrecipientInput = {
-  certifiedAt?: InputMaybe<Scalars['DateTime']>;
-  certifiedById?: InputMaybe<Scalars['Int']>;
-  endDate: Scalars['DateTime'];
   name: Scalars['String'];
   organizationId: Scalars['Int'];
-  startDate: Scalars['DateTime'];
 };
 
 export type CreateSubrecipientUploadInput = {
@@ -628,18 +624,19 @@ export type RoleEnum =
 
 export type Subrecipient = {
   __typename?: 'Subrecipient';
-  certifiedAt?: Maybe<Scalars['DateTime']>;
-  certifiedBy?: Maybe<User>;
-  certifiedById?: Maybe<Scalars['Int']>;
   createdAt: Scalars['DateTime'];
-  endDate: Scalars['DateTime'];
   id: Scalars['Int'];
   name: Scalars['String'];
   organization: Organization;
   organizationId: Scalars['Int'];
-  startDate: Scalars['DateTime'];
+  status?: Maybe<SubrecipientStatus>;
+  subrecipientUploads?: Maybe<Array<Maybe<SubrecipientUpload>>>;
   updatedAt: Scalars['DateTime'];
 };
+
+export type SubrecipientStatus =
+  | 'ACTIVE'
+  | 'ARCHIVED';
 
 export type SubrecipientUpload = {
   __typename?: 'SubrecipientUpload';
@@ -703,12 +700,8 @@ export type UpdateReportingPeriodInput = {
 };
 
 export type UpdateSubrecipientInput = {
-  certifiedAt?: InputMaybe<Scalars['DateTime']>;
-  certifiedById?: InputMaybe<Scalars['Int']>;
-  endDate?: InputMaybe<Scalars['DateTime']>;
   name?: InputMaybe<Scalars['String']>;
   organizationId?: InputMaybe<Scalars['Int']>;
-  startDate?: InputMaybe<Scalars['DateTime']>;
 };
 
 export type UpdateSubrecipientUploadInput = {

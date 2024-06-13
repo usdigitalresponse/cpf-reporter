@@ -23,19 +23,11 @@ export const schema = gql`
   input CreateSubrecipientInput {
     name: String!
     organizationId: Int!
-    startDate: DateTime!
-    endDate: DateTime!
-    certifiedAt: DateTime
-    certifiedById: Int
   }
 
   input UpdateSubrecipientInput {
     name: String
     organizationId: Int
-    startDate: DateTime
-    endDate: DateTime
-    certifiedAt: DateTime
-    certifiedById: Int
   }
 
   type Mutation {
