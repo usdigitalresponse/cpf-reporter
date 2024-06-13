@@ -7,7 +7,7 @@ export const schema = gql`
     createdAt: DateTime!
     updatedAt: DateTime!
     status: SubrecipientStatus
-    subrecipientUploads: SubrecipientUpload[]
+    subrecipientUploads: [SubrecipientUpload]
   }
 
   enum SubrecipientStatus {
