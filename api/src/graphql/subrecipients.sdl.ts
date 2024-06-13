@@ -4,13 +4,15 @@ export const schema = gql`
     name: String!
     organizationId: Int!
     organization: Organization!
-    startDate: DateTime!
-    endDate: DateTime!
-    certifiedAt: DateTime
-    certifiedById: Int
-    certifiedBy: User
     createdAt: DateTime!
     updatedAt: DateTime!
+    status: SubrecipientStatus
+    subrecipientUploads: SubrecipientUpload[]
+  }
+
+  enum SubrecipientStatus {
+    ACTIVE
+    ARCHIVED
   }
 
   type Query {

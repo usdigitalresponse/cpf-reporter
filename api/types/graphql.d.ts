@@ -10,6 +10,7 @@ import {
   Upload as PrismaUpload,
   UploadValidation as PrismaUploadValidation,
   Subrecipient as PrismaSubrecipient,
+  SubrecipientUpload as PrismaSubrecipientUpload,
   Project as PrismaProject,
   ValidationRules as PrismaValidationRules,
 } from '@prisma/client'
@@ -158,6 +159,13 @@ export type CreateSubrecipientInput = {
   startDate: Scalars['DateTime']
 }
 
+export type CreateSubrecipientUploadInput = {
+  rawSubrecipient: Scalars['JSON']
+  subrecipientId: Scalars['Int']
+  ueiTinCombo: Scalars['String']
+  version: Version
+}
+
 export type CreateUploadInput = {
   agencyId: Scalars['Int']
   filename: Scalars['String']
@@ -216,6 +224,7 @@ export type Mutation = {
   createProject: Project
   createReportingPeriod: ReportingPeriod
   createSubrecipient: Subrecipient
+  createSubrecipientUpload: SubrecipientUpload
   createUpload: Upload
   createUploadValidation: UploadValidation
   createUser: User
@@ -228,6 +237,7 @@ export type Mutation = {
   deleteProject: Project
   deleteReportingPeriod: ReportingPeriod
   deleteSubrecipient: Subrecipient
+  deleteSubrecipientUpload: SubrecipientUpload
   deleteUpload: Upload
   deleteUploadValidation: UploadValidation
   deleteUser: User
@@ -241,6 +251,7 @@ export type Mutation = {
   updateProject: Project
   updateReportingPeriod: ReportingPeriod
   updateSubrecipient: Subrecipient
+  updateSubrecipientUpload: SubrecipientUpload
   updateUpload: Upload
   updateUploadValidation: UploadValidation
   updateUser: User
@@ -281,6 +292,10 @@ export type MutationcreateReportingPeriodArgs = {
 
 export type MutationcreateSubrecipientArgs = {
   input: CreateSubrecipientInput
+}
+
+export type MutationcreateSubrecipientUploadArgs = {
+  input: CreateSubrecipientUploadInput
 }
 
 export type MutationcreateUploadArgs = {
@@ -328,6 +343,10 @@ export type MutationdeleteReportingPeriodArgs = {
 }
 
 export type MutationdeleteSubrecipientArgs = {
+  id: Scalars['Int']
+}
+
+export type MutationdeleteSubrecipientUploadArgs = {
   id: Scalars['Int']
 }
 
@@ -389,6 +408,11 @@ export type MutationupdateReportingPeriodArgs = {
 export type MutationupdateSubrecipientArgs = {
   id: Scalars['Int']
   input: UpdateSubrecipientInput
+}
+
+export type MutationupdateSubrecipientUploadArgs = {
+  id: Scalars['Int']
+  input: UpdateSubrecipientUploadInput
 }
 
 export type MutationupdateUploadArgs = {
@@ -473,6 +497,8 @@ export type Query = {
   reportingPeriod?: Maybe<ReportingPeriod>
   reportingPeriods: Array<ReportingPeriod>
   subrecipient?: Maybe<Subrecipient>
+  subrecipientUpload?: Maybe<SubrecipientUpload>
+  subrecipientUploads: Array<SubrecipientUpload>
   subrecipients: Array<Subrecipient>
   upload?: Maybe<Upload>
   uploadValidation?: Maybe<UploadValidation>
@@ -527,6 +553,11 @@ export type QueryreportingPeriodArgs = {
 
 /** About the Redwood queries. */
 export type QuerysubrecipientArgs = {
+  id: Scalars['Int']
+}
+
+/** About the Redwood queries. */
+export type QuerysubrecipientUploadArgs = {
   id: Scalars['Int']
 }
 
@@ -586,8 +617,8 @@ export type ReportingPeriod = {
   startDate: Scalars['DateTime']
   updatedAt: Scalars['DateTime']
   uploads: Array<Maybe<Upload>>
-  validationRulesId: Maybe<Scalars['Int']>
-  validationRules: Maybe<ValidationRules>
+  validationRules?: Maybe<ValidationRules>
+  validationRulesId?: Maybe<Scalars['Int']>
 }
 
 export type RoleEnum =
@@ -597,17 +628,26 @@ export type RoleEnum =
 
 export type Subrecipient = {
   __typename?: 'Subrecipient'
-  certifiedAt?: Maybe<Scalars['DateTime']>
-  certifiedBy?: Maybe<User>
-  certifiedById?: Maybe<Scalars['Int']>
   createdAt: Scalars['DateTime']
-  endDate: Scalars['DateTime']
   id: Scalars['Int']
   name: Scalars['String']
   organization: Organization
   organizationId: Scalars['Int']
-  startDate: Scalars['DateTime']
   updatedAt: Scalars['DateTime']
+  status: SubrecipientStatus
+  subrecipientUploads: Array<Maybe<SubrecipientUpload>>
+}
+
+export type SubrecipientUpload = {
+  __typename?: 'SubrecipientUpload'
+  createdAt: Scalars['DateTime']
+  id: Scalars['Int']
+  rawSubrecipient: Scalars['JSON']
+  subrecipient: Subrecipient
+  subrecipientId: Scalars['Int']
+  ueiTinCombo: Scalars['String']
+  updatedAt: Scalars['DateTime']
+  version: Version
 }
 
 export type UpdateAgencyInput = {
@@ -668,6 +708,13 @@ export type UpdateSubrecipientInput = {
   startDate?: InputMaybe<Scalars['DateTime']>
 }
 
+export type UpdateSubrecipientUploadInput = {
+  rawSubrecipient?: InputMaybe<Scalars['JSON']>
+  subrecipientId?: InputMaybe<Scalars['Int']>
+  ueiTinCombo?: InputMaybe<Scalars['String']>
+  version?: InputMaybe<Version>
+}
+
 export type UpdateUploadInput = {
   agencyId?: InputMaybe<Scalars['Int']>
   expenditureCategoryId?: InputMaybe<Scalars['Int']>
@@ -725,8 +772,8 @@ export type UploadValidation = {
   updatedAt: Scalars['DateTime']
   upload: Upload
   uploadId: Scalars['Int']
-  validationRulesId: Maybe<Scalars['Int']>
-  validationRules: Maybe<ValidationRules>
+  validationRules?: Maybe<ValidationRules>
+  validationRulesId?: Maybe<Scalars['Int']>
 }
 
 export type User = {
@@ -746,12 +793,19 @@ export type ValidationRules = {
   __typename?: 'ValidationRules'
   createdAt: Scalars['DateTime']
   id: Scalars['Int']
+  reportingPeriods: Array<Maybe<ReportingPeriod>>
   updatedAt: Scalars['DateTime']
   validations: Array<Maybe<UploadValidation>>
   versionId: Version
 }
 
-export type Version = 'V2023_12_12' | 'V2024_01_07' | 'V2024_04_01'
+export type Version =
+  | 'V2023_12_12'
+  | 'V2024_01_07'
+  | 'V2024_04_01'
+  | 'V2024_05_24'
+
+export type SubrecipientStatus = 'ACTIVE' | 'ARCHIVED'
 
 type MaybeOrArrayOfMaybe<T> = T | Maybe<T> | Maybe<T>[]
 type AllMappedModels = MaybeOrArrayOfMaybe<
@@ -763,6 +817,7 @@ type AllMappedModels = MaybeOrArrayOfMaybe<
   | Project
   | ReportingPeriod
   | Subrecipient
+  | SubrecipientUpload
   | Upload
   | UploadValidation
   | User
@@ -895,6 +950,7 @@ export type ResolversTypes = {
   CreateProjectInput: CreateProjectInput
   CreateReportingPeriodInput: CreateReportingPeriodInput
   CreateSubrecipientInput: CreateSubrecipientInput
+  CreateSubrecipientUploadInput: CreateSubrecipientUploadInput
   CreateUploadInput: CreateUploadInput
   CreateUploadValidationInput: CreateUploadValidationInput
   CreateUserInput: CreateUserInput
@@ -958,6 +1014,14 @@ export type ResolversTypes = {
       AllMappedModels
     >
   >
+  SubrecipientStatus: SubrecipientStatus
+  SubrecipientUpload: ResolverTypeWrapper<
+    MergePrismaWithSdlTypes<
+      PrismaSubrecipientUpload,
+      MakeRelationsOptional<SubrecipientUpload, AllMappedModels>,
+      AllMappedModels
+    >
+  >
   Time: ResolverTypeWrapper<Scalars['Time']>
   UpdateAgencyInput: UpdateAgencyInput
   UpdateExpenditureCategoryInput: UpdateExpenditureCategoryInput
@@ -967,6 +1031,7 @@ export type ResolversTypes = {
   UpdateProjectInput: UpdateProjectInput
   UpdateReportingPeriodInput: UpdateReportingPeriodInput
   UpdateSubrecipientInput: UpdateSubrecipientInput
+  UpdateSubrecipientUploadInput: UpdateSubrecipientUploadInput
   UpdateUploadInput: UpdateUploadInput
   UpdateUploadValidationInput: UpdateUploadValidationInput
   UpdateUserInput: UpdateUserInput
@@ -1029,6 +1094,7 @@ export type ResolversParentTypes = {
   CreateProjectInput: CreateProjectInput
   CreateReportingPeriodInput: CreateReportingPeriodInput
   CreateSubrecipientInput: CreateSubrecipientInput
+  CreateSubrecipientUploadInput: CreateSubrecipientUploadInput
   CreateUploadInput: CreateUploadInput
   CreateUploadValidationInput: CreateUploadValidationInput
   CreateUserInput: CreateUserInput
@@ -1077,6 +1143,11 @@ export type ResolversParentTypes = {
     MakeRelationsOptional<Subrecipient, AllMappedModels>,
     AllMappedModels
   >
+  SubrecipientUpload: MergePrismaWithSdlTypes<
+    PrismaSubrecipientUpload,
+    MakeRelationsOptional<SubrecipientUpload, AllMappedModels>,
+    AllMappedModels
+  >
   Time: Scalars['Time']
   UpdateAgencyInput: UpdateAgencyInput
   UpdateExpenditureCategoryInput: UpdateExpenditureCategoryInput
@@ -1086,6 +1157,7 @@ export type ResolversParentTypes = {
   UpdateProjectInput: UpdateProjectInput
   UpdateReportingPeriodInput: UpdateReportingPeriodInput
   UpdateSubrecipientInput: UpdateSubrecipientInput
+  UpdateSubrecipientUploadInput: UpdateSubrecipientUploadInput
   UpdateUploadInput: UpdateUploadInput
   UpdateUploadValidationInput: UpdateUploadValidationInput
   UpdateUserInput: UpdateUserInput
@@ -1116,32 +1188,12 @@ export type requireAuthDirectiveArgs = {
   roles?: Maybe<Array<Maybe<Scalars['String']>>>
 }
 
-export interface ByteScalarConfig
-  extends GraphQLScalarTypeConfig<ResolversTypes['Byte'], any> {
-  name: 'Byte'
-}
-
-export type CreateOrgAgencyAdminPayloadResolvers<
+export type requireAuthDirectiveResolver<
+  Result,
+  Parent,
   ContextType = RedwoodGraphQLContext,
-  ParentType extends ResolversParentTypes['CreateOrgAgencyAdminPayload'] = ResolversParentTypes['CreateOrgAgencyAdminPayload']
-> = {
-  agency: OptArgsResolverFn<
-    Maybe<ResolversTypes['Agency']>,
-    ParentType,
-    ContextType
-  >
-  organization: OptArgsResolverFn<
-    Maybe<ResolversTypes['Organization']>,
-    ParentType,
-    ContextType
-  >
-  user: OptArgsResolverFn<
-    Maybe<ResolversTypes['User']>,
-    ParentType,
-    ContextType
-  >
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
-}
+  Args = requireAuthDirectiveArgs
+> = DirectiveResolverFn<Result, Parent, ContextType, Args>
 
 export type skipAuthDirectiveArgs = {}
 
@@ -1195,6 +1247,11 @@ export type AgencyRelationResolvers<
 export interface BigIntScalarConfig
   extends GraphQLScalarTypeConfig<ResolversTypes['BigInt'], any> {
   name: 'BigInt'
+}
+
+export interface ByteScalarConfig
+  extends GraphQLScalarTypeConfig<ResolversTypes['Byte'], any> {
+  name: 'Byte'
 }
 
 export type CreateOrgAgencyAdminPayloadResolvers<
@@ -1443,6 +1500,12 @@ export type MutationResolvers<
     ContextType,
     RequireFields<MutationcreateSubrecipientArgs, 'input'>
   >
+  createSubrecipientUpload: Resolver<
+    ResolversTypes['SubrecipientUpload'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationcreateSubrecipientUploadArgs, 'input'>
+  >
   createUpload: Resolver<
     ResolversTypes['Upload'],
     ParentType,
@@ -1514,6 +1577,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationdeleteSubrecipientArgs, 'id'>
+  >
+  deleteSubrecipientUpload: Resolver<
+    ResolversTypes['SubrecipientUpload'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationdeleteSubrecipientUploadArgs, 'id'>
   >
   deleteUpload: Resolver<
     ResolversTypes['Upload'],
@@ -1592,6 +1661,12 @@ export type MutationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationupdateSubrecipientArgs, 'id' | 'input'>
+  >
+  updateSubrecipientUpload: Resolver<
+    ResolversTypes['SubrecipientUpload'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationupdateSubrecipientUploadArgs, 'id' | 'input'>
   >
   updateUpload: Resolver<
     ResolversTypes['Upload'],
@@ -1677,6 +1752,12 @@ export type MutationRelationResolvers<
     ContextType,
     RequireFields<MutationcreateSubrecipientArgs, 'input'>
   >
+  createSubrecipientUpload?: RequiredResolverFn<
+    ResolversTypes['SubrecipientUpload'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationcreateSubrecipientUploadArgs, 'input'>
+  >
   createUpload?: RequiredResolverFn<
     ResolversTypes['Upload'],
     ParentType,
@@ -1748,6 +1829,12 @@ export type MutationRelationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationdeleteSubrecipientArgs, 'id'>
+  >
+  deleteSubrecipientUpload?: RequiredResolverFn<
+    ResolversTypes['SubrecipientUpload'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationdeleteSubrecipientUploadArgs, 'id'>
   >
   deleteUpload?: RequiredResolverFn<
     ResolversTypes['Upload'],
@@ -1826,6 +1913,12 @@ export type MutationRelationResolvers<
     ParentType,
     ContextType,
     RequireFields<MutationupdateSubrecipientArgs, 'id' | 'input'>
+  >
+  updateSubrecipientUpload?: RequiredResolverFn<
+    ResolversTypes['SubrecipientUpload'],
+    ParentType,
+    ContextType,
+    RequireFields<MutationupdateSubrecipientUploadArgs, 'id' | 'input'>
   >
   updateUpload?: RequiredResolverFn<
     ResolversTypes['Upload'],
@@ -2199,6 +2292,17 @@ export type QueryResolvers<
     ContextType,
     RequireFields<QuerysubrecipientArgs, 'id'>
   >
+  subrecipientUpload: Resolver<
+    Maybe<ResolversTypes['SubrecipientUpload']>,
+    ParentType,
+    ContextType,
+    RequireFields<QuerysubrecipientUploadArgs, 'id'>
+  >
+  subrecipientUploads: OptArgsResolverFn<
+    Array<ResolversTypes['SubrecipientUpload']>,
+    ParentType,
+    ContextType
+  >
   subrecipients: OptArgsResolverFn<
     Array<ResolversTypes['Subrecipient']>,
     ParentType,
@@ -2353,6 +2457,17 @@ export type QueryRelationResolvers<
     ParentType,
     ContextType,
     RequireFields<QuerysubrecipientArgs, 'id'>
+  >
+  subrecipientUpload?: RequiredResolverFn<
+    Maybe<ResolversTypes['SubrecipientUpload']>,
+    ParentType,
+    ContextType,
+    RequireFields<QuerysubrecipientUploadArgs, 'id'>
+  >
+  subrecipientUploads?: RequiredResolverFn<
+    Array<ResolversTypes['SubrecipientUpload']>,
+    ParentType,
+    ContextType
   >
   subrecipients?: RequiredResolverFn<
     Array<ResolversTypes['Subrecipient']>,
@@ -2522,15 +2637,15 @@ export type ReportingPeriodResolvers<
     ContextType
   >
   validationRules: OptArgsResolverFn<
-  Maybe<ResolversTypes['ValidationRules']>,
-  ParentType,
-  ContextType
->
-validationRulesId: OptArgsResolverFn<
-  Maybe<ResolversTypes['Int']>,
-  ParentType,
-  ContextType
->
+    Maybe<ResolversTypes['ValidationRules']>,
+    ParentType,
+    ContextType
+  >
+  validationRulesId: OptArgsResolverFn<
+    Maybe<ResolversTypes['Int']>,
+    ParentType,
+    ContextType
+  >
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
 }
 
@@ -2617,27 +2732,7 @@ export type SubrecipientResolvers<
   ContextType = RedwoodGraphQLContext,
   ParentType extends ResolversParentTypes['Subrecipient'] = ResolversParentTypes['Subrecipient']
 > = {
-  certifiedAt: OptArgsResolverFn<
-    Maybe<ResolversTypes['DateTime']>,
-    ParentType,
-    ContextType
-  >
-  certifiedBy: OptArgsResolverFn<
-    Maybe<ResolversTypes['User']>,
-    ParentType,
-    ContextType
-  >
-  certifiedById: OptArgsResolverFn<
-    Maybe<ResolversTypes['Int']>,
-    ParentType,
-    ContextType
-  >
   createdAt: OptArgsResolverFn<
-    ResolversTypes['DateTime'],
-    ParentType,
-    ContextType
-  >
-  endDate: OptArgsResolverFn<
     ResolversTypes['DateTime'],
     ParentType,
     ContextType
@@ -2654,13 +2749,18 @@ export type SubrecipientResolvers<
     ParentType,
     ContextType
   >
-  startDate: OptArgsResolverFn<
+  updatedAt: OptArgsResolverFn<
     ResolversTypes['DateTime'],
     ParentType,
     ContextType
   >
-  updatedAt: OptArgsResolverFn<
-    ResolversTypes['DateTime'],
+  status: OptArgsResolverFn<
+    ResolversTypes['SubrecipientStatus'],
+    ParentType,
+    ContextType
+  >
+  subrecipientUploads: RequiredResolverFn<
+    Array<Maybe<ResolversTypes['SubrecipientUpload']>>,
     ParentType,
     ContextType
   >
@@ -2671,27 +2771,7 @@ export type SubrecipientRelationResolvers<
   ContextType = RedwoodGraphQLContext,
   ParentType extends ResolversParentTypes['Subrecipient'] = ResolversParentTypes['Subrecipient']
 > = {
-  certifiedAt?: RequiredResolverFn<
-    Maybe<ResolversTypes['DateTime']>,
-    ParentType,
-    ContextType
-  >
-  certifiedBy?: RequiredResolverFn<
-    Maybe<ResolversTypes['User']>,
-    ParentType,
-    ContextType
-  >
-  certifiedById?: RequiredResolverFn<
-    Maybe<ResolversTypes['Int']>,
-    ParentType,
-    ContextType
-  >
   createdAt?: RequiredResolverFn<
-    ResolversTypes['DateTime'],
-    ParentType,
-    ContextType
-  >
-  endDate?: RequiredResolverFn<
     ResolversTypes['DateTime'],
     ParentType,
     ContextType
@@ -2708,13 +2788,100 @@ export type SubrecipientRelationResolvers<
     ParentType,
     ContextType
   >
-  startDate?: RequiredResolverFn<
+  updatedAt?: RequiredResolverFn<
     ResolversTypes['DateTime'],
+    ParentType,
+    ContextType
+  >
+  status: RequiredResolverFn<
+    ResolversTypes['SubrecipientStatus'],
+    ParentType,
+    ContextType
+  >
+  subrecipientUploads?: RequiredResolverFn<
+    Array<Maybe<ResolversTypes['SubrecipientUpload']>>,
+    ParentType,
+    ContextType
+  >
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type SubrecipientUploadResolvers<
+  ContextType = RedwoodGraphQLContext,
+  ParentType extends ResolversParentTypes['SubrecipientUpload'] = ResolversParentTypes['SubrecipientUpload']
+> = {
+  createdAt: OptArgsResolverFn<
+    ResolversTypes['DateTime'],
+    ParentType,
+    ContextType
+  >
+  id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>
+  rawSubrecipient: OptArgsResolverFn<
+    ResolversTypes['JSON'],
+    ParentType,
+    ContextType
+  >
+  subrecipient: OptArgsResolverFn<
+    ResolversTypes['Subrecipient'],
+    ParentType,
+    ContextType
+  >
+  subrecipientId: OptArgsResolverFn<
+    ResolversTypes['Int'],
+    ParentType,
+    ContextType
+  >
+  ueiTinCombo: OptArgsResolverFn<
+    ResolversTypes['String'],
+    ParentType,
+    ContextType
+  >
+  updatedAt: OptArgsResolverFn<
+    ResolversTypes['DateTime'],
+    ParentType,
+    ContextType
+  >
+  version: OptArgsResolverFn<ResolversTypes['Version'], ParentType, ContextType>
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>
+}
+
+export type SubrecipientUploadRelationResolvers<
+  ContextType = RedwoodGraphQLContext,
+  ParentType extends ResolversParentTypes['SubrecipientUpload'] = ResolversParentTypes['SubrecipientUpload']
+> = {
+  createdAt?: RequiredResolverFn<
+    ResolversTypes['DateTime'],
+    ParentType,
+    ContextType
+  >
+  id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>
+  rawSubrecipient?: RequiredResolverFn<
+    ResolversTypes['JSON'],
+    ParentType,
+    ContextType
+  >
+  subrecipient?: RequiredResolverFn<
+    ResolversTypes['Subrecipient'],
+    ParentType,
+    ContextType
+  >
+  subrecipientId?: RequiredResolverFn<
+    ResolversTypes['Int'],
+    ParentType,
+    ContextType
+  >
+  ueiTinCombo?: RequiredResolverFn<
+    ResolversTypes['String'],
     ParentType,
     ContextType
   >
   updatedAt?: RequiredResolverFn<
     ResolversTypes['DateTime'],
+    ParentType,
+    ContextType
+  >
+  version?: RequiredResolverFn<
+    ResolversTypes['Version'],
     ParentType,
     ContextType
   >
@@ -3020,6 +3187,11 @@ export type ValidationRulesResolvers<
     ContextType
   >
   id: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>
+  reportingPeriods: OptArgsResolverFn<
+    Array<Maybe<ResolversTypes['ReportingPeriod']>>,
+    ParentType,
+    ContextType
+  >
   updatedAt: OptArgsResolverFn<
     ResolversTypes['DateTime'],
     ParentType,
@@ -3027,11 +3199,6 @@ export type ValidationRulesResolvers<
   >
   validations: OptArgsResolverFn<
     Array<Maybe<ResolversTypes['UploadValidation']>>,
-    ParentType,
-    ContextType
-  >
-  reportingPeriods: OptArgsResolverFn<
-    Array<Maybe<ResolversTypes['ReportingPeriod']>>,
     ParentType,
     ContextType
   >
@@ -3053,6 +3220,11 @@ export type ValidationRulesRelationResolvers<
     ContextType
   >
   id?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>
+  reportingPeriods?: RequiredResolverFn<
+    Array<Maybe<ResolversTypes['ReportingPeriod']>>,
+    ParentType,
+    ContextType
+  >
   updatedAt?: RequiredResolverFn<
     ResolversTypes['DateTime'],
     ParentType,
@@ -3063,11 +3235,6 @@ export type ValidationRulesRelationResolvers<
     ParentType,
     ContextType
   >
-  reportingPeriods?: RequiredResolverFn<
-    Array<Maybe<ResolversTypes['ReportingPeriod']>>,
-    ParentType,
-    ContextType
-  > 
   versionId?: RequiredResolverFn<
     ResolversTypes['Version'],
     ParentType,
@@ -3095,6 +3262,7 @@ export type Resolvers<ContextType = RedwoodGraphQLContext> = {
   Redwood: RedwoodResolvers<ContextType>
   ReportingPeriod: ReportingPeriodResolvers<ContextType>
   Subrecipient: SubrecipientResolvers<ContextType>
+  SubrecipientUpload: SubrecipientUploadResolvers<ContextType>
   Time: GraphQLScalarType
   Upload: UploadResolvers<ContextType>
   UploadValidation: UploadValidationResolvers<ContextType>
