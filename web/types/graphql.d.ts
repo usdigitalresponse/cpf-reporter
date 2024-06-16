@@ -95,12 +95,15 @@ export type CreateReportingPeriodInput = {
 };
 
 export type CreateSubrecipientInput = {
-  certifiedAt?: InputMaybe<Scalars['DateTime']>;
-  certifiedById?: InputMaybe<Scalars['Int']>;
-  endDate: Scalars['DateTime'];
   name: Scalars['String'];
   organizationId: Scalars['Int'];
-  startDate: Scalars['DateTime'];
+};
+
+export type CreateSubrecipientUploadInput = {
+  rawSubrecipient: Scalars['JSON'];
+  subrecipientId: Scalars['Int'];
+  ueiTinCombo: Scalars['String'];
+  version: Version;
 };
 
 export type CreateUploadInput = {
@@ -161,6 +164,7 @@ export type Mutation = {
   createProject: Project;
   createReportingPeriod: ReportingPeriod;
   createSubrecipient: Subrecipient;
+  createSubrecipientUpload: SubrecipientUpload;
   createUpload: Upload;
   createUploadValidation: UploadValidation;
   createUser: User;
@@ -173,6 +177,7 @@ export type Mutation = {
   deleteProject: Project;
   deleteReportingPeriod: ReportingPeriod;
   deleteSubrecipient: Subrecipient;
+  deleteSubrecipientUpload: SubrecipientUpload;
   deleteUpload: Upload;
   deleteUploadValidation: UploadValidation;
   deleteUser: User;
@@ -186,6 +191,7 @@ export type Mutation = {
   updateProject: Project;
   updateReportingPeriod: ReportingPeriod;
   updateSubrecipient: Subrecipient;
+  updateSubrecipientUpload: SubrecipientUpload;
   updateUpload: Upload;
   updateUploadValidation: UploadValidation;
   updateUser: User;
@@ -235,6 +241,11 @@ export type MutationcreateReportingPeriodArgs = {
 
 export type MutationcreateSubrecipientArgs = {
   input: CreateSubrecipientInput;
+};
+
+
+export type MutationcreateSubrecipientUploadArgs = {
+  input: CreateSubrecipientUploadInput;
 };
 
 
@@ -294,6 +305,11 @@ export type MutationdeleteReportingPeriodArgs = {
 
 
 export type MutationdeleteSubrecipientArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type MutationdeleteSubrecipientUploadArgs = {
   id: Scalars['Int'];
 };
 
@@ -368,6 +384,12 @@ export type MutationupdateReportingPeriodArgs = {
 export type MutationupdateSubrecipientArgs = {
   id: Scalars['Int'];
   input: UpdateSubrecipientInput;
+};
+
+
+export type MutationupdateSubrecipientUploadArgs = {
+  id: Scalars['Int'];
+  input: UpdateSubrecipientUploadInput;
 };
 
 
@@ -457,6 +479,8 @@ export type Query = {
   reportingPeriod?: Maybe<ReportingPeriod>;
   reportingPeriods: Array<ReportingPeriod>;
   subrecipient?: Maybe<Subrecipient>;
+  subrecipientUpload?: Maybe<SubrecipientUpload>;
+  subrecipientUploads: Array<SubrecipientUpload>;
   subrecipients: Array<Subrecipient>;
   upload?: Maybe<Upload>;
   uploadValidation?: Maybe<UploadValidation>;
@@ -520,6 +544,12 @@ export type QueryreportingPeriodArgs = {
 
 /** About the Redwood queries. */
 export type QuerysubrecipientArgs = {
+  id: Scalars['Int'];
+};
+
+
+/** About the Redwood queries. */
+export type QuerysubrecipientUploadArgs = {
   id: Scalars['Int'];
 };
 
@@ -595,17 +625,30 @@ export type RoleEnum =
 
 export type Subrecipient = {
   __typename?: 'Subrecipient';
-  certifiedAt?: Maybe<Scalars['DateTime']>;
-  certifiedBy?: Maybe<User>;
-  certifiedById?: Maybe<Scalars['Int']>;
   createdAt: Scalars['DateTime'];
-  endDate: Scalars['DateTime'];
   id: Scalars['Int'];
   name: Scalars['String'];
   organization: Organization;
   organizationId: Scalars['Int'];
-  startDate: Scalars['DateTime'];
+  status?: Maybe<SubrecipientStatus>;
+  subrecipientUploads?: Maybe<Array<Maybe<SubrecipientUpload>>>;
   updatedAt: Scalars['DateTime'];
+};
+
+export type SubrecipientStatus =
+  | 'ACTIVE'
+  | 'ARCHIVED';
+
+export type SubrecipientUpload = {
+  __typename?: 'SubrecipientUpload';
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Int'];
+  rawSubrecipient: Scalars['JSON'];
+  subrecipient: Subrecipient;
+  subrecipientId: Scalars['Int'];
+  ueiTinCombo: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+  version: Version;
 };
 
 export type UpdateAgencyInput = {
@@ -658,12 +701,15 @@ export type UpdateReportingPeriodInput = {
 };
 
 export type UpdateSubrecipientInput = {
-  certifiedAt?: InputMaybe<Scalars['DateTime']>;
-  certifiedById?: InputMaybe<Scalars['Int']>;
-  endDate?: InputMaybe<Scalars['DateTime']>;
   name?: InputMaybe<Scalars['String']>;
   organizationId?: InputMaybe<Scalars['Int']>;
-  startDate?: InputMaybe<Scalars['DateTime']>;
+};
+
+export type UpdateSubrecipientUploadInput = {
+  rawSubrecipient?: InputMaybe<Scalars['JSON']>;
+  subrecipientId?: InputMaybe<Scalars['Int']>;
+  ueiTinCombo?: InputMaybe<Scalars['String']>;
+  version?: InputMaybe<Version>;
 };
 
 export type UpdateUploadInput = {
@@ -753,7 +799,8 @@ export type ValidationRules = {
 export type Version =
   | 'V2023_12_12'
   | 'V2024_01_07'
-  | 'V2024_04_01';
+  | 'V2024_04_01'
+  | 'V2024_05_24';
 
 export type FindAgenciesByOrganizationIdVariables = Exact<{
   organizationId: Scalars['Int'];

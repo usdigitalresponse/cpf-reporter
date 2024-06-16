@@ -7,8 +7,6 @@ export const standard = defineScenario<Prisma.SubrecipientCreateArgs>({
     one: {
       data: {
         name: 'String',
-        startDate: '2023-12-09T14:50:18.317Z',
-        endDate: '2023-12-09T14:50:18.317Z',
         updatedAt: '2023-12-09T14:50:18.317Z',
         organization: { create: { name: 'String' } },
       },
@@ -16,8 +14,6 @@ export const standard = defineScenario<Prisma.SubrecipientCreateArgs>({
     two: {
       data: {
         name: 'String',
-        startDate: '2023-12-09T14:50:18.317Z',
-        endDate: '2023-12-09T14:50:18.317Z',
         updatedAt: '2023-12-09T14:50:18.317Z',
         organization: { create: { name: 'String' } },
       },

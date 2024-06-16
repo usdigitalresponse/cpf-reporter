@@ -135,15 +135,32 @@ model UploadValidation {
 }
 
 model Subrecipient {
-  id                  Int          @id @default(autoincrement())
+  id                  Int                 @id @default(autoincrement())
   name String
+  status              SubrecipientStatus  @default(ACTIVE)
   organizationId      Int
-  organization        Organization @relation(fields: [organizationId], references: [id])
-  startDate           DateTime     @db.Date
-  endDate             DateTime     @db.Date
-  certifiedAt         DateTime?    @db.Timestamptz(6)
-  createdAt           DateTime     @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime     @default(now()) @db.Timestamptz(6)
+  organization        Organization        @relation(fields: [organizationId], references: [id])
+  createdAt           DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime            @default(now()) @db.Timestamptz(6)
+  subrecipientUploads SubrecipientUpload[]
+}
+
+enum SubrecipientStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model SubrecipientUpload {
+  id                  Int               @id @default(autoincrement())
+  subrecipientId      Int                 
+  subrecipient        Subrecipient      @relation(fields: [subrecipientId], references: [id])
+  ueiTinCombo         String
+  rawSubrecipient     Json
+  createdAt           DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime          @default(now()) @db.Timestamptz(6)
+  version             Version
+
+  @@index(fields: [ueiTinCombo])
 }
 
 model Project {
@@ -166,6 +183,7 @@ enum Version {
   V2023_12_12
   V2024_01_07
   V2024_04_01
+  V2024_05_24
 }
 
 model ValidationRules {
