@@ -35,7 +35,7 @@ export const deleteAgency: MutationResolvers['deleteAgency'] = ({ id }) => {
   })
 }
 
-export const agenciesAvailableForUpload = async () => { 
+export const agenciesAvailableForUpload = async () => {
   try {
     const agencies = []
     const user = await db.user.findFirst({
@@ -59,7 +59,9 @@ export const agenciesAvailableForUpload = async () => {
       agencies.push(agency)
       return agencies
     } else {
-      const allAgenciesUnderOrganization = agenciesByOrganization({ organizationId: organizationId })
+      const allAgenciesUnderOrganization = agenciesByOrganization({
+        organizationId: organizationId,
+      })
       return allAgenciesUnderOrganization
     }
   } catch (error) {

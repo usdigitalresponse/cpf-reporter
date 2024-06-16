@@ -1,6 +1,10 @@
 import { Button } from 'react-bootstrap'
 import { useForm } from 'react-hook-form'
-import type { CreateUploadMutation, CreateUploadMutationVariables, EditUploadById } from 'types/graphql'
+import type {
+  CreateUploadMutation,
+  CreateUploadMutationVariables,
+  EditUploadById,
+} from 'types/graphql'
 
 import {
   Form,
@@ -104,7 +108,12 @@ const UploadForm = ({ error, loading }: UploadFormProps) => {
       />
       <div className="col-md-8">
         <OrganizationPickListsCell />
-        <FileField name="file" validation={{ required: true }} accept=".xlsm" className='form-control mt-3' />
+        <FileField
+          name="file"
+          validation={{ required: true }}
+          accept=".xlsm"
+          className="form-control mt-3"
+        />
         <FieldError name="file" className="rw-field-error" />
       </div>
       <div className="rw-button-group pt-2">

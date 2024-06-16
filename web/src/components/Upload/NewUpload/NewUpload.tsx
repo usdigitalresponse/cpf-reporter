@@ -38,10 +38,7 @@ const NewUpload = () => {
         <h2 className="rw-heading rw-heading-secondary">Submit Workbook</h2>
       </header>
       <div className="rw-segment-main">
-        <UploadForm
-          loading={loading}
-          error={error}
-        />
+        <UploadForm loading={loading} error={error} />
       </div>
     </div>
   )
