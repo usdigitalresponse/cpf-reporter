@@ -9,10 +9,9 @@ import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 
 export const beforeQuery = () => {
   const { currentUser } = useAuth()
-  console.log(currentUser)
 
   return {
-    variables: { agencyId: currentUser.agencyId, organizationId: currentUser.agency.organizationId },
+    variables: { organizationId: currentUser.agency.organizationId },
   }
 }
 export const QUERY = gql`
@@ -24,17 +23,10 @@ export const QUERY = gql`
         id
         name
       }
-      agencies {
-        id
-        name
-      }
     }
-    getAgenciesByUserRole(organizationId: $organizationId) {
+    agencies: agenciesAvailableForUpload {
       id
       name
-      abbreviation
-      code
-      organizationId
     }
   }  
 `
@@ -49,8 +41,10 @@ export const Failure = ({
   <div style={{ color: 'red' }}>Error: {error?.message}</div>
 )
 
-export const Success = ({ organization, getAgenciesByUserRole, currentUser }: CellSuccessProps) => {
-  console.log(getAgenciesByUserRole)
+export const Success = ({ organization, agencies }: CellSuccessProps) => {
+  const { currentUser } = useAuth()
+
+  console.log(agencies)
   return (
     <div>
       {/* Hard-coding the reporting period name temporarily. Will be resolved by issue #79 */}
@@ -69,7 +63,7 @@ export const Success = ({ organization, getAgenciesByUserRole, currentUser }: Ce
         Agency Code
       </Label>
       <SelectField name="agencyId" defaultValue={currentUser.agencyId} className="form-select">
-        {getAgenciesByUserRole.map((agency) => (
+        {agencies.map((agency) => (
           <option key={agency.id} value={agency.id}>
             {agency.name}
           </option>

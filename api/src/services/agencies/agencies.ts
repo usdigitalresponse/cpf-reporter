@@ -35,12 +35,16 @@ export const deleteAgency: MutationResolvers['deleteAgency'] = ({ id }) => {
   })
 }
 
-export const getAgenciesByUserRole = async (organizationId) => { 
+export const agenciesAvailableForUpload = async () => { 
   try {
     const agencies = []
     const user = await db.user.findFirst({
       where: { id: context.currentUser.id },
     })
+    const agency = await db.agency.findFirst({
+      where: { id: user.agencyId },
+    })
+    const organizationId = agency.organizationId
 
     if (!user) {
       logger.error(`User not found`)
@@ -55,10 +59,9 @@ export const getAgenciesByUserRole = async (organizationId) => {
       agencies.push(agency)
       return agencies
     } else {
-      const allAgenciesUnderOrganization = agenciesByOrganization(organizationId)
+      const allAgenciesUnderOrganization = agenciesByOrganization({ organizationId: organizationId })
       return allAgenciesUnderOrganization
     }
-
   } catch (error) {
     logger.error(error, `Error getting agencies by user role`)
   }

@@ -439,11 +439,11 @@ export type Project = {
 export type Query = {
   __typename?: 'Query';
   agencies: Array<Agency>;
+  agenciesAvailableForUpload: Array<Agency>;
   agenciesByOrganization: Array<Agency>;
   agency?: Maybe<Agency>;
   expenditureCategories: Array<ExpenditureCategory>;
   expenditureCategory?: Maybe<ExpenditureCategory>;
-  getAgenciesByUserRole: Array<Agency>;
   inputTemplate?: Maybe<InputTemplate>;
   inputTemplates: Array<InputTemplate>;
   organization?: Maybe<Organization>;
@@ -485,12 +485,6 @@ export type QueryagencyArgs = {
 /** About the Redwood queries. */
 export type QueryexpenditureCategoryArgs = {
   id: Scalars['Int'];
-};
-
-
-/** About the Redwood queries. */
-export type QuerygetAgenciesByUserRoleArgs = {
-  organizationId: Scalars['Int'];
 };
 
 
@@ -845,7 +839,7 @@ export type FindOrganizationQueryVariables = Exact<{
 }>;
 
 
-export type FindOrganizationQuery = { __typename?: 'Query', organization?: { __typename?: 'Organization', id: number, preferences?: Prisma.JsonValue | null, reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, name: string } | null>, agencies: Array<{ __typename?: 'Agency', id: number, name: string } | null> } | null, getAgenciesByUserRole: Array<{ __typename?: 'Agency', id: number, name: string, abbreviation?: string | null, code: string, organizationId: number }> };
+export type FindOrganizationQuery = { __typename?: 'Query', organization?: { __typename?: 'Organization', id: number, preferences?: Prisma.JsonValue | null, reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, name: string } | null> } | null, agencies: Array<{ __typename?: 'Agency', id: number, name: string }> };
 
 export type FindOrganizationsVariables = Exact<{ [key: string]: never; }>;
 

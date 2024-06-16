@@ -11,7 +11,7 @@ export const schema = gql`
     agencies: [Agency!]! @requireAuth
     agency(id: Int!): Agency @requireAuth
     agenciesByOrganization(organizationId: Int!): [Agency!]! @requireAuth
-    getAgenciesByUserRole(organizationId: Int!): [Agency!]! @requireAuth
+    agenciesAvailableForUpload: [Agency!]! @requireAuth
   }
 
   input CreateAgencyInput {

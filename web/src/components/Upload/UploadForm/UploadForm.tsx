@@ -1,7 +1,6 @@
 import { Button } from 'react-bootstrap'
 import { useForm } from 'react-hook-form'
-import type { EditUploadById } from 'types/graphql'
-import { useAuth } from 'src/auth'
+import type { CreateUploadMutation, CreateUploadMutationVariables, EditUploadById } from 'types/graphql'
 
 import {
   Form,
@@ -41,7 +40,6 @@ interface UploadFormProps {
 
 const UploadForm = ({ error, loading }: UploadFormProps) => {
   const formMethods = useForm()
-  const { currentUser } = useAuth()
 
   const [create] = useMutation<
     CreateUploadMutation,
@@ -105,7 +103,7 @@ const UploadForm = ({ error, loading }: UploadFormProps) => {
         listClassName="rw-form-error-list"
       />
       <div className="col-md-8">
-        <OrganizationPickListsCell currentUser={currentUser} />
+        <OrganizationPickListsCell />
         <FileField name="file" validation={{ required: true }} accept=".xlsm" className='form-control mt-3' />
         <FieldError name="file" className="rw-field-error" />
       </div>
