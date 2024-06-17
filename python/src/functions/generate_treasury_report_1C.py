@@ -1,11 +1,12 @@
 from datetime import datetime
-import json
-import tempfile
+from openpyxl import load_workbook
 from typing import IO, List, Union, Dict
 from urllib.parse import unquote_plus
-from openpyxl import load_workbook
 import csv
-
+import json
+import re
+import tempfile
+from typing import Optional
 
 import boto3
 import structlog
@@ -132,6 +133,15 @@ def populate_output_report(
 
     return row_num
 
+
+def escape_for_csv(text: Optional[str]):
+    if not text:
+        return text
+    text = text.replace("\n", " -- ")
+    text = text.replace("\r", " -- ")
+    return text
+
+
 def convert_xlsx_to_csv(csv_file: IO[bytes], file: IO[bytes], num_rows):
     """
     Convert xlsx file to csv.
@@ -143,7 +153,7 @@ def convert_xlsx_to_csv(csv_file: IO[bytes], file: IO[bytes], num_rows):
     for eachrow in sheet.rows:
         if row_num >= num_rows:
             break
-        csv_file_handle.writerow([cell.value for cell in eachrow])
+        csv_file_handle.writerow([escape_for_csv(cell.value) for cell in eachrow])
         row_num = row_num + 1
     
     return csv_file
@@ -178,18 +188,17 @@ def upload_generated_file_to_s3(client: S3Client, bucket, key: str, file: IO[byt
     logger = get_logger()
 
     logger = logger.bind(
-        upload={"s3": {"bucket": bucket, "key": key}, "size": len(data)}
+        upload={"s3": {"bucket": bucket, "key": key}}
     )
     try:
         client.put_object(
+            file,
             Bucket=bucket,
             Key=unquote_plus(key),
-            Body=file,
-            ContentEncoding=encoding,
             ServerSideEncryption="AES256",
         )
     except:
-        logger.exception("failed to upload JSON results to S3")
+        logger.exception("failed to upload treasury report to S3")
         raise
 
-    logger.info("successfully uploaded JSON results to s3")
+    logger.info("successfully uploaded treasury report results to s3")
