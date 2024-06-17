@@ -107,10 +107,14 @@ class BaseProjectRow(BaseModel):
     model_config = ConfigDict(coerce_numbers_to_str=True, loc_by_alias=False)
 
     row_num: conint(ge=1) = Field(
-        default=1, serialization_alias="Row Number", json_schema_extra={"column":"NONE"}
+        default=1,
+        serialization_alias="Row Number",
+        json_schema_extra={"column": "NONE"},
     )
-    Project_Name__c: constr(strip_whitespace=True, min_length=1, max_length=100) = Field(
-        ..., serialization_alias="Project Name", json_schema_extra={"column":"C"}
+    Project_Name__c: constr(strip_whitespace=True, min_length=1, max_length=100) = (
+        Field(
+            ..., serialization_alias="Project Name", json_schema_extra={"column": "C"}
+        )
     )
     Identification_Number__c: constr(
         strip_whitespace=True, min_length=1, max_length=20

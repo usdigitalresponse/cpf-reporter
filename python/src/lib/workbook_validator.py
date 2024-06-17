@@ -259,7 +259,9 @@ def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
     3. Ensure all project rows are validated with the schema
     """
     if project_schema:
-        project_errors, projects = validate_project_sheet(workbook[PROJECT_SHEET], project_schema, version_string)
+        project_errors, projects = validate_project_sheet(
+            workbook[PROJECT_SHEET], project_schema, version_string
+        )
         errors += project_errors
     else:
         projects = None
@@ -267,7 +269,9 @@ def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
     """
     4. Ensure all subrecipient rows are validated with the schema
     """
-    subrecipient_errors, subrecipients = validate_subrecipient_sheet(workbook[SUBRECIPIENTS_SHEET], version_string)
+    subrecipient_errors, subrecipients = validate_subrecipient_sheet(
+        workbook[SUBRECIPIENTS_SHEET], version_string
+    )
     errors += subrecipient_errors
 
     """
@@ -360,8 +364,9 @@ def validate_cover_sheet(
 
 
 def validate_project_sheet(
-        project_sheet: Worksheet, project_schema: Type[Union[Project1ARow, Project1BRow, Project1CRow]], \
-        version_string: str
+    project_sheet: Worksheet,
+    project_schema: Type[Union[Project1ARow, Project1BRow, Project1CRow]],
+    version_string: str,
 ) -> Tuple[Errors, List[Union[Project1ARow, Project1BRow, Project1CRow]]]:
     errors = []
     metadata = getSchemaMetadata(version_string)
@@ -403,13 +408,14 @@ def validate_project_sheet(
 
 
 def validate_subrecipient_sheet(
-        subrecipient_sheet: Worksheet,
-        version_string: str
+    subrecipient_sheet: Worksheet, version_string: str
 ) -> Tuple[Errors, List[SubrecipientRow]]:
     errors = []
     metadata = getSchemaMetadata(version_string)
     subrecipients = []
-    subrecipient_headers = get_headers(subrecipient_sheet, metadata["Subrecipients"]["header_range"])
+    subrecipient_headers = get_headers(
+        subrecipient_sheet, metadata["Subrecipients"]["header_range"]
+    )
     current_row = INITIAL_STARTING_ROW
     SubrecipientRowClass = getSubrecipientRowClass(version_string)
     for subrecipient_row in subrecipient_sheet.iter_rows(
@@ -429,18 +435,29 @@ def validate_subrecipient_sheet(
 
 
 def validate_projects_subrecipients(
-        projects: List[Union[Project1ARow, Project1BRow, Project1CRow]],
-        subrecipients: List[SubrecipientRow]
+    projects: List[Union[Project1ARow, Project1BRow, Project1CRow]],
+    subrecipients: List[SubrecipientRow],
 ) -> Errors:
     errors = []
     subrecipients_by_uei_tin = {}
     for subrecipient in subrecipients:
-        subrecipients_by_uei_tin[(subrecipient.EIN__c, subrecipient.Unique_Entity_Identifier__c)] = subrecipient
+        subrecipients_by_uei_tin[
+            (subrecipient.EIN__c, subrecipient.Unique_Entity_Identifier__c)
+        ] = subrecipient
 
     for project in projects:
-        if subrecipients_by_uei_tin.get((project.Subrecipient_TIN__c, project.Subrecipient_UEI__c)) is None:
-            col_name_tin = project.__class__.model_fields["Subrecipient_TIN__c"].json_schema_extra['column']
-            col_name_uei = project.__class__.model_fields["Subrecipient_UEI__c"].json_schema_extra['column']
+        if (
+            subrecipients_by_uei_tin.get(
+                (project.Subrecipient_TIN__c, project.Subrecipient_UEI__c)
+            )
+            is None
+        ):
+            col_name_tin = project.__class__.model_fields[
+                "Subrecipient_TIN__c"
+            ].json_schema_extra["column"]
+            col_name_uei = project.__class__.model_fields[
+                "Subrecipient_UEI__c"
+            ].json_schema_extra["column"]
             errors.append(
                 WorkbookError(
                     message="You must submit a subrecipient record with the same UEI & TIN numbers entered for this project",
