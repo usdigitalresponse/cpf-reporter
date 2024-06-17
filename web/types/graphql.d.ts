@@ -461,6 +461,7 @@ export type Project = {
 export type Query = {
   __typename?: 'Query';
   agencies: Array<Agency>;
+  agenciesAvailableForUpload: Array<Agency>;
   agenciesByOrganization: Array<Agency>;
   agency?: Maybe<Agency>;
   expenditureCategories: Array<ExpenditureCategory>;
@@ -881,11 +882,11 @@ export type FindOrganizationByIdVariables = Exact<{
 export type FindOrganizationById = { __typename?: 'Query', organization?: { __typename?: 'Organization', id: number, name: string } | null };
 
 export type FindOrganizationQueryVariables = Exact<{
-  id: Scalars['Int'];
+  organizationId: Scalars['Int'];
 }>;
 
 
-export type FindOrganizationQuery = { __typename?: 'Query', organization?: { __typename?: 'Organization', id: number, preferences?: Prisma.JsonValue | null, reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, name: string } | null>, agencies: Array<{ __typename?: 'Agency', id: number, name: string } | null> } | null };
+export type FindOrganizationQuery = { __typename?: 'Query', organization?: { __typename?: 'Organization', id: number, preferences?: Prisma.JsonValue | null, reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, name: string } | null> } | null, agencies: Array<{ __typename?: 'Agency', id: number, name: string }> };
 
 export type FindOrganizationsVariables = Exact<{ [key: string]: never; }>;
 
