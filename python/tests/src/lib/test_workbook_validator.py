@@ -158,17 +158,19 @@ class TestValidateCoverSheet:
 
 class TestValidateproject_sheet:
     def test_valid_project_sheet(self, valid_project_sheet: Worksheet):
-        errors = validate_project_sheet(
+        errors, projects = validate_project_sheet(
             valid_project_sheet,
-            getSchemaByProject(
-                V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP
-            ),
-            V2024_05_24_VERSION_STRING,
+            getSchemaByProject(V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP),
+            V2024_05_24_VERSION_STRING
         )
         assert errors == []
+        assert len(projects) == 1
+        assert projects[0].row_num == 13
+        assert projects[0].Subrecipient_UEI__c == "123412341234"
+        assert projects[0].Subrecipient_TIN__c == "123123123"
 
     def test_invalid_project_sheet(self, invalid_project_sheet: Worksheet):
-        errors = validate_project_sheet(
+        errors, _ = validate_project_sheet(
             invalid_project_sheet,
             getSchemaByProject(
                 V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP
@@ -185,10 +187,8 @@ class TestValidateproject_sheet:
         )
         assert error.severity == ErrorLevel.ERR.name
 
-    def test_invalid_project_sheet_missing_field(
-        self, invalid_project_sheet_missing_field: Worksheet
-    ):
-        errors = validate_project_sheet(
+    def test_invalid_project_sheet_missing_field(self, invalid_project_sheet_missing_field: Worksheet):
+        errors, _ = validate_project_sheet(
             invalid_project_sheet_missing_field,
             getSchemaByProject(
                 V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP
@@ -202,10 +202,8 @@ class TestValidateproject_sheet:
         assert "Value is required for Identification_Number__c" in error.message
         assert error.severity == ErrorLevel.ERR.name
 
-    def test_invalid_project_sheet_empty_field(
-        self, invalid_project_sheet_empty_field: Worksheet
-    ):
-        errors = validate_project_sheet(
+    def test_invalid_project_sheet_empty_field(self, invalid_project_sheet_empty_field: Worksheet):
+        errors, _ = validate_project_sheet(
             invalid_project_sheet_empty_field,
             getSchemaByProject(
                 V2024_05_24_VERSION_STRING, SAMPLE_EXPENDITURE_CATEGORY_GROUP
@@ -222,15 +220,14 @@ class TestValidateproject_sheet:
 
 class TestValidateSubrecipientSheet:
     def test_valid_subrecipient_sheet(self, valid_subrecipientsheet: Worksheet):
-        errors = validate_subrecipient_sheet(
-            valid_subrecipientsheet, V2024_05_24_VERSION_STRING
-        )
+        errors, subrecipients = validate_subrecipient_sheet(valid_subrecipientsheet, V2024_05_24_VERSION_STRING)
         assert errors == []
+        assert len(subrecipients) == 1
+        assert subrecipients[0].EIN__c == "123123123"
+        assert subrecipients[0].Unique_Entity_Identifier__c == "123412341234"
 
     def test_invalid_subrecipient_sheet(self, invalid_subrecipient_sheet: Worksheet):
-        errors = validate_subrecipient_sheet(
-            invalid_subrecipient_sheet, V2024_05_24_VERSION_STRING
-        )
+        errors, _ = validate_subrecipient_sheet(invalid_subrecipient_sheet, V2024_05_24_VERSION_STRING)
         assert errors != []
         error = errors[0]
         assert "EIN__c should have at least 9 characters" in error.message
@@ -238,14 +235,38 @@ class TestValidateSubrecipientSheet:
         assert error.col == "E"
         assert error.severity == ErrorLevel.ERR.name
 
-    def test_valid_subrecipient_sheet_blank_optional_fields(
-        self, valid_subrecipient_sheet_blank_optional_fields: Worksheet
-    ):
-        errors = validate_subrecipient_sheet(
-            valid_subrecipient_sheet_blank_optional_fields, V2024_05_24_VERSION_STRING
-        )
+    def test_valid_subrecipient_sheet_blank_optional_fields(self, valid_subrecipient_sheet_blank_optional_fields: Worksheet):
+        errors, _ = validate_subrecipient_sheet(valid_subrecipient_sheet_blank_optional_fields, V2024_05_24_VERSION_STRING)
         assert errors == []
 
+
+class TestValidateMatchingSubrecipientSheet:
+    def test_invalid_project_sheet_unmatching_subrecipient_tin_field(self, invalid_project_sheet_unmatching_subrecipient_tin_field: Worksheet):
+        errors, _ = validate_workbook(invalid_project_sheet_unmatching_subrecipient_tin_field)
+        assert errors != []
+        error = errors[0]
+        assert "You must submit a subrecipient" in error.message
+        assert error.row == 13
+        assert error.col == "E, F"
+        assert error.severity == ErrorLevel.ERR.name
+
+    def test_invalid_project_sheet_unmatching_subrecipient_uei_field(self, invalid_project_sheet_unmatching_subrecipient_uei_field: Worksheet):
+        errors, _ = validate_workbook(invalid_project_sheet_unmatching_subrecipient_uei_field)
+        assert errors != []
+        error = errors[0]
+        assert "You must submit a subrecipient" in error.message
+        assert error.row == 13
+        assert error.col == "E, F"
+        assert error.severity == ErrorLevel.ERR.name
+
+    def test_invalid_project_sheet_unmatching_subrecipient_tin_uei_field(self, invalid_project_sheet_unmatching_subrecipient_tin_uei_field: Worksheet):
+        errors, _ = validate_workbook(invalid_project_sheet_unmatching_subrecipient_tin_uei_field)
+        assert errors != []
+        error = errors[0]
+        assert "You must submit a subrecipient" in error.message
+        assert error.row == 13
+        assert error.col == "E, F"
+        assert error.severity == ErrorLevel.ERR.name
 
 class TestGetProjectUseCode:
     def test_get_project_use_code(self, valid_coversheet: Worksheet):

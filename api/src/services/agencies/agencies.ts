@@ -1,5 +1,6 @@
 import type { QueryResolvers, MutationResolvers } from 'types/graphql'
 
+import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 
@@ -33,6 +34,40 @@ export const deleteAgency: MutationResolvers['deleteAgency'] = ({ id }) => {
   return db.agency.delete({
     where: { id },
   })
+}
+
+export const agenciesAvailableForUpload = async () => {
+  try {
+    const agencies = []
+    const user = await db.user.findFirst({
+      where: { id: context.currentUser.id },
+    })
+
+    if (!user) {
+      logger.error('User not found')
+      return
+    }
+
+    const agency = await db.agency.findFirst({
+      where: { id: user.agencyId },
+    })
+    const organizationId = agency?.organizationId
+
+    if (user.role === ROLES.ORGANIZATION_STAFF) {
+      const agency = await db.agency.findFirst({
+        where: { id: user.agencyId },
+      })
+      agencies.push(agency)
+      return agencies
+    } else {
+      const allAgenciesUnderOrganization = agenciesByOrganization({
+        organizationId,
+      })
+      return allAgenciesUnderOrganization
+    }
+  } catch (error) {
+    logger.error(error, `Error retrieving agencies`)
+  }
 }
 
 export const getOrCreateAgencies = async (orgName, agencyData) => {
