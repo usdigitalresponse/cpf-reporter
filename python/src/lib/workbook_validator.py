@@ -198,7 +198,14 @@ def get_workbook_errors_for_row(
     return workbook_errors
 
 
-def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str], Optional[List[Union[Project1ARow, Project1BRow, Project1CRow]]], List[SubrecipientRow]]:
+def validate(
+    workbook: IO[bytes],
+) -> Tuple[
+    Errors,
+    Optional[str],
+    Optional[List[Union[Project1ARow, Project1BRow, Project1CRow]]],
+    List[SubrecipientRow],
+]:
     """Validates a given Excel workbook according to CPF validation rules.
 
     Args:
@@ -229,7 +236,14 @@ def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str], Optional[List[
         workbook.close()
 
 
-def validate_workbook(workbook: Workbook, return_data: bool=False) -> Tuple[Errors, Optional[str], List[Union[Project1ARow, Project1BRow, Project1CRow]], List[SubrecipientRow]]:
+def validate_workbook(
+    workbook: Workbook, return_data: bool = False
+) -> Tuple[
+    Errors,
+    Optional[str],
+    List[Union[Project1ARow, Project1BRow, Project1CRow]],
+    List[SubrecipientRow],
+]:
     """Validates a given Excel workbook according to CPF validation rules.
 
     Args:

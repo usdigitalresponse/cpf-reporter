@@ -14,10 +14,9 @@ class ProjectType(str, Enum):
         raise ValueError(
             f"Project name '{project_name}' is not a recognized project type."
         )
-    
+
     def __str__(self):
         return self.value
-    
 
 
 NAME_BY_PROJECT = {

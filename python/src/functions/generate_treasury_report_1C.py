@@ -3,8 +3,6 @@ from openpyxl import load_workbook
 from typing import IO, List, Union, Dict
 from urllib.parse import unquote_plus
 import csv
-import json
-import re
 import tempfile
 from typing import Optional
 
@@ -15,7 +13,13 @@ from aws_lambda_typing.events import S3Event
 from mypy_boto3_s3.client import S3Client
 
 from src.lib.logging import get_logger, reset_contextvars
-from src.schemas.schema_versions import Version, getSchemaByProject, Project1ARow, Project1BRow, Project1CRow
+from src.schemas.schema_versions import (
+    Version,
+    getSchemaByProject,
+    Project1ARow,
+    Project1BRow,
+    Project1CRow,
+)
 from src.schemas.project_types import ProjectType
 
 OUTPUT_STARTING_ROW = 8
@@ -32,27 +36,25 @@ def handle(event: S3Event, context: Context):
         event: S3 Lambda event of type `s3:ObjectCreated:*`
         context: Lambda context
     """
-    structlog.contextvars.bind_contextvars(
-        lambda_event={"step_function": event}
-    )
+    structlog.contextvars.bind_contextvars(lambda_event={"step_function": event})
     logger = get_logger()
     logger.info("received new invocation event from step function")
 
     uploadsByExpenditureCategory = event.get("uploadsByExpenditureCategory", {})
     file_info_list = uploadsByExpenditureCategory.get(PROJECT_USE_CODE, {})
 
-    project_id_to_data: Dict[str, List[Union[Project1ARow, Project1BRow, Project1CRow]]] = {}
+    project_id_to_data: Dict[
+        str, List[Union[Project1ARow, Project1BRow, Project1CRow]]
+    ] = {}
     project_id_to_upload_date: Dict[str, datetime] = {}
     for _, file_info in file_info_list.items():
         # Download projects from DynamoDB
-        projects, createdAt = get_project_from_db(
-
-        )
+        projects, createdAt = get_project_from_db()
         combine_project_rows(
-            projects = projects,
-            project_id_to_upload_date = project_id_to_upload_date,
-            project_id_to_data = project_id_to_data,
-            createdAt = createdAt,
+            projects=projects,
+            project_id_to_upload_date=project_id_to_upload_date,
+            project_id_to_data=project_id_to_data,
+            createdAt=createdAt,
         )
 
     with tempfile.NamedTemporaryFile() as file:
@@ -80,11 +82,14 @@ def handle(event: S3Event, context: Context):
 def get_project_from_db():
     return [], datetime.now()
 
+
 def combine_project_rows(
-        projects: List[Union[Project1ARow, Project1BRow, Project1CRow]],
-        project_id_to_upload_date: Dict[str, datetime],
-        project_id_to_data: Dict[str, List[Union[Project1ARow, Project1BRow, Project1CRow]]],
-        createdAt: datetime,
+    projects: List[Union[Project1ARow, Project1BRow, Project1CRow]],
+    project_id_to_upload_date: Dict[str, datetime],
+    project_id_to_data: Dict[
+        str, List[Union[Project1ARow, Project1BRow, Project1CRow]]
+    ],
+    createdAt: datetime,
 ):
     """
     Combine projects together and check for conflicts.
@@ -104,30 +109,34 @@ def combine_project_rows(
 
 
 def populate_output_report(
-        workbook: IO[bytes],
-        project_id_to_data: Dict[str, List[Union[Project1ARow, Project1BRow, Project1CRow]]]
+    workbook: IO[bytes],
+    project_id_to_data: Dict[
+        str, List[Union[Project1ARow, Project1BRow, Project1CRow]]
+    ],
 ):
     """
     Append projects to the xlsx file
     """
     # Append the project rows
-    sheet = workbook['Baseline']
+    sheet = workbook["Baseline"]
 
     row_num = OUTPUT_STARTING_ROW
     for _, row in project_id_to_data.items():
-        row_schema = row.model_json_schema()['properties']
+        row_schema = row.model_json_schema()["properties"]
         row_dict = dict(row)
 
         row_with_output_cols = {}
         for prop in row_dict.keys():
             prop_meta = row_schema.get(prop)
             if not prop_meta:
-                raise Exception('Property not found. Cannot generate report')
-            if prop_meta[f'output_column_{PROJECT_USE_CODE}']:
-                row_with_output_cols[prop_meta[f'output_column_{PROJECT_USE_CODE}']] = row_dict[prop]
+                raise Exception("Property not found. Cannot generate report")
+            if prop_meta[f"output_column_{PROJECT_USE_CODE}"]:
+                row_with_output_cols[prop_meta[f"output_column_{PROJECT_USE_CODE}"]] = (
+                    row_dict[prop]
+                )
 
         for col in row_with_output_cols.keys():
-            sheet[f'{col}{row_num}'] = str(row_with_output_cols[col])
+            sheet[f"{col}{row_num}"] = str(row_with_output_cols[col])
 
         row_num += 1
 
@@ -146,7 +155,7 @@ def convert_xlsx_to_csv(csv_file: IO[bytes], file: IO[bytes], num_rows):
     """
     Convert xlsx file to csv.
     """
-    sheet = file['Baseline']
+    sheet = file["Baseline"]
     csv_file_handle = csv.writer(csv_file, delimiter=",")
 
     row_num = 1
@@ -155,7 +164,7 @@ def convert_xlsx_to_csv(csv_file: IO[bytes], file: IO[bytes], num_rows):
             break
         csv_file_handle.writerow([escape_for_csv(cell.value) for cell in eachrow])
         row_num = row_num + 1
-    
+
     return csv_file
 
 
@@ -187,9 +196,7 @@ def upload_generated_file_to_s3(client: S3Client, bucket, key: str, file: IO[byt
     """
     logger = get_logger()
 
-    logger = logger.bind(
-        upload={"s3": {"bucket": bucket, "key": key}}
-    )
+    logger = logger.bind(upload={"s3": {"bucket": bucket, "key": key}})
     try:
         client.put_object(
             file,
