@@ -59,7 +59,9 @@ class StateAbbreviation(Enum):
     WI = "WI"
     WY = "WY"
 
-
+    def __str__(self):
+        return self.value
+    
 class CapitalAssetOwnershipType(str, Enum):
     PRIVATE = "1. Private"
     STATE_GOVERNMENT = "2. State Government"
@@ -69,6 +71,8 @@ class CapitalAssetOwnershipType(str, Enum):
     COOPERATIVE = "6. Co-operative"
     OTHER = "7. Other"
 
+    def __str__(self):
+        return self.value
 
 class ProjectStatusType(str, Enum):
     NOT_STARTED = "1. Not Started"
@@ -76,11 +80,14 @@ class ProjectStatusType(str, Enum):
     MORE_THAN_FIFTY_PERCENT_COMPLETE = "3. More than 50 percent complete"
     COMPLETED = "4. Completed"
 
+    def __str__(self):
+        return self.value
 
 class YesNoType(str, Enum):
     YES = "Yes"
     NO = "No"
-
+    def __str__(self):
+        return self.value
 
 class TechType(str, Enum):
     FIBER = "1. Fiber"
@@ -88,17 +95,23 @@ class TechType(str, Enum):
     FIXED_WIRELESS = "3. Fixed Wireless"
     OTHER = "4. Other"
 
+    def __str__(self):
+        return self.value
+
 
 class ProjectInvestmentType(str, Enum):
     NEW_CONSTRUCTION = "1. New Construction"
     RENOVATION = "2. Renovation"
+    
+    def __str__(self):
+        return self.value
 
 
 class BaseProjectRow(BaseModel):
     model_config = ConfigDict(coerce_numbers_to_str=True, loc_by_alias=False)
 
     row_num: conint(ge=1) = Field(
-        default=1, serialization_alias="Row Number", json_schema_extra={"column":"NONE"}
+        default=1, serialization_alias="Row Number", json_schema_extra={"column":None, "output_column_1C": None}
     )
     Project_Name__c: constr(strip_whitespace=True, min_length=1, max_length=100) = Field(
         ..., serialization_alias="Project Name", json_schema_extra={"column":"C", "output_column_1C": "B"}
