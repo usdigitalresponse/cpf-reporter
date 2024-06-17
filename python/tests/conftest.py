@@ -9,6 +9,8 @@ _SAMPLE_VALID_XLSM = "tests/data/sample_valid.xlsm"
 _SAMPLE_VALID_XLSM_V2024_05_24 = "tests/data/sample_valid_V2024_05_24.xlsm"
 _SAMPLE_TEMPLATE = "tests/data/sample_template.xlsx"
 _SAMPLE_TEMPLATE_2 = "tests/data/sample_template_2.xlsx"
+_SAMPLE_TEMPLATE_1C = "tests/data/treasury/sample_1C_input_pass.xlsm"
+_SAMPLE_TREASURY_OUTPUT_XLSM = "tests/data/treasury/sample_1C_output.xlsx"
 
 
 @pytest.fixture
@@ -33,6 +35,28 @@ def valid_coversheet(valid_workbook) -> openpyxl.worksheet.worksheet.Worksheet:
 def valid_project_sheet(valid_workbook) -> openpyxl.worksheet.worksheet.Worksheet:
     return valid_workbook["Project"]
 
+@pytest.fixture
+def valid_workbook_1C() -> openpyxl.Workbook:
+    return openpyxl.load_workbook(_SAMPLE_TEMPLATE_1C)
+
+@pytest.fixture
+def valid_project_sheet_1C() -> openpyxl.worksheet.worksheet.Worksheet:
+    return openpyxl.load_workbook(_SAMPLE_TEMPLATE_1C)["Project"]
+
+@pytest.fixture
+def valid_project_sheet_1C_with_conflict() -> openpyxl.worksheet.worksheet.Worksheet:
+    valid_project_sheet_1C = openpyxl.load_workbook(_SAMPLE_TEMPLATE_1C)["Project"]
+    valid_project_sheet_1C["C13"] = "updated project 1c test"
+    return valid_project_sheet_1C
+
+@pytest.fixture
+def valid_second_project_sheet() -> openpyxl.worksheet.worksheet.Worksheet:
+    valid_project_sheet_1C = openpyxl.load_workbook(_SAMPLE_TEMPLATE_1C)["Project"]
+    valid_project_sheet_1C["C13"] = "test 2"
+    valid_project_sheet_1C["D13"] = "44"
+    valid_project_sheet_1C["E13"] = "345634563457"
+    valid_project_sheet_1C["F13"] = "345345346"
+    return valid_project_sheet_1C
 
 @pytest.fixture
 def valid_subrecipientsheet(valid_workbook) -> openpyxl.worksheet.worksheet.Worksheet:
@@ -142,3 +166,8 @@ def cpf_file_archive_two(sample_template):
     cpf_archive_file.writestr("2024-05-19/TestFile.xlsx", sample_template.read())
     cpf_archive_file.writestr("2024-05-19/TestFile2.xlsx", sample_template.read())
     return CPFFileArchive(cpf_archive_file)
+
+
+@pytest.fixture
+def output_template() -> openpyxl.Workbook:
+    return openpyxl.load_workbook(_SAMPLE_TREASURY_OUTPUT_XLSM)
