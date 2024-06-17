@@ -809,10 +809,6 @@ class Project1CRow(BaseProjectRow, AddressFields):
         max_length=3000,
         json_schema_extra={"column":"EB", "output_column_1C": "T"}
     )
-    @field_validator(
-        "Access_to_Public_Transit__c"
-    )
-
     @field_validator("Access_to_Public_Transit__c")
     @classmethod
     def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
