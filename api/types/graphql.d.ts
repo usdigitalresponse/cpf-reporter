@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client"
 import { MergePrismaWithSdlTypes, MakeRelationsOptional } from '@redwoodjs/api'
-import { Agency as PrismaAgency, Organization as PrismaOrganization, User as PrismaUser, InputTemplate as PrismaInputTemplate, OutputTemplate as PrismaOutputTemplate, ReportingPeriod as PrismaReportingPeriod, ExpenditureCategory as PrismaExpenditureCategory, Upload as PrismaUpload, UploadValidation as PrismaUploadValidation, Subrecipient as PrismaSubrecipient, SubrecipientUpload as PrismaSubrecipientUpload, Project as PrismaProject, ValidationRules as PrismaValidationRules } from '@prisma/client'
+import { Agency as PrismaAgency, Organization as PrismaOrganization, User as PrismaUser, InputTemplate as PrismaInputTemplate, OutputTemplate as PrismaOutputTemplate, ReportingPeriod as PrismaReportingPeriod, ExpenditureCategory as PrismaExpenditureCategory, Upload as PrismaUpload, UploadValidation as PrismaUploadValidation, Subrecipient as PrismaSubrecipient, Project as PrismaProject, ValidationRules as PrismaValidationRules } from '@prisma/client'
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { RedwoodGraphQLContext } from '@redwoodjs/graphql-server/dist/types';
 export type Maybe<T> = T | null;
@@ -822,7 +822,7 @@ export type Version =
   | 'V2024_05_24';
 
 type MaybeOrArrayOfMaybe<T> = T | Maybe<T> | Maybe<T>[];
-type AllMappedModels = MaybeOrArrayOfMaybe<Agency | ExpenditureCategory | InputTemplate | Organization | OutputTemplate | Project | ReportingPeriod | Subrecipient | SubrecipientUpload | Upload | UploadValidation | User | ValidationRules>
+type AllMappedModels = MaybeOrArrayOfMaybe<Agency | ExpenditureCategory | InputTemplate | Organization | OutputTemplate | Project | ReportingPeriod | Subrecipient | Upload | UploadValidation | User | ValidationRules>
 
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -920,7 +920,7 @@ export type ResolversTypes = {
   String: ResolverTypeWrapper<Scalars['String']>;
   Subrecipient: ResolverTypeWrapper<MergePrismaWithSdlTypes<PrismaSubrecipient, MakeRelationsOptional<Subrecipient, AllMappedModels>, AllMappedModels>>;
   SubrecipientStatus: SubrecipientStatus;
-  SubrecipientUpload: ResolverTypeWrapper<MergePrismaWithSdlTypes<PrismaSubrecipientUpload, MakeRelationsOptional<SubrecipientUpload, AllMappedModels>, AllMappedModels>>;
+  SubrecipientUpload: ResolverTypeWrapper<Omit<SubrecipientUpload, 'subrecipient'> & { subrecipient: ResolversTypes['Subrecipient'] }>;
   Time: ResolverTypeWrapper<Scalars['Time']>;
   UpdateAgencyInput: UpdateAgencyInput;
   UpdateExpenditureCategoryInput: UpdateExpenditureCategoryInput;
@@ -979,7 +979,7 @@ export type ResolversParentTypes = {
   ReportingPeriod: MergePrismaWithSdlTypes<PrismaReportingPeriod, MakeRelationsOptional<ReportingPeriod, AllMappedModels>, AllMappedModels>;
   String: Scalars['String'];
   Subrecipient: MergePrismaWithSdlTypes<PrismaSubrecipient, MakeRelationsOptional<Subrecipient, AllMappedModels>, AllMappedModels>;
-  SubrecipientUpload: MergePrismaWithSdlTypes<PrismaSubrecipientUpload, MakeRelationsOptional<SubrecipientUpload, AllMappedModels>, AllMappedModels>;
+  SubrecipientUpload: Omit<SubrecipientUpload, 'subrecipient'> & { subrecipient: ResolversParentTypes['Subrecipient'] };
   Time: Scalars['Time'];
   UpdateAgencyInput: UpdateAgencyInput;
   UpdateExpenditureCategoryInput: UpdateExpenditureCategoryInput;
