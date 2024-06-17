@@ -38,32 +38,14 @@ export const deleteAgency: MutationResolvers['deleteAgency'] = ({ id }) => {
 
 export const agenciesAvailableForUpload = async () => {
   try {
-    const agencies = []
-    const user = await db.user.findFirst({
-      where: { id: context.currentUser.id },
-    })
+    const currentUser = context.currentUser
 
-    if (!user) {
-      logger.error('User not found')
-      return
-    }
-
-    const agency = await db.agency.findFirst({
-      where: { id: user.agencyId },
-    })
-    const organizationId = agency?.organizationId
-
-    if (user.role === ROLES.ORGANIZATION_STAFF) {
-      const agency = await db.agency.findFirst({
-        where: { id: user.agencyId },
-      })
-      agencies.push(agency)
-      return agencies
+    if (currentUser.role === ROLES.ORGANIZATION_STAFF) {
+      return [currentUser.agency]
     } else {
-      const allAgenciesUnderOrganization = agenciesByOrganization({
-        organizationId,
+      return await agenciesByOrganization({
+        organizationId: currentUser.agency.organizationId,
       })
-      return allAgenciesUnderOrganization
     }
   } catch (error) {
     logger.error(error, `Error retrieving agencies`)
