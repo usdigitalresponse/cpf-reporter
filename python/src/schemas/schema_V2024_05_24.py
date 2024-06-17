@@ -2,9 +2,18 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Optional
 
-from pydantic import (BaseModel, ConfigDict, Field, condecimal, conint, constr,
-                      ValidationInfo, field_validator)
-from src.schemas.project_types import ProjectType, NAME_BY_PROJECT
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationInfo,
+    condecimal,
+    conint,
+    constr,
+    field_validator,
+)
+
+from src.schemas.project_types import NAME_BY_PROJECT
 
 
 class StateAbbreviation(Enum):
@@ -287,116 +296,148 @@ class BaseProjectRow(BaseModel):
     @classmethod
     def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
         if isinstance(v, str) and v.strip == "":
-            raise ValueError(
-                f"Value is required for {info.field_name}"
-            )
+            raise ValueError(f"Value is required for {info.field_name}")
         return v
 
 
 class Project1ARow(BaseProjectRow):
     Technology_Type_Planned__c: TechType = Field(
-        ..., serialization_alias="Technology Type (Planned)", json_schema_extra={"column":"AT"}
+        ...,
+        serialization_alias="Technology Type (Planned)",
+        json_schema_extra={"column": "AT"},
     )
     Technology_Type_Actual__c: Optional[TechType] = Field(
-        default=None, serialization_alias="Technology Type (Actual)", json_schema_extra={"column":"AU"}
+        default=None,
+        serialization_alias="Technology Type (Actual)",
+        json_schema_extra={"column": "AU"},
     )
     If_Other_Specify_Planned__c: Optional[str] = Field(
         default=None,
         serialization_alias="If Other, Specify (Planned)?",
         max_length=3000,
-        json_schema_extra={"column":"AV"}
+        json_schema_extra={"column": "AV"},
     )
     If_Other_Specify_Actual__c: Optional[str] = Field(
         default=None,
         serialization_alias="If Other, Specify (Actual?)?",
         max_length=3000,
-        json_schema_extra={"column":"AW"}
+        json_schema_extra={"column": "AW"},
     )
     Total_Miles_Planned__c: conint(ge=0, le=999999999) = Field(
-        ..., serialization_alias="Total Miles of Fiber Deployed (Planned)", json_schema_extra={"column":"AX"}
+        ...,
+        serialization_alias="Total Miles of Fiber Deployed (Planned)",
+        json_schema_extra={"column": "AX"},
     )
     Total_Miles_Actual__c: Optional[conint(ge=0, le=999999999)] = Field(
-        default=None, serialization_alias="Total Miles of Fiber Deployed (Actual)", json_schema_extra={"column":"AY"}
+        default=None,
+        serialization_alias="Total Miles of Fiber Deployed (Actual)",
+        json_schema_extra={"column": "AY"},
     )
     Locations_Served_Planned__c: conint(ge=0, le=999999999) = Field(
-        ..., serialization_alias="A) Total Number of Locations Served (Planned)", json_schema_extra={"column":"AZ"}
+        ...,
+        serialization_alias="A) Total Number of Locations Served (Planned)",
+        json_schema_extra={"column": "AZ"},
     )
     Locations_Served_Actual__c: Optional[conint(ge=0, le=999999999)] = Field(
-        default=None, serialization_alias="A) Total Number of Locations Served (Actual)", json_schema_extra={"column":"BA"}
+        default=None,
+        serialization_alias="A) Total Number of Locations Served (Actual)",
+        json_schema_extra={"column": "BA"},
     )
     X25_3_Mbps_or_below_Planned__c: conint(ge=0, le=999999999) = Field(
-        ..., serialization_alias="B) Less than 25/3 Mbps (Planned)", json_schema_extra={"column":"BB"}
+        ...,
+        serialization_alias="B) Less than 25/3 Mbps (Planned)",
+        json_schema_extra={"column": "BB"},
     )
     X25_3_Mbps_and_100_20_Mbps_Planned__c: conint(ge=0, le=999999999) = Field(
-        ..., serialization_alias="C) 25/3 Mbps and 100/20 Mbps (Planned)", json_schema_extra={"column":"BC"}
+        ...,
+        serialization_alias="C) 25/3 Mbps and 100/20 Mbps (Planned)",
+        json_schema_extra={"column": "BC"},
     )
     Minimum_100_100_Mbps_Planned__c: conint(ge=0, le=999999999) = Field(
-        ..., serialization_alias="D) Minimum 100/100 Mbps (Planned) ", json_schema_extra={"column":"BD"}
+        ...,
+        serialization_alias="D) Minimum 100/100 Mbps (Planned) ",
+        json_schema_extra={"column": "BD"},
     )
     Minimum_100_100_Mbps_Actual__c: Optional[conint(ge=0, le=999999999)] = Field(
-        default=None, serialization_alias="D) Minimum 100/100 Mbps (Actual) ", json_schema_extra={"column":"BE"}
+        default=None,
+        serialization_alias="D) Minimum 100/100 Mbps (Actual) ",
+        json_schema_extra={"column": "BE"},
     )
     X100_20_Mbps_to_100_100_Mbps_Planned__c: conint(ge=0, le=999999999) = Field(
-        ..., serialization_alias="E) 100/20 Mbps to 100/100 Mbps (Planned)", json_schema_extra={"column":"BF"}
+        ...,
+        serialization_alias="E) 100/20 Mbps to 100/100 Mbps (Planned)",
+        json_schema_extra={"column": "BF"},
     )
     X100_20_Mbps_to_100_100_Mbps_Actual__c: Optional[conint(ge=0, le=999999999)] = (
         Field(
-            default=None, serialization_alias="E) 100/20 Mbps to 100/100 Mbps (Actual)", json_schema_extra={"column":"BG"}
+            default=None,
+            serialization_alias="E) 100/20 Mbps to 100/100 Mbps (Actual)",
+            json_schema_extra={"column": "BG"},
         )
     )
     Explanation_of_Discrepancy__c: Optional[str] = Field(
         default=None,
         serialization_alias="Explanation of Discrepancy (Location by Speed)",
         max_length=3000,
-        json_schema_extra={"column":"BH"}
+        json_schema_extra={"column": "BH"},
     )
     Number_of_Locations_Planned__c: conint(ge=0, le=999999999) = Field(
         ...,
         serialization_alias="F) Total Number of Locations Served by Type - Residential (Planned)",
-        json_schema_extra={"column":"BI"}
+        json_schema_extra={"column": "BI"},
     )
     Number_of_Locations_Actual__c: Optional[conint(ge=0, le=999999999)] = Field(
         default=None,
         serialization_alias="F) Total Number of Locations Served by Type - Residential (Actual)",
-        json_schema_extra={"column":"BJ"}
+        json_schema_extra={"column": "BJ"},
     )
     Housing_Units_Planned__c: conint(ge=0, le=999999999) = Field(
-        ..., serialization_alias="G) Total Housing Units (Planned)", json_schema_extra={"column":"BK"}
+        ...,
+        serialization_alias="G) Total Housing Units (Planned)",
+        json_schema_extra={"column": "BK"},
     )
     Housing_Units_Actual__c: Optional[conint(ge=0, le=999999999)] = Field(
-        default=None, serialization_alias="G) Total Housing Units (Actual)", json_schema_extra={"column":"BL"}
+        default=None,
+        serialization_alias="G) Total Housing Units (Actual)",
+        json_schema_extra={"column": "BL"},
     )
     Number_of_Bus_Locations_Planned__c: conint(ge=0, le=999999999) = Field(
         ...,
         serialization_alias="H) Total Number of Locations Served by Type - Business (Planned)",
-        json_schema_extra={"column":"BM"}
+        json_schema_extra={"column": "BM"},
     )
     Number_of_Bus_Locations_Actual__c: Optional[conint(ge=0, le=999999999)] = Field(
         default=None,
         serialization_alias="H) Total Number of Locations Served by Type - Business (Actual)",
-        json_schema_extra={"column":"BN"}
+        json_schema_extra={"column": "BN"},
     )
     Number_of_CAI_Planned__c: conint(ge=0, le=999999999) = Field(
         ...,
         serialization_alias="I) Total Number of Locations Served by Type - Community Anchor Institution (Planned)",
-        json_schema_extra={"column":"BO"}
+        json_schema_extra={"column": "BO"},
     )
     Number_of_CAI_Actual__c: Optional[conint(ge=0, le=999999999)] = Field(
         default=None,
         serialization_alias="I) Total Number of Locations Served by Type - Community Anchor Institution (Actual)",
-        json_schema_extra={"column":"BP"}
+        json_schema_extra={"column": "BP"},
     )
     Explanation_Planned__c: Optional[str] = Field(
-        default=None, serialization_alias="Explanation (Planned)", max_length=3000, json_schema_extra={"column":"BQ"}
+        default=None,
+        serialization_alias="Explanation (Planned)",
+        max_length=3000,
+        json_schema_extra={"column": "BQ"},
     )
     Affordable_Connectivity_Program_ACP__c: YesNoType = Field(
-        ..., serialization_alias="Affordable Connectivity Program (ACP)?", json_schema_extra={"column":"BR"}
+        ...,
+        serialization_alias="Affordable Connectivity Program (ACP)?",
+        json_schema_extra={"column": "BR"},
     )
     Is_this_a_middle_mile_Project__c: Optional[YesNoType] = Field(
         default=None,
         serialization_alias="Is this a middle mile Project?",
-        json_schema_extra={"column":"DV"}
+        json_schema_extra={"column": "DV"},
     )
+
     @field_validator(
         "Technology_Type_Planned__c",
         "Total_Miles_Planned__c",
@@ -414,10 +455,9 @@ class Project1ARow(BaseProjectRow):
     @classmethod
     def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
         if isinstance(v, str) and v.strip == "":
-            raise ValueError(
-                f"Value is required for {info.field_name}"
-            )
+            raise ValueError(f"Value is required for {info.field_name}")
         return v
+
 
 class AddressFields(BaseModel):
     Street_1_Planned__c: constr(strip_whitespace=True, min_length=1, max_length=40) = Field(
@@ -451,6 +491,7 @@ class AddressFields(BaseModel):
     Zip_Code_Actual__c: Optional[str] = Field(
         default=None, serialization_alias="Zip Code (Actual)", max_length=5, json_schema_extra={"column":"CC", "output_column_1C": "BH"}
     )
+
     @field_validator(
         "Street_1_Planned__c",
         "City_Planned__c",
@@ -459,132 +500,198 @@ class AddressFields(BaseModel):
     @classmethod
     def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
         if isinstance(v, str) and v.strip == "":
-            raise ValueError(
-                f"Value is required for {info.field_name}"
-            )
+            raise ValueError(f"Value is required for {info.field_name}")
         return v
+
 
 class Project1BRow(BaseProjectRow, AddressFields):
     Laptops_Planned__c: conint(ge=0, le=9999999999) = Field(
-        ..., serialization_alias="Laptops (Planned)", json_schema_extra={"column":"CD"}
+        ..., serialization_alias="Laptops (Planned)", json_schema_extra={"column": "CD"}
     )
     Laptops_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
-        default=None, serialization_alias="Laptops (Actual)", json_schema_extra={"column":"CE"}
+        default=None,
+        serialization_alias="Laptops (Actual)",
+        json_schema_extra={"column": "CE"},
     )
     Laptops_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = (
-        Field(..., serialization_alias="Laptops Expenditure (Planned)", json_schema_extra={"column":"CF"})
+        Field(
+            ...,
+            serialization_alias="Laptops Expenditure (Planned)",
+            json_schema_extra={"column": "CF"},
+        )
     )
-    Laptops_Expenditures_Actual__c: Optional[condecimal(max_digits=13, decimal_places=2)] = Field(
-        default=None, serialization_alias="Laptops Expenditure (Actual)", json_schema_extra={"column":"CG"}
+    Laptops_Expenditures_Actual__c: Optional[
+        condecimal(max_digits=13, decimal_places=2)
+    ] = Field(
+        default=None,
+        serialization_alias="Laptops Expenditure (Actual)",
+        json_schema_extra={"column": "CG"},
     )
     Tablets_Planned__c: conint(ge=0, le=9999999999) = Field(
-        ..., serialization_alias="Tablets (Planned)", json_schema_extra={"column":"CH"}
+        ..., serialization_alias="Tablets (Planned)", json_schema_extra={"column": "CH"}
     )
     Tablets_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
-        default=None, serialization_alias="Tablets (Actual)", json_schema_extra={"column":"CI"}
+        default=None,
+        serialization_alias="Tablets (Actual)",
+        json_schema_extra={"column": "CI"},
     )
     Tablet_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = Field(
-        ..., serialization_alias="Tablets Expenditure (Planned)", json_schema_extra={"column":"CJ"}
+        ...,
+        serialization_alias="Tablets Expenditure (Planned)",
+        json_schema_extra={"column": "CJ"},
     )
-    Tablets_Expenditures_Actual__c: Optional[condecimal(max_digits=13, decimal_places=2)] = Field(
-        default=None, serialization_alias="Tablets Expenditure (Actual)", json_schema_extra={"column":"CK"}
+    Tablets_Expenditures_Actual__c: Optional[
+        condecimal(max_digits=13, decimal_places=2)
+    ] = Field(
+        default=None,
+        serialization_alias="Tablets Expenditure (Actual)",
+        json_schema_extra={"column": "CK"},
     )
     Desktop_Computers_Planned__c: conint(ge=0, le=9999999999) = Field(
-        ..., serialization_alias="Desktop Computers (Planned)", json_schema_extra={"column":"CL"}
+        ...,
+        serialization_alias="Desktop Computers (Planned)",
+        json_schema_extra={"column": "CL"},
     )
     Desktop_Computers_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
-        default=None, serialization_alias="Desktop Computers (Actual)", json_schema_extra={"column":"CM"}
+        default=None,
+        serialization_alias="Desktop Computers (Actual)",
+        json_schema_extra={"column": "CM"},
     )
-    Desktop_Computers_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = Field(
+    Desktop_Computers_Expenditures_Planned__c: condecimal(
+        max_digits=13, decimal_places=2
+    ) = Field(
         ...,
         serialization_alias="Desktop Computers Expenditure (Planned)",
-        json_schema_extra={"column":"CN"}
+        json_schema_extra={"column": "CN"},
     )
-    Desktop_Computers_Expenditures_Actual__c: Optional[condecimal(max_digits=13, decimal_places=2)] = Field(
+    Desktop_Computers_Expenditures_Actual__c: Optional[
+        condecimal(max_digits=13, decimal_places=2)
+    ] = Field(
         default=None,
         serialization_alias="Desktop Computers Expenditure (Actual)",
-        json_schema_extra={"column":"CO"}
+        json_schema_extra={"column": "CO"},
     )
     Public_WiFi_Planned__c: conint(ge=0, le=9999999999) = Field(
-        ..., serialization_alias="Public WiFi (Planned)", json_schema_extra={"column":"CP"}
+        ...,
+        serialization_alias="Public WiFi (Planned)",
+        json_schema_extra={"column": "CP"},
     )
     Public_WiFi_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
-        default=None, serialization_alias="Public WiFi (Actual)", json_schema_extra={"column":"CQ"}
+        default=None,
+        serialization_alias="Public WiFi (Actual)",
+        json_schema_extra={"column": "CQ"},
     )
     Public_WiFi_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = (
-        Field(..., serialization_alias="Public Wifi Expenditures (Planned)", json_schema_extra={"column":"CR"})
+        Field(
+            ...,
+            serialization_alias="Public Wifi Expenditures (Planned)",
+            json_schema_extra={"column": "CR"},
+        )
     )
-    Public_WiFi_Expenditures_Actual__c: Optional[condecimal(max_digits=13, decimal_places=2)] = (
-        Field(default=None, serialization_alias="Public Wifi Expenditures (Actual)", json_schema_extra={"column":"CS"})
+    Public_WiFi_Expenditures_Actual__c: Optional[
+        condecimal(max_digits=13, decimal_places=2)
+    ] = Field(
+        default=None,
+        serialization_alias="Public Wifi Expenditures (Actual)",
+        json_schema_extra={"column": "CS"},
     )
     Other_Devices_Planned__c: conint(ge=0, le=9999999999) = Field(
-        ..., serialization_alias="Other Devices (Planned)", json_schema_extra={"column":"CT"}
+        ...,
+        serialization_alias="Other Devices (Planned)",
+        json_schema_extra={"column": "CT"},
     )
     Other_Devices_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
-        default=None, serialization_alias="Other Devices (Actual)", json_schema_extra={"column":"CU"}
+        default=None,
+        serialization_alias="Other Devices (Actual)",
+        json_schema_extra={"column": "CU"},
     )
     Other_Expenditures_Planned__c: condecimal(max_digits=7, decimal_places=2) = Field(
-        ..., serialization_alias="Other Expenditures (Planned)", json_schema_extra={"column":"CV"}
+        ...,
+        serialization_alias="Other Expenditures (Planned)",
+        json_schema_extra={"column": "CV"},
     )
-    Other_Expenditures_Actual__c: Optional[condecimal(max_digits=7, decimal_places=2)] = Field(
-        default=None, serialization_alias="Other Expenditures (Actual)", json_schema_extra={"column":"CW"}
+    Other_Expenditures_Actual__c: Optional[
+        condecimal(max_digits=7, decimal_places=2)
+    ] = Field(
+        default=None,
+        serialization_alias="Other Expenditures (Actual)",
+        json_schema_extra={"column": "CW"},
     )
     Explanation_of_Other_Expend__c: Optional[str] = Field(
         default=None,
         serialization_alias="Explanation of Other Expenditures",
         max_length=3000,
-        json_schema_extra={"column":"CX"}
+        json_schema_extra={"column": "CX"},
     )
     Number_of_Users_Planned__c: conint(ge=0, le=9999999999) = Field(
-        ..., serialization_alias="Number of Users (Planned)", json_schema_extra={"column":"CY"}
+        ...,
+        serialization_alias="Number of Users (Planned)",
+        json_schema_extra={"column": "CY"},
     )
     Number_of_Users_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
-        default=None, serialization_alias="Number of Users (Actual)", json_schema_extra={"column":"CZ"}
+        default=None,
+        serialization_alias="Number of Users (Actual)",
+        json_schema_extra={"column": "CZ"},
     )
-    Brief_Narrative_Planned__c: constr(strip_whitespace=True, min_length=1, max_length=3000) = Field(
-        ..., serialization_alias="Brief Narrative (Planned)", json_schema_extra={"column":"DA"}
+    Brief_Narrative_Planned__c: constr(
+        strip_whitespace=True, min_length=1, max_length=3000
+    ) = Field(
+        ...,
+        serialization_alias="Brief Narrative (Planned)",
+        json_schema_extra={"column": "DA"},
     )
     Brief_Narrative_Actual__c: Optional[str] = Field(
         default=None,
         serialization_alias="Brief Narrative (Actual)",
         max_length=3000,
-        json_schema_extra={"column":"DB"}
+        json_schema_extra={"column": "DB"},
     )
     Measurement_of_Effectiveness__c: YesNoType = Field(
-        ..., serialization_alias="Measurement of Effectiveness?", json_schema_extra={"column":"DC"}
+        ...,
+        serialization_alias="Measurement of Effectiveness?",
+        json_schema_extra={"column": "DC"},
     )
     # Columns below exist on Project1CRow as well as Project1BRow, so they jump in column defs
-    Current_Program_Income_Earned__c: Optional[condecimal(max_digits=15, decimal_places=2)] = Field(
+    Current_Program_Income_Earned__c: Optional[
+        condecimal(max_digits=15, decimal_places=2)
+    ] = Field(
         default=None,
         serialization_alias="Current Period Program Income Earned",
-        json_schema_extra={"column":"DW"}
+        json_schema_extra={"column": "DW"},
     )
-    Current_Program_Income_Expended__c: Optional[condecimal(max_digits=15, decimal_places=2)] = Field(
+    Current_Program_Income_Expended__c: Optional[
+        condecimal(max_digits=15, decimal_places=2)
+    ] = Field(
         default=None,
         serialization_alias="Current Period Program Income Expended",
-        json_schema_extra={"column":"DX"}
+        json_schema_extra={"column": "DX"},
     )
-    Cumulative_Program_Income_Earned__c: Optional[condecimal(max_digits=15, decimal_places=2)] = Field(
+    Cumulative_Program_Income_Earned__c: Optional[
+        condecimal(max_digits=15, decimal_places=2)
+    ] = Field(
         default=None,
         serialization_alias="Cumulative Program Income Earned",
-        json_schema_extra={"column":"DY"}
+        json_schema_extra={"column": "DY"},
     )
-    Cumulative_Program_Income_Expended__c: Optional[condecimal(max_digits=15, decimal_places=2)] = Field(
+    Cumulative_Program_Income_Expended__c: Optional[
+        condecimal(max_digits=15, decimal_places=2)
+    ] = Field(
         default=None,
         serialization_alias="Cumulative Program Income Expended",
-        json_schema_extra={"column":"DZ"}
+        json_schema_extra={"column": "DZ"},
     )
     Program_Income_2_CFR__c: Optional[YesNoType] = Field(
         default=None,
         serialization_alias="Program Income Pursuant",
-        json_schema_extra={"column":"EA"}
+        json_schema_extra={"column": "EA"},
     )
     Program_Income_2_CFR_Explanation__c: Optional[str] = Field(
         default=None,
         serialization_alias="Program Income Pursuant Explanation",
         max_length=3000,
-        json_schema_extra={"column":"EB"}
+        json_schema_extra={"column": "EB"},
     )
+
     @field_validator(
         "Laptops_Planned__c",
         "Laptops_Expenditures_Planned__c",
@@ -603,10 +710,9 @@ class Project1BRow(BaseProjectRow, AddressFields):
     @classmethod
     def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
         if isinstance(v, str) and v.strip == "":
-            raise ValueError(
-                f"Value is required for {info.field_name}"
-            )
+            raise ValueError(f"Value is required for {info.field_name}")
         return v
+
 
 class Project1CRow(BaseProjectRow, AddressFields):
     Type_of_Investment__c: Optional[str] = Field(
@@ -664,22 +770,30 @@ class Project1CRow(BaseProjectRow, AddressFields):
         ..., serialization_alias="Access to Public Transit?", json_schema_extra={"column":"DU", "output_column_1C": "CA"}
     )
     # Columns below exist on Project1BRow as well as Project1CRow
-    Current_Program_Income_Earned__c: Optional[condecimal(max_digits=15, decimal_places=2)] = Field(
+    Current_Program_Income_Earned__c: Optional[
+        condecimal(max_digits=15, decimal_places=2)
+    ] = Field(
         default=None,
         serialization_alias="Current Period Program Income Earned",
         json_schema_extra={"column":"DW", "output_column_1C": "O"}
     )
-    Current_Program_Income_Expended__c: Optional[condecimal(max_digits=15, decimal_places=2)] = Field(
+    Current_Program_Income_Expended__c: Optional[
+        condecimal(max_digits=15, decimal_places=2)
+    ] = Field(
         default=None,
         serialization_alias="Current Period Program Income Expended",
         json_schema_extra={"column":"DX", "output_column_1C": "P"}
     )
-    Cumulative_Program_Income_Earned__c: Optional[condecimal(max_digits=15, decimal_places=2)] = Field(
+    Cumulative_Program_Income_Earned__c: Optional[
+        condecimal(max_digits=15, decimal_places=2)
+    ] = Field(
         default=None,
         serialization_alias="Cumulative Program Income Earned",
         json_schema_extra={"column":"DY", "output_column_1C": "Q"}
     )
-    Cumulative_Program_Income_Expended__c: Optional[condecimal(max_digits=15, decimal_places=2)] = Field(
+    Cumulative_Program_Income_Expended__c: Optional[
+        condecimal(max_digits=15, decimal_places=2)
+    ] = Field(
         default=None,
         serialization_alias="Cumulative Program Income Expended",
         json_schema_extra={"column":"DZ", "output_column_1C": "R"}
@@ -698,13 +812,14 @@ class Project1CRow(BaseProjectRow, AddressFields):
     @field_validator(
         "Access_to_Public_Transit__c"
     )
+
+    @field_validator("Access_to_Public_Transit__c")
     @classmethod
     def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
         if isinstance(v, str) and v.strip == "":
-            raise ValueError(
-                f"Value is required for {info.field_name}"
-            )
+            raise ValueError(f"Value is required for {info.field_name}")
         return v
+
 
 class SubrecipientRow(BaseModel):
     model_config = ConfigDict(coerce_numbers_to_str=True, loc_by_alias=False)
@@ -712,57 +827,85 @@ class SubrecipientRow(BaseModel):
     Name: constr(strip_whitespace=True, min_length=1, max_length=80) = Field(
         ...,
         serialization_alias="Subrecipient Name",
-        json_schema_extra={"column":"C", "output_column": "B"}
+        json_schema_extra={"column": "C", "output_column": "B"},
     )
-    Recipient_Profile_ID__c: Optional[constr(strip_whitespace=True, min_length=1, max_length=100)] = Field(
+    Recipient_Profile_ID__c: Optional[
+        constr(strip_whitespace=True, min_length=1, max_length=100)
+    ] = Field(
         default=None,
         serialization_alias="Recipient ID",
-        json_schema_extra={"column":"D", "output_column": "C"}
+        json_schema_extra={"column": "D", "output_column": "C"},
     )
     EIN__c: constr(strip_whitespace=True, min_length=9, max_length=9) = Field(
         ...,
         serialization_alias="Subrecipient Tax ID Number (TIN)",
-        json_schema_extra={"column":"E", "output_column": "D"}
+        json_schema_extra={"column": "E", "output_column": "D"},
     )
-    Unique_Entity_Identifier__c: constr(strip_whitespace=True, min_length=12, max_length=12) = Field(
+    Unique_Entity_Identifier__c: constr(
+        strip_whitespace=True, min_length=12, max_length=12
+    ) = Field(
         ...,
         serialization_alias="Unique Entity Identifier (UEI)",
-        json_schema_extra={"column":"F", "output_column": "E"}
+        json_schema_extra={"column": "F", "output_column": "E"},
     )
     POC_Name__c: constr(strip_whitespace=True, min_length=1, max_length=100) = Field(
         ...,
         serialization_alias="POC Name",
-        json_schema_extra={"column":"G", "output_column": "F"}
+        json_schema_extra={"column": "G", "output_column": "F"},
     )
-    POC_Phone_Number__c: constr(strip_whitespace=True, min_length=1, max_length=10) = Field(
-        ..., serialization_alias="POC Phone Number", json_schema_extra={"column":"H", "output_column": "G"}
+    POC_Phone_Number__c: constr(strip_whitespace=True, min_length=1, max_length=10) = (
+        Field(
+            ...,
+            serialization_alias="POC Phone Number",
+            json_schema_extra={"column": "H", "output_column": "G"},
+        )
     )
-    POC_Email_Address__c: constr(strip_whitespace=True, min_length=1, max_length=80) = Field(
-        ..., serialization_alias="POC Email Address", json_schema_extra={"column":"I", "output_column": "H"}
+    POC_Email_Address__c: constr(strip_whitespace=True, min_length=1, max_length=80) = (
+        Field(
+            ...,
+            serialization_alias="POC Email Address",
+            json_schema_extra={"column": "I", "output_column": "H"},
+        )
     )
     Zip__c: constr(strip_whitespace=True, min_length=1, max_length=5) = Field(
         ...,
         serialization_alias="Zip5",
-        json_schema_extra={"column":"J", "output_column": "I"}
+        json_schema_extra={"column": "J", "output_column": "I"},
     )
-    Zip_4__c: Optional[str] = Field(default=None, serialization_alias="Zip4", max_length=4, json_schema_extra={"column":"K", "output_column": "J"})
+    Zip_4__c: Optional[str] = Field(
+        default=None,
+        serialization_alias="Zip4",
+        max_length=4,
+        json_schema_extra={"column": "K", "output_column": "J"},
+    )
     Address__c: constr(strip_whitespace=True, min_length=1, max_length=40) = Field(
         ...,
         serialization_alias="Address Line 1",
-        json_schema_extra={"column":"L", "output_column": "K"}
+        json_schema_extra={"column": "L", "output_column": "K"},
     )
     Address_2__c: Optional[str] = Field(
-        default=None, serialization_alias="Address Line 2", max_length=40, json_schema_extra={"column":"M", "output_column": "L"}
+        default=None,
+        serialization_alias="Address Line 2",
+        max_length=40,
+        json_schema_extra={"column": "M", "output_column": "L"},
     )
     Address_3__c: Optional[str] = Field(
-        default=None, serialization_alias="Address Line 3", max_length=40, json_schema_extra={"column":"N", "output_column": "M"}
+        default=None,
+        serialization_alias="Address Line 3",
+        max_length=40,
+        json_schema_extra={"column": "N", "output_column": "M"},
     )
     City__c: constr(strip_whitespace=True, min_length=1, max_length=100) = Field(
-        ..., serialization_alias="City", json_schema_extra={"column":"O", "output_column": "N"}
+        ...,
+        serialization_alias="City",
+        json_schema_extra={"column": "O", "output_column": "N"},
     )
     State_Abbreviated__c: StateAbbreviation = Field(
-        ..., serialization_alias="State Abbreviated", json_schema_extra={"column":"P", "output_column": "O"}
+        ...,
+        serialization_alias="State Abbreviated",
+        json_schema_extra={"column": "P", "output_column": "O"},
     )
+
     @field_validator(
         "Name",
         "EIN__c",
@@ -778,10 +921,9 @@ class SubrecipientRow(BaseModel):
     @classmethod
     def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
         if isinstance(v, str) and v.strip == "":
-            raise ValueError(
-                f"Value is required for {info.field_name}"
-            )
+            raise ValueError(f"Value is required for {info.field_name}")
         return v
+
 
 METADATA_BY_SHEET = {
     "Cover": {
@@ -812,22 +954,17 @@ class CoverSheetRow(BaseModel):
     model_config = ConfigDict(loc_by_alias=False)
 
     expenditure_category_group: constr(strip_whitespace=True, min_length=1) = Field(
-        ...,
-        alias="Expenditure Category Group", json_schema_extra={"column":"A"}
+        ..., alias="Expenditure Category Group", json_schema_extra={"column": "A"}
     )
     detailed_expenditure_category: constr(strip_whitespace=True, min_length=1) = Field(
-        ...,
-        alias="Detailed Expenditure Category",
-        json_schema_extra={"column":"B"}
+        ..., alias="Detailed Expenditure Category", json_schema_extra={"column": "B"}
     )
 
     @field_validator("expenditure_category_group")
     @classmethod
     def validate_code(cls, v: Any, info: ValidationInfo, **kwargs):
         if v is None or v.strip() == "":
-            raise ValueError(
-                f"EC code must be set"
-            )
+            raise ValueError("EC code must be set")
         return v
 
     @field_validator("detailed_expenditure_category")

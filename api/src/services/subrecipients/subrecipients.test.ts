@@ -36,8 +36,6 @@ describe('subrecipients', () => {
       input: {
         name: 'String',
         organizationId: scenario.subrecipient.two.organizationId,
-        startDate: '2023-12-09T14:50:18.092Z',
-        endDate: '2023-12-09T14:50:18.092Z',
       },
     })
 
@@ -45,8 +43,6 @@ describe('subrecipients', () => {
     expect(result.organizationId).toEqual(
       scenario.subrecipient.two.organizationId
     )
-    expect(result.startDate).toEqual(new Date('2023-12-09T00:00:00.000Z'))
-    expect(result.endDate).toEqual(new Date('2023-12-09T00:00:00.000Z'))
     expect(result.updatedAt).toBeDefined()
   })
 
