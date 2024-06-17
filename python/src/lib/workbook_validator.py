@@ -322,7 +322,7 @@ def validate_project_sheet(
     current_row = INITIAL_STARTING_ROW
     sheet_has_data = False
     for project_row in project_sheet.iter_rows(
-        min_row=13, min_col=3, max_col=123, values_only=True
+        min_row=13, min_col=3, max_col=156, values_only=True
     ):
         current_row += 1
         if is_empty_row(project_row):
