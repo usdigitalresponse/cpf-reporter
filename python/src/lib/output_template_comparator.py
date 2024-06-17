@@ -54,9 +54,7 @@ class CPFDiffReport:
 
 
 class CPFFileArchive:
-    """
-    Class for working with a CPF file archive
-    """
+    """Class for working with a CPF file archive"""
 
     _zip_file: zipfile.ZipFile
     _file_name_map: dict
@@ -66,21 +64,15 @@ class CPFFileArchive:
         self._normalize_names()
 
     def normalized_file_names(self) -> Set[str]:
-        """
-        Returns a dictionary of normalized file names
-        """
+        """Returns a dictionary of normalized file names"""
         return set(self._file_name_map.keys())
 
     def file_by_name(self, name) -> zipfile.ZipExtFile:
-        """
-        Returns a file object by name
-        """
+        """Returns a file object by name"""
         return self._zip_file.open(self._file_name_map[name])
 
     def _normalize_names(self):
-        """
-        Normalizes file names
-        """
+        """Normalizes file names"""
         suffix_regex = r"\s\(\d+\)"
         normalized_files = {}
         for file in self._zip_file.namelist():
@@ -204,18 +196,19 @@ def compare(
                 previous_sheet, latest_sheet, header_map
             )
             if cell_value_differences:
-                differences.cell_value_changed[
-                    f"{file}: {sheet}"
-                ] += cell_value_differences
+                differences.cell_value_changed[f"{file}: {sheet}"] += (
+                    cell_value_differences
+                )
 
     return differences
 
 
 def load_files(zip_path) -> zipfile.ZipFile:
-    """
-    Load XLSX files from a zip file
+    """Loads XLSX files from a zip file.
+
     Args:
         zip_path (str): Path to the zip file
+
     Returns:
         list: List of files in the zip file
     """
@@ -224,13 +217,14 @@ def load_files(zip_path) -> zipfile.ZipFile:
 
 
 if __name__ == "__main__":
-    """
-    Main function to test comparator function
-    Accepts two arguments. First argument is the "latest" template. Second argument is the previous template.
-    Returns a list of changes that are in the latest template that are different from the previous template.
+    """Main function to test comparator function.
+
+    Accepts two arguments:
+        1. Argument is the "latest" template. Second argument is the previous template.
+        2. Returns a list of changes that are in the latest template that are different
+        from the previous template.
 
     Run with `poetry run python -m src.lib.output_template_comparator 2024_05_16.zip 2024_04_26.zip`
-
     """
     import sys
 

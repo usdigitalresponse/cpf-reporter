@@ -16,11 +16,12 @@ export default async ({ args }) => {
   const { action, email, id } = args
 
   switch (action) {
-    case 'create':
+    case 'create': {
       const newUser = await createPassageUser(email)
       console.log('User successfully created:')
       console.log(newUser)
       break
+    }
     case 'delete':
       await deletePassageUser(id)
       console.log('User successfully deleted.')
