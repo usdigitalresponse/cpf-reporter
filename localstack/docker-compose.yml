@@ -15,3 +15,5 @@ services:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "./entrypoint/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh"
+      - "../scripts/function.zip:/tmp/function.zip"
+      - "../scripts/function_py.zip:/tmp/function_py.zip"
