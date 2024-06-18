@@ -21,13 +21,16 @@ def valid_file() -> BinaryIO:
 def valid_workbook() -> openpyxl.Workbook:
     return openpyxl.load_workbook(_SAMPLE_VALID_XLSM_V2024_05_24)
 
+
 @pytest.fixture
 def valid_workbook_old_schema() -> openpyxl.Workbook:
     return openpyxl.load_workbook(_SAMPLE_VALID_XLSM)
 
+
 @pytest.fixture
 def valid_coversheet(valid_workbook) -> openpyxl.worksheet.worksheet.Worksheet:
     return valid_workbook["Cover"]
+
 
 @pytest.fixture
 def valid_project_sheet(valid_workbook) -> openpyxl.worksheet.worksheet.Worksheet:
@@ -58,6 +61,12 @@ def invalid_cover_sheet_empty_code(valid_coversheet):
 
 
 @pytest.fixture
+def invalid_cover_sheet_empty_desc(valid_coversheet):
+    valid_coversheet["B2"] = "  "
+    return valid_coversheet
+
+
+@pytest.fixture
 def invalid_project_sheet(valid_project_sheet):
     valid_project_sheet["D13"] = "X" * 21
     return valid_project_sheet
@@ -73,6 +82,25 @@ def invalid_project_sheet_missing_field(valid_project_sheet):
 def invalid_project_sheet_empty_field(valid_project_sheet):
     valid_project_sheet["D13"] = "    "
     return valid_project_sheet
+
+
+@pytest.fixture
+def invalid_project_sheet_unmatching_subrecipient_tin_field(valid_workbook):
+    valid_workbook["Subrecipients"]["E13"] = "123123124"
+    return valid_workbook
+
+
+@pytest.fixture
+def invalid_project_sheet_unmatching_subrecipient_uei_field(valid_workbook):
+    valid_workbook["Subrecipients"]["F13"] = "123412341235"
+    return valid_workbook
+
+
+@pytest.fixture
+def invalid_project_sheet_unmatching_subrecipient_tin_uei_field(valid_workbook):
+    valid_workbook["Subrecipients"]["E13"] = "123123124"
+    valid_workbook["Subrecipients"]["F13"] = "123412341235"
+    return valid_workbook
 
 
 @pytest.fixture
