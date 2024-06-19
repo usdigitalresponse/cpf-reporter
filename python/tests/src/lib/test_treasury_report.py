@@ -16,9 +16,9 @@ from src.schemas.schema_versions import Version
 from src.schemas.project_types import ProjectType
 
 OUTPUT_STARTING_ROW = 8
-PROJECT_USE_CODE = ProjectType._1C
+project_use_code = ProjectType._1C
 VERSION = Version.V2024_05_24
-ProjectRowSchema = getSchemaByProject(VERSION, PROJECT_USE_CODE)
+ProjectRowSchema = getSchemaByProject(VERSION, project_use_code)
 
 FIRST_ID = "33"
 SECOND_ID = "44"
@@ -37,6 +37,7 @@ class TestGenerateOutput1C:
         project_id_to_upload_date = {}
         createdAt = datetime.now()
         combine_project_rows(
+            ProjectRowSchema=ProjectRowSchema,
             projects=project_jsons,
             project_id_to_upload_date=project_id_to_upload_date,
             project_id_to_data=project_id_to_data,
@@ -60,6 +61,7 @@ class TestGenerateOutput1C:
         project_id_to_upload_date = {}
         createdAt1 = datetime.now()
         combine_project_rows(
+            ProjectRowSchema=ProjectRowSchema,
             projects=project_jsons,
             project_id_to_upload_date=project_id_to_upload_date,
             project_id_to_data=project_id_to_data,
@@ -76,6 +78,7 @@ class TestGenerateOutput1C:
 
         createdAt2 = datetime.now()
         combine_project_rows(
+            ProjectRowSchema=ProjectRowSchema,
             projects=project_jsons,
             project_id_to_upload_date=project_id_to_upload_date,
             project_id_to_data=project_id_to_data,
@@ -102,6 +105,7 @@ class TestGenerateOutput1C:
         project_id_to_upload_date = {}
         createdAt1 = datetime.now()
         combine_project_rows(
+            ProjectRowSchema=ProjectRowSchema,
             projects=project_jsons,
             project_id_to_upload_date=project_id_to_upload_date,
             project_id_to_data=project_id_to_data,
@@ -118,6 +122,7 @@ class TestGenerateOutput1C:
 
         createdAt2 = datetime.now() - timedelta(days=1)
         combine_project_rows(
+            ProjectRowSchema=ProjectRowSchema,
             projects=project_jsons,
             project_id_to_upload_date=project_id_to_upload_date,
             project_id_to_data=project_id_to_data,
@@ -141,6 +146,7 @@ class TestGenerateOutput1C:
         project_id_to_upload_date = {}
         createdAt1 = datetime.now()
         combine_project_rows(
+            ProjectRowSchema=ProjectRowSchema,
             projects=project_jsons,
             project_id_to_upload_date=project_id_to_upload_date,
             project_id_to_data=project_id_to_data,
@@ -155,6 +161,7 @@ class TestGenerateOutput1C:
 
         createdAt2 = datetime.now() - timedelta(days=1)
         combine_project_rows(
+            ProjectRowSchema=ProjectRowSchema,
             projects=project_jsons,
             project_id_to_upload_date=project_id_to_upload_date,
             project_id_to_data=project_id_to_data,
@@ -181,13 +188,16 @@ class TestGenerateOutput1C:
         project_id_to_upload_date = {}
         createdAt = datetime.now()
         combine_project_rows(
+            ProjectRowSchema=ProjectRowSchema,
             projects=project_jsons,
             project_id_to_upload_date=project_id_to_upload_date,
             project_id_to_data=project_id_to_data,
             createdAt=createdAt,
         )
         populate_output_report(
-            workbook=output_template, project_id_to_data=project_id_to_data
+            project_use_code=project_use_code,
+            workbook=output_template,
+            project_id_to_data=project_id_to_data
         )
         sheet = output_template["Baseline"]
         assert sheet["B8"].value == project_id_to_data[FIRST_ID].Project_Name__c
@@ -209,6 +219,7 @@ class TestGenerateOutput1C:
         project_id_to_upload_date = {}
         createdAt1 = datetime.now()
         combine_project_rows(
+            ProjectRowSchema=ProjectRowSchema,
             projects=project_jsons,
             project_id_to_upload_date=project_id_to_upload_date,
             project_id_to_data=project_id_to_data,
@@ -223,13 +234,16 @@ class TestGenerateOutput1C:
 
         createdAt2 = datetime.now() - timedelta(days=1)
         combine_project_rows(
+            ProjectRowSchema=ProjectRowSchema,
             projects=project_jsons,
             project_id_to_upload_date=project_id_to_upload_date,
             project_id_to_data=project_id_to_data,
             createdAt=createdAt2,
         )
         populate_output_report(
-            workbook=output_template, project_id_to_data=project_id_to_data
+            project_use_code=project_use_code,
+            workbook=output_template,
+            project_id_to_data=project_id_to_data
         )
         sheet = output_template["Baseline"]
         assert sheet["B8"].value == project_id_to_data[FIRST_ID].Project_Name__c
@@ -253,6 +267,7 @@ class TestGenerateOutput1C:
         project_id_to_upload_date = {}
         createdAt = datetime.now()
         combine_project_rows(
+            ProjectRowSchema=ProjectRowSchema,
             projects=project_jsons,
             project_id_to_upload_date=project_id_to_upload_date,
             project_id_to_data=project_id_to_data,
@@ -266,13 +281,16 @@ class TestGenerateOutput1C:
 
         createdAt2 = datetime.now() - timedelta(days=1)
         combine_project_rows(
+            ProjectRowSchema=ProjectRowSchema,
             projects=project_jsons,
             project_id_to_upload_date=project_id_to_upload_date,
             project_id_to_data=project_id_to_data,
             createdAt=createdAt2,
         )
         num_rows = populate_output_report(
-            workbook=output_template, project_id_to_data=project_id_to_data
+            project_use_code=project_use_code,
+            workbook=output_template,
+            project_id_to_data=project_id_to_data
         )
         with tempfile.NamedTemporaryFile("w+") as csv_file:
             convert_xlsx_to_csv(csv_file, output_template, num_rows)
