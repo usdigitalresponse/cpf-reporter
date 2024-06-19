@@ -6,7 +6,7 @@ from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from src.lib.workbook_validator import validate_project_sheet
 from src.schemas.schema_versions import getSchemaByProject
-from src.functions.generate_treasury_report_1C import (
+from src.functions.generate_treasury_report import (
     combine_project_rows,
     populate_output_report,
     convert_xlsx_to_csv,
