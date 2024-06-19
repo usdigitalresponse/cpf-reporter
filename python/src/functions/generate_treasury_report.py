@@ -217,8 +217,9 @@ def upload_generated_file_to_s3(client: S3Client, bucket, key: str, file: IO[byt
 
     logger = logger.bind(upload={"s3": {"bucket": bucket, "key": key}})
     try:
+        file.seek(0)
         client.put_object(
-            file,
+            Body=file,
             Bucket=bucket,
             Key=unquote_plus(key),
             ServerSideEncryption="AES256",
