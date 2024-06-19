@@ -23,14 +23,17 @@ from src.schemas.schema_versions import (
 from src.schemas.project_types import ProjectType
 
 OUTPUT_STARTING_ROW = 8
-PROJECT_USE_CODE = ProjectType._1C
+OUTPUT_TEMPLATE = {
+    ProjectType._1A: "CPF1ABroadbandInfrastructureTemplate",
+    ProjectType._1B: "CPF1BDigitalConnectivityTechTemplate",
+    ProjectType._1C: "CPF1CMultiPurposeCommunityTemplate",
+}
 VERSION = Version.V2024_05_24
-ProjectRowSchema = getSchemaByProject(VERSION, PROJECT_USE_CODE)
 
 
 @reset_contextvars
 def handle(event: S3Event, context: Context):
-    """Lambda handler for generating Treasure Reports for Project Code 1C
+    """Lambda handler for generating Treasure Reports
 
     Args:
         event: S3 Lambda event of type `s3:ObjectCreated:*`
@@ -40,8 +43,17 @@ def handle(event: S3Event, context: Context):
     logger = get_logger()
     logger.info("received new invocation event from step function")
 
+    project_code = event["Project"]
+    if project_code == "1A":
+        project_use_code = ProjectType._1A
+    elif project_code == "1B":
+        project_use_code = ProjectType._1B
+    elif project_code == "1C":
+        project_use_code = ProjectType._1C
+    ProjectRowSchema = getSchemaByProject(VERSION, project_use_code)
+
     uploadsByExpenditureCategory = event.get("uploadsByExpenditureCategory", {})
-    file_info_list = uploadsByExpenditureCategory.get(PROJECT_USE_CODE, {})
+    file_info_list = uploadsByExpenditureCategory.get(project_use_code, {})
 
     project_id_to_data: Dict[
         str, List[Union[Project1ARow, Project1BRow, Project1CRow]]
@@ -51,6 +63,7 @@ def handle(event: S3Event, context: Context):
         # Download projects from DynamoDB
         projects, createdAt = get_project_from_db()
         combine_project_rows(
+            ProjectRowSchema=ProjectRowSchema,
             projects=projects,
             project_id_to_upload_date=project_id_to_upload_date,
             project_id_to_data=project_id_to_data,
@@ -63,18 +76,22 @@ def handle(event: S3Event, context: Context):
         download_workbook(
             s3_client,
             event["Records"][0]["s3"]["bucket"]["name"],
-            event["Records"][0]["s3"]["object"]["key"],
+            f"{OUTPUT_TEMPLATE[project_use_code]}.xlsx",
             file,
         )
         workbook = load_workbook(filename=file)
-        populate_output_report(workbook=workbook, project_id_to_data=project_id_to_data)
+        populate_output_report(
+            project_use_code=project_use_code,
+            workbook=workbook,
+            project_id_to_data=project_id_to_data,
+        )
 
         with tempfile.NamedTemporaryFile("w") as csv_file:
             convert_xlsx_to_csv(csv_file, workbook)
             upload_generated_file_to_s3(
                 s3_client,
-                event["Records"][0]["s3"]["bucket"]["name"],
-                f"{event["Records"][0]["s3"]["object"]["key"]}.json",
+                f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/{user.id}",
+                f"{OUTPUT_TEMPLATE[project_use_code]}.csv",
                 csv_file,
             )
 
@@ -84,6 +101,7 @@ def get_project_from_db():
 
 
 def combine_project_rows(
+    ProjectRowSchema,
     projects: List[Union[Project1ARow, Project1BRow, Project1CRow]],
     project_id_to_upload_date: Dict[str, datetime],
     project_id_to_data: Dict[
@@ -109,6 +127,7 @@ def combine_project_rows(
 
 
 def populate_output_report(
+    project_use_code,
     workbook: IO[bytes],
     project_id_to_data: Dict[
         str, List[Union[Project1ARow, Project1BRow, Project1CRow]]
@@ -130,8 +149,8 @@ def populate_output_report(
             prop_meta = row_schema.get(prop)
             if not prop_meta:
                 raise Exception("Property not found. Cannot generate report")
-            if prop_meta[f"output_column_{PROJECT_USE_CODE}"]:
-                row_with_output_cols[prop_meta[f"output_column_{PROJECT_USE_CODE}"]] = (
+            if prop_meta[f"output_column_{project_use_code}"]:
+                row_with_output_cols[prop_meta[f"output_column_{project_use_code}"]] = (
                     row_dict[prop]
                 )
 
