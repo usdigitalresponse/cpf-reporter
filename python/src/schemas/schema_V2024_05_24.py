@@ -127,13 +127,13 @@ class BaseProjectRow(BaseModel):
     row_num: conint(ge=1) = Field(
         default=1,
         serialization_alias="Row Number",
-        json_schema_extra={"column": None, "output_column_1C": None},
+        json_schema_extra={"column": None, "output_column_1A": None, "output_column_1B": None, "output_column_1C": None},
     )
     Project_Name__c: constr(strip_whitespace=True, min_length=1, max_length=100) = (
         Field(
             ...,
             serialization_alias="Project Name",
-            json_schema_extra={"column": "C", "output_column_1A": "B", "output_column_1C": "B"},
+            json_schema_extra={"column": "C", "output_column_1A": "B", "output_column_1B": "B", "output_column_1C": "B"},
         )
     )
     Identification_Number__c: constr(
@@ -141,20 +141,20 @@ class BaseProjectRow(BaseModel):
     ) = Field(
         ...,
         serialization_alias="Identification Number",
-        json_schema_extra={"column": "D", "output_column_1A": "C", "output_column_1C": "C"},
+        json_schema_extra={"column": "D", "output_column_1A": "C", "output_column_1B": "C", "output_column_1C": "C"},
     )
     Subrecipient_UEI__c: constr(strip_whitespace=True, min_length=12, max_length=12) = (
         Field(
             ...,
             serialization_alias="Subrecipient UEI",
-            json_schema_extra={"column": "E", "output_column_1A": "D", "output_column_1C": "D"},
+            json_schema_extra={"column": "E", "output_column_1A": "D", "output_column_1B": "D", "output_column_1C": "D"},
         )
     )
     Subrecipient_TIN__c: constr(strip_whitespace=True, min_length=9, max_length=9) = (
         Field(
             ...,
             serialization_alias="Subrecipient TIN",
-            json_schema_extra={"column": "F", "output_column_1A": "E", "output_column_1C": "E"},
+            json_schema_extra={"column": "F", "output_column_1A": "E", "output_column_1B": "E", "output_column_1C": "E"},
         )
     )
     Project_Description__c: constr(
@@ -162,214 +162,214 @@ class BaseProjectRow(BaseModel):
     ) = Field(
         ...,
         serialization_alias="Project Description",
-        json_schema_extra={"column": "G", "output_column_1A": "F", "output_column_1C": "F"},
+        json_schema_extra={"column": "G", "output_column_1A": "F", "output_column_1B": "F", "output_column_1C": "F"},
     )
     Capital_Asset_Ownership_Type__c: CapitalAssetOwnershipType = Field(
         ...,
         serialization_alias="Capital Asset Owenership Type",
-        json_schema_extra={"column": "H", "output_column_1A": "G", "output_column_1C": "G"},
+        json_schema_extra={"column": "H", "output_column_1A": "G", "output_column_1B": "G", "output_column_1C": "G"},
     )
     Total_CPF_Funding_for_Project__c: condecimal(max_digits=13, decimal_places=2) = (
         Field(
             ...,
             serialization_alias="Total CPF Funding for Project",
-            json_schema_extra={"column": "I", "output_column_1A": "H", "output_column_1C": "H"},
+            json_schema_extra={"column": "I", "output_column_1A": "H", "output_column_1B": "H", "output_column_1C": "H"},
         )
     )
     Total_from_all_funding_sources__c: condecimal(max_digits=13, decimal_places=2) = (
         Field(
             ...,
             serialization_alias="Total From all Funding Sources",
-            json_schema_extra={"column": "J", "output_column_1A": "I", "output_column_1C": "I"},
+            json_schema_extra={"column": "J", "output_column_1A": "I", "output_column_1B": "I", "output_column_1C": "I"},
         )
     )
     Narrative_Description__c: Optional[str] = Field(
         default=None,
         serialization_alias="Narrative Description",
         max_length=3000,
-        json_schema_extra={"column": "K", "output_column_1A": "J", "output_column_1C": "J"},
+        json_schema_extra={"column": "K", "output_column_1A": "J", "output_column_1B": "J", "output_column_1C": "J"},
     )
     Current_Period_Obligation__c: condecimal(max_digits=12, decimal_places=2) = Field(
         ...,
         serialization_alias="Current Period Obligation",
-        json_schema_extra={"column": "L", "output_column_1A": "K", "output_column_1C": "K"},
+        json_schema_extra={"column": "L", "output_column_1A": "K", "output_column_1B": "K", "output_column_1C": "K"},
     )
     Current_Period_Expenditure__c: condecimal(max_digits=12, decimal_places=2) = Field(
         ...,
         serialization_alias="Current Period Expenditure",
-        json_schema_extra={"column": "M", "output_column_1A": "L", "output_column_1C": "L"},
+        json_schema_extra={"column": "M", "output_column_1A": "L", "output_column_1B": "L", "output_column_1C": "L"},
     )
     Cumulative_Obligation__c: condecimal(max_digits=12, decimal_places=2) = Field(
         ...,
         serialization_alias="Cumulative Obligation",
-        json_schema_extra={"column": "N", "output_column_1A": "M", "output_column_1C": "M"},
+        json_schema_extra={"column": "N", "output_column_1A": "M", "output_column_1B": "M", "output_column_1C": "M"},
     )
     Cumulative_Expenditure__c: condecimal(max_digits=12, decimal_places=2) = Field(
         ...,
         serialization_alias="Cumulative Expenditure",
-        json_schema_extra={"column": "O", "output_column_1A": "N", "output_column_1C": "N"},
+        json_schema_extra={"column": "O", "output_column_1A": "N", "output_column_1B": "N", "output_column_1C": "N"},
     )
     Cost_Overview__c: constr(strip_whitespace=True, min_length=1, max_length=3000) = (
         Field(
             ...,
             serialization_alias="Cost Overview",
-            json_schema_extra={"column": "P", "output_column_1A": "O", "output_column_1C": "U"},
+            json_schema_extra={"column": "P", "output_column_1A": "O", "output_column_1B": "U", "output_column_1C": "U"},
         )
     )
     Project_Status__c: ProjectStatusType = Field(
         ...,
         serialization_alias="Project Status",
-        json_schema_extra={"column": "Q", "output_column_1A": "P", "output_column_1C": "V"},
+        json_schema_extra={"column": "Q", "output_column_1A": "P", "output_column_1B": "V", "output_column_1C": "V"},
     )
     Projected_Con_Start_Date__c: Optional[datetime] = Field(
         default=None,
         serialization_alias="Projected Con. Start Date",
-        json_schema_extra={"column": "R", "output_column_1A": "Q", "output_column_1C": "W"},
+        json_schema_extra={"column": "R", "output_column_1A": "Q", "output_column_1B": "W", "output_column_1C": "W"},
     )
     Projected_Con_Completion__c: Optional[datetime] = Field(
         default=None,
         serialization_alias="Projected Con. Completion",
-        json_schema_extra={"column": "S", "output_column_1A": "R", "output_column_1C": "X"},
+        json_schema_extra={"column": "S", "output_column_1A": "R", "output_column_1B": "X", "output_column_1C": "X"},
     )
     Projected_Init_of_Operations__c: Optional[datetime] = Field(
         default=None,
         serialization_alias="Projected Init. of Operations",
-        json_schema_extra={"column": "T", "output_column_1A": "S", "output_column_1C": "Y"},
+        json_schema_extra={"column": "T", "output_column_1A": "S", "output_column_1B": "Y", "output_column_1C": "Y"},
     )
     Actual_Con_Start_Date__c: Optional[datetime] = Field(
         default=None,
         serialization_alias="Actual Con. Start Date",
-        json_schema_extra={"column": "U", "output_column_1A": "T", "output_column_1C": "Z"},
+        json_schema_extra={"column": "U", "output_column_1A": "T", "output_column_1B": "Z", "output_column_1C": "Z"},
     )
     Actual_Con_Completion__c: Optional[datetime] = Field(
         default=None,
         serialization_alias="Actual Con. Completion",
-        json_schema_extra={"column": "V", "output_column_1A": "U", "output_column_1C": "AA"},
+        json_schema_extra={"column": "V", "output_column_1A": "U", "output_column_1B": "AA", "output_column_1C": "AA"},
     )
     Operations_initiated__c: Optional[YesNoType] = Field(
         default=None,
         serialization_alias="Operations Initiated",
-        json_schema_extra={"column": "W", "output_column_1A": "V", "output_column_1C": "AB"},
+        json_schema_extra={"column": "W", "output_column_1A": "V", "output_column_1B": "AB", "output_column_1C": "AB"},
     )
     Actual_operations_date__c: Optional[datetime] = Field(
         default=None,
         serialization_alias="Actual operations date",
-        json_schema_extra={"column": "X", "output_column_1A": "W", "output_column_1C": "AC"},
+        json_schema_extra={"column": "X", "output_column_1A": "W", "output_column_1B": "AC", "output_column_1C": "AC"},
     )
     Operations_explanation__c: Optional[str] = Field(
         default=None,
         serialization_alias="Operations explanation",
         max_length=3000,
-        json_schema_extra={"column": "Y", "output_column_1A": "X", "output_column_1C": "AD"},
+        json_schema_extra={"column": "Y", "output_column_1A": "X", "output_column_1B": "AD", "output_column_1C": "AD"},
     )
     Other_Federal_Funding__c: YesNoType = Field(
         ...,
         serialization_alias="Other Federal Funding?",
-        json_schema_extra={"column": "Z", "output_column_1A": "Y", "output_column_1C": "AF"},
+        json_schema_extra={"column": "Z", "output_column_1A": "Y", "output_column_1B": "AE", "output_column_1C": "AF"},
     )
     Matching_Funds__c: YesNoType = Field(
         ...,
         serialization_alias="Matching Funds?",
-        json_schema_extra={"column": "AA", "output_column_1A": "Z", "output_column_1C": "AE"},
+        json_schema_extra={"column": "AA", "output_column_1A": "Z", "output_column_1B": "AF", "output_column_1C": "AE"},
     )
     Program_Information__c: Optional[str] = Field(
         default=None,
         serialization_alias="Program Information",
         max_length=50,
-        json_schema_extra={"column": "AB", "output_column_1A": "AA", "output_column_1C": "AG"},
+        json_schema_extra={"column": "AB", "output_column_1A": "AA", "output_column_1B": "AG", "output_column_1C": "AG"},
     )
     Amount_of_Matching_Funds__c: Optional[
         condecimal(max_digits=12, decimal_places=2)
     ] = Field(
         default=None,
         serialization_alias="Amount of Matching Funds",
-        json_schema_extra={"column": "AC", "output_column_1A": "AB", "output_column_1C": "AH"},
+        json_schema_extra={"column": "AC", "output_column_1A": "AB", "output_column_1B": "AH", "output_column_1C": "AH"},
     )
     Target_Project_Info__c: Optional[str] = Field(
         default=None,
         serialization_alias="Target Project Info",
         max_length=3000,
-        json_schema_extra={"column": "AD", "output_column_1A": "AC", "output_column_1C": "AI"},
+        json_schema_extra={"column": "AD", "output_column_1A": "AC", "output_column_1B": "AI", "output_column_1C": "AI"},
     )
     Davis_Bacon_Certification__c: Optional[YesNoType] = Field(
         default=None,
         serialization_alias="Davis Bacon Certification?",
-        json_schema_extra={"column": "AE", "output_column_1A": "AD", "output_column_1C": "AJ"},
+        json_schema_extra={"column": "AE", "output_column_1A": "AD", "output_column_1B": "AJ", "output_column_1C": "AJ"},
     )
     Number_of_Direct_Employees__c: Optional[conint(ge=0, le=99999999999)] = Field(
         default=None,
         serialization_alias="Number of Direct Employees",
-        json_schema_extra={"column": "AF", "output_column_1A": "AE", "output_column_1C": "AK"},
+        json_schema_extra={"column": "AF", "output_column_1A": "AE", "output_column_1B": "AK", "output_column_1C": "AK"},
     )
     Number_of_Contractor_Employees__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None,
         serialization_alias="Number of Contractor Employees",
-        json_schema_extra={"column": "AG", "output_column_1A": "AF", "output_column_1C": "AL"},
+        json_schema_extra={"column": "AG", "output_column_1A": "AF", "output_column_1B": "AL", "output_column_1C": "AL"},
     )
     Number_of_3rd_Party_Employees__c: Optional[conint(ge=0, le=999999999999)] = Field(
         default=None,
         serialization_alias="Number of 3rd Party Employees",
-        json_schema_extra={"column": "AH", "output_column_1A": "AG", "output_column_1C": "AM"},
+        json_schema_extra={"column": "AH", "output_column_1A": "AG", "output_column_1B": "AM", "output_column_1C": "AM"},
     )
     Any_Wages_Less_Than_Prevailing__c: Optional[YesNoType] = Field(
         default=None,
         serialization_alias="Any Wages Less Than Prevailing?",
-        json_schema_extra={"column": "AI", "output_column_1A": "AH", "output_column_1C": "AN"},
+        json_schema_extra={"column": "AI", "output_column_1A": "AH", "output_column_1B": "AN", "output_column_1C": "AN"},
     )
     Wages_and_benefits__c: Optional[str] = Field(
         default=None,
         serialization_alias="Wages and benefits of workers on the project by classification",
         max_length=3000,
-        json_schema_extra={"column": "AJ", "output_column_1A": "AI", "output_column_1C": "AO"},
+        json_schema_extra={"column": "AJ", "output_column_1A": "AI", "output_column_1B": "AO", "output_column_1C": "AO"},
     )
     Project_Labor_Certification__c: Optional[YesNoType] = Field(
         default=None,
         serialization_alias="Project Labor Certification?",
-        json_schema_extra={"column": "AK", "output_column_1A": "AJ", "output_column_1C": "AP"},
+        json_schema_extra={"column": "AK", "output_column_1A": "AJ", "output_column_1B": "AP", "output_column_1C": "AP"},
     )
     Assurance_of_Adequate_Labor__c: Optional[str] = Field(
         default=None,
         serialization_alias="Assurance of Adequate Labor?",
         max_length=3000,
-        json_schema_extra={"column": "AL", "output_column_1A": "AK", "output_column_1C": "AQ"},
+        json_schema_extra={"column": "AL", "output_column_1A": "AK", "output_column_1B": "AQ", "output_column_1C": "AQ"},
     )
     Minimizing_Risks__c: Optional[str] = Field(
         default=None,
         serialization_alias="Minimizing Risks?",
         max_length=3000,
-        json_schema_extra={"column": "AM", "output_column_1A": "AL", "output_column_1C": "AR"},
+        json_schema_extra={"column": "AM", "output_column_1A": "AL", "output_column_1B": "AR", "output_column_1C": "AR"},
     )
     Safe_and_Healthy_Workplace__c: Optional[str] = Field(
         default=None,
         serialization_alias="Explain Safe and Healthy Workplace",
         max_length=3000,
-        json_schema_extra={"column": "AN", "output_column_1A": "AM", "output_column_1C": "AS"},
+        json_schema_extra={"column": "AN", "output_column_1A": "AM", "output_column_1B": "AS", "output_column_1C": "AS"},
     )
     Adequate_Wages__c: Optional[YesNoType] = Field(
         default=None,
         serialization_alias="Adequate Wages?",
-        json_schema_extra={"column": "AO", "output_column_1A": "AN", "output_column_1C": "AT"},
+        json_schema_extra={"column": "AO", "output_column_1A": "AN", "output_column_1B": "AT", "output_column_1C": "AT"},
     )
     Project_Labor_Agreement__c: Optional[YesNoType] = Field(
         default=None,
         serialization_alias="Project Labor Agreement?",
-        json_schema_extra={"column": "AP", "output_column_1A": "AO", "output_column_1C": "AU"},
+        json_schema_extra={"column": "AP", "output_column_1A": "AO", "output_column_1B": "AU", "output_column_1C": "AU"},
     )
     Prioritize_Local_Hires__c: Optional[YesNoType] = Field(
         default=None,
         serialization_alias="Prioritize Local Hires?",
-        json_schema_extra={"column": "AQ", "output_column_1A": "AP", "output_column_1C": "AV"},
+        json_schema_extra={"column": "AQ", "output_column_1A": "AP", "output_column_1B": "AV", "output_column_1C": "AV"},
     )
     Community_Benefit_Agreement__c: Optional[YesNoType] = Field(
         default=None,
         serialization_alias="Community Benefit Agreement?",
-        json_schema_extra={"column": "AR", "output_column_1A": "AQ", "output_column_1C": "AW"},
+        json_schema_extra={"column": "AR", "output_column_1A": "AQ", "output_column_1B": "AW", "output_column_1C": "AW"},
     )
     Description_of_Community_Ben_Agr__c: Optional[str] = Field(
         default=None,
         serialization_alias="Description of Community Ben. Agr.",
         max_length=3000,
-        json_schema_extra={"column": "AS", "output_column_1A": "AR", "output_column_1C": "AX"},
+        json_schema_extra={"column": "AS", "output_column_1A": "AR", "output_column_1B": "AX", "output_column_1C": "AX"},
     )
 
     @field_validator(
@@ -574,65 +574,65 @@ class AddressFields(BaseModel):
         Field(
             ...,
             serialization_alias="Street 1 (Planned)",
-            json_schema_extra={"column": "BS", "output_column_1C": "AY"},
+            json_schema_extra={"column": "BS", "output_column_1B": "AY", "output_column_1C": "AY"},
         )
     )
     Street_2_Planned__c: Optional[str] = Field(
         default=None,
         serialization_alias="Street 2 (Planned)",
         max_length=40,
-        json_schema_extra={"column": "BT", "output_column_1C": "AZ"},
+        json_schema_extra={"column": "BT", "output_column_1B": "AZ", "output_column_1C": "AZ"},
     )
     Same_Address__c: Optional[YesNoType] = Field(
         default=None,
         serialization_alias="Same Address",
-        json_schema_extra={"column": "BU", "output_column_1C": "BI"},
+        json_schema_extra={"column": "BU", "output_column_1B": "BI", "output_column_1C": "BI"},
     )
     Street_1_Actual__c: Optional[str] = Field(
         default=None,
         serialization_alias="Street 1 (Actual)",
         max_length=40,
-        json_schema_extra={"column": "BV", "output_column_1C": "BA"},
+        json_schema_extra={"column": "BV", "output_column_1B": "BA", "output_column_1C": "BA"},
     )
     Street_2_Actual__c: Optional[str] = Field(
         default=None,
         serialization_alias="Street 2 (Actual)",
         max_length=40,
-        json_schema_extra={"column": "BW", "output_column_1C": "BB"},
+        json_schema_extra={"column": "BW", "output_column_1B": "BB", "output_column_1C": "BB"},
     )
     City_Planned__c: constr(strip_whitespace=True, min_length=1, max_length=40) = Field(
         ...,
         serialization_alias="City (Planned)",
-        json_schema_extra={"column": "BX", "output_column_1C": "BC"},
+        json_schema_extra={"column": "BX", "output_column_1B": "BC", "output_column_1C": "BC"},
     )
     City_Actual__c: Optional[str] = Field(
         default=None,
         serialization_alias="City (Actual)",
         max_length=40,
-        json_schema_extra={"column": "BY", "output_column_1C": "BD"},
+        json_schema_extra={"column": "BY", "output_column_1B": "BD", "output_column_1C": "BD"},
     )
     State_Planned__c: StateAbbreviation = Field(
         ...,
         serialization_alias="State (Planned)",
-        json_schema_extra={"column": "BZ", "output_column_1C": "BE"},
+        json_schema_extra={"column": "BZ", "output_column_1B": "BE", "output_column_1C": "BE"},
     )
     State_Actual__c: Optional[StateAbbreviation] = Field(
         default=None,
         serialization_alias="State (Actual)",
-        json_schema_extra={"column": "CA", "output_column_1C": "BF"},
+        json_schema_extra={"column": "CA", "output_column_1B": "BF", "output_column_1C": "BF"},
     )
     Zip_Code_Planned__c: constr(strip_whitespace=True, min_length=1, max_length=5) = (
         Field(
             ...,
             serialization_alias="Zip Code (Planned)",
-            json_schema_extra={"column": "CB", "output_column_1C": "BG"},
+            json_schema_extra={"column": "CB", "output_column_1B": "BG", "output_column_1C": "BG"},
         )
     )
     Zip_Code_Actual__c: Optional[str] = Field(
         default=None,
         serialization_alias="Zip Code (Actual)",
         max_length=5,
-        json_schema_extra={"column": "CC", "output_column_1C": "BH"},
+        json_schema_extra={"column": "CC", "output_column_1B": "BH", "output_column_1C": "BH"},
     )
 
     @field_validator(
@@ -649,18 +649,18 @@ class AddressFields(BaseModel):
 
 class Project1BRow(BaseProjectRow, AddressFields):
     Laptops_Planned__c: conint(ge=0, le=9999999999) = Field(
-        ..., serialization_alias="Laptops (Planned)", json_schema_extra={"column": "CD"}
+        ..., serialization_alias="Laptops (Planned)", json_schema_extra={"column": "CD", "output_column_1B": "BJ"}
     )
     Laptops_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None,
         serialization_alias="Laptops (Actual)",
-        json_schema_extra={"column": "CE"},
+        json_schema_extra={"column": "CE", "output_column_1B": "BK"},
     )
     Laptops_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = (
         Field(
             ...,
             serialization_alias="Laptops Expenditure (Planned)",
-            json_schema_extra={"column": "CF"},
+            json_schema_extra={"column": "CF", "output_column_1B": "BL"},
         )
     )
     Laptops_Expenditures_Actual__c: Optional[
@@ -668,67 +668,67 @@ class Project1BRow(BaseProjectRow, AddressFields):
     ] = Field(
         default=None,
         serialization_alias="Laptops Expenditure (Actual)",
-        json_schema_extra={"column": "CG"},
+        json_schema_extra={"column": "CG", "output_column_1B": "BM"},
     )
     Tablets_Planned__c: conint(ge=0, le=9999999999) = Field(
-        ..., serialization_alias="Tablets (Planned)", json_schema_extra={"column": "CH"}
+        ..., serialization_alias="Tablets (Planned)", json_schema_extra={"column": "CH", "output_column_1B": "BN"}
     )
     Tablets_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None,
         serialization_alias="Tablets (Actual)",
-        json_schema_extra={"column": "CI"},
+        json_schema_extra={"column": "CI", "output_column_1B": "BO"},
     )
     Tablet_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = Field(
         ...,
         serialization_alias="Tablets Expenditure (Planned)",
-        json_schema_extra={"column": "CJ"},
+        json_schema_extra={"column": "CJ", "output_column_1B": "BP"},
     )
     Tablets_Expenditures_Actual__c: Optional[
         condecimal(max_digits=13, decimal_places=2)
     ] = Field(
         default=None,
         serialization_alias="Tablets Expenditure (Actual)",
-        json_schema_extra={"column": "CK"},
+        json_schema_extra={"column": "CK", "output_column_1B": "BQ"},
     )
     Desktop_Computers_Planned__c: conint(ge=0, le=9999999999) = Field(
         ...,
         serialization_alias="Desktop Computers (Planned)",
-        json_schema_extra={"column": "CL"},
+        json_schema_extra={"column": "CL", "output_column_1B": "BR"},
     )
     Desktop_Computers_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None,
         serialization_alias="Desktop Computers (Actual)",
-        json_schema_extra={"column": "CM"},
+        json_schema_extra={"column": "CM", "output_column_1B": "BS"},
     )
     Desktop_Computers_Expenditures_Planned__c: condecimal(
         max_digits=13, decimal_places=2
     ) = Field(
         ...,
         serialization_alias="Desktop Computers Expenditure (Planned)",
-        json_schema_extra={"column": "CN"},
+        json_schema_extra={"column": "CN", "output_column_1B": "BT"},
     )
     Desktop_Computers_Expenditures_Actual__c: Optional[
         condecimal(max_digits=13, decimal_places=2)
     ] = Field(
         default=None,
         serialization_alias="Desktop Computers Expenditure (Actual)",
-        json_schema_extra={"column": "CO"},
+        json_schema_extra={"column": "CO", "output_column_1B": "BU"},
     )
     Public_WiFi_Planned__c: conint(ge=0, le=9999999999) = Field(
         ...,
         serialization_alias="Public WiFi (Planned)",
-        json_schema_extra={"column": "CP"},
+        json_schema_extra={"column": "CP", "output_column_1B": "BV"},
     )
     Public_WiFi_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None,
         serialization_alias="Public WiFi (Actual)",
-        json_schema_extra={"column": "CQ"},
+        json_schema_extra={"column": "CQ", "output_column_1B": "BW"},
     )
     Public_WiFi_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = (
         Field(
             ...,
             serialization_alias="Public Wifi Expenditures (Planned)",
-            json_schema_extra={"column": "CR"},
+            json_schema_extra={"column": "CR", "output_column_1B": "BX"},
         )
     )
     Public_WiFi_Expenditures_Actual__c: Optional[
@@ -736,63 +736,63 @@ class Project1BRow(BaseProjectRow, AddressFields):
     ] = Field(
         default=None,
         serialization_alias="Public Wifi Expenditures (Actual)",
-        json_schema_extra={"column": "CS"},
+        json_schema_extra={"column": "CS", "output_column_1B": "BY"},
     )
     Other_Devices_Planned__c: conint(ge=0, le=9999999999) = Field(
         ...,
         serialization_alias="Other Devices (Planned)",
-        json_schema_extra={"column": "CT"},
+        json_schema_extra={"column": "CT", "output_column_1B": "BZ"},
     )
     Other_Devices_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None,
         serialization_alias="Other Devices (Actual)",
-        json_schema_extra={"column": "CU"},
+        json_schema_extra={"column": "CU", "output_column_1B": "CA"},
     )
     Other_Expenditures_Planned__c: condecimal(max_digits=7, decimal_places=2) = Field(
         ...,
         serialization_alias="Other Expenditures (Planned)",
-        json_schema_extra={"column": "CV"},
+        json_schema_extra={"column": "CV", "output_column_1B": "CB"},
     )
     Other_Expenditures_Actual__c: Optional[
         condecimal(max_digits=7, decimal_places=2)
     ] = Field(
         default=None,
         serialization_alias="Other Expenditures (Actual)",
-        json_schema_extra={"column": "CW"},
+        json_schema_extra={"column": "CW", "output_column_1B": "CC"},
     )
     Explanation_of_Other_Expend__c: Optional[str] = Field(
         default=None,
         serialization_alias="Explanation of Other Expenditures",
         max_length=3000,
-        json_schema_extra={"column": "CX"},
+        json_schema_extra={"column": "CX", "output_column_1B": "CD"},
     )
     Number_of_Users_Planned__c: conint(ge=0, le=9999999999) = Field(
         ...,
         serialization_alias="Number of Users (Planned)",
-        json_schema_extra={"column": "CY"},
+        json_schema_extra={"column": "CY", "output_column_1B": "CE"},
     )
     Number_of_Users_Actual__c: Optional[conint(ge=0, le=9999999999)] = Field(
         default=None,
         serialization_alias="Number of Users (Actual)",
-        json_schema_extra={"column": "CZ"},
+        json_schema_extra={"column": "CZ", "output_column_1B": "CF"},
     )
     Brief_Narrative_Planned__c: constr(
         strip_whitespace=True, min_length=1, max_length=3000
     ) = Field(
         ...,
         serialization_alias="Brief Narrative (Planned)",
-        json_schema_extra={"column": "DA"},
+        json_schema_extra={"column": "DA", "output_column_1B": "CG"},
     )
     Brief_Narrative_Actual__c: Optional[str] = Field(
         default=None,
         serialization_alias="Brief Narrative (Actual)",
         max_length=3000,
-        json_schema_extra={"column": "DB"},
+        json_schema_extra={"column": "DB", "output_column_1B": "CH"},
     )
     Measurement_of_Effectiveness__c: YesNoType = Field(
         ...,
         serialization_alias="Measurement of Effectiveness?",
-        json_schema_extra={"column": "DC"},
+        json_schema_extra={"column": "DC", "output_column_1B": "CI"},
     )
     # Columns below exist on Project1CRow as well as Project1BRow, so they jump in column defs
     Current_Program_Income_Earned__c: Optional[
@@ -800,39 +800,39 @@ class Project1BRow(BaseProjectRow, AddressFields):
     ] = Field(
         default=None,
         serialization_alias="Current Period Program Income Earned",
-        json_schema_extra={"column": "DW"},
+        json_schema_extra={"column": "DW", "output_column_1B": "O"},
     )
     Current_Program_Income_Expended__c: Optional[
         condecimal(max_digits=15, decimal_places=2)
     ] = Field(
         default=None,
         serialization_alias="Current Period Program Income Expended",
-        json_schema_extra={"column": "DX"},
+        json_schema_extra={"column": "DX", "output_column_1B": "P"},
     )
     Cumulative_Program_Income_Earned__c: Optional[
         condecimal(max_digits=15, decimal_places=2)
     ] = Field(
         default=None,
         serialization_alias="Cumulative Program Income Earned",
-        json_schema_extra={"column": "DY"},
+        json_schema_extra={"column": "DY", "output_column_1B": "Q"},
     )
     Cumulative_Program_Income_Expended__c: Optional[
         condecimal(max_digits=15, decimal_places=2)
     ] = Field(
         default=None,
         serialization_alias="Cumulative Program Income Expended",
-        json_schema_extra={"column": "DZ"},
+        json_schema_extra={"column": "DZ", "output_column_1B": "R"},
     )
     Program_Income_2_CFR__c: Optional[YesNoType] = Field(
         default=None,
         serialization_alias="Program Income Pursuant",
-        json_schema_extra={"column": "EA"},
+        json_schema_extra={"column": "EA", "output_column_1B": "S"},
     )
     Program_Income_2_CFR_Explanation__c: Optional[str] = Field(
         default=None,
         serialization_alias="Program Income Pursuant Explanation",
         max_length=3000,
-        json_schema_extra={"column": "EB"},
+        json_schema_extra={"column": "EB", "output_column_1B": "T"},
     )
 
     @field_validator(
