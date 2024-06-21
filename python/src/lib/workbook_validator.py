@@ -480,7 +480,7 @@ if __name__ == "__main__":
 
     file_path = sys.argv[1]
     with open(file_path, "rb") as f:
-        errors = validate(f)
+        errors, project_use_code = validate(f)
         if errors:
             print("Errors found:")
             for error in errors:
