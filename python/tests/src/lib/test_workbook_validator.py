@@ -16,19 +16,22 @@ from src.lib.workbook_validator import (
     validate_workbook,
     validate_workbook_sheets,
 )
-from src.schemas.schema_versions import getSchemaByProject
+from src.schemas.schema_versions import getSchemaByProject, Version
 
 SAMPLE_EXPENDITURE_CATEGORY_GROUP = "1A"
-V2024_05_24_VERSION_STRING = "v:20240524"
+V2024_05_24_VERSION_STRING = Version.V2024_05_24.value
 
 
 class TestValidateWorkbookWithOldSchema:
-    def test_valid_workbook_old_schema(self, valid_workbook_old_schema: Workbook):
+    def test_valid_workbook_old_compatible_schema(
+        self, valid_workbook_old_compatible_schema: Workbook
+    ):
         errors, version_string = validate_logic_sheet(
-            valid_workbook_old_schema["Logic"]
+            valid_workbook_old_compatible_schema["Logic"]
         )
         assert len(errors) == 1
-        assert "Using outdated version of template." in errors[0].message
+        assert "is older than the latest input template" in errors[0].message
+        assert "Using outdated version of template." not in errors[0].message
 
 
 class TestIsEmptyRow:
