@@ -97,7 +97,7 @@ def get_project_use_code(
         row_dict = map_values_to_headers(cover_header, cover_row)
     version = getVersionFromString(version_string)
     codeKey = "Expenditure Category Group"
-    if version != Version.latest_version():
+    if version != Version.V2024_05_24:
         version = "Project Use Code"
     code = row_dict[codeKey]
     return ProjectType.from_project_name(code)

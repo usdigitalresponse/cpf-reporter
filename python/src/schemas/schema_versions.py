@@ -77,16 +77,16 @@ class Version(Enum):
     V2024_05_24 = "v:20240524"
 
     @classmethod
-    def latest_version(cls):
+    def active_version(cls):
         return cls.V2024_05_24
 
     @classmethod
     def compatible_older_versions(cls):
-        return [cls.V2024_04_01]
+        return [cls.V2023_12_12, cls.V2024_01_07, cls.V2024_04_01]
     
     @classmethod
     def compatible_newer_versions(cls):
-        return [cls.V2024_04_01]
+        return []
 
 
 class LogicSheetVersion(BaseModel):
@@ -95,19 +95,19 @@ class LogicSheetVersion(BaseModel):
     @field_validator("version")
     @classmethod
     def validate_field(cls, version: Version, info: ValidationInfo, **kwargs):
-        if version == Version.latest_version():
+        if version == Version.active_version():
             return version
         elif version in Version.compatible_older_versions():
             raise ValueError(
-                f"Upload template version {version.value} is older than the latest input template {Version.latest_version().value}",
+                f"Upload template version {version.value} is older than the latest input template {Version.active_version().value}",
             )
         elif version in Version.compatible_newer_versions():
             raise ValueError(
-                f"Upload template version {version.value} is newer than the latest input template {Version.latest_version().value}",
+                f"Upload template version {version.value} is newer than the latest input template {Version.active_version().value}",
             )
         else:
             raise ValueError(
-                f"Using outdated version of template. Please update to {Version.latest_version().value}."
+                f"Using outdated version of template. Please update to {Version.active_version().value}."
             )
 
 
@@ -121,7 +121,7 @@ def getVersionFromString(version_string: str) -> Version:
     except KeyError:
         # Handle the edge case of a bad version with the latest schema
         # We should have already collected a user-facing error for this in validate_logic_sheet
-        version = Version.latest_version()
+        version = Version.active_version()
     return version
 
 
