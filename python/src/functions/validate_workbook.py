@@ -12,7 +12,8 @@ from mypy_boto3_s3.client import S3Client
 from src.lib.logging import get_logger, reset_contextvars
 from src.lib.workbook_validator import validate
 
-type ValidationResults = Dict[str, Union[List[Dict[str,str]], str, None]]
+type ValidationResults = Dict[str, Union[List[Dict[str, str]], str, None]]
+
 
 @reset_contextvars
 def handle(event: S3Event, context: Context):
@@ -85,9 +86,7 @@ def validate_workbook(file: IO[bytes]) -> ValidationResults:
         logger.exception("unhandled exception validating workbook")
         raise
 
-    logger.debug(
-        "successfully validated workbook", count_validation_errors=len(errors)
-    )
+    logger.debug("successfully validated workbook", count_validation_errors=len(errors))
     results: ValidationResults = {
         "errors": list(map(lambda x: x.__dict__, errors)),
         "projectUseCode": project_use_code,
@@ -95,7 +94,9 @@ def validate_workbook(file: IO[bytes]) -> ValidationResults:
     return results
 
 
-def save_validation_results(client: S3Client, bucket, key: str, results: ValidationResults):
+def save_validation_results(
+    client: S3Client, bucket, key: str, results: ValidationResults
+):
     """Persists workbook validation results to S3.
 
     Args:

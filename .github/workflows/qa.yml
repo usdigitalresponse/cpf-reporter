@@ -209,6 +209,9 @@ jobs:
       - name: Run linter for web side
         if: ${{ !cancelled() }}
         run: yarn eslint web/src
+      - name: Run linter for scripts
+        if: ${{ !cancelled() }}
+        run: yarn eslint scripts
 
   ruff:
     name: Lint python
@@ -224,7 +227,6 @@ jobs:
           show-progress: 'false'
           persist-credentials: 'false'
       - uses: chartboost/ruff-action@e18ae971ccee1b2d7bbef113930f00c670b78da4 # v1
-        continue-on-error: true
         with:
           src: python
 
