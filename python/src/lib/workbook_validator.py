@@ -97,7 +97,7 @@ def get_project_use_code(
         row_dict = map_values_to_headers(cover_header, cover_row)
     version = getVersionFromString(version_string)
     codeKey = "Expenditure Category Group"
-    if version != Version.V2024_05_24:
+    if version != Version.latest_version():
         version = "Project Use Code"
     code = row_dict[codeKey]
     return ProjectType.from_project_name(code)
@@ -307,11 +307,11 @@ def validate_logic_sheet(logic_sheet: Worksheet) -> Tuple[Errors, str]:
     except ValidationError as e:
         errors.append(
             WorkbookError(
-                f"{LOGIC_SHEET} Sheet: Invalid {e}",
-                "1",
-                "B",
-                LOGIC_SHEET,
-                "version",
+                message=f"{e}",
+                row="1",
+                col="B",
+                tab=LOGIC_SHEET,
+                field_name="version",
                 severity=ErrorLevel.WARN.name,
             )
         )

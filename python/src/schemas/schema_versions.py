@@ -76,18 +76,39 @@ class Version(Enum):
     V2024_04_01 = "v:20240401"
     V2024_05_24 = "v:20240524"
 
+    @classmethod
+    def latest_version(cls):
+        return cls.V2024_05_24
+
+    @classmethod
+    def compatible_older_versions(cls):
+        return [cls.V2024_04_01]
+    
+    @classmethod
+    def compatible_newer_versions(cls):
+        return [cls.V2024_04_01]
+
 
 class LogicSheetVersion(BaseModel):
     version: Version = Field(...)
 
     @field_validator("version")
     @classmethod
-    def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
-        if v != Version.V2024_05_24:
+    def validate_field(cls, version: Version, info: ValidationInfo, **kwargs):
+        if version == Version.latest_version():
+            return version
+        elif version in Version.compatible_older_versions():
             raise ValueError(
-                f"Using outdated version of template. Please update to {Version.V2024_05_24}."
+                f"Upload template version {version.value} is older than the latest input template {Version.latest_version().value}",
             )
-        return v
+        elif version in Version.compatible_newer_versions():
+            raise ValueError(
+                f"Upload template version {version.value} is newer than the latest input template {Version.latest_version().value}",
+            )
+        else:
+            raise ValueError(
+                f"Using outdated version of template. Please update to {Version.latest_version().value}."
+            )
 
 
 def getVersionFromString(version_string: str) -> Version:
@@ -100,7 +121,7 @@ def getVersionFromString(version_string: str) -> Version:
     except KeyError:
         # Handle the edge case of a bad version with the latest schema
         # We should have already collected a user-facing error for this in validate_logic_sheet
-        version = Version.V2024_05_24
+        version = Version.latest_version()
     return version
 
 
