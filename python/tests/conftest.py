@@ -12,7 +12,9 @@ _SAMPLE_TEMPLATE_2 = "tests/data/sample_template_2.xlsx"
 _SAMPLE_TEMPLATE_1A = "tests/data/treasury/sample_1A_input_pass.xlsm"
 _SAMPLE_TEMPLATE_1B = "tests/data/treasury/sample_1B_input_pass.xlsm"
 _SAMPLE_TEMPLATE_1C = "tests/data/treasury/sample_1C_input_pass.xlsm"
-_SAMPLE_TREASURY_OUTPUT_XLSM = "tests/data/treasury/sample_1C_output.xlsx"
+_SAMPLE_TREASURY_OUTPUT_1A_XLSM = "tests/data/treasury/sample_1A_output.xlsx"
+_SAMPLE_TREASURY_OUTPUT_1B_XLSM = "tests/data/treasury/sample_1B_output.xlsx"
+_SAMPLE_TREASURY_OUTPUT_1C_XLSM = "tests/data/treasury/sample_1C_output.xlsx"
 
 
 @pytest.fixture
@@ -234,5 +236,13 @@ def cpf_file_archive_two(sample_template):
 
 
 @pytest.fixture
-def output_template() -> openpyxl.Workbook:
-    return openpyxl.load_workbook(_SAMPLE_TREASURY_OUTPUT_XLSM)
+def output_1A_template() -> openpyxl.Workbook:
+    return openpyxl.load_workbook(_SAMPLE_TREASURY_OUTPUT_1A_XLSM)
+
+@pytest.fixture
+def output_1B_template() -> openpyxl.Workbook:
+    return openpyxl.load_workbook(_SAMPLE_TREASURY_OUTPUT_1B_XLSM)
+
+@pytest.fixture
+def output_1C_template() -> openpyxl.Workbook:
+    return openpyxl.load_workbook(_SAMPLE_TREASURY_OUTPUT_1C_XLSM)
