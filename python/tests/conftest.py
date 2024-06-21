@@ -33,6 +33,7 @@ def valid_workbook_old_compatible_schema() -> openpyxl.Workbook:
     workbook["Logic"]["B1"] = "v:20240401"
     return workbook
 
+
 @pytest.fixture
 def valid_coversheet(valid_workbook) -> openpyxl.worksheet.worksheet.Worksheet:
     return valid_workbook["Cover"]

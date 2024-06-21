@@ -23,8 +23,9 @@ V2024_05_24_VERSION_STRING = Version.V2024_05_24.value
 
 
 class TestValidateWorkbookWithOldSchema:
-    
-    def test_valid_workbook_old_compatible_schema(self, valid_workbook_old_compatible_schema: Workbook):
+    def test_valid_workbook_old_compatible_schema(
+        self, valid_workbook_old_compatible_schema: Workbook
+    ):
         errors, version_string = validate_logic_sheet(
             valid_workbook_old_compatible_schema["Logic"]
         )

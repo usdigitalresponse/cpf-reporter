@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Type, Union
+from typing import Type, Union
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
@@ -83,7 +83,7 @@ class Version(Enum):
     @classmethod
     def compatible_older_versions(cls):
         return [cls.V2023_12_12, cls.V2024_01_07, cls.V2024_04_01]
-    
+
     @classmethod
     def compatible_newer_versions(cls):
         return []
