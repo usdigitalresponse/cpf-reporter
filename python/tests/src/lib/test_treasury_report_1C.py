@@ -17,12 +17,12 @@ from src.schemas.project_types import ProjectType
 
 OUTPUT_STARTING_ROW = 8
 project_use_code = ProjectType._1C
-VERSION = Version.V2024_05_24
+VERSION = Version.latest_version()
 ProjectRowSchema = getSchemaByProject(VERSION, project_use_code)
 
 FIRST_ID = "33"
 SECOND_ID = "44"
-V2024_05_24_VERSION_STRING = "v:20240524"
+V2024_05_24_VERSION_STRING = Version.V2024_05_24.value
 
 
 class TestGenerateOutput1C:
