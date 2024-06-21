@@ -178,7 +178,7 @@ class TestGenerateOutput1A:
         assert project_id_to_data.get(SECOND_ID).Project_Name__c == "test 2"
 
     def test_populate_output_report(
-        self, valid_project_sheet_1A: Worksheet, output_template: Workbook
+        self, valid_project_sheet_1A: Worksheet, output_1A_template: Workbook
     ):
         """Populate the output report with one project"""
         _, projects = validate_project_sheet(
@@ -197,17 +197,17 @@ class TestGenerateOutput1A:
         )
         populate_output_report(
             project_use_code=project_use_code,
-            workbook=output_template,
+            workbook=output_1A_template,
             project_id_to_data=project_id_to_data
         )
-        sheet = output_template["Baseline"]
+        sheet = output_1A_template["Baseline"]
         assert sheet["B8"].value == project_id_to_data[FIRST_ID].Project_Name__c
         assert (
             sheet["C8"].value == project_id_to_data[FIRST_ID].Identification_Number__c
         )
 
     def test_populate_output_report_multiple(
-        self, valid_project_sheet_1A, valid_second_project_1A_sheet, output_template
+        self, valid_project_sheet_1A, valid_second_project_1A_sheet, output_1A_template
     ):
         """Populate the output report with multiple projects from different sheets"""
         project_errors, projects = validate_project_sheet(
@@ -243,10 +243,10 @@ class TestGenerateOutput1A:
         )
         populate_output_report(
             project_use_code=project_use_code,
-            workbook=output_template,
+            workbook=output_1A_template,
             project_id_to_data=project_id_to_data
         )
-        sheet = output_template["Baseline"]
+        sheet = output_1A_template["Baseline"]
         assert sheet["B8"].value == project_id_to_data[FIRST_ID].Project_Name__c
         assert (
             sheet["C8"].value == project_id_to_data[FIRST_ID].Identification_Number__c
@@ -257,7 +257,7 @@ class TestGenerateOutput1A:
         )
 
     def test_convert_xlsx_to_csv(
-        self, valid_project_sheet_1A, valid_second_project_1A_sheet, output_template
+        self, valid_project_sheet_1A, valid_second_project_1A_sheet, output_1A_template
     ):
         """Populate the output report with one project"""
         _, projects = validate_project_sheet(
@@ -290,8 +290,8 @@ class TestGenerateOutput1A:
         )
         num_rows = populate_output_report(
             project_use_code=project_use_code,
-            workbook=output_template,
+            workbook=output_1A_template,
             project_id_to_data=project_id_to_data
         )
         with tempfile.NamedTemporaryFile("w+") as csv_file:
-            convert_xlsx_to_csv(csv_file, output_template, num_rows)
+            convert_xlsx_to_csv(csv_file, output_1A_template, num_rows)
