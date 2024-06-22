@@ -160,3 +160,7 @@ python/htmlcov/
 
 # Python build artifacts
 python/dist/
+
+# Generated Type files
+web/types/graphql.d.ts
+api/types/graphql.d.ts
