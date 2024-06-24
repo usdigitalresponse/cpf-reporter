@@ -17,7 +17,7 @@ from src.schemas.project_types import ProjectType
 
 OUTPUT_STARTING_ROW = 8
 project_use_code = ProjectType._1C
-VERSION = Version.latest_version()
+VERSION = Version.active_version()
 ProjectRowSchema = getSchemaByProject(VERSION, project_use_code)
 
 FIRST_ID = "33"

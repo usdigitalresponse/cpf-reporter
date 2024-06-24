@@ -28,7 +28,7 @@ OUTPUT_TEMPLATE = {
     ProjectType._1B: "CPF1BDigitalConnectivityTechTemplate",
     ProjectType._1C: "CPF1CMultiPurposeCommunityTemplate",
 }
-VERSION = Version.latest_version()
+VERSION = Version.active_version()
 
 
 @reset_contextvars
