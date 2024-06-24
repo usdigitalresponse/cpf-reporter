@@ -1,6 +1,6 @@
 import Table from 'react-bootstrap/Table'
 
-export enum Severity {
+enum Severity {
   Error = 'ERR',
   Warning = 'WARN',
   Info = 'INFO',
