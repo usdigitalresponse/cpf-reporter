@@ -442,7 +442,6 @@ def validate_projects_subrecipients(
     subrecipients: List[SubrecipientRow],
     version_string: str,
 ) -> Errors:
-    
     # Versions older than V2024_05_24 don't have subrecipient information
     # in the project sheet so skip this validation.
     if getVersionFromString(version_string) != Version.active_version():
