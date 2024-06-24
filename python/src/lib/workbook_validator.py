@@ -98,7 +98,7 @@ def get_project_use_code(
     version = getVersionFromString(version_string)
     codeKey = "Expenditure Category Group"
     if version != Version.V2024_05_24:
-        version = "Project Use Code"
+        codeKey = "Project Use Code"
     code = row_dict[codeKey]
     return ProjectType.from_project_name(code)
 
@@ -292,7 +292,9 @@ def validate_workbook(
     5. Ensure all projects are mapped to a valid subrecipient
     """
     if projects:
-        errors += validate_projects_subrecipients(projects, subrecipients)
+        errors += validate_projects_subrecipients(
+            projects, subrecipients, version_string
+        )
 
     if return_data:
         return (errors, project_use_code, projects, subrecipients)
@@ -324,11 +326,11 @@ def validate_logic_sheet(logic_sheet: Worksheet) -> Tuple[Errors, str]:
     except ValidationError as e:
         errors.append(
             WorkbookError(
-                f"{LOGIC_SHEET} Sheet: Invalid {e}",
-                "1",
-                "B",
-                LOGIC_SHEET,
-                "version",
+                message=f"{e}",
+                row="1",
+                col="B",
+                tab=LOGIC_SHEET,
+                field_name="version",
                 severity=ErrorLevel.WARN.name,
             )
         )
@@ -454,7 +456,14 @@ def validate_subrecipient_sheet(
 def validate_projects_subrecipients(
     projects: List[Union[Project1ARow, Project1BRow, Project1CRow]],
     subrecipients: List[SubrecipientRow],
+    version_string: str,
 ) -> Errors:
+    
+    # Versions older than V2024_05_24 don't have subrecipient information
+    # in the project sheet so skip this validation.
+    if getVersionFromString(version_string) != Version.active_version():
+        return []
+
     errors = []
     subrecipients_by_uei_tin = {}
     for subrecipient in subrecipients:
@@ -497,10 +506,10 @@ if __name__ == "__main__":
 
     file_path = sys.argv[1]
     with open(file_path, "rb") as f:
-        errors = validate(f)
+        errors, project_use_code = validate(f)
         if errors:
             print("Errors found:")
             for error in errors:
-                print(error)
+                print(error.message)
         else:
             print("No errors found")
