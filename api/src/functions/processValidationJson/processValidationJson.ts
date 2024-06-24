@@ -6,6 +6,12 @@ import aws from 'src/lib/aws'
 import { db, getPrismaClient } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 
+enum Severity {
+  Error = 'ERR',
+  Warning = 'WARN',
+  Info = 'INFO',
+}
+
 type UploadValidationRecord = {
   s3: {
     bucket: {
@@ -21,7 +27,13 @@ type Response = {
 }
 
 type ResultSchema = {
-  errors: string[]
+  errors: {
+    severity: Severity
+    message: string
+    tab?: string
+    row?: string
+    col?: string
+  }[]
   projectUseCode: string
 }
 
@@ -105,7 +117,7 @@ export const processRecord = async (
     const result: ResultSchema = JSON.parse(strBody) || []
 
     // when the results array is empty then we know the file has passed validations
-    const passed = result.errors.length === 0
+    const passed = result.errors.filter((e) => e.severity != Severity.Error).length === 0
 
     const uploadId = extractUploadIdFromKey(key)
 
