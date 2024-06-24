@@ -1,10 +1,11 @@
 import Table from 'react-bootstrap/Table'
 
-enum Severity {
+export enum Severity {
   Error = 'ERR',
   Warning = 'WARN',
   Info = 'INFO',
 }
+
 interface Props {
   errors: {
     severity: Severity
