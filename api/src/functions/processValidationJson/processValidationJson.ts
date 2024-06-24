@@ -117,7 +117,7 @@ export const processRecord = async (
     const result: ResultSchema = JSON.parse(strBody) || []
 
     // when the results array is empty then we know the file has passed validations
-    const passed = (result?.errors || []).filter((e) => e.severity != Severity.Error).length === 0
+    const passed = (result?.errors || []).filter((e) => e.severity == Severity.Error).length === 0
 
     const uploadId = extractUploadIdFromKey(key)
 
