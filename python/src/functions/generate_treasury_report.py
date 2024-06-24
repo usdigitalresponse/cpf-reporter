@@ -149,8 +149,8 @@ def populate_output_report(
             prop_meta = row_schema.get(prop)
             if not prop_meta:
                 raise Exception("Property not found. Cannot generate report")
-            if prop_meta[f"output_column_{project_use_code}"]:
-                row_with_output_cols[prop_meta[f"output_column_{project_use_code}"]] = (
+            if prop_meta[f"treasury_report_col_{project_use_code}"]:
+                row_with_output_cols[prop_meta[f"treasury_report_col_{project_use_code}"]] = (
                     row_dict[prop]
                 )
 
