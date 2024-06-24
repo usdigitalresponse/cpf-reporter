@@ -307,16 +307,17 @@ def validate_logic_sheet(logic_sheet: Worksheet) -> Tuple[Errors, str]:
         # Cell B1 contains the version
         LogicSheetVersion(**{"version": version_string})
     except ValidationError as e:
-        errors.append(
-            WorkbookError(
-                message=f"{e}",
-                row="1",
-                col="B",
-                tab=LOGIC_SHEET,
-                field_name="version",
-                severity=ErrorLevel.WARN.name,
+        for error in e.errors():
+            errors.append(
+                WorkbookError(
+                    message=error["msg"].replace("Value error, ", ""),
+                    row="1",
+                    col="B",
+                    tab=LOGIC_SHEET,
+                    field_name="version",
+                    severity=ErrorLevel.WARN.name,
+                )
             )
-        )
     return errors, version_string
 
 
