@@ -5,6 +5,7 @@ enum Severity {
   Warning = 'WARN',
   Info = 'INFO',
 }
+
 interface Props {
   errors: {
     severity: Severity
