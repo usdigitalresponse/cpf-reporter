@@ -186,7 +186,7 @@ export const createUser: MutationResolvers['createUser'] = async ({
   return validateUniqueness(
     'user',
     { email },
-    { message: 'This email is already in use' },
+    { message: 'This email is already in use', db: db },
     (db) => db.user.create({ data: input })
   )
 }
