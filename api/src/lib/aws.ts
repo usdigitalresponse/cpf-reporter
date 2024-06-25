@@ -7,6 +7,11 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3'
 import {
+  SFNClient,
+  StartExecutionCommand,
+  StartExecutionCommandOutput
+} from '@aws-sdk/client-sfn';
+import {
   ReceiveMessageCommand,
   SendMessageCommand,
   SQSClient,
@@ -165,6 +170,45 @@ async function receiveSqsMessage(queueUrl: string) {
   )
 }
 
+/**
+ * Create a step function execution.
+ * AWS docs can be found at the following:
+ * https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/sfn/command/StartExecutionCommand/
+ *
+ * For localstack docs, see https://docs.localstack.cloud/user-guide/aws/stepfunctions/
+ *
+ * @param arn
+ * @param name
+ * @param input
+ * @param traceHeader
+ */
+async function startStepFunctionExecution(
+  arn: string,
+  name?: string,
+  input?: any,
+  traceHeader?: string,
+): Promise<StartExecutionCommandOutput> {
+  let client: SFNClient;
+  const command = new StartExecutionCommand(
+    {
+      stateMachineArn: arn,
+      name,
+      input: input ?? "{}",
+      traceHeader,
+    }
+  );
+  if (process.env.LOCALSTACK_HOSTNAME) {
+    console.log('------------ USING LOCALSTACK FOR SFN ------------')
+    const endpoint = `http://${process.env.LOCALSTACK_HOSTNAME}:${
+      process.env.EDGE_PORT || 4566
+    }`
+    client = new SFNClient({ endpoint, region: process.env.AWS_DEFAULT_REGION })
+  } else {
+    client = new SFNClient()
+  }
+  return await client.send(command)
+}
+
 export default {
   sendPutObjectToS3Bucket,
   sendHeadObjectToS3Bucket,
@@ -172,4 +216,5 @@ export default {
   sendSqsMessage,
   receiveSqsMessage,
   getS3Client,
+  startStepFunctionExecution,
 }
