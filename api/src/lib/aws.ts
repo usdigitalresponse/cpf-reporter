@@ -118,9 +118,7 @@ export async function s3PutSignedUrl(
 
 export async function deleteUploadFile(upload: Upload) {
   const fileKey = `uploads/${upload.agency.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.id}/${upload.filename}`
-  const fileJsonKey = `uploads/${upload.agency.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.id}/${upload.filename}.json`
   await s3DeleteObject(fileKey)
-  await s3DeleteObject(fileJsonKey)
 }
 
 async function s3DeleteObject(key: string) {
