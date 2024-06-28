@@ -22,8 +22,6 @@ import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { StreamingBlobPayloadInputTypes } from '@smithy/types'
 import { CreateUploadInput, Upload } from 'types/graphql'
 
-import { logger } from 'src/lib/logger'
-
 const REPORTING_DATA_BUCKET_NAME = `${process.env.REPORTING_DATA_BUCKET_NAME}`
 
 function getS3Client() {
