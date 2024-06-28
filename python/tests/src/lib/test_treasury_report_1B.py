@@ -1,18 +1,13 @@
-
 from datetime import datetime, timedelta
 from typing import Dict
 
 import tempfile
-from openpyxl import Workbook
-from openpyxl.worksheet.worksheet import Worksheet
-from src.lib.workbook_validator import validate_project_sheet
 from src.schemas.schema_versions import getSchemaByProject
 from src.functions.generate_treasury_report import (
     combine_project_rows,
-    populate_output_report,
-    convert_xlsx_to_csv,
+    update_project_agency_ids_to_row_map,
+    get_projects_to_remove,
 )
-from src.schemas.schema_versions import Project1BRow
 from src.schemas.schema_versions import Version
 from src.schemas.project_types import ProjectType
 
@@ -24,274 +19,292 @@ ProjectRowSchema = getSchemaByProject(VERSION, project_use_code)
 FIRST_ID = "222"
 SECOND_ID = "44"
 V2024_05_24_VERSION_STRING = Version.V2024_05_24.value
-
+AGENCY_ID = 999
+PROJECT_AGENCY_ID = f"{FIRST_ID}_{AGENCY_ID}"
+PROJECT_AGENCY_ID_2 = f"{SECOND_ID}_{AGENCY_ID}"
 
 class TestGenerateOutput1B:
-    def test_combine_project_rows(self, valid_project_sheet_1B):
-        project_errors, projects = validate_project_sheet(
-            valid_project_sheet_1B, ProjectRowSchema, V2024_05_24_VERSION_STRING
-        )
-        assert project_errors == []
-
-        project_jsons = [dict(project) for project in projects]
-        project_id_to_data: Dict[str, Project1BRow] = {}
-        project_id_to_upload_date = {}
-        createdAt = datetime.now()
-        combine_project_rows(
+    def test_get_projects_to_remove(self, valid_workbook_1B):
+        project_agency_ids_to_remove = get_projects_to_remove(
+            workbook=valid_workbook_1B,
             ProjectRowSchema=ProjectRowSchema,
-            projects=project_jsons,
-            project_id_to_upload_date=project_id_to_upload_date,
-            project_id_to_data=project_id_to_data,
-            createdAt=createdAt,
+            agency_id=AGENCY_ID
         )
-        assert project_id_to_upload_date.get(FIRST_ID) == createdAt
-        assert project_id_to_data.get(FIRST_ID) is not None
-        assert project_id_to_data.get(FIRST_ID).Project_Name__c == "Test 1b"
+        assert len(project_agency_ids_to_remove) == 1
+        assert PROJECT_AGENCY_ID in project_agency_ids_to_remove
+
+    def test_update_project_agency_ids_to_row_map_1(self):
+        project_agency_id_to_row_map = {
+            f"1_{AGENCY_ID}": 13,
+            f"2_{AGENCY_ID}": 14,
+            f"3_{AGENCY_ID}": 15,
+            f"4_{AGENCY_ID}": 16,
+            f"5_{AGENCY_ID}": 17,
+        }
+        project_agency_ids_to_remove = set([
+            f"1_{AGENCY_ID}"
+        ])
+        highest_row_num = max(project_agency_id_to_row_map.values())
+        update_project_agency_ids_to_row_map(
+            project_agency_id_to_row_map=project_agency_id_to_row_map,
+            project_agency_ids_to_remove=project_agency_ids_to_remove,
+            sheet=None,
+            highest_row_num=highest_row_num,
+        )
+        assert len(project_agency_id_to_row_map.keys()) == 4
+        assert project_agency_id_to_row_map.get(f"1_{AGENCY_ID}") is None
+        assert project_agency_id_to_row_map.get(f"2_{AGENCY_ID}") == 13
+        assert project_agency_id_to_row_map.get(f"3_{AGENCY_ID}") == 14
+        assert project_agency_id_to_row_map.get(f"4_{AGENCY_ID}") == 15
+        assert project_agency_id_to_row_map.get(f"5_{AGENCY_ID}") == 16
+    
+    def test_update_project_agency_ids_to_row_map_2(self):
+        project_agency_id_to_row_map = {
+            f"1_{AGENCY_ID}": 13,
+            f"2_{AGENCY_ID}": 14,
+            f"3_{AGENCY_ID}": 15,
+            f"4_{AGENCY_ID}": 16,
+            f"5_{AGENCY_ID}": 17,
+        }
+        project_agency_ids_to_remove = set([
+            f"6_{AGENCY_ID}"
+        ])
+        highest_row_num = max(project_agency_id_to_row_map.values())
+        update_project_agency_ids_to_row_map(
+            project_agency_id_to_row_map=project_agency_id_to_row_map,
+            project_agency_ids_to_remove=project_agency_ids_to_remove,
+            sheet=None,
+            highest_row_num=highest_row_num,
+        )
+        assert len(project_agency_id_to_row_map.keys()) == 5
+        assert project_agency_id_to_row_map.get(f"1_{AGENCY_ID}") == 13
+        assert project_agency_id_to_row_map.get(f"2_{AGENCY_ID}") == 14
+        assert project_agency_id_to_row_map.get(f"3_{AGENCY_ID}") == 15
+        assert project_agency_id_to_row_map.get(f"4_{AGENCY_ID}") == 16
+        assert project_agency_id_to_row_map.get(f"5_{AGENCY_ID}") == 17
+    
+    def test_update_project_agency_ids_to_row_map_3(self):
+        project_agency_id_to_row_map = {
+            f"1_{AGENCY_ID}": 13,
+            f"2_{AGENCY_ID}": 14,
+            f"3_{AGENCY_ID}": 15,
+            f"4_{AGENCY_ID}": 16,
+            f"5_{AGENCY_ID}": 17,
+        }
+        project_agency_ids_to_remove = set([
+            f"3_{AGENCY_ID}"
+        ])
+        highest_row_num = max(project_agency_id_to_row_map.values())
+        update_project_agency_ids_to_row_map(
+            project_agency_id_to_row_map=project_agency_id_to_row_map,
+            project_agency_ids_to_remove=project_agency_ids_to_remove,
+            sheet=None,
+            highest_row_num=highest_row_num,
+        )
+        assert len(project_agency_id_to_row_map.keys()) == 4
+        assert project_agency_id_to_row_map.get(f"1_{AGENCY_ID}") == 13
+        assert project_agency_id_to_row_map.get(f"2_{AGENCY_ID}") == 14
+        assert project_agency_id_to_row_map.get(f"3_{AGENCY_ID}") is None
+        assert project_agency_id_to_row_map.get(f"4_{AGENCY_ID}") == 15
+        assert project_agency_id_to_row_map.get(f"5_{AGENCY_ID}") == 16
+    
+    def test_update_project_agency_ids_to_row_map_4(self):
+        project_agency_id_to_row_map = {
+            f"1_{AGENCY_ID}": 13,
+            f"2_{AGENCY_ID}": 14,
+            f"3_{AGENCY_ID}": 15,
+            f"4_{AGENCY_ID}": 16,
+            f"5_{AGENCY_ID}": 17,
+        }
+        project_agency_ids_to_remove = set([
+            f"5_{AGENCY_ID}"
+        ])
+        highest_row_num = max(project_agency_id_to_row_map.values())
+        update_project_agency_ids_to_row_map(
+            project_agency_id_to_row_map=project_agency_id_to_row_map,
+            project_agency_ids_to_remove=project_agency_ids_to_remove,
+            sheet=None,
+            highest_row_num=highest_row_num,
+        )
+        assert len(project_agency_id_to_row_map.keys()) == 4
+        assert project_agency_id_to_row_map.get(f"1_{AGENCY_ID}") == 13
+        assert project_agency_id_to_row_map.get(f"2_{AGENCY_ID}") == 14
+        assert project_agency_id_to_row_map.get(f"3_{AGENCY_ID}") == 15
+        assert project_agency_id_to_row_map.get(f"4_{AGENCY_ID}") == 16
+        assert project_agency_id_to_row_map.get(f"5_{AGENCY_ID}") is None
+    
+    def test_update_project_agency_ids_to_row_map_5(self):
+        project_agency_id_to_row_map = {
+            f"1_{AGENCY_ID}": 13,
+            f"2_{AGENCY_ID}": 14,
+            f"3_{AGENCY_ID}": 15,
+            f"4_{AGENCY_ID}": 16,
+            f"5_{AGENCY_ID}": 17,
+        }
+        project_agency_ids_to_remove = set([
+            f"2_{AGENCY_ID}", f"4_{AGENCY_ID}"
+        ])
+        highest_row_num = max(project_agency_id_to_row_map.values())
+        update_project_agency_ids_to_row_map(
+            project_agency_id_to_row_map=project_agency_id_to_row_map,
+            project_agency_ids_to_remove=project_agency_ids_to_remove,
+            sheet=None,
+            highest_row_num=highest_row_num,
+        )
+        assert len(project_agency_id_to_row_map.keys()) == 3
+        assert project_agency_id_to_row_map.get(f"1_{AGENCY_ID}") == 13
+        assert project_agency_id_to_row_map.get(f"2_{AGENCY_ID}") is None
+        assert project_agency_id_to_row_map.get(f"3_{AGENCY_ID}") == 14
+        assert project_agency_id_to_row_map.get(f"4_{AGENCY_ID}") is None
+        assert project_agency_id_to_row_map.get(f"5_{AGENCY_ID}") == 15
+
+    def test_update_project_agency_ids_to_row_map_6(self):
+        project_agency_id_to_row_map = {
+            f"1_{AGENCY_ID}": 13,
+            f"2_{AGENCY_ID}": 14,
+            f"3_{AGENCY_ID}": 15,
+            f"4_{AGENCY_ID}": 16,
+            f"5_{AGENCY_ID}": 17,
+        }
+        project_agency_ids_to_remove = set([
+            f"2_{AGENCY_ID}", f"1_{AGENCY_ID}"
+        ])
+        highest_row_num = max(project_agency_id_to_row_map.values())
+        update_project_agency_ids_to_row_map(
+            project_agency_id_to_row_map=project_agency_id_to_row_map,
+            project_agency_ids_to_remove=project_agency_ids_to_remove,
+            sheet=None,
+            highest_row_num=highest_row_num,
+        )
+        assert len(project_agency_id_to_row_map.keys()) == 3
+        assert project_agency_id_to_row_map.get(f"1_{AGENCY_ID}") is None
+        assert project_agency_id_to_row_map.get(f"2_{AGENCY_ID}") is None
+        assert project_agency_id_to_row_map.get(f"3_{AGENCY_ID}") == 13
+        assert project_agency_id_to_row_map.get(f"4_{AGENCY_ID}") == 14
+        assert project_agency_id_to_row_map.get(f"5_{AGENCY_ID}") == 15
+
+    def test_combine_project_rows(self, valid_workbook_1B):
+        project_id_agency_id_to_upload_date = {}
+        project_id_agency_id_to_row_num = {}
+        createdAt = datetime.now()
+        new_highest_row_num = combine_project_rows(
+            project_workbook=valid_workbook_1B,
+            output_sheet=None,
+            project_use_code=project_use_code,
+            highest_row_num=12,
+            ProjectRowSchema=ProjectRowSchema,
+            project_id_agency_id_to_upload_date=project_id_agency_id_to_upload_date,
+            project_id_agency_id_to_row_num=project_id_agency_id_to_row_num,
+            created_at=createdAt,
+            agency_id=AGENCY_ID,
+        )
+        assert project_id_agency_id_to_upload_date.get(PROJECT_AGENCY_ID) == createdAt
+        assert project_id_agency_id_to_row_num.get(PROJECT_AGENCY_ID) == 13
+        assert new_highest_row_num == 13
 
     def test_combine_project_rows_with_conflicts_1(
-        self, valid_project_sheet_1B, valid_project_sheet_1B_with_conflict
+        self, valid_workbook_1B, valid_workbook_1B_with_conflict
     ):
         """Choose the project with the later created at date"""
-        project_errors, projects = validate_project_sheet(
-            valid_project_sheet_1B, ProjectRowSchema, V2024_05_24_VERSION_STRING
-        )
-        assert project_errors == []
-        project_jsons = [dict(project) for project in projects]
-
-        project_id_to_data: Dict[str, Project1BRow] = {}
-        project_id_to_upload_date = {}
+        project_id_agency_id_to_upload_date = {}
+        project_id_agency_id_to_row_num = {}
         createdAt1 = datetime.now()
-        combine_project_rows(
+        highest_row_num = combine_project_rows(
+            project_workbook=valid_workbook_1B,
+            output_sheet=None,
+            project_use_code=project_use_code,
+            highest_row_num=12,
             ProjectRowSchema=ProjectRowSchema,
-            projects=project_jsons,
-            project_id_to_upload_date=project_id_to_upload_date,
-            project_id_to_data=project_id_to_data,
-            createdAt=createdAt1,
+            project_id_agency_id_to_upload_date=project_id_agency_id_to_upload_date,
+            project_id_agency_id_to_row_num=project_id_agency_id_to_row_num,
+            created_at=createdAt1,
+            agency_id=AGENCY_ID,
         )
-
-        project_errors, projects = validate_project_sheet(
-            valid_project_sheet_1B_with_conflict,
-            ProjectRowSchema,
-            V2024_05_24_VERSION_STRING,
-        )
-        assert project_errors == []
-        project_jsons = [dict(project) for project in projects]
 
         createdAt2 = datetime.now()
-        combine_project_rows(
+        new_highest_row_num = combine_project_rows(
+            project_workbook=valid_workbook_1B_with_conflict,
+            output_sheet=None,
+            project_use_code=project_use_code,
+            highest_row_num=highest_row_num,
             ProjectRowSchema=ProjectRowSchema,
-            projects=project_jsons,
-            project_id_to_upload_date=project_id_to_upload_date,
-            project_id_to_data=project_id_to_data,
-            createdAt=createdAt2,
+            project_id_agency_id_to_upload_date=project_id_agency_id_to_upload_date,
+            project_id_agency_id_to_row_num=project_id_agency_id_to_row_num,
+            created_at=createdAt2,
+            agency_id=AGENCY_ID,
         )
-        assert project_id_to_upload_date.get(FIRST_ID) == createdAt2
-        assert project_id_to_data.get(FIRST_ID) is not None
-        assert (
-            project_id_to_data.get(FIRST_ID).Project_Name__c
-            == "updated project 1B test"
-        )
+        assert project_id_agency_id_to_upload_date.get(PROJECT_AGENCY_ID) == createdAt2
+        assert project_id_agency_id_to_row_num.get(PROJECT_AGENCY_ID) == 13
+        assert new_highest_row_num == 13
 
     def test_combine_project_rows_with_conflicts_2(
-        self, valid_project_sheet_1B, valid_project_sheet_1B_with_conflict
+        self, valid_workbook_1B, valid_workbook_1B_with_conflict
     ):
         """Choose the project with the later created at date"""
-        project_errors, projects = validate_project_sheet(
-            valid_project_sheet_1B, ProjectRowSchema, V2024_05_24_VERSION_STRING
-        )
-        assert project_errors == []
-        project_jsons = [dict(project) for project in projects]
-
-        project_id_to_data: Dict[str, Project1BRow] = {}
-        project_id_to_upload_date = {}
+        project_id_agency_id_to_upload_date = {}
+        project_id_agency_id_to_row_num = {}
         createdAt1 = datetime.now()
-        combine_project_rows(
+        highest_row_num = combine_project_rows(
+            project_workbook=valid_workbook_1B,
+            output_sheet=None,
+            project_use_code=project_use_code,
+            highest_row_num=12,
             ProjectRowSchema=ProjectRowSchema,
-            projects=project_jsons,
-            project_id_to_upload_date=project_id_to_upload_date,
-            project_id_to_data=project_id_to_data,
-            createdAt=createdAt1,
+            project_id_agency_id_to_upload_date=project_id_agency_id_to_upload_date,
+            project_id_agency_id_to_row_num=project_id_agency_id_to_row_num,
+            created_at=createdAt1,
+            agency_id=AGENCY_ID,
         )
-
-        project_errors, projects = validate_project_sheet(
-            valid_project_sheet_1B_with_conflict,
-            ProjectRowSchema,
-            V2024_05_24_VERSION_STRING,
-        )
-        assert project_errors == []
-        project_jsons = [dict(project) for project in projects]
 
         createdAt2 = datetime.now() - timedelta(days=1)
-        combine_project_rows(
+        new_highest_row_num = combine_project_rows(
+            project_workbook=valid_workbook_1B_with_conflict,
+            output_sheet=None,
+            project_use_code=project_use_code,
+            highest_row_num=highest_row_num,
             ProjectRowSchema=ProjectRowSchema,
-            projects=project_jsons,
-            project_id_to_upload_date=project_id_to_upload_date,
-            project_id_to_data=project_id_to_data,
-            createdAt=createdAt2,
+            project_id_agency_id_to_upload_date=project_id_agency_id_to_upload_date,
+            project_id_agency_id_to_row_num=project_id_agency_id_to_row_num,
+            created_at=createdAt2,
+            agency_id=AGENCY_ID,
         )
-        assert project_id_to_upload_date.get(FIRST_ID) == createdAt1
-        assert project_id_to_data.get(FIRST_ID) is not None
-        assert project_id_to_data.get(FIRST_ID).Project_Name__c == "Test 1b"
+        assert project_id_agency_id_to_upload_date.get(PROJECT_AGENCY_ID) == createdAt1
+        assert project_id_agency_id_to_row_num.get(PROJECT_AGENCY_ID) == 13
+        assert new_highest_row_num == 13
 
     def test_combine_project_rows_multiple(
-        self, valid_project_sheet_1B, valid_second_project_1B_sheet
+        self, valid_workbook_1B, valid_second_workbook_1B_sheet
     ):
         """Choose the project with the later created at date"""
-        project_errors, projects = validate_project_sheet(
-            valid_project_sheet_1B, ProjectRowSchema, V2024_05_24_VERSION_STRING
-        )
-        assert project_errors == []
-        project_jsons = [dict(project) for project in projects]
-
-        project_id_to_data: Dict[str, Project1BRow] = {}
-        project_id_to_upload_date = {}
+        project_id_agency_id_to_upload_date = {}
+        project_id_agency_id_to_row_num = {}
         createdAt1 = datetime.now()
-        combine_project_rows(
-            ProjectRowSchema=ProjectRowSchema,
-            projects=project_jsons,
-            project_id_to_upload_date=project_id_to_upload_date,
-            project_id_to_data=project_id_to_data,
-            createdAt=createdAt1,
-        )
-
-        project_errors, projects = validate_project_sheet(
-            valid_second_project_1B_sheet, ProjectRowSchema, V2024_05_24_VERSION_STRING
-        )
-        assert project_errors == []
-        project_jsons = [dict(project) for project in projects]
-
-        createdAt2 = datetime.now() - timedelta(days=1)
-        combine_project_rows(
-            ProjectRowSchema=ProjectRowSchema,
-            projects=project_jsons,
-            project_id_to_upload_date=project_id_to_upload_date,
-            project_id_to_data=project_id_to_data,
-            createdAt=createdAt2,
-        )
-        print(project_id_to_upload_date)
-        print(project_id_to_data)
-        assert project_id_to_upload_date.get(FIRST_ID) == createdAt1
-        assert project_id_to_data.get(FIRST_ID) is not None
-        assert project_id_to_data.get(FIRST_ID).Project_Name__c == "Test 1b"
-        assert project_id_to_upload_date.get(SECOND_ID) == createdAt2
-        assert project_id_to_data.get(SECOND_ID) is not None
-        assert project_id_to_data.get(SECOND_ID).Project_Name__c == "test 2"
-
-    def test_populate_output_report(
-        self, valid_project_sheet_1B: Worksheet, output_1B_template: Workbook
-    ):
-        """Populate the output report with one project"""
-        _, projects = validate_project_sheet(
-            valid_project_sheet_1B, ProjectRowSchema, V2024_05_24_VERSION_STRING
-        )
-        project_jsons = [dict(project) for project in projects]
-        project_id_to_data: Dict[str, Project1BRow] = {}
-        project_id_to_upload_date = {}
-        createdAt = datetime.now()
-        combine_project_rows(
-            ProjectRowSchema=ProjectRowSchema,
-            projects=project_jsons,
-            project_id_to_upload_date=project_id_to_upload_date,
-            project_id_to_data=project_id_to_data,
-            createdAt=createdAt,
-        )
-        populate_output_report(
+        highest_row_num = combine_project_rows(
+            project_workbook=valid_workbook_1B,
+            output_sheet=None,
             project_use_code=project_use_code,
-            workbook=output_1B_template,
-            project_id_to_data=project_id_to_data
-        )
-        sheet = output_1B_template["Baseline"]
-        assert sheet["B8"].value == project_id_to_data[FIRST_ID].Project_Name__c
-        assert (
-            sheet["C8"].value == project_id_to_data[FIRST_ID].Identification_Number__c
-        )
-
-    def test_populate_output_report_multiple(
-        self, valid_project_sheet_1B, valid_second_project_1B_sheet, output_1B_template
-    ):
-        """Populate the output report with multiple projects from different sheets"""
-        project_errors, projects = validate_project_sheet(
-            valid_project_sheet_1B, ProjectRowSchema, V2024_05_24_VERSION_STRING
-        )
-        assert project_errors == []
-        project_jsons = [dict(project) for project in projects]
-
-        project_id_to_data: Dict[str, Project1BRow] = {}
-        project_id_to_upload_date = {}
-        createdAt1 = datetime.now()
-        combine_project_rows(
+            highest_row_num=12,
             ProjectRowSchema=ProjectRowSchema,
-            projects=project_jsons,
-            project_id_to_upload_date=project_id_to_upload_date,
-            project_id_to_data=project_id_to_data,
-            createdAt=createdAt1,
+            project_id_agency_id_to_upload_date=project_id_agency_id_to_upload_date,
+            project_id_agency_id_to_row_num=project_id_agency_id_to_row_num,
+            created_at=createdAt1,
+            agency_id=AGENCY_ID,
         )
 
-        project_errors, projects = validate_project_sheet(
-            valid_second_project_1B_sheet, ProjectRowSchema, V2024_05_24_VERSION_STRING
-        )
-        assert project_errors == []
-        project_jsons = [dict(project) for project in projects]
-
-        createdAt2 = datetime.now() - timedelta(days=1)
-        combine_project_rows(
-            ProjectRowSchema=ProjectRowSchema,
-            projects=project_jsons,
-            project_id_to_upload_date=project_id_to_upload_date,
-            project_id_to_data=project_id_to_data,
-            createdAt=createdAt2,
-        )
-        populate_output_report(
+        createdAt2 = datetime.now()
+        new_highest_row_num = combine_project_rows(
+            project_workbook=valid_second_workbook_1B_sheet,
+            output_sheet=None,
             project_use_code=project_use_code,
-            workbook=output_1B_template,
-            project_id_to_data=project_id_to_data
-        )
-        sheet = output_1B_template["Baseline"]
-        assert sheet["B8"].value == project_id_to_data[FIRST_ID].Project_Name__c
-        assert (
-            sheet["C8"].value == project_id_to_data[FIRST_ID].Identification_Number__c
-        )
-        assert sheet["B9"].value == project_id_to_data[SECOND_ID].Project_Name__c
-        assert (
-            sheet["C9"].value == project_id_to_data[SECOND_ID].Identification_Number__c
-        )
-
-    def test_convert_xlsx_to_csv(
-        self, valid_project_sheet_1B, valid_second_project_1B_sheet, output_1B_template
-    ):
-        """Populate the output report with one project"""
-        _, projects = validate_project_sheet(
-            valid_project_sheet_1B, ProjectRowSchema, V2024_05_24_VERSION_STRING
-        )
-        project_jsons = [dict(project) for project in projects]
-        project_id_to_data: Dict[str, Project1BRow] = {}
-        project_id_to_upload_date = {}
-        createdAt = datetime.now()
-        combine_project_rows(
+            highest_row_num=highest_row_num,
             ProjectRowSchema=ProjectRowSchema,
-            projects=project_jsons,
-            project_id_to_upload_date=project_id_to_upload_date,
-            project_id_to_data=project_id_to_data,
-            createdAt=createdAt,
+            project_id_agency_id_to_upload_date=project_id_agency_id_to_upload_date,
+            project_id_agency_id_to_row_num=project_id_agency_id_to_row_num,
+            created_at=createdAt2,
+            agency_id=AGENCY_ID,
         )
-        project_errors, projects = validate_project_sheet(
-            valid_second_project_1B_sheet, ProjectRowSchema, V2024_05_24_VERSION_STRING
-        )
-        assert project_errors == []
-        project_jsons = [dict(project) for project in projects]
-
-        createdAt2 = datetime.now() - timedelta(days=1)
-        combine_project_rows(
-            ProjectRowSchema=ProjectRowSchema,
-            projects=project_jsons,
-            project_id_to_upload_date=project_id_to_upload_date,
-            project_id_to_data=project_id_to_data,
-            createdAt=createdAt2,
-        )
-        num_rows = populate_output_report(
-            project_use_code=project_use_code,
-            workbook=output_1B_template,
-            project_id_to_data=project_id_to_data
-        )
-        with tempfile.NamedTemporaryFile("w+") as csv_file:
-            convert_xlsx_to_csv(csv_file, output_1B_template, num_rows)
+        assert project_id_agency_id_to_upload_date.get(PROJECT_AGENCY_ID) == createdAt1
+        assert project_id_agency_id_to_upload_date.get(PROJECT_AGENCY_ID_2) == createdAt2
+        assert project_id_agency_id_to_row_num.get(PROJECT_AGENCY_ID) == 13
+        assert project_id_agency_id_to_row_num.get(PROJECT_AGENCY_ID_2) == 14
+        assert new_highest_row_num == 14

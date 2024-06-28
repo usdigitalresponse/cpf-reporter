@@ -61,20 +61,22 @@ def valid_project_sheet_1A() -> openpyxl.worksheet.worksheet.Worksheet:
 
 
 @pytest.fixture
-def valid_project_sheet_1A_with_conflict() -> openpyxl.worksheet.worksheet.Worksheet:
-    valid_project_sheet_1A = openpyxl.load_workbook(_SAMPLE_TEMPLATE_1A)["Project"]
+def valid_workbook_1A_with_conflict() -> openpyxl.worksheet.worksheet.Worksheet:
+    workbook = openpyxl.load_workbook(_SAMPLE_TEMPLATE_1A)
+    valid_project_sheet_1A = workbook["Project"]
     valid_project_sheet_1A["C13"] = "updated project 1a test"
-    return valid_project_sheet_1A
+    return workbook
 
 
 @pytest.fixture
-def valid_second_project_1A_sheet() -> openpyxl.worksheet.worksheet.Worksheet:
-    valid_project_sheet_1A = openpyxl.load_workbook(_SAMPLE_TEMPLATE_1A)["Project"]
+def valid_second_workbook_1A_sheet() -> openpyxl.worksheet.worksheet.Worksheet:
+    workbook = openpyxl.load_workbook(_SAMPLE_TEMPLATE_1A)
+    valid_project_sheet_1A = workbook["Project"]
     valid_project_sheet_1A["C13"] = "test 2"
     valid_project_sheet_1A["D13"] = "44"
     valid_project_sheet_1A["E13"] = "345634563457"
     valid_project_sheet_1A["F13"] = "345345346"
-    return valid_project_sheet_1A
+    return workbook
 
 
 
@@ -89,20 +91,22 @@ def valid_project_sheet_1B() -> openpyxl.worksheet.worksheet.Worksheet:
 
 
 @pytest.fixture
-def valid_project_sheet_1B_with_conflict() -> openpyxl.worksheet.worksheet.Worksheet:
-    valid_project_sheet_1B = openpyxl.load_workbook(_SAMPLE_TEMPLATE_1B)["Project"]
+def valid_workbook_1B_with_conflict() -> openpyxl.worksheet.worksheet.Worksheet:
+    workbook = openpyxl.load_workbook(_SAMPLE_TEMPLATE_1B)
+    valid_project_sheet_1B = workbook["Project"]
     valid_project_sheet_1B["C13"] = "updated project 1B test"
-    return valid_project_sheet_1B
+    return workbook
 
 
 @pytest.fixture
-def valid_second_project_1B_sheet() -> openpyxl.worksheet.worksheet.Worksheet:
-    valid_project_sheet_1B = openpyxl.load_workbook(_SAMPLE_TEMPLATE_1B)["Project"]
+def valid_second_workbook_1B_sheet() -> openpyxl.worksheet.worksheet.Worksheet:
+    workbook = openpyxl.load_workbook(_SAMPLE_TEMPLATE_1B)
+    valid_project_sheet_1B = workbook["Project"]
     valid_project_sheet_1B["C13"] = "test 2"
     valid_project_sheet_1B["D13"] = "44"
     valid_project_sheet_1B["E13"] = "345634563457"
     valid_project_sheet_1B["F13"] = "345345346"
-    return valid_project_sheet_1B
+    return workbook
 
 
 @pytest.fixture
@@ -116,20 +120,22 @@ def valid_project_sheet_1C() -> openpyxl.worksheet.worksheet.Worksheet:
 
 
 @pytest.fixture
-def valid_project_sheet_1C_with_conflict() -> openpyxl.worksheet.worksheet.Worksheet:
-    valid_project_sheet_1C = openpyxl.load_workbook(_SAMPLE_TEMPLATE_1C)["Project"]
+def valid_workbook_1C_with_conflict() -> openpyxl.worksheet.worksheet.Worksheet:
+    workbook = openpyxl.load_workbook(_SAMPLE_TEMPLATE_1C)
+    valid_project_sheet_1C = workbook["Project"]
     valid_project_sheet_1C["C13"] = "updated project 1c test"
-    return valid_project_sheet_1C
+    return workbook
 
 
 @pytest.fixture
-def valid_second_project_1C_sheet() -> openpyxl.worksheet.worksheet.Worksheet:
-    valid_project_sheet_1C = openpyxl.load_workbook(_SAMPLE_TEMPLATE_1C)["Project"]
+def valid_second_workbook_1C_sheet() -> openpyxl.worksheet.worksheet.Worksheet:
+    workbook = openpyxl.load_workbook(_SAMPLE_TEMPLATE_1C)
+    valid_project_sheet_1C = workbook["Project"]
     valid_project_sheet_1C["C13"] = "test 2"
     valid_project_sheet_1C["D13"] = "44"
     valid_project_sheet_1C["E13"] = "345634563457"
     valid_project_sheet_1C["F13"] = "345345346"
-    return valid_project_sheet_1C
+    return workbook
 
 
 @pytest.fixture
