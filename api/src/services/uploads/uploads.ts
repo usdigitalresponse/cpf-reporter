@@ -6,7 +6,7 @@ import type {
 } from 'types/graphql'
 
 import { hasRole } from 'src/lib/auth'
-import { s3PutSignedUrl, deleteUploadFile } from 'src/lib/aws'
+import { s3PutSignedUrl } from 'src/lib/aws'
 import aws from 'src/lib/aws'
 import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
@@ -97,9 +97,7 @@ export const deleteUpload: MutationResolvers['deleteUpload'] = ({ id }) => {
   }
   // TODO: fix aws permissions issue on ECS instance. For now, we'll just log the delete
   // deleteUploadFile(upload)
-  logger.info(
-    `Deleted database record for upload ${id} - Need to delete this from s3`
-  )
+  logger.info({ upload_id: id }, 'deleted database record for upload')
 
   // 2. delete the upload
   return db.upload.delete({
