@@ -104,25 +104,24 @@ def handle(event: S3Event, context: Context):
     # If it doesn't exist, download the output template
 
     ### 1) Load the metadata
-    existing_project_agency_id_to_row_number = get_existing_output_metadata(
+    project_agency_id_to_row_map = get_existing_output_metadata(
         s3_client=s3_client,
         organization=organization,
         user=user,
         project_use_code=project_use_code,
     )
-    project_agency_id_to_row_map = set(existing_project_agency_id_to_row_number.keys())
 
     ### 2) Download the existing output XLSX file. If it doesn't exist, download
     #    the template file.
     output_file = tempfile.NamedTemporaryFile()
-    if existing_project_agency_id_to_row_number:
+    if project_agency_id_to_row_map:
         download_file(
             s3_client,
             f"treasuryreports/{organization_id}/{current_reporting_period_id}/{user.id}",
             f"{OUTPUT_TEMPLATE[project_use_code]}.xlsx",
             output_file,
         )
-        highest_row_num = max(existing_project_agency_id_to_row_number.values())
+        highest_row_num = max(project_agency_id_to_row_map.values())
     else:
         download_file(
             s3_client,
