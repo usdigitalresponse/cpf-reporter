@@ -137,7 +137,7 @@ describe('uploads', () => {
     await deleteUpload({
       id: scenario.upload.one.id,
     })
-    expect(deleteUploadFile).toHaveBeenCalled()
+    expect(deleteUploadFile).not.toHaveBeenCalled()
   })
 
   scenario(

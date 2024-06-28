@@ -95,7 +95,11 @@ export const deleteUpload: MutationResolvers['deleteUpload'] = ({ id }) => {
   if (!upload) {
     throw new ValidationError(`Upload with id ${id} not found`)
   }
-  deleteUploadFile(upload)
+  // TODO: fix aws permissions issue on ECS instance. For now, we'll just log the delete
+  // deleteUploadFile(upload)
+  logger.info(
+    `Deleted database record for upload ${id} - Need to delete this from s3`
+  )
 
   // 2. delete the upload
   return db.upload.delete({
