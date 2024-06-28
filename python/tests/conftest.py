@@ -79,7 +79,6 @@ def valid_second_workbook_1A_sheet() -> openpyxl.worksheet.worksheet.Worksheet:
     return workbook
 
 
-
 @pytest.fixture
 def valid_workbook_1B() -> openpyxl.Workbook:
     return openpyxl.load_workbook(_SAMPLE_TEMPLATE_1B)
@@ -252,9 +251,11 @@ def cpf_file_archive_two(sample_template):
 def output_1A_template() -> openpyxl.Workbook:
     return openpyxl.load_workbook(_SAMPLE_TREASURY_OUTPUT_1A_XLSM)
 
+
 @pytest.fixture
 def output_1B_template() -> openpyxl.Workbook:
     return openpyxl.load_workbook(_SAMPLE_TREASURY_OUTPUT_1B_XLSM)
+
 
 @pytest.fixture
 def output_1C_template() -> openpyxl.Workbook:

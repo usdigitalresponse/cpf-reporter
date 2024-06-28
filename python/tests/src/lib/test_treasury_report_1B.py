@@ -1,7 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Dict
 
-import tempfile
 from src.schemas.schema_versions import getSchemaByProject
 from src.functions.generate_treasury_report import (
     combine_project_rows,
@@ -23,12 +21,13 @@ AGENCY_ID = 999
 PROJECT_AGENCY_ID = f"{FIRST_ID}_{AGENCY_ID}"
 PROJECT_AGENCY_ID_2 = f"{SECOND_ID}_{AGENCY_ID}"
 
+
 class TestGenerateOutput1B:
     def test_get_projects_to_remove(self, valid_workbook_1B):
         project_agency_ids_to_remove = get_projects_to_remove(
             workbook=valid_workbook_1B,
             ProjectRowSchema=ProjectRowSchema,
-            agency_id=AGENCY_ID
+            agency_id=AGENCY_ID,
         )
         assert len(project_agency_ids_to_remove) == 1
         assert PROJECT_AGENCY_ID in project_agency_ids_to_remove
@@ -41,9 +40,7 @@ class TestGenerateOutput1B:
             f"4_{AGENCY_ID}": 16,
             f"5_{AGENCY_ID}": 17,
         }
-        project_agency_ids_to_remove = set([
-            f"1_{AGENCY_ID}"
-        ])
+        project_agency_ids_to_remove = set([f"1_{AGENCY_ID}"])
         highest_row_num = max(project_agency_id_to_row_map.values())
         update_project_agency_ids_to_row_map(
             project_agency_id_to_row_map=project_agency_id_to_row_map,
@@ -57,7 +54,7 @@ class TestGenerateOutput1B:
         assert project_agency_id_to_row_map.get(f"3_{AGENCY_ID}") == 14
         assert project_agency_id_to_row_map.get(f"4_{AGENCY_ID}") == 15
         assert project_agency_id_to_row_map.get(f"5_{AGENCY_ID}") == 16
-    
+
     def test_update_project_agency_ids_to_row_map_2(self):
         project_agency_id_to_row_map = {
             f"1_{AGENCY_ID}": 13,
@@ -66,9 +63,7 @@ class TestGenerateOutput1B:
             f"4_{AGENCY_ID}": 16,
             f"5_{AGENCY_ID}": 17,
         }
-        project_agency_ids_to_remove = set([
-            f"6_{AGENCY_ID}"
-        ])
+        project_agency_ids_to_remove = set([f"6_{AGENCY_ID}"])
         highest_row_num = max(project_agency_id_to_row_map.values())
         update_project_agency_ids_to_row_map(
             project_agency_id_to_row_map=project_agency_id_to_row_map,
@@ -82,7 +77,7 @@ class TestGenerateOutput1B:
         assert project_agency_id_to_row_map.get(f"3_{AGENCY_ID}") == 15
         assert project_agency_id_to_row_map.get(f"4_{AGENCY_ID}") == 16
         assert project_agency_id_to_row_map.get(f"5_{AGENCY_ID}") == 17
-    
+
     def test_update_project_agency_ids_to_row_map_3(self):
         project_agency_id_to_row_map = {
             f"1_{AGENCY_ID}": 13,
@@ -91,9 +86,7 @@ class TestGenerateOutput1B:
             f"4_{AGENCY_ID}": 16,
             f"5_{AGENCY_ID}": 17,
         }
-        project_agency_ids_to_remove = set([
-            f"3_{AGENCY_ID}"
-        ])
+        project_agency_ids_to_remove = set([f"3_{AGENCY_ID}"])
         highest_row_num = max(project_agency_id_to_row_map.values())
         update_project_agency_ids_to_row_map(
             project_agency_id_to_row_map=project_agency_id_to_row_map,
@@ -107,7 +100,7 @@ class TestGenerateOutput1B:
         assert project_agency_id_to_row_map.get(f"3_{AGENCY_ID}") is None
         assert project_agency_id_to_row_map.get(f"4_{AGENCY_ID}") == 15
         assert project_agency_id_to_row_map.get(f"5_{AGENCY_ID}") == 16
-    
+
     def test_update_project_agency_ids_to_row_map_4(self):
         project_agency_id_to_row_map = {
             f"1_{AGENCY_ID}": 13,
@@ -116,9 +109,7 @@ class TestGenerateOutput1B:
             f"4_{AGENCY_ID}": 16,
             f"5_{AGENCY_ID}": 17,
         }
-        project_agency_ids_to_remove = set([
-            f"5_{AGENCY_ID}"
-        ])
+        project_agency_ids_to_remove = set([f"5_{AGENCY_ID}"])
         highest_row_num = max(project_agency_id_to_row_map.values())
         update_project_agency_ids_to_row_map(
             project_agency_id_to_row_map=project_agency_id_to_row_map,
@@ -132,7 +123,7 @@ class TestGenerateOutput1B:
         assert project_agency_id_to_row_map.get(f"3_{AGENCY_ID}") == 15
         assert project_agency_id_to_row_map.get(f"4_{AGENCY_ID}") == 16
         assert project_agency_id_to_row_map.get(f"5_{AGENCY_ID}") is None
-    
+
     def test_update_project_agency_ids_to_row_map_5(self):
         project_agency_id_to_row_map = {
             f"1_{AGENCY_ID}": 13,
@@ -141,9 +132,7 @@ class TestGenerateOutput1B:
             f"4_{AGENCY_ID}": 16,
             f"5_{AGENCY_ID}": 17,
         }
-        project_agency_ids_to_remove = set([
-            f"2_{AGENCY_ID}", f"4_{AGENCY_ID}"
-        ])
+        project_agency_ids_to_remove = set([f"2_{AGENCY_ID}", f"4_{AGENCY_ID}"])
         highest_row_num = max(project_agency_id_to_row_map.values())
         update_project_agency_ids_to_row_map(
             project_agency_id_to_row_map=project_agency_id_to_row_map,
@@ -166,9 +155,7 @@ class TestGenerateOutput1B:
             f"4_{AGENCY_ID}": 16,
             f"5_{AGENCY_ID}": 17,
         }
-        project_agency_ids_to_remove = set([
-            f"2_{AGENCY_ID}", f"1_{AGENCY_ID}"
-        ])
+        project_agency_ids_to_remove = set([f"2_{AGENCY_ID}", f"1_{AGENCY_ID}"])
         highest_row_num = max(project_agency_id_to_row_map.values())
         update_project_agency_ids_to_row_map(
             project_agency_id_to_row_map=project_agency_id_to_row_map,
@@ -304,7 +291,9 @@ class TestGenerateOutput1B:
             agency_id=AGENCY_ID,
         )
         assert project_id_agency_id_to_upload_date.get(PROJECT_AGENCY_ID) == createdAt1
-        assert project_id_agency_id_to_upload_date.get(PROJECT_AGENCY_ID_2) == createdAt2
+        assert (
+            project_id_agency_id_to_upload_date.get(PROJECT_AGENCY_ID_2) == createdAt2
+        )
         assert project_id_agency_id_to_row_num.get(PROJECT_AGENCY_ID) == 13
         assert project_id_agency_id_to_row_num.get(PROJECT_AGENCY_ID_2) == 14
         assert new_highest_row_num == 14

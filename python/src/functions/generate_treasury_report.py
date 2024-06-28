@@ -6,7 +6,7 @@ from urllib.parse import unquote_plus
 import csv
 import json
 import tempfile
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Optional, Set
 
 import boto3
 import structlog
@@ -86,13 +86,19 @@ def handle(event: S3Event, context: Context):
 
     organization: Dict[str, Any] = event["Records"][0]["organization"]
     organization_id = organization.get("id")
-    current_reporting_period_id = organization.get("preferences").get("current_reporting_period_id")
+    current_reporting_period_id = organization.get("preferences").get(
+        "current_reporting_period_id"
+    )
     user: Dict[str, Any] = event["Records"][0]["user"]
 
     uploadsByExpenditureCategory = event.get("uploadsByExpenditureCategory", {})
     file_info_list = uploadsByExpenditureCategory.get(project_use_code, {})
-    outdatedUploadsByExpenditureCategory = event.get("outdatedUploadsByExpenditureCategory", {})
-    outdated_file_info_list = outdatedUploadsByExpenditureCategory.get(project_use_code, {})
+    outdatedUploadsByExpenditureCategory = event.get(
+        "outdatedUploadsByExpenditureCategory", {}
+    )
+    outdated_file_info_list = outdatedUploadsByExpenditureCategory.get(
+        project_use_code, {}
+    )
 
     # If the treasury report file exists, download it and store the data
     # If it doesn't exist, download the output template
@@ -102,7 +108,7 @@ def handle(event: S3Event, context: Context):
         s3_client=s3_client,
         organization=organization,
         user=user,
-        project_use_code=project_use_code
+        project_use_code=project_use_code,
     )
     project_agency_id_to_row_map = set(existing_project_agency_id_to_row_number.keys())
 
@@ -125,7 +131,7 @@ def handle(event: S3Event, context: Context):
             output_file,
         )
         highest_row_num = OUTPUT_STARTING_ROW - 1
-    
+
     workbook = load_workbook(filename=output_file, read_only=True)
     sheet = workbook["Baseline"]
 
@@ -134,7 +140,7 @@ def handle(event: S3Event, context: Context):
     project_agency_ids_to_remove = get_outdated_projects_to_remove(
         s3_client=s3_client,
         outdated_file_info_list=outdated_file_info_list,
-        ProjectRowSchema=ProjectRowSchema
+        ProjectRowSchema=ProjectRowSchema,
     )
 
     # Delete rows corresponding to project_agency_ids_to_remove in the existing output file
@@ -145,7 +151,7 @@ def handle(event: S3Event, context: Context):
         sheet=sheet,
         highest_row_num=highest_row_num,
     )
-    
+
     ### 4) Open files in the uploadsByExpenditureCategory parameter.
     # Get project data to add to the output
     project_id_agency_id_to_upload_date: Dict[str, datetime] = {}
@@ -209,12 +215,12 @@ def handle(event: S3Event, context: Context):
 
 
 def get_existing_output_metadata(
-        s3_client,
-        organization: Dict[str, Any],
-        user: Dict[str, Any],
-        project_use_code: str,
+    s3_client,
+    organization: Dict[str, Any],
+    user: Dict[str, Any],
+    project_use_code: str,
 ):
-    existing_project_agency_id_to_row_number = {}    
+    existing_project_agency_id_to_row_number = {}
     with tempfile.NamedTemporaryFile() as existing_file:
         try:
             download_file(
@@ -232,9 +238,9 @@ def get_existing_output_metadata(
 
 
 def get_projects_to_remove(
-        workbook: Workbook,
-        ProjectRowSchema: Union[Project1ARow, Project1BRow, Project1CRow],
-        agency_id: str,
+    workbook: Workbook,
+    ProjectRowSchema: Union[Project1ARow, Project1BRow, Project1CRow],
+    agency_id: str,
 ):
     """
     Get the set of '{project_id}_{agency_id}' ids to remove from the
@@ -254,9 +260,9 @@ def get_projects_to_remove(
 
 
 def get_outdated_projects_to_remove(
-        s3_client,
-        outdated_file_info_list: Dict[str, Any],
-        ProjectRowSchema: Union[Project1ARow, Project1BRow, Project1CRow],
+    s3_client,
+    outdated_file_info_list: Dict[str, Any],
+    ProjectRowSchema: Union[Project1ARow, Project1BRow, Project1CRow],
 ):
     """
     Open the files in the outdated_file_info_list and get the projects to
@@ -281,17 +287,17 @@ def get_outdated_projects_to_remove(
                 get_projects_to_remove(
                     workbook=outdated_wb,
                     ProjectRowSchema=ProjectRowSchema,
-                    agency_id=agency_id
+                    agency_id=agency_id,
                 )
             )
     return project_agency_ids_to_remove
 
 
 def update_project_agency_ids_to_row_map(
-        project_agency_id_to_row_map: Dict[str, int],
-        project_agency_ids_to_remove: Set[str],
-        highest_row_num: int,
-        sheet: Worksheet,
+    project_agency_id_to_row_map: Dict[str, int],
+    project_agency_ids_to_remove: Set[str],
+    highest_row_num: int,
+    sheet: Worksheet,
 ):
     """
     Delete rows corresponding to project_agency_ids_to_remove in the existing
@@ -337,9 +343,9 @@ def insert_project_row(
         if not prop_meta:
             raise Exception("Property not found. Cannot generate report")
         if prop_meta[f"treasury_report_col_{project_use_code}"]:
-            row_with_output_cols[prop_meta[f"treasury_report_col_{project_use_code}"]] = (
-                row_dict[prop]
-            )
+            row_with_output_cols[
+                prop_meta[f"treasury_report_col_{project_use_code}"]
+            ] = row_dict[prop]
 
     for col in row_with_output_cols.keys():
         if sheet:
@@ -347,15 +353,15 @@ def insert_project_row(
 
 
 def combine_project_rows(
-        project_workbook: Workbook,
-        output_sheet: Worksheet,
-        project_use_code: str,
-        highest_row_num: int,
-        ProjectRowSchema: Union[Project1ARow, Project1BRow, Project1CRow],
-        project_id_agency_id_to_upload_date: Dict[str, datetime],
-        project_id_agency_id_to_row_num: Dict[str, int],
-        created_at: datetime,
-        agency_id: str,
+    project_workbook: Workbook,
+    output_sheet: Worksheet,
+    project_use_code: str,
+    highest_row_num: int,
+    ProjectRowSchema: Union[Project1ARow, Project1BRow, Project1CRow],
+    project_id_agency_id_to_upload_date: Dict[str, datetime],
+    project_id_agency_id_to_row_num: Dict[str, int],
+    created_at: datetime,
+    agency_id: str,
 ):
     """
     Combine projects together and check for conflicts.
@@ -376,7 +382,9 @@ def combine_project_rows(
             continue
         else:
             project_id_agency_id_to_upload_date[project_agency_id] = created_at
-            existing_project_row = project_id_agency_id_to_row_num.get(project_agency_id)
+            existing_project_row = project_id_agency_id_to_row_num.get(
+                project_agency_id
+            )
             if existing_project_row:
                 row_to_insert = existing_project_row
             else:
@@ -387,7 +395,7 @@ def combine_project_rows(
                 project_use_code=project_use_code,
                 sheet=output_sheet,
                 row_num=row_to_insert,
-                row=project
+                row=project,
             )
     return highest_row_num
 
