@@ -5,10 +5,10 @@ import { deleteUpload } from 'api/src/services/uploads/uploads'
 
 export default async ({ args }) => {
   /*
-  Useful to create a new organization, agencies, and users.
+  Useful to reset a new organization by deleting any unnecessary uploads.
 
   Example:
-    yarn redwood exec onboardOrganization \
+    yarn redwood exec deleteTestFiles \
       --orgName 'Sample Org' \
       --uploadIds '[1, 2, 3]'
   */
@@ -27,7 +27,6 @@ export default async ({ args }) => {
     throw new Error(`Organization ${args.orgName} not found`)
   }
   console.log(`Organization found: ${organization.name}`)
-  // find all uploads
 
   const whereClause: any = {
     agency: { organizationId: organization.id },
@@ -35,8 +34,10 @@ export default async ({ args }) => {
 
   if (args.uploadIds) {
     // only delete the uploads that were requested by the user
-    whereClause.id = { in: args.uploadIds }
+    whereClause.id = { in: JSON.parse(args.uploadIds) }
   }
+
+  // find all the relevant uploads
   const uploads = await db.upload.findMany({
     where: whereClause,
   })
