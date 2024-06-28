@@ -1,4 +1,6 @@
 import {
+  DeleteObjectCommandInput,
+  DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
   HeadObjectCommandInput,
@@ -9,8 +11,8 @@ import {
 import {
   SFNClient,
   StartExecutionCommand,
-  StartExecutionCommandOutput
-} from '@aws-sdk/client-sfn';
+  StartExecutionCommandOutput,
+} from '@aws-sdk/client-sfn'
 import {
   ReceiveMessageCommand,
   SendMessageCommand,
@@ -18,7 +20,7 @@ import {
 } from '@aws-sdk/client-sqs'
 import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { StreamingBlobPayloadInputTypes } from '@smithy/types'
-import { CreateUploadInput } from 'types/graphql'
+import { CreateUploadInput, Upload } from 'types/graphql'
 
 const REPORTING_DATA_BUCKET_NAME = `${process.env.REPORTING_DATA_BUCKET_NAME}`
 
@@ -114,6 +116,22 @@ export async function s3PutSignedUrl(
   return url
 }
 
+export async function deleteUploadFile(upload: Upload) {
+  const fileKey = `uploads/${upload.agency.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.id}/${upload.filename}`
+  const fileJsonKey = `uploads/${upload.agency.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.id}/${upload.filename}.json`
+  await s3DeleteObject(fileKey)
+  await s3DeleteObject(fileJsonKey)
+}
+
+async function s3DeleteObject(key: string) {
+  const s3 = getS3Client()
+  const baseParams: DeleteObjectCommandInput = {
+    Bucket: REPORTING_DATA_BUCKET_NAME,
+    Key: key,
+  }
+  await s3.send(new DeleteObjectCommand(baseParams))
+}
+
 /**
  *  This function is a wrapper around the getSignedUrl function from the @aws-sdk/s3-request-presigner package.
  *  Exists to organize the imports and to make it easier to mock in tests.
@@ -186,17 +204,15 @@ async function startStepFunctionExecution(
   arn: string,
   name?: string,
   input?: any,
-  traceHeader?: string,
+  traceHeader?: string
 ): Promise<StartExecutionCommandOutput> {
-  let client: SFNClient;
-  const command = new StartExecutionCommand(
-    {
-      stateMachineArn: arn,
-      name,
-      input: input ?? "{}",
-      traceHeader,
-    }
-  );
+  let client: SFNClient
+  const command = new StartExecutionCommand({
+    stateMachineArn: arn,
+    name,
+    input: input ?? '{}',
+    traceHeader,
+  })
   if (process.env.LOCALSTACK_HOSTNAME) {
     console.log('------------ USING LOCALSTACK FOR SFN ------------')
     const endpoint = `http://${process.env.LOCALSTACK_HOSTNAME}:${
@@ -217,4 +233,5 @@ export default {
   receiveSqsMessage,
   getS3Client,
   startStepFunctionExecution,
+  s3DeleteObject,
 }

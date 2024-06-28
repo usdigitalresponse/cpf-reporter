@@ -6,7 +6,7 @@ import type {
 } from 'types/graphql'
 
 import { hasRole } from 'src/lib/auth'
-import { s3PutSignedUrl } from 'src/lib/aws'
+import { s3PutSignedUrl, deleteUploadFile } from 'src/lib/aws'
 import aws from 'src/lib/aws'
 import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
@@ -82,6 +82,22 @@ export const updateUpload: MutationResolvers['updateUpload'] = ({
 }
 
 export const deleteUpload: MutationResolvers['deleteUpload'] = ({ id }) => {
+  // 1. delete any upload validations
+  db.uploadValidation.deleteMany({
+    where: { uploadId: id },
+  })
+
+  // remove object from s3
+  const upload = db.upload.findUnique({
+    where: { id },
+    include: { agency: true },
+  })
+  if (!upload) {
+    throw new ValidationError(`Upload with id ${id} not found`)
+  }
+  deleteUploadFile(upload)
+
+  // 2. delete the upload
   return db.upload.delete({
     where: { id },
   })
