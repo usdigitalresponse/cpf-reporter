@@ -22,6 +22,8 @@ import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { StreamingBlobPayloadInputTypes } from '@smithy/types'
 import { CreateUploadInput, Upload } from 'types/graphql'
 
+import { logger } from 'src/lib/logger'
+
 const REPORTING_DATA_BUCKET_NAME = `${process.env.REPORTING_DATA_BUCKET_NAME}`
 
 function getS3Client() {
@@ -117,8 +119,12 @@ export async function s3PutSignedUrl(
 }
 
 export async function deleteUploadFile(upload: Upload) {
-  const fileKey = `uploads/${upload.agency.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.id}/${upload.filename}`
-  await s3DeleteObject(fileKey)
+  try {
+    const fileKey = `uploads/${upload.agency.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.id}/${upload.filename}`
+    await s3DeleteObject(fileKey)
+  } catch (error) {
+    logger.error(error, 'Error deleting file from S3:')
+  }
 }
 
 async function s3DeleteObject(key: string) {
