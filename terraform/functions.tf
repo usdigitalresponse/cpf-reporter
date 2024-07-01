@@ -560,6 +560,14 @@ module "lambda_function-cpfCreateArchive" {
         "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.zip",
       ]
     }
+    AllowSQSReceive = {
+      effect = "Allow"
+      actions = [
+        "sqs:ReceiveMessage",
+        "sqs:DeleteMessage",
+      ]
+      resources = [module.archive_sqs_queue.queue_arn]
+    }
   }
 
   // Artifacts
@@ -615,35 +623,4 @@ module "archive_sqs_queue" {
   create_dlq                    = true
   dlq_message_retention_seconds = 1209600 # 14 days, in seconds
   dlq_sqs_managed_sse_enabled   = true
-}
-
-module "consume_sqs_messages_policy" {
-  source  = "cloudposse/iam-policy/aws"
-  version = "1.0.1"
-  context = module.this.context
-
-  name = "consume-sqs-messages"
-
-  iam_policy = {
-    statements = [
-      {
-        sid    = "AllowConsumeMessages"
-        effect = "Allow"
-        actions = [
-          "sqs:DeleteMessage",
-          "sqs:ReceiveMessage",
-        ]
-        resources = [module.archive_sqs_queue.queue_arn]
-      },
-      {
-        sid    = "AllowReadMetadata"
-        effect = "Allow"
-        actions = [
-          "sqs:GetQueueAttributes",
-          "sqs:GetQueueUrl",
-        ]
-        resources = [module.archive_sqs_queue.queue_arn]
-      },
-    ]
-  }
 }
