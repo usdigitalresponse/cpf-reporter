@@ -597,7 +597,7 @@ module "lambda_function-cpfCreateArchive" {
 
 module "archive_sqs_queue" {
   source  = "terraform-aws-modules/sqs/aws"
-  version = "6.5.0"
+  version = "4.2.0"
 
   name            = treasury-request-archive
   use_name_prefix = true
