@@ -1,7 +1,4 @@
 #!/usr/bin/env bats
-bats_load_library "bats-support"
-bats_load_library "bats-assert"
-
 
 setup_file() {
   export AWS_PAGER=""
@@ -29,7 +26,7 @@ teardown_file() {
 }
 
 @test "Compile Lambda function" {
-  /bin/bash python/build-lambda.bash
+  /bin/bash ../python/build-lambda.bash
 }
 
 @test "Create Lambda function" {
@@ -49,6 +46,10 @@ teardown_file() {
 }
 
 @test "Get Lambda function logs" {
+  # echo the lambda name
+  echo ${LAMBDA_NAME} # debugging
+  # give the lambda a moment to run
+  sleep 5
   run awslocal logs tail /aws/lambda/${LAMBDA_NAME}
   [ "$status" -eq 0 ]
 }

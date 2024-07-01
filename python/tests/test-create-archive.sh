@@ -31,9 +31,7 @@ rm ${RS_PREFIX}file1.csv
 # Send a message to the queue with fields org_id, reporting_period_id
 awslocal sqs send-message --queue-url http://sqs.us-west-2.localhost.localstack.cloud:4566/000000000000/${QUEUE_NAME} --message-body "{\"org_id\": ${TEST_ORG_ID}, \"reporting_period_id\": ${TEST_REPORTING_PERIOD_ID}}"
 
-# invoke the function manually
-awslocal lambda invoke --cli-binary-format raw-in-base64-out --function-name ${LAMBDA_NAME} --payload "{\"org_id\": ${TEST_ORG_ID}, \"reporting_period_id\": ${TEST_REPORTING_PERIOD_ID}}" /dev/stdout
-
+sleep 5
 # Get the function logs
 awslocal logs tail /aws/lambda/${LAMBDA_NAME}
 
