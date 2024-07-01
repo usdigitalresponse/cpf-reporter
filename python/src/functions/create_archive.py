@@ -9,7 +9,7 @@ from aws_lambda_typing.events import SQSEvent
 from mypy_boto3_s3.client import S3Client
 from src.lib.logging import get_logger, reset_contextvars
 
-S3_BUCKET = os.environ["S3_BUCKET"]
+S3_BUCKET = os.environ.get("S3_BUCKET", "test_bucket")
 
 
 @reset_contextvars
@@ -70,6 +70,7 @@ def create_archive(
             logger.info(f"Created archive file: {file.name}")
             upload_key = f"{target_key}report.zip"
             # upload the zip file to the target key
+
             s3_client.upload_file(file.name, S3_BUCKET, upload_key)
             logger.info(f"Uploaded archive file to {upload_key}")
             logger.info(f"Uploaded archive file to {upload_key}")

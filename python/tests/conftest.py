@@ -141,14 +141,14 @@ def template_workbook_two():
 
 @pytest.fixture
 def cpf_file_archive(sample_template):
-    cpf_archive_file = zipfile.ZipFile("test.zip", "w")
+    cpf_archive_file = zipfile.ZipFile("_tmp_test.zip", "w")
     cpf_archive_file.writestr("2024-05-19/TestFile.xlsx", sample_template.read())
     return CPFFileArchive(cpf_archive_file)
 
 
 @pytest.fixture
 def cpf_file_archive_two(sample_template):
-    cpf_archive_file = zipfile.ZipFile("test.zip", "w")
+    cpf_archive_file = zipfile.ZipFile("_tmp_test.zip", "w")
     cpf_archive_file.writestr("2024-05-19/TestFile.xlsx", sample_template.read())
     cpf_archive_file.writestr("2024-05-19/TestFile2.xlsx", sample_template.read())
     return CPFFileArchive(cpf_archive_file)
