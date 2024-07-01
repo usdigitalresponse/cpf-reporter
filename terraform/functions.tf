@@ -599,7 +599,7 @@ module "archive_sqs_queue" {
   source  = "terraform-aws-modules/sqs/aws"
   version = "4.2.0"
 
-  name            = treasury-request-archive
+  name            = "treasury-request-archive"
   use_name_prefix = true
 
   # Primary queue
