@@ -1,8 +1,11 @@
 import type { Upload } from '@prisma/client'
 
 import { deleteUploadFile, s3PutSignedUrl, getSignedUrl } from 'src/lib/aws'
-
 import { db } from 'src/lib/db'
+
+import {
+  updateOrganization
+} from '../organizations/organizations'
 
 import {
   uploads,
@@ -14,11 +17,6 @@ import {
   Upload as UploadRelationResolver,
   getUploadsByExpenditureCategory,
 } from './uploads'
-
-import {
-  updateOrganization
-} from '../organizations/organizations'
-
 import type { StandardScenario } from './uploads.scenarios'
 import type { StandardScenario as UploadScenario } from './uploadsValidation.scenarios'
 
@@ -32,7 +30,9 @@ jest.mock('src/lib/aws', () => ({
   deleteUploadFile: jest.fn(),
   s3PutSignedUrl: jest.fn(),
   getSignedUrl: jest.fn(),
+  getS3UploadFileKey: jest.fn(),
 }))
+
 describe('uploads', () => {
   async function uploadsBelongToOrganization(uploads, expectedOrganizationId) {
     const uploadOrganizationIds = await Promise.all(

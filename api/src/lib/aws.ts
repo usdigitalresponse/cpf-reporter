@@ -97,12 +97,9 @@ async function sendHeadObjectToS3Bucket(bucketName: string, key: string) {
   await s3.send(new HeadObjectCommand(uploadParams))
 }
 
-export function getS3UploadFileKey(organizationId: number, upload: Upload | CreateUploadInput, uploadId?: number): string {
+export function getS3UploadFileKey(organizationId: number, upload: Upload | CreateUploadInput, uploadId?: number) {
   if ('id' in upload) {
     uploadId = upload.id
-  }
-  if (!uploadId) {
-    throw new Error('uploadId is required')
   }
   return `uploads/${organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${uploadId}/${upload.filename}`
 }

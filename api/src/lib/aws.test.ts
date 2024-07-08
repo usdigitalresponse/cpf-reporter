@@ -1,8 +1,8 @@
 import { APIGatewayEvent } from 'aws-lambda'
 
 import { getCurrentUser } from 'src/lib/auth'
-import { db } from 'src/lib/db'
 import { getS3UploadFileKey } from 'src/lib/aws'
+import { db } from 'src/lib/db'
 
 jest.mock('src/lib/db', () => ({
   db: {

@@ -224,8 +224,8 @@ export const getUploadsByExpenditureCategory = async () => {
   // Get the most recent upload for each expenditure category and agency and set the S3 Object key
   for (const upload of uploadsForPeriod)  {
     // Set the S3 Object key
-    const objectKey = getS3UploadFileKey(organization.id, upload);
-    upload.objectKey = objectKey;
+    const objectKey = getS3UploadFileKey(organization.id, upload)
+    upload.objectKey = objectKey
 
     // Filter the uploads by expenditure category of the current upload.
     const uploadsByAgency =
