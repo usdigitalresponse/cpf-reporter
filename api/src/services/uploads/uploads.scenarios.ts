@@ -5,6 +5,7 @@ import type {
   Organization,
   Agency,
   ReportingPeriod,
+  ExpenditureCategory,
 } from '@prisma/client'
 
 import type { ScenarioData } from '@redwoodjs/testing/api'
@@ -20,11 +21,13 @@ export const standard = defineScenario<
     one: {
       data: {
         name: 'USDR',
+        preferences: { }
       },
     },
     two: {
       data: {
         name: 'Example Organization',
+        preferences: { }
       },
     },
   },
@@ -120,6 +123,22 @@ export const standard = defineScenario<
       },
     }),
   },
+  expenditureCategory: {
+    one: {
+      data: {
+        name: '1A',
+        code: '1A',
+        updatedAt: '2024-01-26T15:11:27.000Z',
+      }
+    },
+    two: {
+      data: {
+        name: '2A',
+        code: '2A',
+        updatedAt: '2024-01-26T15:11:27.000Z',
+      }
+    }
+  },
   upload: {
     one: (scenario) => ({
       data: {
@@ -127,6 +146,7 @@ export const standard = defineScenario<
         uploadedById: scenario.user.one.id,
         agencyId: scenario.agency.one.id,
         reportingPeriodId: scenario.reportingPeriod.one.id,
+        expenditureCategoryId: scenario.expenditureCategory.one.id,
         validations: {
           create: [
             {
@@ -153,6 +173,7 @@ export const standard = defineScenario<
         uploadedById: scenario.user.two.id,
         agencyId: scenario.agency.one.id,
         reportingPeriodId: scenario.reportingPeriod.one.id,
+        expenditureCategoryId: scenario.expenditureCategory.one.id,
         validations: {
           create: [
             {
@@ -179,7 +200,17 @@ export const standard = defineScenario<
         uploadedById: scenario.user.three.id,
         agencyId: scenario.agency.two.id,
         reportingPeriodId: scenario.reportingPeriod.one.id,
-        validations: {},
+        expenditureCategoryId: scenario.expenditureCategory.one.id,
+        validations: {
+          create: [
+            {
+              passed: true,
+              results: '{error:false}',
+              initiatedById: scenario.user.two.id,
+              createdAt: '2024-01-29T18:13:25.000Z',
+            },
+          ]
+        },
         createdAt: '2024-01-21T18:10:17.000Z',
         updatedAt: '2024-01-21T18:10:17.000Z',
       },
@@ -190,16 +221,27 @@ export const standard = defineScenario<
         uploadedById: scenario.user.four.id,
         agencyId: scenario.agency.two.id,
         reportingPeriodId: scenario.reportingPeriod.one.id,
-        validations: {},
+        expenditureCategoryId: scenario.expenditureCategory.two.id,
+        validations: {
+          create: [
+            {
+              passed: true,
+              results: '{error:false}',
+              initiatedById: scenario.user.two.id,
+              createdAt: '2024-01-29T18:13:25.000Z',
+            },
+          ]
+        },
         createdAt: '2024-01-21T18:10:17.000Z',
         updatedAt: '2024-01-21T18:10:17.000Z',
       },
     }),
   },
-})
+});
 
 export type StandardScenario = ScenarioData<Upload, 'upload'> &
   ScenarioData<User, 'user'> &
   ScenarioData<Organization, 'organization'> &
   ScenarioData<Agency, 'agency'> &
-  ScenarioData<ReportingPeriod, 'reportingPeriod'>
+  ScenarioData<ReportingPeriod, 'reportingPeriod'> &
+  ScenarioData<ExpenditureCategory, 'expenditureCategory'>

@@ -1,3 +1,4 @@
+import type { Upload } from '@prisma/client'
 import {
   GetObjectCommand,
   HeadObjectCommand,
@@ -165,6 +166,10 @@ async function receiveSqsMessage(queueUrl: string) {
   )
 }
 
+export function getS3UploadFileKey(organizationId: number, upload: Upload) {
+  return `uploads/${organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.id}/${upload.filename}`
+}
+
 export default {
   sendPutObjectToS3Bucket,
   sendHeadObjectToS3Bucket,
@@ -172,4 +177,5 @@ export default {
   sendSqsMessage,
   receiveSqsMessage,
   getS3Client,
+  getS3UploadFileKey,
 }
