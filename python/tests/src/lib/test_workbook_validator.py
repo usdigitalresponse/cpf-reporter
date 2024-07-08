@@ -261,7 +261,7 @@ class TestValidateMatchingSubrecipientSheet:
     def test_invalid_project_sheet_unmatching_subrecipient_tin_field(
         self, invalid_project_sheet_unmatching_subrecipient_tin_field: Worksheet
     ):
-        errors, _ = validate_workbook(
+        errors, _, _ = validate_workbook(
             invalid_project_sheet_unmatching_subrecipient_tin_field
         )
         assert errors != []
@@ -274,7 +274,7 @@ class TestValidateMatchingSubrecipientSheet:
     def test_invalid_project_sheet_unmatching_subrecipient_uei_field(
         self, invalid_project_sheet_unmatching_subrecipient_uei_field: Worksheet
     ):
-        errors, _ = validate_workbook(
+        errors, _, _ = validate_workbook(
             invalid_project_sheet_unmatching_subrecipient_uei_field
         )
         assert errors != []
@@ -287,7 +287,7 @@ class TestValidateMatchingSubrecipientSheet:
     def test_invalid_project_sheet_unmatching_subrecipient_tin_uei_field(
         self, invalid_project_sheet_unmatching_subrecipient_tin_uei_field: Worksheet
     ):
-        errors, _ = validate_workbook(
+        errors, _, _ = validate_workbook(
             invalid_project_sheet_unmatching_subrecipient_tin_uei_field
         )
         assert errors != []
