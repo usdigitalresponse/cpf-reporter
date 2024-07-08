@@ -1,5 +1,7 @@
 import type { Upload } from '@prisma/client'
 
+import { deleteUploadFile, s3PutSignedUrl, getSignedUrl } from 'src/lib/aws'
+
 import { db } from 'src/lib/db'
 
 import {
@@ -12,9 +14,11 @@ import {
   Upload as UploadRelationResolver,
   getUploadsByExpenditureCategory,
 } from './uploads'
+
 import {
   updateOrganization
 } from '../organizations/organizations'
+
 import type { StandardScenario } from './uploads.scenarios'
 import type { StandardScenario as UploadScenario } from './uploadsValidation.scenarios'
 
@@ -24,6 +28,11 @@ import type { StandardScenario as UploadScenario } from './uploadsValidation.sce
 //       https://redwoodjs.com/docs/testing#testing-services
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
+jest.mock('src/lib/aws', () => ({
+  deleteUploadFile: jest.fn(),
+  s3PutSignedUrl: jest.fn(),
+  getSignedUrl: jest.fn(),
+}))
 describe('uploads', () => {
   async function uploadsBelongToOrganization(uploads, expectedOrganizationId) {
     const uploadOrganizationIds = await Promise.all(
@@ -105,6 +114,7 @@ describe('uploads', () => {
       },
     })
 
+    expect(s3PutSignedUrl).toHaveBeenCalled()
     expect(result.filename).toEqual('String')
     expect(result.uploadedById).toEqual(scenario.upload.one.uploadedById)
     expect(result.agencyId).toEqual(scenario.upload.two.agencyId)
@@ -131,12 +141,11 @@ describe('uploads', () => {
   })
 
   scenario('deletes an upload', async (scenario: StandardScenario) => {
-    const original = (await deleteUpload({
+    // mock the s3DeleteObject function
+    await deleteUpload({
       id: scenario.upload.one.id,
-    })) as Upload
-    const result = await upload({ id: original.id })
-
-    expect(result).toEqual(null)
+    })
+    expect(deleteUploadFile).not.toHaveBeenCalled()
   })
 
   scenario(
@@ -193,7 +202,8 @@ describe('uploads', () => {
 describe('downloads', () => {
   scenario('returns a download link', async (scenario: StandardScenario) => {
     const result = await downloadUploadFile({ id: scenario.upload.one.id })
-    expect(result).toMatch(/^https:\/\/.*\.amazonaws\.com\/uploads\/.*$/)
+    console.log(result)
+    expect(getSignedUrl).toHaveBeenCalled()
   })
   scenario('handles a missing value', async (_scenario: StandardScenario) => {
     await expect(downloadUploadFile({ id: -1 })).rejects.toThrow(

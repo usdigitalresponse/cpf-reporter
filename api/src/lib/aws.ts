@@ -1,5 +1,6 @@
-import type { Upload } from '@prisma/client'
 import {
+  DeleteObjectCommandInput,
+  DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
   HeadObjectCommandInput,
@@ -8,13 +9,18 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3'
 import {
+  SFNClient,
+  StartExecutionCommand,
+  StartExecutionCommandOutput,
+} from '@aws-sdk/client-sfn'
+import {
   ReceiveMessageCommand,
   SendMessageCommand,
   SQSClient,
 } from '@aws-sdk/client-sqs'
 import { getSignedUrl as awsGetSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { StreamingBlobPayloadInputTypes } from '@smithy/types'
-import { CreateUploadInput } from 'types/graphql'
+import { CreateUploadInput, Upload } from 'types/graphql'
 
 const REPORTING_DATA_BUCKET_NAME = `${process.env.REPORTING_DATA_BUCKET_NAME}`
 
@@ -91,13 +97,24 @@ async function sendHeadObjectToS3Bucket(bucketName: string, key: string) {
   await s3.send(new HeadObjectCommand(uploadParams))
 }
 
+export function getS3UploadFileKey(organizationId: number, upload: Upload | CreateUploadInput, uploadId?: number): string {
+  if ('id' in upload) {
+    uploadId = upload.id
+  }
+  if (!uploadId) {
+    throw new Error('uploadId is required')
+  }
+  return `uploads/${organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${uploadId}/${upload.filename}`
+}
+
+
 export async function s3PutSignedUrl(
   upload: CreateUploadInput,
   uploadId: number,
   organizationId: number
 ): Promise<string> {
   const s3 = getS3Client()
-  const key = `uploads/${organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${uploadId}/${upload.filename}`
+  const key = getS3UploadFileKey(organizationId, upload, uploadId)
   const baseParams: PutObjectCommandInput = {
     Bucket: REPORTING_DATA_BUCKET_NAME,
     Key: key,
@@ -110,12 +127,26 @@ export async function s3PutSignedUrl(
   return url
 }
 
+export async function deleteUploadFile(upload: Upload) {
+  const fileKey = getS3UploadFileKey(upload.agency.organizationId, upload)
+  await s3DeleteObject(fileKey)
+}
+
+async function s3DeleteObject(key: string) {
+  const s3 = getS3Client()
+  const baseParams: DeleteObjectCommandInput = {
+    Bucket: REPORTING_DATA_BUCKET_NAME,
+    Key: key,
+  }
+  await s3.send(new DeleteObjectCommand(baseParams))
+}
+
 /**
  *  This function is a wrapper around the getSignedUrl function from the @aws-sdk/s3-request-presigner package.
  *  Exists to organize the imports and to make it easier to mock in tests.
  */
 async function getSignedUrl(upload: Upload): Promise<string> {
-  const key = `uploads/${upload.agency.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.id}/${upload.filename}`
+  const key = getS3UploadFileKey(upload.agency.organizationId, upload)
   const s3 = getS3Client()
   const baseParams = { Bucket: REPORTING_DATA_BUCKET_NAME, Key: key }
   return awsGetSignedUrl(s3, new GetObjectCommand(baseParams), {
@@ -166,8 +197,41 @@ async function receiveSqsMessage(queueUrl: string) {
   )
 }
 
-export function getS3UploadFileKey(organizationId: number, upload: Upload) {
-  return `uploads/${organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.id}/${upload.filename}`
+/**
+ * Create a step function execution.
+ * AWS docs can be found at the following:
+ * https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/client/sfn/command/StartExecutionCommand/
+ *
+ * For localstack docs, see https://docs.localstack.cloud/user-guide/aws/stepfunctions/
+ *
+ * @param arn
+ * @param name
+ * @param input
+ * @param traceHeader
+ */
+async function startStepFunctionExecution(
+  arn: string,
+  name?: string,
+  input?: any,
+  traceHeader?: string
+): Promise<StartExecutionCommandOutput> {
+  let client: SFNClient
+  const command = new StartExecutionCommand({
+    stateMachineArn: arn,
+    name,
+    input: input ?? '{}',
+    traceHeader,
+  })
+  if (process.env.LOCALSTACK_HOSTNAME) {
+    console.log('------------ USING LOCALSTACK FOR SFN ------------')
+    const endpoint = `http://${process.env.LOCALSTACK_HOSTNAME}:${
+      process.env.EDGE_PORT || 4566
+    }`
+    client = new SFNClient({ endpoint, region: process.env.AWS_DEFAULT_REGION })
+  } else {
+    client = new SFNClient()
+  }
+  return await client.send(command)
 }
 
 export default {
@@ -177,5 +241,6 @@ export default {
   sendSqsMessage,
   receiveSqsMessage,
   getS3Client,
-  getS3UploadFileKey,
+  startStepFunctionExecution,
+  s3DeleteObject,
 }

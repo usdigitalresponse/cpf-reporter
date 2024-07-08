@@ -62,7 +62,10 @@ describe('cpfValidation function', () => {
   })
 
   scenario('validation error', async (scenario) => {
-    const expectedBody = { errors: 'error' }
+    const expectedBody = { errors: [{
+      severity: 'ERR',
+      message: 'error',
+    }] }
     const mocks3 = new MockS3Client(JSON.stringify(expectedBody))
     const record = buildRecord(scenario.uploadValidation.one.uploadId)
 
