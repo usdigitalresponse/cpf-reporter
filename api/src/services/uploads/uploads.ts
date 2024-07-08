@@ -6,7 +6,7 @@ import type {
 } from 'types/graphql'
 
 import { hasRole } from 'src/lib/auth'
-import { s3PutSignedUrl } from 'src/lib/aws'
+import { s3PutSignedUrl, getS3UploadFileKey } from 'src/lib/aws'
 import aws from 'src/lib/aws'
 import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
@@ -193,7 +193,6 @@ export const getUploadsByExpenditureCategory = async () => {
   const organization = await db.organization.findFirst({
     where: { id: context.currentUser.agency.organizationId },
   })
-  const organizations = await db.organization.findMany();
 
   const reportingPeriod = await db.reportingPeriod.findFirst({
     where: { id: organization.preferences['current_reporting_period_id'] },
@@ -225,7 +224,7 @@ export const getUploadsByExpenditureCategory = async () => {
   // Get the most recent upload for each expenditure category and agency and set the S3 Object key
   for (const upload of uploadsForPeriod)  {
     // Set the S3 Object key
-    const objectKey = await aws.getS3UploadFileKey(organization.id, upload);
+    const objectKey = getS3UploadFileKey(organization.id, upload);
     upload.objectKey = objectKey;
 
     // Filter the uploads by expenditure category of the current upload.

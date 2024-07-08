@@ -133,4 +133,20 @@ describe('getS3UploadFileKey', () => {
       'uploads/10/2/3/1/test.csv'
     )
   })
+
+  it('should return a valid s3 upload key based on the upload with no id', () => {
+    const upload = {
+      filename: 'test.csv',
+      uploadedById: 1,
+      agencyId: 2,
+      reportingPeriodId: 3,
+      expenditureCategoryId: 4,
+      createdAt: '2024-01-26T15:11:27.000Z',
+      updatedAt: '2024-01-26T15:11:27.000Z',
+      validations: [],
+    }
+    expect(getS3UploadFileKey(10, upload, 11)).toEqual(
+      'uploads/10/2/3/11/test.csv'
+    )
+  })
 })
