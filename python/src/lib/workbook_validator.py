@@ -283,6 +283,9 @@ def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
             projects, subrecipients, version_string
         )
 
+    
+    subrecipients = [subrecipient.json() for subrecipient in subrecipients]
+
     return (errors, project_use_code, subrecipients)
 
 
