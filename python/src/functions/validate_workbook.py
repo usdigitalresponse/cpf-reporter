@@ -81,7 +81,7 @@ def validate_workbook(file: IO[bytes]) -> ValidationResults:
     logger.debug("validating workbook")
 
     try:
-        errors, project_use_code = validate(file)
+        errors, project_use_code, subrecipients = validate(file)
     except:
         logger.exception("unhandled exception validating workbook")
         raise
@@ -90,6 +90,7 @@ def validate_workbook(file: IO[bytes]) -> ValidationResults:
     results: ValidationResults = {
         "errors": list(map(lambda x: x.__dict__, errors)),
         "projectUseCode": project_use_code,
+        "subrecipients": subrecipients
     }
     return results
 
