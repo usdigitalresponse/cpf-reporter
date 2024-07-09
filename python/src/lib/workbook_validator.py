@@ -1,4 +1,5 @@
 from enum import Enum
+import json
 from typing import IO, Any, Dict, Iterable, List, Optional, Tuple, Type, Union
 
 from openpyxl import Workbook, load_workbook
@@ -284,7 +285,7 @@ def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
         )
 
     
-    subrecipients = [subrecipient.json() for subrecipient in subrecipients]
+    subrecipients = [subrecipient.model_dump() for subrecipient in subrecipients]
 
     return (errors, project_use_code, subrecipients)
 
