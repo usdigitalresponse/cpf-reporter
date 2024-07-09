@@ -26,6 +26,14 @@ type Response = {
   statusCode: number
 }
 
+type Subrecipient = {
+  Name: string
+  EIN__c: string
+  Unique_Entity_Identifier__c: string
+  // Look at SubrecipientRow in the latest Python schema file for the full range of what we can pull out here if needed
+  [key: string]: any
+}
+
 type ResultSchema = {
   errors: {
     severity: Severity
@@ -35,6 +43,7 @@ type ResultSchema = {
     col?: string
   }[]
   projectUseCode: string
+  subrecipients: Subrecipient[]
 }
 
 type UploadValidationS3Client = {
@@ -183,6 +192,18 @@ export const processRecord = async (
       throw new Error('Error updating validation record')
     }
 
+    // If we passed validation, we will save the subrecipient info into our DB
+    if (passed) {
+        result.subrecipients.forEach(subrecipient => saveSubrecipientInfo(subrecipient, key))
+
+        try {
+          // TODO upload a subrecipients JSON file to S3
+        } catch (err) {
+          logger.error(`Error saving subrecipients JSON file to S3: ${err}`)
+          throw new Error('Error saving subrecipient info to S3')
+        }
+    }
+
     // Delete the errors.json file from S3
     try {
       await s3Client.send(
@@ -197,6 +218,15 @@ export const processRecord = async (
     }
   } else {
     logger.error('No body in getObjectResponse')
+  }
+}
+
+function saveSubrecipientInfo(subrecipient: Subrecipient, key: string) {
+  try {
+    // TODO -- dedupe and save Subrecipient and SubrecipientUpload as necessary
+  } catch (err) {
+    logger.error(`Error saving subrecipient: ${err} - key: ${key} - subrecipient: ${subrecipient.Name}`)
+    throw new Error('Error saving subrecipient')
   }
 }
 
