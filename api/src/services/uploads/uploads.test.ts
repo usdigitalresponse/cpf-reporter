@@ -18,7 +18,6 @@ import {
   getUploadsByExpenditureCategory,
 } from './uploads'
 import type { StandardScenario } from './uploads.scenarios'
-import type { StandardScenario as UploadScenario } from './uploadsValidation.scenarios'
 
 // Generated boilerplate tests do not account for all circumstances
 // and can fail without adjustments, e.g. Float.
@@ -212,42 +211,37 @@ describe('downloads', () => {
   })
 })
 
-describe('getUploads', () => {
-  scenario('returns most recent upload for one category',
-    async (scenario: UploadScenario) => {
+describeScenario<StandardScenario>('uploadCheck', 'getUploads', (getScenario) => {
+
+  let scenario: StandardScenario
+
+  beforeEach(async () => {
+    scenario = getScenario()
+    await updateOrganization({
+      id: scenario.organization.one.id,
+      input: { preferences: {
+          current_reporting_period_id: scenario.reportingPeriod.one.id,
+      }},
+    })
+    await updateOrganization({
+      id: scenario.organization.two.id,
+      input: { preferences: {
+          current_reporting_period_id: scenario.reportingPeriod.one.id,
+      }},
+    })
+  })
+
+  it('returns most recent upload for one category',
+    async () => {
       mockCurrentUser(scenario.user.one)
-      await updateOrganization({
-        id: scenario.organization.one.id,
-        input: { preferences: {
-            current_reporting_period_id: scenario.reportingPeriod.one.id,
-        }},
-      })
-      await updateOrganization({
-        id: scenario.organization.two.id,
-        input: { preferences: {
-            current_reporting_period_id: scenario.reportingPeriod.one.id,
-        }},
-      })
       const result = await getUploadsByExpenditureCategory();
       expect(Object.keys(result).length).toEqual(1);
       expect(Object.keys(result)).toEqual(['1A']);
   })
 
-  scenario('returns two uploads of different categories',
-    async (scenario: UploadScenario) => {
+  it('returns two uploads of different categories',
+    async () => {
       mockCurrentUser(scenario.user.three)
-      await updateOrganization({
-        id: scenario.organization.one.id,
-        input: { preferences: {
-            current_reporting_period_id: scenario.reportingPeriod.one.id,
-        }},
-      })
-      await updateOrganization({
-        id: scenario.organization.two.id,
-        input: { preferences: {
-            current_reporting_period_id: scenario.reportingPeriod.one.id,
-        }},
-      })
       const result = await getUploadsByExpenditureCategory();
       expect(Object.keys(result).length).toEqual(2);
       expect(Object.keys(result).sort()).toEqual(['2A', '1A'].sort());

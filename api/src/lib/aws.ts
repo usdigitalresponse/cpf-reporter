@@ -97,13 +97,17 @@ async function sendHeadObjectToS3Bucket(bucketName: string, key: string) {
   await s3.send(new HeadObjectCommand(uploadParams))
 }
 
+/**
+ * Create an upload key used for S3 based on the upload or create upload input object.
+ * If the upload is new, such as a CreateUploadInput object, the id will be null as it is not from the database.
+ * In that case, you can use the optional uploadId field to create the key.
+ */
 export function getS3UploadFileKey(organizationId: number, upload: Upload | CreateUploadInput, uploadId?: number) {
   if ('id' in upload) {
     uploadId = upload.id
   }
   return `uploads/${organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${uploadId}/${upload.filename}`
 }
-
 
 export async function s3PutSignedUrl(
   upload: CreateUploadInput,
