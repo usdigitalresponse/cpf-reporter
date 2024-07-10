@@ -29,7 +29,7 @@ export const createSubrecipientUpload: MutationResolvers['createSubrecipientUplo
 export const updateSubrecipientUpload: MutationResolvers['updateSubrecipientUpload'] =
   ({ id, input }) => {
     return db.subrecipientUpload.update({
-      data: { ...input, updatedAt: new Date() },
+      data: input,
       where: { id },
     })
   }

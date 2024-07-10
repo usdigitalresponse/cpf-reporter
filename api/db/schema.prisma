@@ -37,7 +37,7 @@ model User {
   name           String
   agencyId       Int
   createdAt      DateTime            @default(now()) @db.Timestamptz(6)
-  updatedAt      DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime            @default(now()) @db.Timestamptz(6) @updatedAt
   role           Role
   isActive       Boolean             @default(true)
   passageId      String?
@@ -61,7 +61,7 @@ model InputTemplate {
   effectiveDate       DateTime           @db.Date
   rulesGeneratedAt    DateTime?          @db.Timestamptz(6)
   createdAt           DateTime           @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime           @default(now()) @db.Timestamptz(6) @updatedAt
   reportingPeriods    ReportingPeriod[]
 }
 
@@ -72,7 +72,7 @@ model OutputTemplate {
   effectiveDate      DateTime          @db.Date
   rulesGeneratedAt   DateTime?         @db.Timestamptz(6)
   createdAt          DateTime          @default(now()) @db.Timestamptz(6)
-  updatedAt          DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime          @default(now()) @db.Timestamptz(6) @updatedAt
   reportingPeriods   ReportingPeriod[]
 }
 
@@ -90,7 +90,7 @@ model ReportingPeriod {
   validationRulesId Int?
   validationRules   ValidationRules? @relation(fields: [validationRulesId], references: [id])
   createdAt         DateTime       @default(now()) @db.Timestamptz(6)
-  updatedAt         DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime       @default(now()) @db.Timestamptz(6) @updatedAt
   uploads           Upload[]
   projects          Project[]
 }
@@ -100,7 +100,7 @@ model ExpenditureCategory {
   name      String
   code      String
   createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6) @updatedAt
   Uploads   Upload[]
 }
 
@@ -116,7 +116,7 @@ model Upload {
   expenditureCategoryId Int?
   expenditureCategory   ExpenditureCategory? @relation(fields: [expenditureCategoryId], references: [id])
   createdAt             DateTime             @default(now()) @db.Timestamptz(6)
-  updatedAt             DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime             @default(now()) @db.Timestamptz(6) @updatedAt
   validations           UploadValidation[]
   subrecipientUploads   SubrecipientUpload[]
 }
@@ -130,7 +130,7 @@ model UploadValidation {
   initiatedById       Int
   initiatedBy         User          @relation(fields: [initiatedById], references: [id])
   createdAt           DateTime      @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime      @default(now()) @db.Timestamptz(6) @updatedAt
   validationRulesId   Int?
   validationRules     ValidationRules? @relation(fields: [validationRulesId], references:[id])
 }
@@ -143,7 +143,7 @@ model Subrecipient {
   organizationId      Int
   organization        Organization        @relation(fields: [organizationId], references: [id])
   createdAt           DateTime            @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime            @default(now()) @db.Timestamptz(6) @updatedAt
   subrecipientUploads SubrecipientUpload[]
 }
 
@@ -160,7 +160,7 @@ model SubrecipientUpload {
   upload              Upload            @relation(fields: [uploadId], references: [id])
   rawSubrecipient     Json
   createdAt           DateTime          @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime          @default(now()) @db.Timestamptz(6) @updatedAt
   version             Version
 }
 
@@ -177,7 +177,7 @@ model Project {
   originationPeriodId Int
   originationPeriod   ReportingPeriod @relation(fields: [originationPeriodId], references: [id])
   createdAt           DateTime        @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime        @default(now()) @db.Timestamptz(6) @updatedAt
 }
 
 enum Version {
@@ -191,7 +191,7 @@ model ValidationRules {
   id                  Int               @id @default(autoincrement())
   versionId           Version
   createdAt           DateTime        @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime        @default(now()) @db.Timestamptz(6) @updatedAt
   validations         UploadValidation[]
   reportingPeriods    ReportingPeriod[]
 }
