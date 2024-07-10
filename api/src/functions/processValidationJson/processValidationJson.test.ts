@@ -46,7 +46,7 @@ function buildRecord(uploadValidationId: string) {
 
 describe('cpfValidation function', () => {
   scenario('no validation errors', async (scenario) => {
-    const noErrorResults = { errors: [] }
+    const noErrorResults = { errors: [], subrecipients: []}
     const expectedBody = JSON.stringify(noErrorResults)
     const mocks3 = new MockS3Client(expectedBody)
     const record = buildRecord(scenario.uploadValidation.one.uploadId)

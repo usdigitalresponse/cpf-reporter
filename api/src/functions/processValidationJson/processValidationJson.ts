@@ -4,6 +4,8 @@ import { S3Handler, S3ObjectCreatedNotificationEvent } from 'aws-lambda'
 
 import aws from 'src/lib/aws'
 import { db, getPrismaClient } from 'src/lib/db'
+import { createSubrecipient } from 'src/services/subrecipients'
+import { createSubrecipientUpload, updateSubrecipientUpload } from 'src/services/subrecipientUploads/subrecipientUploads'
 import { logger } from 'src/lib/logger'
 
 enum Severity {
@@ -194,8 +196,7 @@ export const processRecord = async (
 
     // If we passed validation, we will save the subrecipient info into our DB
     if (passed) {
-        result.subrecipients.forEach(subrecipient => saveSubrecipientInfo(subrecipient, key))
-
+        result.subrecipients.forEach(subrecipient => saveSubrecipientInfo(subrecipient, key, uploadId))
         try {
           // TODO upload a subrecipients JSON file to S3
         } catch (err) {
@@ -221,23 +222,59 @@ export const processRecord = async (
   }
 }
 
-function saveSubrecipientInfo(subrecipient: Subrecipient, key: string) {
+async function saveSubrecipientInfo(subrecipientInput: Subrecipient, key: string, uploadId: number) {
   try {
-    // TODO -- dedupe and save Subrecipient and SubrecipientUpload as necessary
+    const ueiTinCombo = `${subrecipientInput.Unique_Entity_Identifier__c}${subrecipientInput.EIN__c}`
+    const organizationId = extractOrganizationIdFromKey(key)
+    let subrecipient = await db.subrecipient.findUnique({
+      where: {
+        ueiTinCombo
+      }
+    })
+    if (!subrecipient) {
+      subrecipient = await createSubrecipient({
+        input: {
+          name: subrecipientInput.Name,
+          ueiTinCombo,
+          organizationId,
+        }
+      })
+    }
+    await createSubrecipientUpload({
+      input: {
+        subrecipientId: subrecipient.id,
+        uploadId,
+        rawSubrecipient: subrecipientInput,
+        version: 'V2024_05_24' // TODO -- we should pass the version enum through on the `ResultsSchema` as well, for now just using the latest one 
+      }
+    })
+
   } catch (err) {
-    logger.error(`Error saving subrecipient: ${err} - key: ${key} - subrecipient: ${subrecipient.Name}`)
+    logger.error(`Error saving subrecipient: ${err} - key: ${key} - subrecipient: ${subrecipientInput.Name}`)
     throw new Error('Error saving subrecipient')
   }
 }
 
 function extractUploadIdFromKey(key: string): number {
   logger.debug(`Extracting upload_id from key: ${key}`)
+  const match = matchRegex(key)
+  logger.info(`Extracted upload_id: ${match.groups.upload_id}`)
+  return parseInt(match.groups.upload_id)
+}
+
+function extractOrganizationIdFromKey(key: string): number {
+  logger.debug(`Extracting organization id from key: ${key}`)
+  const match = matchRegex(key)
+  logger.info(`Extracted organization_id: ${match.groups.organization_id}`)
+  return parseInt(match.groups.organization_id)
+}
+
+function matchRegex(key: string): RegExpMatchArray {
   const regex =
-    /uploads\/(?<organization_id>\w+)\/(?<agency_id>\w+)\/(?<reporting_period_id>\w+)\/(?<upload_id>\w+)\/(?<filename>.+)/
+  /uploads\/(?<organization_id>\w+)\/(?<agency_id>\w+)\/(?<reporting_period_id>\w+)\/(?<upload_id>\w+)\/(?<filename>.+)/
   const match = key.match(regex)
   if (!match) {
     throw new Error('Invalid key format')
   }
-  logger.info(`Extracted upload_id: ${match.groups.upload_id}`)
-  return parseInt(match.groups.upload_id)
+  return match;
 }

@@ -70,6 +70,7 @@ describe('subrecipientUploads', () => {
       })
 
       expect(result.rawSubrecipient).toEqual({ 'boo': 'baz' })
+      expect(result.updatedAt).not.toEqual(original.updatedAt)
     }
   )
 
