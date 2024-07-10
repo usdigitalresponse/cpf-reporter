@@ -37,7 +37,7 @@ export const standard = defineScenario<
         subrecipient: {
           create: {
             name: 'String',
-            organization: { connect: { id: scenario.agency.one.id } },
+            organization: { connect: { id: scenario.organization.one.id } },
             ueiTinCombo: 'String1',
           },
         },
