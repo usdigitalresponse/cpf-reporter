@@ -224,7 +224,7 @@ export const processRecord = async (
 
 async function saveSubrecipientInfo(subrecipientInput: Subrecipient, key: string, uploadId: number) {
   try {
-    const ueiTinCombo = `${subrecipientInput.Unique_Entity_Identifier__c}${subrecipientInput.EIN__c}`
+    const ueiTinCombo = `${subrecipientInput.Unique_Entity_Identifier__c}_${subrecipientInput.EIN__c}`
     const organizationId = extractOrganizationIdFromKey(key)
     let subrecipient = await db.subrecipient.findUnique({
       where: {
