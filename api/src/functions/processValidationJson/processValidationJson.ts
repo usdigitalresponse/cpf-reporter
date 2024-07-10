@@ -4,7 +4,6 @@ import { S3Handler, S3ObjectCreatedNotificationEvent } from 'aws-lambda'
 
 import aws from 'src/lib/aws'
 import { db, getPrismaClient } from 'src/lib/db'
-import { createSubrecipient } from 'src/services/subrecipients'
 import { logger } from 'src/lib/logger'
 
 enum Severity {
@@ -224,20 +223,17 @@ export const processRecord = async (
 async function saveSubrecipientInfo(subrecipientInput: Subrecipient, key: string, uploadId: number) {
   try {
     const ueiTinCombo = `${subrecipientInput.Unique_Entity_Identifier__c}_${subrecipientInput.EIN__c}`
-    let subrecipient = await db.subrecipient.findUnique({
-      where: {
-        ueiTinCombo
-      }
+    // Per documentation here: https://www.prisma.io/docs/orm/prisma-client/queries/crud#update-or-create-records
+    // providing an empty `update` block in `upsert` is essentially a "findOrCreate" operation
+    const subrecipient = await db.subrecipient.upsert({
+      where: { ueiTinCombo },
+      create: {
+        name: subrecipientInput.Name,
+        ueiTinCombo,
+        organizationId: extractOrganizationIdFromKey(key)
+      },
+      update: {}
     })
-    if (!subrecipient) {
-      subrecipient = await createSubrecipient({
-        input: {
-          name: subrecipientInput.Name,
-          ueiTinCombo,
-          organizationId: extractOrganizationIdFromKey(key),
-        }
-      })
-    }
     await db.subrecipientUpload.upsert({
       create: {
         subrecipientId: subrecipient.id,
