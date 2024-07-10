@@ -25,9 +25,9 @@ export const schema = gql`
 
   input CreateSubrecipientUploadInput {
     subrecipientId: Int!
-    ueiTinCombo: String!
     rawSubrecipient: JSON!
     version: Version!
+    uploadId: Int!
   }
 
   input UpdateSubrecipientUploadInput {

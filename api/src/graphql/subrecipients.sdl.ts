@@ -24,6 +24,7 @@ export const schema = gql`
   input CreateSubrecipientInput {
     name: String!
     organizationId: Int!
+    ueiTinCombo: String!
   }
 
   input UpdateSubrecipientInput {
