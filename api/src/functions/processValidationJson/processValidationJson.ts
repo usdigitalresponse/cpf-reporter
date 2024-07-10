@@ -240,12 +240,18 @@ async function saveSubrecipientInfo(subrecipientInput: Subrecipient, key: string
         }
       })
     }
-    await createSubrecipientUpload({
-      input: {
+    await db.subrecipientUpload.upsert({
+      create: {
         subrecipientId: subrecipient.id,
         uploadId,
         rawSubrecipient: subrecipientInput,
         version: 'V2024_05_24' // TODO -- we should pass the version enum through on the `ResultsSchema` as well, for now just using the latest one 
+      },
+      update: {
+        rawSubrecipient: subrecipientInput
+      },
+      where: {
+        subrecipientId_uploadId: { subrecipientId: subrecipient.id, uploadId }
       }
     })
 

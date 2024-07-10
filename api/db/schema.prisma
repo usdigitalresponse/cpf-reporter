@@ -162,6 +162,8 @@ model SubrecipientUpload {
   createdAt           DateTime          @default(now()) @db.Timestamptz(6)
   updatedAt           DateTime          @default(now()) @db.Timestamptz(6) @updatedAt
   version             Version
+
+  @@unique([subrecipientId, uploadId])
 }
 
 model Project {
