@@ -43,7 +43,7 @@ describe('subrecipientUploads', () => {
     async (scenario: StandardScenario) => {
       const result = await createSubrecipientUpload({
         input: {
-          subrecipientId: scenario.subrecipientUpload.two.subrecipientId,
+          subrecipientId: scenario.subrecipient.one.id,
           rawSubrecipient: { foo: 'bar' },
           version: 'V2023_12_12',
           uploadId: scenario.subrecipientUpload.two.uploadId,
@@ -51,7 +51,7 @@ describe('subrecipientUploads', () => {
       })
 
       expect(result.subrecipientId).toEqual(
-        scenario.subrecipientUpload.two.subrecipientId
+        scenario.subrecipient.one.id
       )
       expect(result.rawSubrecipient).toEqual({ foo: 'bar' })
       expect(result.version).toEqual('V2023_12_12')

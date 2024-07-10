@@ -1,11 +1,12 @@
-import type { Prisma, SubrecipientUpload, Organization, Agency } from '@prisma/client'
+import type { Prisma, SubrecipientUpload, Organization, Agency, Subrecipient } from '@prisma/client'
 
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
 export const standard = defineScenario<
 | Prisma.OrganizationCreateArgs
 | Prisma.AgencyCreateArgs
-| Prisma.SubrecipientUploadCreateArgs>({
+| Prisma.SubrecipientUploadCreateArgs
+| Prisma.SubrecipientCreateArgs>({
   organization: {
     one: {
       data: {
@@ -28,6 +29,15 @@ export const standard = defineScenario<
         organization: true,
       },
     }),
+  },
+  subrecipient: {
+    one: (scenario) => ({
+      data: {
+        name: 'String',
+        organization: { connect: { id: scenario.organization.one.id } },
+        ueiTinCombo: 'String4'
+      }
+    })
   },
   subrecipientUpload: {
     one: (scenario) => ({
@@ -150,4 +160,5 @@ export const standard = defineScenario<
 export type StandardScenario = 
   ScenarioData<SubrecipientUpload,'subrecipientUpload'> & 
   ScenarioData<Organization, 'organization'> &
-  ScenarioData<Agency, 'agency'>
+  ScenarioData<Agency, 'agency'> &
+  ScenarioData<Subrecipient, 'subrecipient'>
