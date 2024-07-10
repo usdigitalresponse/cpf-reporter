@@ -5,7 +5,6 @@ import { S3Handler, S3ObjectCreatedNotificationEvent } from 'aws-lambda'
 import aws from 'src/lib/aws'
 import { db, getPrismaClient } from 'src/lib/db'
 import { createSubrecipient } from 'src/services/subrecipients'
-import { createSubrecipientUpload, updateSubrecipientUpload } from 'src/services/subrecipientUploads/subrecipientUploads'
 import { logger } from 'src/lib/logger'
 
 enum Severity {
