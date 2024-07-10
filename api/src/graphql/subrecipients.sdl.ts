@@ -2,6 +2,7 @@ export const schema = gql`
   type Subrecipient {
     id: Int!
     name: String!
+    ueiTinCombo: String!
     organizationId: Int!
     organization: Organization!
     createdAt: DateTime!
