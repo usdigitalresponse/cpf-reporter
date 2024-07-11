@@ -46,6 +46,16 @@ function buildRecord(uploadValidationId: string, organizationId=12) {
 }
 
 describe('cpfValidation function', () => {
+  let organizationId
+  beforeEach(async () => {
+    const organization = await db.organization.create({
+      data: {
+        name: 'My Organization'
+      },
+    })
+    organizationId = organization.id
+  })
+
   scenario('no validation errors', async (scenario) => {
     const noErrorResults = { errors: [], subrecipients: []}
     const expectedBody = JSON.stringify(noErrorResults)
@@ -134,27 +144,23 @@ describe('cpfValidation function', () => {
   )
 
   scenario('subrecipients to save', async (scenario) => {
-    const organization = await db.organization.create({
-      data: {
-        name: 'My Organization'
-      },
-    })
-
     const Unique_Entity_Identifier__c = '93849389237'
     const EIN__c = '1233435'
     const ueiTinCombo = `${Unique_Entity_Identifier__c}_${EIN__c}`
     const Name = 'Joe Schmo'
-    const expectedResult = { errors: [], subrecipients: [{ Name, EIN__c, Unique_Entity_Identifier__c}] }
-    const mocks3 = new MockS3Client(JSON.stringify(expectedResult))
-    const record = buildRecord(scenario.uploadValidation.one.uploadId, organization.id)
+    const mocks3 = new MockS3Client(JSON.stringify({ 
+      errors: [], 
+      subrecipients: [{ Name, EIN__c, Unique_Entity_Identifier__c}] 
+    }))
+    const record = buildRecord(scenario.uploadValidation.one.uploadId, organizationId)
 
-    await processRecord(record, mocks3).then(async () => {
-      await db.subrecipient.findUnique({ where: { ueiTinCombo }})
-      .then(subrecipient => {
-        expect(subrecipient).toBeTruthy()
-        expect(subrecipient.ueiTinCombo).toBe(ueiTinCombo)
-        expect(subrecipient.name).toBe(Name)
-      })
+    await processRecord(record, mocks3)
+
+    setTimeout(async () => {
+      const subrecipient = await db.subrecipient.findUnique({ where: { ueiTinCombo }})
+      expect(subrecipient).toBeTruthy()
+      expect(subrecipient.ueiTinCombo).toBe(ueiTinCombo)
+      expect(subrecipient.name).toBe(Name)
     })
   })
 })
