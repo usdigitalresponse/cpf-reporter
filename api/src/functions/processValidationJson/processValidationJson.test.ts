@@ -1,6 +1,7 @@
 import { db } from 'src/lib/db'
 
 import { processRecord } from './processValidationJson'
+import { subrecipient } from 'src/services/subrecipients'
 
 type DocumentBody = {
   transformToString: () => string
@@ -148,10 +149,12 @@ describe('cpfValidation function', () => {
     const record = buildRecord(scenario.uploadValidation.one.uploadId, organization.id)
 
     await processRecord(record, mocks3).then(async () => {
-      const subrecipient = await db.subrecipient.findUnique({ where: { ueiTinCombo }})
-      expect(subrecipient).toBeTruthy()
-      expect(subrecipient.ueiTinCombo).toBe(ueiTinCombo)
-      expect(subrecipient.name).toBe(Name)
+      await db.subrecipient.findUnique({ where: { ueiTinCombo }})
+      .then(subrecipient => {
+        expect(subrecipient).toBeTruthy()
+        expect(subrecipient.ueiTinCombo).toBe(ueiTinCombo)
+        expect(subrecipient.name).toBe(Name)
+      })
     })
   })
 })
