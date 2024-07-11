@@ -224,7 +224,7 @@ async function saveSubrecipientInfo(subrecipientInput: Subrecipient, key: string
   try {
     const ueiTinCombo = `${subrecipientInput.Unique_Entity_Identifier__c}_${subrecipientInput.EIN__c}`
     // Per documentation here: https://www.prisma.io/docs/orm/prisma-client/queries/crud#update-or-create-records
-    // providing an empty `update` block in `upsert` is essentially a "findOrCreate" operation
+    // providing an empty `update` block in `upsert` is essentially a "findOrCreate" operation, which works as long as you're selecting on a field that is unique
     const subrecipient = await db.subrecipient.upsert({
       where: { ueiTinCombo },
       create: {

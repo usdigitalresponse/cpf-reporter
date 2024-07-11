@@ -25,7 +25,7 @@ class MockS3Client {
   }
 }
 
-function buildRecord(uploadValidationId: string) {
+function buildRecord(uploadValidationId: string, organizationId=12) {
   return {
     s3: {
       s3SchemaVersion: '1.0',
@@ -38,7 +38,7 @@ function buildRecord(uploadValidationId: string) {
         },
       },
       object: {
-        key: `uploads/12/34/56/${uploadValidationId}/{filename}`,
+        key: `uploads/${organizationId}/34/56/${uploadValidationId}/{filename}`,
       },
     },
   }
@@ -131,4 +131,27 @@ describe('cpfValidation function', () => {
       )
     }
   )
+
+  scenario('subrecipients to save', async (scenario) => {
+    const organization = await db.organization.create({
+      data: {
+        name: 'My Organization'
+      },
+    })
+
+    const Unique_Entity_Identifier__c = '93849389237'
+    const EIN__c = '1233435'
+    const ueiTinCombo = `${Unique_Entity_Identifier__c}_${EIN__c}`
+    const Name = 'Joe Schmo'
+    const expectedResult = { errors: [], subrecipients: [{ Name, EIN__c, Unique_Entity_Identifier__c}] }
+    const mocks3 = new MockS3Client(JSON.stringify(expectedResult))
+    const record = buildRecord(scenario.uploadValidation.one.uploadId, organization.id)
+
+    await processRecord(record, mocks3)
+
+    const subrecipient = await db.subrecipient.findUnique({ where: { ueiTinCombo }})
+    expect(subrecipient).toBeTruthy()
+    expect(subrecipient.ueiTinCombo).toBe(ueiTinCombo)
+    expect(subrecipient.name).toBe(Name)
+  })
 })
