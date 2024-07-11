@@ -147,11 +147,11 @@ describe('cpfValidation function', () => {
     const mocks3 = new MockS3Client(JSON.stringify(expectedResult))
     const record = buildRecord(scenario.uploadValidation.one.uploadId, organization.id)
 
-    await processRecord(record, mocks3)
-
-    const subrecipient = await db.subrecipient.findUnique({ where: { ueiTinCombo }})
-    expect(subrecipient).toBeTruthy()
-    expect(subrecipient.ueiTinCombo).toBe(ueiTinCombo)
-    expect(subrecipient.name).toBe(Name)
+    await processRecord(record, mocks3).then(async () => {
+      const subrecipient = await db.subrecipient.findUnique({ where: { ueiTinCombo }})
+      expect(subrecipient).toBeTruthy()
+      expect(subrecipient.ueiTinCombo).toBe(ueiTinCombo)
+      expect(subrecipient.name).toBe(Name)
+    })
   })
 })
