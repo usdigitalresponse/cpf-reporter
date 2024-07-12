@@ -90,7 +90,7 @@ def validate_workbook(file: IO[bytes]) -> ValidationResults:
     results: ValidationResults = {
         "errors": list(map(lambda x: x.__dict__, errors)),
         "projectUseCode": project_use_code,
-        "subrecipients": subrecipients
+        "subrecipients": subrecipients,
     }
     return results
 

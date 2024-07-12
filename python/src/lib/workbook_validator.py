@@ -290,7 +290,6 @@ def validate_workbook(
             projects, subrecipients, version_string
         )
 
-    
     subrecipients = [subrecipient.model_dump() for subrecipient in subrecipients]
 
     return (errors, project_use_code, subrecipients)
