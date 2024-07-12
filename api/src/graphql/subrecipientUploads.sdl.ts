@@ -3,7 +3,8 @@ export const schema = gql`
     id: Int!
     subrecipientId: Int!
     subrecipient: Subrecipient!
-    ueiTinCombo: String!
+    uploadId: Int!
+    upload: Upload!
     rawSubrecipient: JSON!
     createdAt: DateTime!
     updatedAt: DateTime!
@@ -24,9 +25,9 @@ export const schema = gql`
 
   input CreateSubrecipientUploadInput {
     subrecipientId: Int!
-    ueiTinCombo: String!
     rawSubrecipient: JSON!
     version: Version!
+    uploadId: Int!
   }
 
   input UpdateSubrecipientUploadInput {

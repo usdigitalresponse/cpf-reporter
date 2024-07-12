@@ -16,7 +16,7 @@ from pydantic import (
 from src.schemas.project_types import NAME_BY_PROJECT
 
 
-class StateAbbreviation(Enum):
+class StateAbbreviation(str, Enum):
     AL = "AL"
     AK = "AK"
     AZ = "AZ"
