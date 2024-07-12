@@ -61,9 +61,8 @@ const UploadForm = ({ error, loading }: UploadFormProps) => {
   })
 
   const onSubmit = async (data) => {
-
     if (data.file[0].size > FILE_SIZE_THRESHOLD) {
-      toast.error("Upload should not be larger than 5MB")
+      toast.error('Upload should not be larger than 5MB')
       return
     }
 

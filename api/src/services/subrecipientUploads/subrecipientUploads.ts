@@ -51,5 +51,5 @@ export const SubrecipientUpload: SubrecipientUploadRelationResolvers = {
     return db.subrecipientUpload
       .findUnique({ where: { id: root?.id } })
       .upload()
-  }
+  },
 }

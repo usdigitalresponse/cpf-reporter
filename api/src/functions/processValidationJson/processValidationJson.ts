@@ -26,6 +26,15 @@ type Response = {
   statusCode: number
 }
 
+type Subrecipient = {
+  Name: string
+  EIN__c: string
+  Unique_Entity_Identifier__c: string
+  // Look at SubrecipientRow in the latest Python schema file for the full range of what we can pull out here if needed
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any
+}
+
 type ResultSchema = {
   errors: {
     severity: Severity
@@ -35,6 +44,7 @@ type ResultSchema = {
     col?: string
   }[]
   projectUseCode: string
+  subrecipients: Subrecipient[]
 }
 
 type UploadValidationS3Client = {
@@ -117,7 +127,9 @@ export const processRecord = async (
     const result: ResultSchema = JSON.parse(strBody) || []
 
     // when the results array is empty then we know the file has passed validations
-    const passed = (result?.errors || []).filter((e) => e.severity == Severity.Error).length === 0
+    const passed =
+      (result?.errors || []).filter((e) => e.severity == Severity.Error)
+        .length === 0
 
     const uploadId = extractUploadIdFromKey(key)
 
@@ -183,6 +195,19 @@ export const processRecord = async (
       throw new Error('Error updating validation record')
     }
 
+    // If we passed validation, we will save the subrecipient info into our DB
+    if (passed) {
+      result.subrecipients.forEach((subrecipient) =>
+        saveSubrecipientInfo(subrecipient, key, uploadId)
+      )
+      try {
+        // TODO upload a subrecipients JSON file to S3
+      } catch (err) {
+        logger.error(`Error saving subrecipients JSON file to S3: ${err}`)
+        throw new Error('Error saving subrecipient info to S3')
+      }
+    }
+
     // Delete the errors.json file from S3
     try {
       await s3Client.send(
@@ -200,14 +225,66 @@ export const processRecord = async (
   }
 }
 
+async function saveSubrecipientInfo(
+  subrecipientInput: Subrecipient,
+  key: string,
+  uploadId: number
+) {
+  try {
+    const ueiTinCombo = `${subrecipientInput.Unique_Entity_Identifier__c}_${subrecipientInput.EIN__c}`
+    // Per documentation here: https://www.prisma.io/docs/orm/prisma-client/queries/crud#update-or-create-records
+    // providing an empty `update` block in `upsert` is essentially a "findOrCreate" operation, which works as long as you're selecting on a field that is unique
+    const subrecipient = await db.subrecipient.upsert({
+      where: { ueiTinCombo },
+      create: {
+        name: subrecipientInput.Name,
+        ueiTinCombo,
+        organizationId: extractOrganizationIdFromKey(key),
+      },
+      update: {},
+    })
+    await db.subrecipientUpload.upsert({
+      create: {
+        subrecipientId: subrecipient.id,
+        uploadId,
+        rawSubrecipient: subrecipientInput,
+        version: 'V2024_05_24', // TODO -- we should pass the version enum through on the `ResultsSchema` as well, for now just using the latest one
+      },
+      update: {
+        rawSubrecipient: subrecipientInput,
+      },
+      where: {
+        subrecipientId_uploadId: { subrecipientId: subrecipient.id, uploadId },
+      },
+    })
+  } catch (err) {
+    logger.error(
+      `Error saving subrecipient: ${err} - key: ${key} - subrecipient: ${subrecipientInput.Name}`
+    )
+    throw new Error('Error saving subrecipient')
+  }
+}
+
 function extractUploadIdFromKey(key: string): number {
   logger.debug(`Extracting upload_id from key: ${key}`)
+  const match = matchRegex(key)
+  logger.info(`Extracted upload_id: ${match.groups.upload_id}`)
+  return parseInt(match.groups.upload_id)
+}
+
+function extractOrganizationIdFromKey(key: string): number {
+  logger.debug(`Extracting organization id from key: ${key}`)
+  const match = matchRegex(key)
+  logger.info(`Extracted organization_id: ${match.groups.organization_id}`)
+  return parseInt(match.groups.organization_id)
+}
+
+function matchRegex(key: string): RegExpMatchArray {
   const regex =
     /uploads\/(?<organization_id>\w+)\/(?<agency_id>\w+)\/(?<reporting_period_id>\w+)\/(?<upload_id>\w+)\/(?<filename>.+)/
   const match = key.match(regex)
   if (!match) {
     throw new Error('Invalid key format')
   }
-  logger.info(`Extracted upload_id: ${match.groups.upload_id}`)
-  return parseInt(match.groups.upload_id)
+  return match
 }
