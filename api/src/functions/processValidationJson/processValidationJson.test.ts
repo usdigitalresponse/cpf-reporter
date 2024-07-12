@@ -162,7 +162,7 @@ describe('cpfValidation function', () => {
       organizationId
     )
 
-    await processRecord(record, mocks3)
+    await await processRecord(record, mocks3)
 
     setTimeout(async () => {
       const subrecipient = await db.subrecipient.findUnique({
