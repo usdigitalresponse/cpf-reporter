@@ -50,9 +50,7 @@ describe('subrecipientUploads', () => {
         },
       })
 
-      expect(result.subrecipientId).toEqual(
-        scenario.subrecipient.one.id
-      )
+      expect(result.subrecipientId).toEqual(scenario.subrecipient.one.id)
       expect(result.rawSubrecipient).toEqual({ foo: 'bar' })
       expect(result.version).toEqual('V2023_12_12')
     }
@@ -66,10 +64,10 @@ describe('subrecipientUploads', () => {
       })) as SubrecipientUpload
       const result = await updateSubrecipientUpload({
         id: original.id,
-        input: { rawSubrecipient: { 'boo': 'baz' } },
+        input: { rawSubrecipient: { boo: 'baz' } },
       })
 
-      expect(result.rawSubrecipient).toEqual({ 'boo': 'baz' })
+      expect(result.rawSubrecipient).toEqual({ boo: 'baz' })
       expect(result.updatedAt).not.toEqual(original.updatedAt)
     }
   )

@@ -2,7 +2,6 @@ import { db } from 'src/lib/db'
 
 import { processRecord } from './processValidationJson'
 
-
 type DocumentBody = {
   transformToString: () => string
 }
@@ -26,7 +25,7 @@ class MockS3Client {
   }
 }
 
-function buildRecord(uploadValidationId: string, organizationId=12) {
+function buildRecord(uploadValidationId: string, organizationId = 12) {
   return {
     s3: {
       s3SchemaVersion: '1.0',
@@ -50,14 +49,14 @@ describe('cpfValidation function', () => {
   beforeEach(async () => {
     const organization = await db.organization.create({
       data: {
-        name: 'My Organization'
+        name: 'My Organization',
       },
     })
     organizationId = organization.id
   })
 
   scenario('no validation errors', async (scenario) => {
-    const noErrorResults = { errors: [], subrecipients: []}
+    const noErrorResults = { errors: [], subrecipients: [] }
     const expectedBody = JSON.stringify(noErrorResults)
     const mocks3 = new MockS3Client(expectedBody)
     const record = buildRecord(scenario.uploadValidation.one.uploadId)
@@ -73,10 +72,14 @@ describe('cpfValidation function', () => {
   })
 
   scenario('validation error', async (scenario) => {
-    const expectedBody = { errors: [{
-      severity: 'ERR',
-      message: 'error',
-    }] }
+    const expectedBody = {
+      errors: [
+        {
+          severity: 'ERR',
+          message: 'error',
+        },
+      ],
+    }
     const mocks3 = new MockS3Client(JSON.stringify(expectedBody))
     const record = buildRecord(scenario.uploadValidation.one.uploadId)
 
@@ -148,16 +151,23 @@ describe('cpfValidation function', () => {
     const EIN__c = '1233435'
     const ueiTinCombo = `${Unique_Entity_Identifier__c}_${EIN__c}`
     const Name = 'Joe Schmo'
-    const mocks3 = new MockS3Client(JSON.stringify({ 
-      errors: [], 
-      subrecipients: [{ Name, EIN__c, Unique_Entity_Identifier__c}] 
-    }))
-    const record = buildRecord(scenario.uploadValidation.one.uploadId, organizationId)
+    const mocks3 = new MockS3Client(
+      JSON.stringify({
+        errors: [],
+        subrecipients: [{ Name, EIN__c, Unique_Entity_Identifier__c }],
+      })
+    )
+    const record = buildRecord(
+      scenario.uploadValidation.one.uploadId,
+      organizationId
+    )
 
     await processRecord(record, mocks3)
 
     setTimeout(async () => {
-      const subrecipient = await db.subrecipient.findUnique({ where: { ueiTinCombo }})
+      const subrecipient = await db.subrecipient.findUnique({
+        where: { ueiTinCombo },
+      })
       expect(subrecipient).toBeTruthy()
       expect(subrecipient.ueiTinCombo).toBe(ueiTinCombo)
       expect(subrecipient.name).toBe(Name)

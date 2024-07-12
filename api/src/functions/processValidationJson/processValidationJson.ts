@@ -31,6 +31,7 @@ type Subrecipient = {
   EIN__c: string
   Unique_Entity_Identifier__c: string
   // Look at SubrecipientRow in the latest Python schema file for the full range of what we can pull out here if needed
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
 
@@ -126,7 +127,9 @@ export const processRecord = async (
     const result: ResultSchema = JSON.parse(strBody) || []
 
     // when the results array is empty then we know the file has passed validations
-    const passed = (result?.errors || []).filter((e) => e.severity == Severity.Error).length === 0
+    const passed =
+      (result?.errors || []).filter((e) => e.severity == Severity.Error)
+        .length === 0
 
     const uploadId = extractUploadIdFromKey(key)
 
@@ -194,13 +197,15 @@ export const processRecord = async (
 
     // If we passed validation, we will save the subrecipient info into our DB
     if (passed) {
-        result.subrecipients.forEach(subrecipient => saveSubrecipientInfo(subrecipient, key, uploadId))
-        try {
-          // TODO upload a subrecipients JSON file to S3
-        } catch (err) {
-          logger.error(`Error saving subrecipients JSON file to S3: ${err}`)
-          throw new Error('Error saving subrecipient info to S3')
-        }
+      result.subrecipients.forEach((subrecipient) =>
+        saveSubrecipientInfo(subrecipient, key, uploadId)
+      )
+      try {
+        // TODO upload a subrecipients JSON file to S3
+      } catch (err) {
+        logger.error(`Error saving subrecipients JSON file to S3: ${err}`)
+        throw new Error('Error saving subrecipient info to S3')
+      }
     }
 
     // Delete the errors.json file from S3
@@ -220,7 +225,11 @@ export const processRecord = async (
   }
 }
 
-async function saveSubrecipientInfo(subrecipientInput: Subrecipient, key: string, uploadId: number) {
+async function saveSubrecipientInfo(
+  subrecipientInput: Subrecipient,
+  key: string,
+  uploadId: number
+) {
   try {
     const ueiTinCombo = `${subrecipientInput.Unique_Entity_Identifier__c}_${subrecipientInput.EIN__c}`
     // Per documentation here: https://www.prisma.io/docs/orm/prisma-client/queries/crud#update-or-create-records
@@ -230,27 +239,28 @@ async function saveSubrecipientInfo(subrecipientInput: Subrecipient, key: string
       create: {
         name: subrecipientInput.Name,
         ueiTinCombo,
-        organizationId: extractOrganizationIdFromKey(key)
+        organizationId: extractOrganizationIdFromKey(key),
       },
-      update: {}
+      update: {},
     })
     await db.subrecipientUpload.upsert({
       create: {
         subrecipientId: subrecipient.id,
         uploadId,
         rawSubrecipient: subrecipientInput,
-        version: 'V2024_05_24' // TODO -- we should pass the version enum through on the `ResultsSchema` as well, for now just using the latest one 
+        version: 'V2024_05_24', // TODO -- we should pass the version enum through on the `ResultsSchema` as well, for now just using the latest one
       },
       update: {
-        rawSubrecipient: subrecipientInput
+        rawSubrecipient: subrecipientInput,
       },
       where: {
-        subrecipientId_uploadId: { subrecipientId: subrecipient.id, uploadId }
-      }
+        subrecipientId_uploadId: { subrecipientId: subrecipient.id, uploadId },
+      },
     })
-
   } catch (err) {
-    logger.error(`Error saving subrecipient: ${err} - key: ${key} - subrecipient: ${subrecipientInput.Name}`)
+    logger.error(
+      `Error saving subrecipient: ${err} - key: ${key} - subrecipient: ${subrecipientInput.Name}`
+    )
     throw new Error('Error saving subrecipient')
   }
 }
@@ -271,10 +281,10 @@ function extractOrganizationIdFromKey(key: string): number {
 
 function matchRegex(key: string): RegExpMatchArray {
   const regex =
-  /uploads\/(?<organization_id>\w+)\/(?<agency_id>\w+)\/(?<reporting_period_id>\w+)\/(?<upload_id>\w+)\/(?<filename>.+)/
+    /uploads\/(?<organization_id>\w+)\/(?<agency_id>\w+)\/(?<reporting_period_id>\w+)\/(?<upload_id>\w+)\/(?<filename>.+)/
   const match = key.match(regex)
   if (!match) {
     throw new Error('Invalid key format')
   }
-  return match;
+  return match
 }
