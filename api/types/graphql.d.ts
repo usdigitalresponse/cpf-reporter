@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client"
 import { MergePrismaWithSdlTypes, MakeRelationsOptional } from '@redwoodjs/api'
-import { Agency as PrismaAgency, Organization as PrismaOrganization, User as PrismaUser, InputTemplate as PrismaInputTemplate, OutputTemplate as PrismaOutputTemplate, ReportingPeriod as PrismaReportingPeriod, ExpenditureCategory as PrismaExpenditureCategory, Upload as PrismaUpload, UploadValidation as PrismaUploadValidation, Subrecipient as PrismaSubrecipient, Project as PrismaProject, ValidationRules as PrismaValidationRules } from '@prisma/client'
+import { Agency as PrismaAgency, Organization as PrismaOrganization, User as PrismaUser, InputTemplate as PrismaInputTemplate, OutputTemplate as PrismaOutputTemplate, ReportingPeriod as PrismaReportingPeriod, ExpenditureCategory as PrismaExpenditureCategory, Upload as PrismaUpload, UploadValidation as PrismaUploadValidation, Subrecipient as PrismaSubrecipient, SubrecipientUpload as PrismaSubrecipientUpload, Project as PrismaProject, ValidationRules as PrismaValidationRules } from '@prisma/client'
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
 import { RedwoodGraphQLContext } from '@redwoodjs/graphql-server/dist/types';
 export type Maybe<T> = T | null;
@@ -116,12 +116,13 @@ export type CreateReportingPeriodInput = {
 export type CreateSubrecipientInput = {
   name: Scalars['String'];
   organizationId: Scalars['Int'];
+  ueiTinCombo: Scalars['String'];
 };
 
 export type CreateSubrecipientUploadInput = {
   rawSubrecipient: Scalars['JSON'];
   subrecipientId: Scalars['Int'];
-  ueiTinCombo: Scalars['String'];
+  uploadId: Scalars['Int'];
   version: Version;
 };
 
@@ -651,6 +652,7 @@ export type Subrecipient = {
   organizationId: Scalars['Int'];
   status?: Maybe<SubrecipientStatus>;
   subrecipientUploads?: Maybe<Array<Maybe<SubrecipientUpload>>>;
+  ueiTinCombo: Scalars['String'];
   updatedAt: Scalars['DateTime'];
 };
 
@@ -665,8 +667,9 @@ export type SubrecipientUpload = {
   rawSubrecipient: Scalars['JSON'];
   subrecipient: Subrecipient;
   subrecipientId: Scalars['Int'];
-  ueiTinCombo: Scalars['String'];
   updatedAt: Scalars['DateTime'];
+  upload: Upload;
+  uploadId: Scalars['Int'];
   version: Version;
 };
 
@@ -771,6 +774,7 @@ export type Upload = {
   reportingPeriod: ReportingPeriod;
   reportingPeriodId: Scalars['Int'];
   signedUrl?: Maybe<Scalars['String']>;
+  subrecipientUploads?: Maybe<Array<SubrecipientUpload>>;
   updatedAt: Scalars['DateTime'];
   uploadedBy: User;
   uploadedById: Scalars['Int'];
@@ -822,7 +826,7 @@ export type Version =
   | 'V2024_05_24';
 
 type MaybeOrArrayOfMaybe<T> = T | Maybe<T> | Maybe<T>[];
-type AllMappedModels = MaybeOrArrayOfMaybe<Agency | ExpenditureCategory | InputTemplate | Organization | OutputTemplate | Project | ReportingPeriod | Subrecipient | Upload | UploadValidation | User | ValidationRules>
+type AllMappedModels = MaybeOrArrayOfMaybe<Agency | ExpenditureCategory | InputTemplate | Organization | OutputTemplate | Project | ReportingPeriod | Subrecipient | SubrecipientUpload | Upload | UploadValidation | User | ValidationRules>
 
 
 export type ResolverTypeWrapper<T> = Promise<T> | T;
@@ -920,7 +924,7 @@ export type ResolversTypes = {
   String: ResolverTypeWrapper<Scalars['String']>;
   Subrecipient: ResolverTypeWrapper<MergePrismaWithSdlTypes<PrismaSubrecipient, MakeRelationsOptional<Subrecipient, AllMappedModels>, AllMappedModels>>;
   SubrecipientStatus: SubrecipientStatus;
-  SubrecipientUpload: ResolverTypeWrapper<Omit<SubrecipientUpload, 'subrecipient'> & { subrecipient: ResolversTypes['Subrecipient'] }>;
+  SubrecipientUpload: ResolverTypeWrapper<MergePrismaWithSdlTypes<PrismaSubrecipientUpload, MakeRelationsOptional<SubrecipientUpload, AllMappedModels>, AllMappedModels>>;
   Time: ResolverTypeWrapper<Scalars['Time']>;
   UpdateAgencyInput: UpdateAgencyInput;
   UpdateExpenditureCategoryInput: UpdateExpenditureCategoryInput;
@@ -979,7 +983,7 @@ export type ResolversParentTypes = {
   ReportingPeriod: MergePrismaWithSdlTypes<PrismaReportingPeriod, MakeRelationsOptional<ReportingPeriod, AllMappedModels>, AllMappedModels>;
   String: Scalars['String'];
   Subrecipient: MergePrismaWithSdlTypes<PrismaSubrecipient, MakeRelationsOptional<Subrecipient, AllMappedModels>, AllMappedModels>;
-  SubrecipientUpload: Omit<SubrecipientUpload, 'subrecipient'> & { subrecipient: ResolversParentTypes['Subrecipient'] };
+  SubrecipientUpload: MergePrismaWithSdlTypes<PrismaSubrecipientUpload, MakeRelationsOptional<SubrecipientUpload, AllMappedModels>, AllMappedModels>;
   Time: Scalars['Time'];
   UpdateAgencyInput: UpdateAgencyInput;
   UpdateExpenditureCategoryInput: UpdateExpenditureCategoryInput;
@@ -1408,6 +1412,7 @@ export type SubrecipientResolvers<ContextType = RedwoodGraphQLContext, ParentTyp
   organizationId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   status: OptArgsResolverFn<Maybe<ResolversTypes['SubrecipientStatus']>, ParentType, ContextType>;
   subrecipientUploads: OptArgsResolverFn<Maybe<Array<Maybe<ResolversTypes['SubrecipientUpload']>>>, ParentType, ContextType>;
+  ueiTinCombo: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   updatedAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -1420,6 +1425,7 @@ export type SubrecipientRelationResolvers<ContextType = RedwoodGraphQLContext, P
   organizationId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   status?: RequiredResolverFn<Maybe<ResolversTypes['SubrecipientStatus']>, ParentType, ContextType>;
   subrecipientUploads?: RequiredResolverFn<Maybe<Array<Maybe<ResolversTypes['SubrecipientUpload']>>>, ParentType, ContextType>;
+  ueiTinCombo?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   updatedAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -1430,8 +1436,9 @@ export type SubrecipientUploadResolvers<ContextType = RedwoodGraphQLContext, Par
   rawSubrecipient: OptArgsResolverFn<ResolversTypes['JSON'], ParentType, ContextType>;
   subrecipient: OptArgsResolverFn<ResolversTypes['Subrecipient'], ParentType, ContextType>;
   subrecipientId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
-  ueiTinCombo: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   updatedAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  upload: OptArgsResolverFn<ResolversTypes['Upload'], ParentType, ContextType>;
+  uploadId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   version: OptArgsResolverFn<ResolversTypes['Version'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -1442,8 +1449,9 @@ export type SubrecipientUploadRelationResolvers<ContextType = RedwoodGraphQLCont
   rawSubrecipient?: RequiredResolverFn<ResolversTypes['JSON'], ParentType, ContextType>;
   subrecipient?: RequiredResolverFn<ResolversTypes['Subrecipient'], ParentType, ContextType>;
   subrecipientId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
-  ueiTinCombo?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   updatedAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
+  upload?: RequiredResolverFn<ResolversTypes['Upload'], ParentType, ContextType>;
+  uploadId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   version?: RequiredResolverFn<ResolversTypes['Version'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -1464,6 +1472,7 @@ export type UploadResolvers<ContextType = RedwoodGraphQLContext, ParentType exte
   reportingPeriod: OptArgsResolverFn<ResolversTypes['ReportingPeriod'], ParentType, ContextType>;
   reportingPeriodId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   signedUrl: OptArgsResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  subrecipientUploads: OptArgsResolverFn<Maybe<Array<ResolversTypes['SubrecipientUpload']>>, ParentType, ContextType>;
   updatedAt: OptArgsResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   uploadedBy: OptArgsResolverFn<ResolversTypes['User'], ParentType, ContextType>;
   uploadedById: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
@@ -1483,6 +1492,7 @@ export type UploadRelationResolvers<ContextType = RedwoodGraphQLContext, ParentT
   reportingPeriod?: RequiredResolverFn<ResolversTypes['ReportingPeriod'], ParentType, ContextType>;
   reportingPeriodId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   signedUrl?: RequiredResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  subrecipientUploads?: RequiredResolverFn<Maybe<Array<ResolversTypes['SubrecipientUpload']>>, ParentType, ContextType>;
   updatedAt?: RequiredResolverFn<ResolversTypes['DateTime'], ParentType, ContextType>;
   uploadedBy?: RequiredResolverFn<ResolversTypes['User'], ParentType, ContextType>;
   uploadedById?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;

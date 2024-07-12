@@ -97,12 +97,13 @@ export type CreateReportingPeriodInput = {
 export type CreateSubrecipientInput = {
   name: Scalars['String'];
   organizationId: Scalars['Int'];
+  ueiTinCombo: Scalars['String'];
 };
 
 export type CreateSubrecipientUploadInput = {
   rawSubrecipient: Scalars['JSON'];
   subrecipientId: Scalars['Int'];
-  ueiTinCombo: Scalars['String'];
+  uploadId: Scalars['Int'];
   version: Version;
 };
 
@@ -632,6 +633,7 @@ export type Subrecipient = {
   organizationId: Scalars['Int'];
   status?: Maybe<SubrecipientStatus>;
   subrecipientUploads?: Maybe<Array<Maybe<SubrecipientUpload>>>;
+  ueiTinCombo: Scalars['String'];
   updatedAt: Scalars['DateTime'];
 };
 
@@ -646,8 +648,9 @@ export type SubrecipientUpload = {
   rawSubrecipient: Scalars['JSON'];
   subrecipient: Subrecipient;
   subrecipientId: Scalars['Int'];
-  ueiTinCombo: Scalars['String'];
   updatedAt: Scalars['DateTime'];
+  upload: Upload;
+  uploadId: Scalars['Int'];
   version: Version;
 };
 
@@ -752,6 +755,7 @@ export type Upload = {
   reportingPeriod: ReportingPeriod;
   reportingPeriodId: Scalars['Int'];
   signedUrl?: Maybe<Scalars['String']>;
+  subrecipientUploads?: Maybe<Array<SubrecipientUpload>>;
   updatedAt: Scalars['DateTime'];
   uploadedBy: User;
   uploadedById: Scalars['Int'];

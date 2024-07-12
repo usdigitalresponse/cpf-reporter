@@ -36,6 +36,7 @@ describe('subrecipients', () => {
       input: {
         name: 'String',
         organizationId: scenario.subrecipient.two.organizationId,
+        ueiTinCombo: '10934985867'
       },
     })
 

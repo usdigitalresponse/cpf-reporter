@@ -24,6 +24,7 @@ from src.schemas.schema_versions import (
 )
 
 type Errors = List[WorkbookError]
+type Subrecipients = List[SubrecipientRow]
 
 LOGIC_SHEET = "Logic"
 COVER_SHEET = "Cover"
@@ -198,14 +199,7 @@ def get_workbook_errors_for_row(
     return workbook_errors
 
 
-def validate(
-    workbook: IO[bytes],
-) -> Tuple[
-    Errors,
-    Optional[str],
-    Optional[List[Union[Project1ARow, Project1BRow, Project1CRow]]],
-    List[SubrecipientRow],
-]:
+def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str], Subrecipients]:
     """Validates a given Excel workbook according to CPF validation rules.
 
     Args:
@@ -296,10 +290,10 @@ def validate_workbook(
             projects, subrecipients, version_string
         )
 
-    if return_data:
-        return (errors, project_use_code, projects, subrecipients)
-    else:
-        return (errors, project_use_code)
+    
+    subrecipients = [subrecipient.model_dump() for subrecipient in subrecipients]
+
+    return (errors, project_use_code, subrecipients)
 
 
 def validate_workbook_sheets(workbook: Workbook) -> Errors:
