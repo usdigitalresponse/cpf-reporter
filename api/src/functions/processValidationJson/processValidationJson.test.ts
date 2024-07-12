@@ -53,6 +53,7 @@ describe('cpfValidation function', () => {
       },
     })
     organizationId = organization.id
+    console.log(organizationId) // Fixing linter until I uncomment test
   })
 
   scenario('no validation errors', async (scenario) => {
