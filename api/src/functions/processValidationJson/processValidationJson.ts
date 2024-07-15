@@ -198,11 +198,45 @@ export const processRecord = async (
 
     // If we passed validation, we will save the subrecipient info into our DB
     if (passed) {
+      const organizationId = extractOrganizationIdFromKey(key)
       result.subrecipients.forEach((subrecipient) =>
-        saveSubrecipientInfo(subrecipient, key, uploadId, result.versionString)
+        saveSubrecipientInfo(
+          subrecipient,
+          key,
+          uploadId,
+          result.versionString,
+          organizationId
+        )
       )
+
+      let reportingPeriod
       try {
-        // TODO upload a subrecipients JSON file to S3
+        reportingPeriod = (
+          await db.upload.findUnique({
+            where: { id: uploadId },
+            include: { reportingPeriod: true },
+          })
+        ).reportingPeriod
+      } catch (err) {
+        logger.error(`Could not find reporting period for upload ${uploadId}`)
+        throw new Error('Error determining reporting period for upload')
+      }
+
+      try {
+        const subrecipientKey = `/${organizationId}/${reportingPeriod.id}/subrecipients`
+        const { startDate, endDate } = reportingPeriod
+        const subrecipientsWithUploads = await db.subrecipient.findMany({
+          where: { createdAt: { lte: endDate, gte: startDate } },
+          include: { subrecipientUploads: true },
+        })
+        const subrecipients = {
+          subrecipients: subrecipientsWithUploads,
+        }
+        aws.sendPutObjectToS3Bucket(
+          bucket,
+          subrecipientKey,
+          JSON.stringify(subrecipients)
+        )
       } catch (err) {
         logger.error(`Error saving subrecipients JSON file to S3: ${err}`)
         throw new Error('Error saving subrecipient info to S3')
@@ -230,7 +264,8 @@ async function saveSubrecipientInfo(
   subrecipientInput: Subrecipient,
   key: string,
   uploadId: number,
-  versionString: string
+  versionString: string,
+  organizationId: number
 ) {
   let version = Version[versionString]
   if (!version) {
@@ -249,7 +284,7 @@ async function saveSubrecipientInfo(
       create: {
         name: subrecipientInput.Name,
         ueiTinCombo,
-        organizationId: extractOrganizationIdFromKey(key),
+        organizationId,
       },
       update: {},
     })
