@@ -197,7 +197,7 @@ export const processRecord = async (
     }
 
     // If we passed validation, we will save the subrecipient info into our DB
-    if (passed) {
+    if (passed && result.subrecipients?.length) {
       const organizationId = extractOrganizationIdFromKey(key)
       result.subrecipients.forEach((subrecipient) =>
         saveSubrecipientInfo(
@@ -232,7 +232,7 @@ export const processRecord = async (
         const subrecipients = {
           subrecipients: subrecipientsWithUploads,
         }
-        aws.sendPutObjectToS3Bucket(
+        await aws.sendPutObjectToS3Bucket(
           bucket,
           subrecipientKey,
           JSON.stringify(subrecipients)
