@@ -1,5 +1,5 @@
 import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
-import { Prisma } from '@prisma/client'
+import { Prisma, Version } from '@prisma/client'
 import { S3Handler, S3ObjectCreatedNotificationEvent } from 'aws-lambda'
 
 import aws from 'src/lib/aws'
@@ -45,6 +45,7 @@ type ResultSchema = {
   }[]
   projectUseCode: string
   subrecipients: Subrecipient[]
+  versionString: string
 }
 
 type UploadValidationS3Client = {
@@ -198,7 +199,7 @@ export const processRecord = async (
     // If we passed validation, we will save the subrecipient info into our DB
     if (passed) {
       result.subrecipients.forEach((subrecipient) =>
-        saveSubrecipientInfo(subrecipient, key, uploadId)
+        saveSubrecipientInfo(subrecipient, key, uploadId, result.versionString)
       )
       try {
         // TODO upload a subrecipients JSON file to S3
@@ -228,8 +229,17 @@ export const processRecord = async (
 async function saveSubrecipientInfo(
   subrecipientInput: Subrecipient,
   key: string,
-  uploadId: number
+  uploadId: number,
+  versionString: string
 ) {
+  let version = Version[versionString]
+  if (!version) {
+    version = Version.V2024_05_24
+    logger.error(
+      `Error obtaining version from version passed in results ${versionString}, falling back on ${version}`
+    )
+  }
+
   try {
     const ueiTinCombo = `${subrecipientInput.Unique_Entity_Identifier__c}_${subrecipientInput.EIN__c}`
     // Per documentation here: https://www.prisma.io/docs/orm/prisma-client/queries/crud#update-or-create-records
@@ -248,7 +258,7 @@ async function saveSubrecipientInfo(
         subrecipientId: subrecipient.id,
         uploadId,
         rawSubrecipient: subrecipientInput,
-        version: 'V2024_05_24', // TODO -- we should pass the version enum through on the `ResultsSchema` as well, for now just using the latest one
+        version,
       },
       update: {
         rawSubrecipient: subrecipientInput,
