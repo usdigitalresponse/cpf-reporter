@@ -46,7 +46,6 @@ type ResultSchema = {
   projectUseCode: string
   subrecipients: Subrecipient[]
   versionString: string
-
 }
 
 type UploadValidationS3Client = {
@@ -233,10 +232,12 @@ async function saveSubrecipientInfo(
   uploadId: number,
   versionString: string
 ) {
-  let version = Version[versionString];
+  let version = Version[versionString]
   if (!version) {
     version = Version.V2024_05_24
-    logger.error(`Error obtaining version from version passed in results ${versionString}, falling back on ${version}`)
+    logger.error(
+      `Error obtaining version from version passed in results ${versionString}, falling back on ${version}`
+    )
   }
 
   try {
