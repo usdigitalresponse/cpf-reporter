@@ -19,5 +19,6 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": false,
-    "autoDocstring.docstringFormat": "google-notypes"
+    "autoDocstring.docstringFormat": "google-notypes",
+    "files.insertFinalNewline": true
 }
