@@ -7,6 +7,7 @@ import csv
 import json
 import tempfile
 from typing import Any, Optional, Set
+import os
 
 import boto3
 import structlog
@@ -75,7 +76,7 @@ def handle(event: S3Event, context: Context):
 
     s3_client: S3Client = boto3.client("s3")
 
-    project_code = event["Project"]
+    project_code = os.getenv("PROJECT_USE_CODE")
     if project_code == "1A":
         project_use_code = ProjectType._1A
     elif project_code == "1B":
