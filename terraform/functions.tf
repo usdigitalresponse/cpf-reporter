@@ -600,7 +600,7 @@ module "lambda_function-treasuryReportGeneration" {
   environment_variables = merge(local.lambda_default_environment_variables, {
     DD_LAMBDA_HANDLER = "src.functions.generate_treasury_report.handle"
     DD_LOGS_INJECTION = "true"
-    PROJECT_USE_CODE = each.key
+    PROJECT_USE_CODE = "${each.key}"
   })
 
   // Triggers
