@@ -283,7 +283,6 @@ def validate_workbook(workbook: Workbook) -> Tuple[Errors, Optional[str]]:
             projects, subrecipients, version_string
         )
 
-    
     subrecipients = [subrecipient.model_dump() for subrecipient in subrecipients]
 
     return (errors, project_use_code, subrecipients, version_string)

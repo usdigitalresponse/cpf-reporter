@@ -3,6 +3,7 @@ from typing import BinaryIO
 
 import openpyxl
 import pytest
+from aws_lambda_typing.context import Context
 from src.lib.output_template_comparator import CPFFileArchive
 
 _SAMPLE_VALID_XLSM = "tests/data/sample_valid.xlsm"
@@ -152,3 +153,18 @@ def cpf_file_archive_two(sample_template):
     cpf_archive_file.writestr("2024-05-19/TestFile.xlsx", sample_template.read())
     cpf_archive_file.writestr("2024-05-19/TestFile2.xlsx", sample_template.read())
     return CPFFileArchive(cpf_archive_file)
+
+
+@pytest.fixture
+def valid_aws_typing_context():
+    valid_context = Context
+    valid_context._aws_request_id = "dummy_aws_request_id"
+    valid_context._log_group_name = "dummy_log_group_name"
+    valid_context._log_stream_name = "dummy_log_stream_name"
+    valid_context._function_name = "dummy_function_name"
+    valid_context._memory_limit_in_mb = "128"
+    valid_context._function_version = "$LATEST"
+    valid_context._invoked_function_arn = (
+        "arn:aws:lambda:dummy-region:123456789012:function:dummy_function_name"
+    )
+    return valid_context
