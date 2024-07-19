@@ -518,8 +518,8 @@ module "lambda_function-cpfValidation" {
 
 module "lambda_function-treasuryReportGeneration" {
   for_each = toset(["1A", "1B", "1C"])
-  source  = "terraform-aws-modules/lambda/aws"
-  version = "6.5.0"
+  source   = "terraform-aws-modules/lambda/aws"
+  version  = "6.5.0"
 
   // Metadata
   function_name = "${var.namespace}-treasuryReportGeneration${each.key}"
@@ -600,7 +600,7 @@ module "lambda_function-treasuryReportGeneration" {
   environment_variables = merge(local.lambda_default_environment_variables, {
     DD_LAMBDA_HANDLER = "src.functions.generate_treasury_report.handle"
     DD_LOGS_INJECTION = "true"
-    PROJECT_USE_CODE = "${each.key}"
+    PROJECT_USE_CODE  = "${each.key}"
   })
 
   // Triggers
