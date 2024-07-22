@@ -6,7 +6,7 @@ import type {
 } from 'types/graphql'
 
 import { hasRole } from 'src/lib/auth'
-import { s3PutSignedUrl } from 'src/lib/aws'
+import { s3PutSignedUrl, getS3UploadFileKey } from 'src/lib/aws'
 import aws from 'src/lib/aws'
 import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
@@ -146,4 +146,115 @@ export const Upload: UploadRelationResolvers = {
     })
     return latestValidation
   },
+}
+
+/*
+This function should return the most recent upload for each expenditure category and agency for the `currentUser`'s organization.
+The uploads must be grouped by expenditure category and agency. If there are multiple uploads for the grouping, the most recent upload must be chosen.
+The S3 Object key must be set on each upload object.
+The return value structure should look like the following:
+{
+  EC-Code: {
+    AgencyId: {
+      UploadObject
+    }
+  }
+}
+Example:
+{
+  '1A': {
+    '1': {
+      id: 1,
+      filename: 'file1.csv',
+      objectKey: 'uploads/1/1/1/1/file1.csv',
+      ...
+    },
+    '2': {
+      id: 2,
+      filename: 'file2.csv',
+      objectKey: 'uploads/1/2/1/2/file2.csv',
+      ...
+    },
+    ...
+  },
+  '1B': {
+    '1': {
+      id: 3,
+      filename: 'file3.csv',
+      objectKey: 'uploads/1/1/1/3/file3.csv',
+      ...
+    },
+    ...
+  },
+  ...
+}
+*/
+export const getUploadsByExpenditureCategory = async () => {
+  const organization = await db.organization.findFirst({
+    where: { id: context.currentUser.agency.organizationId },
+  })
+
+  const reportingPeriod = await db.reportingPeriod.findFirst({
+    where: { id: organization.preferences['current_reporting_period_id'] },
+  })
+
+  // valid upload validations
+  const validUploadIds = await db.uploadValidation.findMany({
+    where: {
+      passed: true,
+      upload: { agency: { organizationId: organization.id } },
+    },
+    select: {
+      uploadId: true,
+    },
+    distinct: ['uploadId'],
+  })
+
+  const uploadsForPeriod = await db.upload.findMany({
+    where: {
+      reportingPeriodId: reportingPeriod.id,
+      agency: { organizationId: organization.id },
+      id: { in: validUploadIds.map((v) => v.uploadId) },
+    },
+    include: { expenditureCategory: true },
+  })
+
+  const uploadsByExpenditureCategory = {}
+
+  // Get the most recent upload for each expenditure category and agency and set the S3 Object key
+  for (const upload of uploadsForPeriod)  {
+    // Set the S3 Object key
+    const objectKey = getS3UploadFileKey(organization.id, upload)
+    upload.objectKey = objectKey
+
+    // Filter the uploads by expenditure category of the current upload.
+    const uploadsByAgency =
+      uploadsByExpenditureCategory[upload.expenditureCategory.code]
+
+    if (!uploadsByAgency) {
+      // The EC code was never added. This is the time to initialize it.
+      uploadsByExpenditureCategory[upload.expenditureCategory.code] = {}
+
+      // Set the upload for this agency
+      uploadsByExpenditureCategory[upload.expenditureCategory.code][
+        upload.agencyId
+      ] = upload
+    } else {
+      if (!uploadsByAgency[upload.agencyId]) {
+        // The agency was never added. This is the time to initialize it.
+        uploadsByExpenditureCategory[upload.expenditureCategory.code][
+          upload.agencyId
+        ] = upload
+      } else {
+        // If the current upload is newer than the one stored, replace it
+        if (upload.createdAt > uploadsByAgency[upload.agencyId].createdAt) {
+          uploadsByExpenditureCategory[upload.expenditureCategory.code][
+            upload.agencyId
+          ] = upload
+        }
+      }
+    }
+  }
+
+  return uploadsByExpenditureCategory
 }

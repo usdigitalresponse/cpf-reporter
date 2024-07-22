@@ -4,6 +4,10 @@ import { deleteUploadFile, s3PutSignedUrl, getSignedUrl } from 'src/lib/aws'
 import { db } from 'src/lib/db'
 
 import {
+  updateOrganization
+} from '../organizations/organizations'
+
+import {
   uploads,
   upload,
   createUpload,
@@ -11,6 +15,7 @@ import {
   deleteUpload,
   downloadUploadFile,
   Upload as UploadRelationResolver,
+  getUploadsByExpenditureCategory,
 } from './uploads'
 import type { StandardScenario } from './uploads.scenarios'
 
@@ -24,7 +29,9 @@ jest.mock('src/lib/aws', () => ({
   deleteUploadFile: jest.fn(),
   s3PutSignedUrl: jest.fn(),
   getSignedUrl: jest.fn(),
+  getS3UploadFileKey: jest.fn(),
 }))
+
 describe('uploads', () => {
   async function uploadsBelongToOrganization(uploads, expectedOrganizationId) {
     const uploadOrganizationIds = await Promise.all(
@@ -200,5 +207,42 @@ describe('downloads', () => {
     await expect(downloadUploadFile({ id: -1 })).rejects.toThrow(
       'Upload with id -1 not found'
     )
+  })
+})
+
+describeScenario<StandardScenario>('uploadCheck', 'getUploads', (getScenario) => {
+
+  let scenario: StandardScenario
+
+  beforeEach(async () => {
+    scenario = getScenario()
+    await updateOrganization({
+      id: scenario.organization.one.id,
+      input: { preferences: {
+          current_reporting_period_id: scenario.reportingPeriod.one.id,
+      }},
+    })
+    await updateOrganization({
+      id: scenario.organization.two.id,
+      input: { preferences: {
+          current_reporting_period_id: scenario.reportingPeriod.one.id,
+      }},
+    })
+  })
+
+  it('returns most recent upload for one category',
+    async () => {
+      mockCurrentUser(scenario.user.one)
+      const result = await getUploadsByExpenditureCategory();
+      expect(Object.keys(result).length).toEqual(1);
+      expect(Object.keys(result)).toEqual(['1A']);
+  })
+
+  it('returns two uploads of different categories',
+    async () => {
+      mockCurrentUser(scenario.user.three)
+      const result = await getUploadsByExpenditureCategory();
+      expect(Object.keys(result).length).toEqual(2);
+      expect(Object.keys(result).sort()).toEqual(['2A', '1A'].sort());
   })
 })
