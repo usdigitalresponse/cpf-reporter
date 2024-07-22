@@ -213,6 +213,7 @@ async function receiveSqsMessage(queueUrl: string) {
 async function startStepFunctionExecution(
   arn: string,
   name?: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   input?: any,
   traceHeader?: string
 ): Promise<StartExecutionCommandOutput> {

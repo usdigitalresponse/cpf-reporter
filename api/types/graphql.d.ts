@@ -730,7 +730,6 @@ export type UpdateSubrecipientInput = {
 export type UpdateSubrecipientUploadInput = {
   rawSubrecipient?: InputMaybe<Scalars['JSON']>;
   subrecipientId?: InputMaybe<Scalars['Int']>;
-  ueiTinCombo?: InputMaybe<Scalars['String']>;
   version?: InputMaybe<Version>;
 };
 

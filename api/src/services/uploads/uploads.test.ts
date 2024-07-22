@@ -200,8 +200,7 @@ describe('uploads', () => {
 
 describe('downloads', () => {
   scenario('returns a download link', async (scenario: StandardScenario) => {
-    const result = await downloadUploadFile({ id: scenario.upload.one.id })
-    console.log(result)
+    await downloadUploadFile({ id: scenario.upload.one.id })
     expect(getSignedUrl).toHaveBeenCalled()
   })
   scenario('handles a missing value', async (_scenario: StandardScenario) => {
