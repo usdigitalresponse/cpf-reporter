@@ -222,7 +222,7 @@ export const getUploadsByExpenditureCategory = async () => {
   const uploadsByExpenditureCategory = {}
 
   // Get the most recent upload for each expenditure category and agency and set the S3 Object key
-  for (const upload of uploadsForPeriod)  {
+  for (const upload of uploadsForPeriod) {
     // Set the S3 Object key
     const objectKey = getS3UploadFileKey(organization.id, upload)
     upload.objectKey = objectKey
@@ -261,52 +261,36 @@ export const getUploadsByExpenditureCategory = async () => {
 
 export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
   async () => {
-    const organization = await db.organization.findFirst({
-      where: { id: context.currentUser.agency.organizationId },
-    })
-    const reportingPeriod = await db.reportingPeriod.findFirst({
-      where: { id: organization.preferences['current_reporting_period_id'] },
-    })
-    const uploadsByExpenditureCategory = await getUploadsByExpenditureCategory()
-    const arn = process.env.TREASURY_STEP_FUNCTION_ARN
-
-    if (!arn) {
-      throw new Error('TREASURY_STEP_FUNCTION_ARN is not set')
-    }
-    // aws.startStepFunctionExecution(process.env.TREASURY_STEP_FUNCTION_ARN, args.name, args.input, '');
-
     try {
-      // Send the Treasury Report
-      // For now, we just log that we're sending the report
-      // Call amazon step function with the following parameters:
-      /*
-      {
-        "reportingPeriod": reportingPeriod.name,
-        "organization": organization.name,
-        "email": context.currentUser.email,
-        "uploadsByExpenditureCategory": uploadsByExpenditureCategory
+      const organization = await db.organization.findFirst({
+        where: { id: context.currentUser.agency.organizationId },
+      })
+      const reportingPeriod = await db.reportingPeriod.findFirst({
+        where: { id: organization.preferences['current_reporting_period_id'] },
+      })
+      const uploadsByExpenditureCategory =
+        await getUploadsByExpenditureCategory()
+      const arn = process.env.TREASURY_STEP_FUNCTION_ARN
+
+      if (!arn) {
+        throw new Error('TREASURY_STEP_FUNCTION_ARN is not set')
       }
-      */
       logger.info(uploadsByExpenditureCategory)
       logger.info('Sending Treasury Report')
-      const params = {
+
+      const input = {
         reportingPeriod: reportingPeriod.name,
         organization: organization.name,
         email: context.currentUser.email,
         uploadsByExpenditureCategory,
       }
-      const paramsJson = JSON.stringify(params)
-      console.log('params', paramsJson)
 
-      aws.startStepFunctionExecution(arn, undefined, paramsJson, '')
-
-      // aws.startStepFunctionExecution(
-      //   reportingPeriod.name,
-      //   organization.name,
-      //   context.currentUser.email,
-      //   uploadsByExpenditureCategory
-      // )
-      
+      await aws.startStepFunctionExecution(
+        arn,
+        undefined,
+        JSON.stringify(input),
+        ''
+      )
       return true
     } catch (error) {
       logger.error(error, 'Error sending Treasury Report')
