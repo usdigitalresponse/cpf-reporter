@@ -258,3 +258,58 @@ export const getUploadsByExpenditureCategory = async () => {
 
   return uploadsByExpenditureCategory
 }
+
+export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
+  async () => {
+    const organization = await db.organization.findFirst({
+      where: { id: context.currentUser.agency.organizationId },
+    })
+    const reportingPeriod = await db.reportingPeriod.findFirst({
+      where: { id: organization.preferences['current_reporting_period_id'] },
+    })
+    const uploadsByExpenditureCategory = await getUploadsByExpenditureCategory()
+    const arn = process.env.TREASURY_STEP_FUNCTION_ARN
+
+    if (!arn) {
+      throw new Error('TREASURY_STEP_FUNCTION_ARN is not set')
+    }
+    // aws.startStepFunctionExecution(process.env.TREASURY_STEP_FUNCTION_ARN, args.name, args.input, '');
+
+    try {
+      // Send the Treasury Report
+      // For now, we just log that we're sending the report
+      // Call amazon step function with the following parameters:
+      /*
+      {
+        "reportingPeriod": reportingPeriod.name,
+        "organization": organization.name,
+        "email": context.currentUser.email,
+        "uploadsByExpenditureCategory": uploadsByExpenditureCategory
+      }
+      */
+      logger.info(uploadsByExpenditureCategory)
+      logger.info('Sending Treasury Report')
+      const params = {
+        reportingPeriod: reportingPeriod.name,
+        organization: organization.name,
+        email: context.currentUser.email,
+        uploadsByExpenditureCategory,
+      }
+      const paramsJson = JSON.stringify(params)
+      console.log('params', paramsJson)
+
+      aws.startStepFunctionExecution(arn, undefined, paramsJson, '')
+
+      // aws.startStepFunctionExecution(
+      //   reportingPeriod.name,
+      //   organization.name,
+      //   context.currentUser.email,
+      //   uploadsByExpenditureCategory
+      // )
+      
+      return true
+    } catch (error) {
+      logger.error(error, 'Error sending Treasury Report')
+      return false
+    }
+  }
