@@ -118,7 +118,7 @@ def handle(event: S3Event, context: Context):
     if project_agency_id_to_row_map:
         download_file(
             s3_client,
-            f"treasuryreports/{organization_id}/{current_reporting_period_id}/{user.id}",
+            f"treasuryreports/{organization_id}/{current_reporting_period_id}",
             f"{OUTPUT_TEMPLATE[project_use_code]}.xlsx",
             output_file,
         )
@@ -189,7 +189,7 @@ def handle(event: S3Event, context: Context):
         workbook.save(new_output_file.name)
         upload_generated_file_to_s3(
             s3_client,
-            f"treasuryreports/{organization_id}/{current_reporting_period_id}/{user.id}",
+            f"treasuryreports/{organization_id}/{current_reporting_period_id}",
             f"{OUTPUT_TEMPLATE[project_use_code]}.xlsx",
             new_output_file,
         )
@@ -198,7 +198,7 @@ def handle(event: S3Event, context: Context):
         convert_xlsx_to_csv(csv_file, workbook, highest_row_num)
         upload_generated_file_to_s3(
             s3_client,
-            f"treasuryreports/{organization_id}/{current_reporting_period_id}/{user.id}",
+            f"treasuryreports/{organization_id}/{current_reporting_period_id}",
             f"{OUTPUT_TEMPLATE[project_use_code]}.csv",
             csv_file,
         )
@@ -207,7 +207,7 @@ def handle(event: S3Event, context: Context):
         json_file = json.dump(project_agency_id_to_row_map)
         upload_generated_file_to_s3(
             s3_client,
-            f"treasuryreports/{organization_id}/{current_reporting_period_id}/{user.id}",
+            f"treasuryreports/{organization_id}/{current_reporting_period_id}",
             f"{OUTPUT_TEMPLATE[project_use_code]}.json",
             json_file,
         )
@@ -225,7 +225,7 @@ def get_existing_output_metadata(
         try:
             download_file(
                 s3_client,
-                f"treasuryreports/{organization.get("id")}/{organization.get("preferences").get("current_reporting_period_id")}/{user.id}",
+                f"treasuryreports/{organization.get("id")}/{organization.get("preferences").get("current_reporting_period_id")}",
                 f"{OUTPUT_TEMPLATE[project_use_code]}.json",
                 existing_file,
             )
