@@ -199,7 +199,7 @@ def get_workbook_errors_for_row(
     return workbook_errors
 
 
-def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str], Subrecipients]:
+def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str], Subrecipients, str]:
     """Validates a given Excel workbook according to CPF validation rules.
 
     Args:
@@ -292,7 +292,7 @@ def validate_workbook(
 
     subrecipients = [subrecipient.model_dump() for subrecipient in subrecipients]
 
-    return (errors, project_use_code, subrecipients)
+    return (errors, project_use_code, subrecipients, version_string)
 
 
 def validate_workbook_sheets(workbook: Workbook) -> Errors:

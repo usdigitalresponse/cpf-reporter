@@ -97,13 +97,25 @@ async function sendHeadObjectToS3Bucket(bucketName: string, key: string) {
   await s3.send(new HeadObjectCommand(uploadParams))
 }
 
+/**
+ * Create an upload key used for S3 based on the upload or create upload input object.
+ * If the upload is new, such as a CreateUploadInput object, the id will be null as it is not from the database.
+ * In that case, you can use the optional uploadId field to create the key.
+ */
+export function getS3UploadFileKey(organizationId: number, upload: Upload | CreateUploadInput, uploadId?: number) {
+  if ('id' in upload) {
+    uploadId = upload.id
+  }
+  return `uploads/${organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${uploadId}/${upload.filename}`
+}
+
 export async function s3PutSignedUrl(
   upload: CreateUploadInput,
   uploadId: number,
   organizationId: number
 ): Promise<string> {
   const s3 = getS3Client()
-  const key = `uploads/${organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${uploadId}/${upload.filename}`
+  const key = getS3UploadFileKey(organizationId, upload, uploadId)
   const baseParams: PutObjectCommandInput = {
     Bucket: REPORTING_DATA_BUCKET_NAME,
     Key: key,
@@ -117,7 +129,7 @@ export async function s3PutSignedUrl(
 }
 
 export async function deleteUploadFile(upload: Upload) {
-  const fileKey = `uploads/${upload.agency.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.id}/${upload.filename}`
+  const fileKey = getS3UploadFileKey(upload.agency.organizationId, upload)
   await s3DeleteObject(fileKey)
 }
 
@@ -135,7 +147,7 @@ async function s3DeleteObject(key: string) {
  *  Exists to organize the imports and to make it easier to mock in tests.
  */
 async function getSignedUrl(upload: Upload): Promise<string> {
-  const key = `uploads/${upload.agency.organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${upload.id}/${upload.filename}`
+  const key = getS3UploadFileKey(upload.agency.organizationId, upload)
   const s3 = getS3Client()
   const baseParams = { Bucket: REPORTING_DATA_BUCKET_NAME, Key: key }
   return awsGetSignedUrl(s3, new GetObjectCommand(baseParams), {
@@ -201,6 +213,7 @@ async function receiveSqsMessage(queueUrl: string) {
 async function startStepFunctionExecution(
   arn: string,
   name?: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   input?: any,
   traceHeader?: string
 ): Promise<StartExecutionCommandOutput> {

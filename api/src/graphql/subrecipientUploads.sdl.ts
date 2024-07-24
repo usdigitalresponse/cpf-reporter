@@ -32,7 +32,6 @@ export const schema = gql`
 
   input UpdateSubrecipientUploadInput {
     subrecipientId: Int
-    ueiTinCombo: String
     rawSubrecipient: JSON
     version: Version
   }
