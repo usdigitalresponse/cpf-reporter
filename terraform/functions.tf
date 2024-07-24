@@ -620,8 +620,8 @@ module "lambda_function-treasuryReportGeneration" {
         "s3:HeadObject",
       ]
       resources = [
-        # Path: treasuryreports/{organization_id}/{reporting_period_id}/{user_id}/{filename}.xlsm
-        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*/*.xlsm",
+        # Path: treasuryreports/{organization_id}/{reporting_period_id}/{filename}.xlsm
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.xlsm",
       ]
     }
     AllowUploadXlsxObjects = {
@@ -630,8 +630,8 @@ module "lambda_function-treasuryReportGeneration" {
         "s3:PutObject"
       ]
       resources = [
-        # Path: uploads/{organization_id}/{reporting_period_id}/{user.id}/{filename}.xlsx
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*.xlsx",
+        # Path: uploads/{organization_id}/{reporting_period_id}/{filename}.xlsx
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*.xlsx",
       ]
     }
     AllowUploadCsvObjects = {
@@ -640,8 +640,8 @@ module "lambda_function-treasuryReportGeneration" {
         "s3:PutObject"
       ]
       resources = [
-        # Path: uploads/{organization_id}/{reporting_period_id}/{user.id}/{filename}.csv
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*.csv",
+        # Path: uploads/{organization_id}/{reporting_period_id}/{filename}.csv
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*.csv",
       ]
     }
     AllowUploadJsonObjects = {
@@ -650,8 +650,8 @@ module "lambda_function-treasuryReportGeneration" {
         "s3:PutObject"
       ]
       resources = [
-        # Path: uploads/{organization_id}/{reporting_period_id}/{user.id}/{filename}.json
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*.json",
+        # Path: uploads/{organization_id}/{reporting_period_id}/{filename}.json
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*.json",
       ]
     }
   }
