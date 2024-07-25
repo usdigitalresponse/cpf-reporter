@@ -3,6 +3,7 @@ from typing import IO, Any, Dict
 
 import boto3
 import structlog
+import json
 from aws_lambda_typing.context import Context
 from mypy_boto3_s3.client import S3Client
 
@@ -50,6 +51,9 @@ def handle(event: Dict[str, Any], context: Context):
         )
         return
 
+    # For format, remove when using
+    print(output_template_id)
+
     subrecipients_file_key = f"{organization_id}/{reporting_period_id}/subrecipients"
 
     s3_client: S3Client = boto3.client("s3")
@@ -64,10 +68,23 @@ def handle(event: Dict[str, Any], context: Context):
                 subrecipients_file_key,
                 recent_subrecipients_file,
             )
-            subrecipient_template = generate_subrecipient_template(
-                recent_subrecipients_file=recent_subrecipients_file
-            )
-            print(subrecipient_template)
+
+    subrecipients_json = ...
+    try:
+        # Parse recent_subrecipients_file to JSON
+        logger.info("Parsing recent subrecipients to JSON")
+        recent_subrecipients_file.seek(0)
+        subrecipients_json = json.loads(recent_subrecipients_file)
+    except ValueError:
+        logger.exception("Encountered an error parsing subrecipients file")
+        return
+
+    print(subrecipients_json)
+
+    subrecipient_template = generate_subrecipient_template(
+        recent_subrecipients_file=recent_subrecipients_file
+    )
+    print(subrecipient_template)
 
     # Save subrecipient_template to S3
 

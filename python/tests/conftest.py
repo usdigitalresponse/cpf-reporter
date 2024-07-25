@@ -276,3 +276,19 @@ def valid_aws_typing_context():
         "arn:aws:lambda:dummy-region:123456789012:function:dummy_function_name"
     )
     return valid_context
+
+
+@pytest.fixture
+def invalid_subrecipients_json_content():
+    return "{key: value}"
+
+
+@pytest.fixture
+def sample_subrecipients_generation_event():
+    return {
+        "organization": {
+            "id": "org123",
+            "preferences": {"current_reporting_period_id": "reporting123"},
+        },
+        "outputTemplateId": "template123",
+    }
