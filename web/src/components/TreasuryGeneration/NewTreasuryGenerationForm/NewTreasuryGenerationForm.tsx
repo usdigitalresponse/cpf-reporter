@@ -15,8 +15,7 @@ interface NewOrganizationFormProps {
 }
 
 /* 
-  This form creates a new organization, assigns a new agency to that organization, 
-  and assigns a new admin user to both the organization and the agency.
+  This form collects any payload information to kick-off a lambda function to generate a treasury file.
 */
 const NewTreasuryGenerationForm = (props: NewOrganizationFormProps) => {
   const { onSave, error, loading } = props

@@ -2,14 +2,6 @@ import { toast, Toaster, ToastBar } from '@redwoodjs/web/toast'
 
 import DownloadTreasuryFiles from 'src/components/TreasuryGeneration/DownloadTreasuryFiles/DownloadTreasuryFiles'
 import NewTreasuryGeneration from 'src/components/TreasuryGeneration/NewTreasuryGeneration/NewTreasuryGeneration'
-/*
-Form Field 1 - Accepts a long text containing payload from the user.
-Button 1 - Kick-off file generation
-Button 2 - Download Project 1A file
-Button 3 - Download Project 1B file
-Button 4 - Download Project 1C file
-Button 5 - Download Subrecipient file
-*/
 
 const TreasuryReportGenerationPage = () => {
   return (
