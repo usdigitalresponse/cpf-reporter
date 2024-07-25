@@ -1,6 +1,5 @@
 import Button from 'react-bootstrap/Button'
 
-import { Link, routes } from '@redwoodjs/router'
 import { toast, Toaster, ToastBar } from '@redwoodjs/web/toast'
 
 import NewTreasuryGeneration from 'src/components/TreasuryGeneration/NewTreasuryGeneration/NewTreasuryGeneration'
@@ -14,9 +13,6 @@ Button 5 - Download Subrecipient file
 */
 
 const TreasuryReportGenerationPage = () => {
-  const onSubmit = (data) => {
-    console.log(data)
-  }
   return (
     <div>
       <Toaster
