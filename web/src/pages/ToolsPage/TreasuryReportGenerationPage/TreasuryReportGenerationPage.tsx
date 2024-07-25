@@ -1,7 +1,6 @@
-import Button from 'react-bootstrap/Button'
-
 import { toast, Toaster, ToastBar } from '@redwoodjs/web/toast'
 
+import DownloadTreasuryFiles from 'src/components/TreasuryGeneration/DownloadTreasuryFiles/DownloadTreasuryFiles'
 import NewTreasuryGeneration from 'src/components/TreasuryGeneration/NewTreasuryGeneration/NewTreasuryGeneration'
 /*
 Form Field 1 - Accepts a long text containing payload from the user.
@@ -35,13 +34,7 @@ const TreasuryReportGenerationPage = () => {
       </Toaster>
       <h2>Treasury File Generation Tool</h2>
       <NewTreasuryGeneration />
-
-      <div className="rw-button-group">
-        <Button className="rw-button">Download Project 1A file</Button>
-        <Button className="rw-button">Download Project 1B file</Button>
-        <Button className="rw-button">Download Project 1C file</Button>
-        <Button className="rw-button">Download Subrecipient file</Button>
-      </div>
+      <DownloadTreasuryFiles />
     </div>
   )
 }

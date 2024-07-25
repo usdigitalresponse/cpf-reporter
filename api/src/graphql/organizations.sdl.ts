@@ -32,6 +32,14 @@ export const schema = gql`
     response: JSON
   }
 
+  input DownloadTreasuryFileInput {
+    fileType: String!
+  }
+
+  type TreasuryFilePayload {
+    fileLink: String
+  }
+
   type Mutation {
     createOrganization(input: CreateOrganizationInput!): Organization!
       @requireAuth
@@ -46,6 +54,9 @@ export const schema = gql`
     kickOffTreasuryReportGeneration(
       input: NewTreasuryGenerationInput!
     ): TreasuryReportGenerationPayload @requireAuth
+    downloadTreasuryFile(
+      input: DownloadTreasuryFileInput!
+    ): TreasuryFilePayload @requireAuth
   }
 
   input CreateOrgAgencyAdminInput {

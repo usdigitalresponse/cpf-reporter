@@ -184,6 +184,7 @@ export type Mutation = {
   deleteUser: User;
   deleteValidationRules: ValidationRules;
   downloadUploadFile: Scalars['String'];
+  kickOffTreasuryReportGeneration?: Maybe<TreasuryReportGenerationPayload>;
   updateAgency: Agency;
   updateExpenditureCategory: ExpenditureCategory;
   updateInputTemplate: InputTemplate;
@@ -340,6 +341,11 @@ export type MutationdownloadUploadFileArgs = {
 };
 
 
+export type MutationkickOffTreasuryReportGenerationArgs = {
+  input: NewTreasuryGenerationInput;
+};
+
+
 export type MutationupdateAgencyArgs = {
   id: Scalars['Int'];
   input: UpdateAgencyInput;
@@ -415,6 +421,11 @@ export type MutationupdateUserArgs = {
 export type MutationupdateValidationRulesArgs = {
   id: Scalars['Int'];
   input: UpdateValidationRulesInput;
+};
+
+export type NewTreasuryGenerationInput = {
+  organizationId?: InputMaybe<Scalars['Int']>;
+  payload: Scalars['JSON'];
 };
 
 export type Organization = {
@@ -652,6 +663,11 @@ export type SubrecipientUpload = {
   upload: Upload;
   uploadId: Scalars['Int'];
   version: Version;
+};
+
+export type TreasuryReportGenerationPayload = {
+  __typename?: 'TreasuryReportGenerationPayload';
+  response?: Maybe<Scalars['JSON']>;
 };
 
 export type UpdateAgencyInput = {
@@ -948,6 +964,18 @@ export type FindReportingPeriodQueryVariables = Exact<{
 
 
 export type FindReportingPeriodQuery = { __typename?: 'Query', reportingPeriod?: { __typename?: 'ReportingPeriod', name: string } | null };
+
+export type KickOffTreasuryReportGenerationVariables = Exact<{
+  input: NewTreasuryGenerationInput;
+}>;
+
+
+export type KickOffTreasuryReportGeneration = { __typename?: 'Mutation', kickOffTreasuryReportGeneration?: { __typename?: 'TreasuryReportGenerationPayload', response?: Prisma.JsonValue | null } | null };
+
+export type RetreiveSignedURLsVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RetreiveSignedURLs = { __typename?: 'Query', organizations: Array<{ __typename?: 'Organization', id: number, name: string }> };
 
 export type EditUploadByIdVariables = Exact<{
   id: Scalars['Int'];

@@ -6,6 +6,7 @@ import type {
   Agency,
 } from 'types/graphql'
 
+import aws from 'src/lib/aws'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 
@@ -74,6 +75,28 @@ export const getOrCreateOrganization = async (orgName, reportingPeriodName) => {
     logger.error(error, `Error getting or creating organization: ${orgName}`)
   }
 }
+
+export const downloadTreasuryFile: MutationResolvers['downloadTreasuryFile'] =
+  async ({ input }) => {
+    const { fileType } = input
+    const { organizationId } = context.currentUser.agency
+
+    // get the organization
+    const organization = await db.organization.findUnique({
+      where: { id: organizationId },
+    })
+
+    // Do something with the fileType
+    logger.info(`Downloading treasury file for ${fileType}`)
+    const url = await aws.getTreasurySignedUrl(
+      fileType,
+      organization.id,
+      organization.preferences['current_reporting_period_id']
+    )
+
+    // Return the file link
+    return { fileLink: url }
+  }
 
 export const kickOffTreasuryReportGeneration: MutationResolvers['kickOffTreasuryReportGeneration'] =
   async ({ input }) => {

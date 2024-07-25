@@ -1,7 +1,4 @@
-import type {
-  CreateOrgAgencyAdminInput,
-  NewTreasuryGenerationInput,
-} from 'types/graphql'
+import type { NewTreasuryGenerationInput } from 'types/graphql'
 
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'

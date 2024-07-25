@@ -151,6 +151,10 @@ export type CreateValidationRulesInput = {
   versionId: Version;
 };
 
+export type DownloadTreasuryFileInput = {
+  fileType: Scalars['String'];
+};
+
 export type ExpenditureCategory = {
   __typename?: 'ExpenditureCategory';
   Uploads: Array<Maybe<Upload>>;
@@ -202,6 +206,7 @@ export type Mutation = {
   deleteUploadValidation: UploadValidation;
   deleteUser: User;
   deleteValidationRules: ValidationRules;
+  downloadTreasuryFile?: Maybe<TreasuryFilePayload>;
   downloadUploadFile: Scalars['String'];
   kickOffTreasuryReportGeneration?: Maybe<TreasuryReportGenerationPayload>;
   updateAgency: Agency;
@@ -352,6 +357,11 @@ export type MutationdeleteUserArgs = {
 
 export type MutationdeleteValidationRulesArgs = {
   id: Scalars['Int'];
+};
+
+
+export type MutationdownloadTreasuryFileArgs = {
+  input: DownloadTreasuryFileInput;
 };
 
 
@@ -684,6 +694,11 @@ export type SubrecipientUpload = {
   version: Version;
 };
 
+export type TreasuryFilePayload = {
+  __typename?: 'TreasuryFilePayload';
+  fileLink?: Maybe<Scalars['String']>;
+};
+
 export type TreasuryReportGenerationPayload = {
   __typename?: 'TreasuryReportGenerationPayload';
   response?: Maybe<Scalars['JSON']>;
@@ -923,6 +938,7 @@ export type ResolversTypes = {
   CreateValidationRulesInput: CreateValidationRulesInput;
   Date: ResolverTypeWrapper<Scalars['Date']>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']>;
+  DownloadTreasuryFileInput: DownloadTreasuryFileInput;
   ExpenditureCategory: ResolverTypeWrapper<MergePrismaWithSdlTypes<PrismaExpenditureCategory, MakeRelationsOptional<ExpenditureCategory, AllMappedModels>, AllMappedModels>>;
   InputTemplate: ResolverTypeWrapper<MergePrismaWithSdlTypes<PrismaInputTemplate, MakeRelationsOptional<InputTemplate, AllMappedModels>, AllMappedModels>>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
@@ -942,6 +958,7 @@ export type ResolversTypes = {
   SubrecipientStatus: SubrecipientStatus;
   SubrecipientUpload: ResolverTypeWrapper<MergePrismaWithSdlTypes<PrismaSubrecipientUpload, MakeRelationsOptional<SubrecipientUpload, AllMappedModels>, AllMappedModels>>;
   Time: ResolverTypeWrapper<Scalars['Time']>;
+  TreasuryFilePayload: ResolverTypeWrapper<TreasuryFilePayload>;
   TreasuryReportGenerationPayload: ResolverTypeWrapper<TreasuryReportGenerationPayload>;
   UpdateAgencyInput: UpdateAgencyInput;
   UpdateExpenditureCategoryInput: UpdateExpenditureCategoryInput;
@@ -986,6 +1003,7 @@ export type ResolversParentTypes = {
   CreateValidationRulesInput: CreateValidationRulesInput;
   Date: Scalars['Date'];
   DateTime: Scalars['DateTime'];
+  DownloadTreasuryFileInput: DownloadTreasuryFileInput;
   ExpenditureCategory: MergePrismaWithSdlTypes<PrismaExpenditureCategory, MakeRelationsOptional<ExpenditureCategory, AllMappedModels>, AllMappedModels>;
   InputTemplate: MergePrismaWithSdlTypes<PrismaInputTemplate, MakeRelationsOptional<InputTemplate, AllMappedModels>, AllMappedModels>;
   Int: Scalars['Int'];
@@ -1003,6 +1021,7 @@ export type ResolversParentTypes = {
   Subrecipient: MergePrismaWithSdlTypes<PrismaSubrecipient, MakeRelationsOptional<Subrecipient, AllMappedModels>, AllMappedModels>;
   SubrecipientUpload: MergePrismaWithSdlTypes<PrismaSubrecipientUpload, MakeRelationsOptional<SubrecipientUpload, AllMappedModels>, AllMappedModels>;
   Time: Scalars['Time'];
+  TreasuryFilePayload: TreasuryFilePayload;
   TreasuryReportGenerationPayload: TreasuryReportGenerationPayload;
   UpdateAgencyInput: UpdateAgencyInput;
   UpdateExpenditureCategoryInput: UpdateExpenditureCategoryInput;
@@ -1161,6 +1180,7 @@ export type MutationResolvers<ContextType = RedwoodGraphQLContext, ParentType ex
   deleteUploadValidation: Resolver<ResolversTypes['UploadValidation'], ParentType, ContextType, RequireFields<MutationdeleteUploadValidationArgs, 'id'>>;
   deleteUser: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationdeleteUserArgs, 'id'>>;
   deleteValidationRules: Resolver<ResolversTypes['ValidationRules'], ParentType, ContextType, RequireFields<MutationdeleteValidationRulesArgs, 'id'>>;
+  downloadTreasuryFile: Resolver<Maybe<ResolversTypes['TreasuryFilePayload']>, ParentType, ContextType, RequireFields<MutationdownloadTreasuryFileArgs, 'input'>>;
   downloadUploadFile: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationdownloadUploadFileArgs, 'id'>>;
   kickOffTreasuryReportGeneration: Resolver<Maybe<ResolversTypes['TreasuryReportGenerationPayload']>, ParentType, ContextType, RequireFields<MutationkickOffTreasuryReportGenerationArgs, 'input'>>;
   updateAgency: Resolver<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationupdateAgencyArgs, 'id' | 'input'>>;
@@ -1206,6 +1226,7 @@ export type MutationRelationResolvers<ContextType = RedwoodGraphQLContext, Paren
   deleteUploadValidation?: RequiredResolverFn<ResolversTypes['UploadValidation'], ParentType, ContextType, RequireFields<MutationdeleteUploadValidationArgs, 'id'>>;
   deleteUser?: RequiredResolverFn<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationdeleteUserArgs, 'id'>>;
   deleteValidationRules?: RequiredResolverFn<ResolversTypes['ValidationRules'], ParentType, ContextType, RequireFields<MutationdeleteValidationRulesArgs, 'id'>>;
+  downloadTreasuryFile?: RequiredResolverFn<Maybe<ResolversTypes['TreasuryFilePayload']>, ParentType, ContextType, RequireFields<MutationdownloadTreasuryFileArgs, 'input'>>;
   downloadUploadFile?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationdownloadUploadFileArgs, 'id'>>;
   kickOffTreasuryReportGeneration?: RequiredResolverFn<Maybe<ResolversTypes['TreasuryReportGenerationPayload']>, ParentType, ContextType, RequireFields<MutationkickOffTreasuryReportGenerationArgs, 'input'>>;
   updateAgency?: RequiredResolverFn<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationupdateAgencyArgs, 'id' | 'input'>>;
@@ -1481,6 +1502,16 @@ export interface TimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes
   name: 'Time';
 }
 
+export type TreasuryFilePayloadResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['TreasuryFilePayload'] = ResolversParentTypes['TreasuryFilePayload']> = {
+  fileLink: OptArgsResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type TreasuryFilePayloadRelationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['TreasuryFilePayload'] = ResolversParentTypes['TreasuryFilePayload']> = {
+  fileLink?: RequiredResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type TreasuryReportGenerationPayloadResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['TreasuryReportGenerationPayload'] = ResolversParentTypes['TreasuryReportGenerationPayload']> = {
   response: OptArgsResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -1628,6 +1659,7 @@ export type Resolvers<ContextType = RedwoodGraphQLContext> = {
   Subrecipient: SubrecipientResolvers<ContextType>;
   SubrecipientUpload: SubrecipientUploadResolvers<ContextType>;
   Time: GraphQLScalarType;
+  TreasuryFilePayload: TreasuryFilePayloadResolvers<ContextType>;
   TreasuryReportGenerationPayload: TreasuryReportGenerationPayloadResolvers<ContextType>;
   Upload: UploadResolvers<ContextType>;
   UploadValidation: UploadValidationResolvers<ContextType>;
