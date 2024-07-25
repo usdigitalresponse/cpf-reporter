@@ -69,3 +69,15 @@ class TestHandleIncompleteEventInput:
         mock_logger.exception.assert_called_once_with(
             "Exception getting reporting period or organization id from event -- missing field: 'current_reporting_period_id'"
         )
+
+    @patch("src.functions.subrecipient_treasury_report_gen.get_logger")
+    def test_handle_no_output_template_id(self, mock_get_logger, valid_aws_typing_context: Context):
+        mock_logger = MagicMock()
+        mock_get_logger.return_value = mock_logger
+
+        handle({"organization": {"id": 1, "preferences": { "current_reporting_period_id": 1 }}}, valid_aws_typing_context)
+
+        mock_logger.exception.assert_called_once_with(
+            "Exception getting reporting period or organization id from event -- missing field: 'outputTemplateId'"
+        )
+

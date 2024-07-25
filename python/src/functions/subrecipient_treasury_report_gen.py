@@ -21,6 +21,7 @@ def handle(event: Dict[str, Any], context: Context):
         {
             organization: <all fields in organization object>,
             user: <id and email fields of the user object>,
+            outputTemplateId: <id for the output template to use>
         }
         context: Lambda context
     """
@@ -35,12 +36,14 @@ def handle(event: Dict[str, Any], context: Context):
 
     organization_id = ...
     reporting_period_id = ...
+    output_template_id = ...
 
     try:
         reporting_period_id = event["organization"]["preferences"][
             "current_reporting_period_id"
         ]
         organization_id = event["organization"]["id"]
+        output_template_id = event["outputTemplateId"]
     except KeyError as e:
         logger.exception(
             f"Exception getting reporting period or organization id from event -- missing field: {e}"
