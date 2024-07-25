@@ -1,12 +1,15 @@
 import type { Upload } from '@prisma/client'
 
-import { deleteUploadFile, s3PutSignedUrl, getSignedUrl, startStepFunctionExecution } from 'src/lib/aws'
+import {
+  deleteUploadFile,
+  s3PutSignedUrl,
+  getSignedUrl,
+  startStepFunctionExecution,
+} from 'src/lib/aws'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 
-import {
-  updateOrganization
-} from '../organizations/organizations'
+import { updateOrganization } from '../organizations/organizations'
 
 import {
   uploads,
@@ -17,7 +20,7 @@ import {
   downloadUploadFile,
   Upload as UploadRelationResolver,
   getUploadsByExpenditureCategory,
-  sendTreasuryReport
+  sendTreasuryReport,
 } from './uploads'
 import type { StandardScenario } from './uploads.scenarios'
 
@@ -214,89 +217,110 @@ describe('downloads', () => {
   })
 })
 
-describeScenario<StandardScenario>('uploadCheck', 'getUploads', (getScenario) => {
-  let scenario: StandardScenario
+describeScenario<StandardScenario>(
+  'uploadCheck',
+  'getUploads',
+  (getScenario) => {
+    let scenario: StandardScenario
 
-  beforeEach(async () => {
-    scenario = getScenario()
-    await updateOrganization({
-      id: scenario.organization.one.id,
-      input: { preferences: {
-          current_reporting_period_id: scenario.reportingPeriod.one.id,
-      }},
+    beforeEach(async () => {
+      scenario = getScenario()
+      await updateOrganization({
+        id: scenario.organization.one.id,
+        input: {
+          preferences: {
+            current_reporting_period_id: scenario.reportingPeriod.one.id,
+          },
+        },
+      })
+      await updateOrganization({
+        id: scenario.organization.two.id,
+        input: {
+          preferences: {
+            current_reporting_period_id: scenario.reportingPeriod.one.id,
+          },
+        },
+      })
     })
-    await updateOrganization({
-      id: scenario.organization.two.id,
-      input: { preferences: {
-          current_reporting_period_id: scenario.reportingPeriod.one.id,
-      }},
-    })
-  })
 
-  it('returns most recent upload for one category',
-    async () => {
+    it('returns most recent upload for one category', async () => {
       mockCurrentUser(scenario.user.one)
-      const result = await getUploadsByExpenditureCategory();
-      expect(Object.keys(result).length).toEqual(1);
-      expect(Object.keys(result)).toEqual(['1A']);
-  })
+      const result = await getUploadsByExpenditureCategory()
+      expect(Object.keys(result).length).toEqual(1)
+      expect(Object.keys(result)).toEqual(['1A'])
+    })
 
-  it('returns two uploads of different categories',
-    async () => {
+    it('returns two uploads of different categories', async () => {
       mockCurrentUser(scenario.user.three)
-      const result = await getUploadsByExpenditureCategory();
-      expect(Object.keys(result).length).toEqual(2);
-      expect(Object.keys(result).sort()).toEqual(['2A', '1A'].sort());
-  })
-})
+      const result = await getUploadsByExpenditureCategory()
+      expect(Object.keys(result).length).toEqual(2)
+      expect(Object.keys(result).sort()).toEqual(['2A', '1A'].sort())
+    })
+  }
+)
 
 describe('treasury report', () => {
   beforeEach(() => {
     jest.resetAllMocks()
     process.env.TREASURY_STEP_FUNCTION_ARN = 'test-arn'
   })
-  
-  scenario('successfully sends a treasury report', async (scenario: StandardScenario) => {
-    mockCurrentUser(scenario.user.one)
-    const mockOrganization = scenario.organization.one
-    const mockReportingPeriod = scenario.reportingPeriod.one
-    const uploadsByExpenditureCategory = await getUploadsByExpenditureCategory()
 
-    const input = JSON.stringify({
-      reportingPeriod: mockReportingPeriod.name,
-      organization: mockOrganization.name,
-      email: scenario.user.one.email,
-      uploadsByExpenditureCategory,
-    })
+  scenario(
+    'successfully sends a treasury report',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser(scenario.user.one)
+      const mockOrganization = scenario.organization.one
+      const mockReportingPeriod = scenario.reportingPeriod.one
+      const uploadsByExpenditureCategory =
+        await getUploadsByExpenditureCategory()
+
+      const input = JSON.stringify({
+        reportingPeriod: mockReportingPeriod.name,
+        organization: mockOrganization.name,
+        email: scenario.user.one.email,
+        uploadsByExpenditureCategory,
+      })
+      const result = await sendTreasuryReport()
+
+      expect(result).toBe(true)
+      expect(startStepFunctionExecution).toHaveBeenCalledWith(
+        'test-arn',
+        undefined,
+        input,
+        ''
+      )
+      expect(logger.info).toHaveBeenCalledWith(uploadsByExpenditureCategory)
+      expect(logger.info).toHaveBeenCalledWith('Sending Treasury Report')
+    }
+  )
+
+  scenario('handles database errors', async (scenario: StandardScenario) => {
+    mockCurrentUser(scenario.user.one)
+    db.organization.findFirst = jest
+      .fn()
+      .mockRejectedValue(new Error('Database error'))
+
     const result = await sendTreasuryReport()
-  
-    expect(result).toBe(true)
-    expect(startStepFunctionExecution).toHaveBeenCalledWith(
-      'test-arn',
-      undefined,
-      input,
-      ''
+
+    expect(result).toBe(false)
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.any(Error),
+      'Error sending Treasury Report'
     )
-    expect(logger.info).toHaveBeenCalledWith(uploadsByExpenditureCategory)
-    expect(logger.info).toHaveBeenCalledWith('Sending Treasury Report') 
   })
 
-  scenario('handles errors and returns false', async (scenario: StandardScenario) => {
-    mockCurrentUser(scenario.user.one)
-    db.organization.findFirst = jest.fn().mockRejectedValue(new Error('Database error'))
+  scenario(
+    'handles missing TREASURY_STEP_FUNCTION_ARN',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser(scenario.user.one)
+      delete process.env.TREASURY_STEP_FUNCTION_ARN
+      const result = await sendTreasuryReport()
 
-    const result = await sendTreasuryReport()
-
-    expect(result).toBe(false)
-    expect(logger.error).toHaveBeenCalledWith(expect.any(Error), 'Error sending Treasury Report')
-  })
-
-  scenario('handles missing TREASURY_STEP_FUNCTION_ARN', async (scenario: StandardScenario) => {
-    mockCurrentUser(scenario.user.one)
-    delete process.env.TREASURY_STEP_FUNCTION_ARN
-    const result = await sendTreasuryReport()
-
-    expect(result).toBe(false)
-    expect(logger.error).toHaveBeenCalledWith(expect.any(Error), 'Error sending Treasury Report')
-  })
+      expect(result).toBe(false)
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.any(Error),
+        'Error sending Treasury Report'
+      )
+    }
+  )
 })
