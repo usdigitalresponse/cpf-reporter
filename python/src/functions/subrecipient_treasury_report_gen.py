@@ -54,10 +54,11 @@ def handle(event: Dict[str, Any], context: Context):
     # For format, remove when using
     print(output_template_id)
 
-    subrecipients_file_key = f"{organization_id}/{reporting_period_id}/subrecipients"
+    subrecipients_file_key = f"/{organization_id}/{reporting_period_id}/subrecipients"
 
     s3_client: S3Client = boto3.client("s3")
 
+    recent_subrecipients = ...
     with tempfile.NamedTemporaryFile() as recent_subrecipients_file:
         with structlog.contextvars.bound_contextvars(
             subrecipients_filename=recent_subrecipients_file.name
@@ -69,17 +70,22 @@ def handle(event: Dict[str, Any], context: Context):
                 recent_subrecipients_file,
             )
 
-    subrecipients_json = ...
+    recent_subrecipients_file.seek(0)
     try:
-        # Parse recent_subrecipients_file to JSON
-        logger.info("Parsing recent subrecipients to JSON")
-        recent_subrecipients_file.seek(0)
-        subrecipients_json = json.loads(recent_subrecipients_file)
-    except ValueError:
-        logger.exception("Encountered an error parsing subrecipients file")
+        recent_subrecipients = json.load(recent_subrecipients_file)
+    except json.JSONDecodeError:
+        logger.exception(
+            f"Subrecipients file for organization {organization_id} and reporting period {reporting_period_id} does not contain valid JSON"
+        )
         return
 
-    print(subrecipients_json)
+    if no_subrecipients_in_file(recent_subrecipients=recent_subrecipients):
+        logger.exception(
+            f"Subrecipients file for organization {organization_id} and reporting period {reporting_period_id} does not have any subrecipients listed"
+        )
+        return
+
+    logger.info("The 'subrecipients' list is not empty.")
 
     subrecipient_template = generate_subrecipient_template(
         recent_subrecipients_file=recent_subrecipients_file
@@ -87,6 +93,14 @@ def handle(event: Dict[str, Any], context: Context):
     print(subrecipient_template)
 
     # Save subrecipient_template to S3
+
+
+def no_subrecipients_in_file(recent_subrecipients):
+    return (
+        "subrecipients" not in recent_subrecipients
+        or not isinstance(recent_subrecipients["subrecipients"], list)
+        or len(recent_subrecipients["subrecipients"]) == 0
+    )
 
 
 def generate_subrecipient_template(recent_subrecipients_file: IO[bytes]):

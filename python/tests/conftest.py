@@ -279,8 +279,46 @@ def valid_aws_typing_context():
 
 
 @pytest.fixture
-def invalid_subrecipients_json_content():
-    return "{key: value}"
+def valid_subrecipients_json_content():
+    return {
+        "subrecipients": [
+            {
+                "id": 1,
+                "name": "subrecipient 3",
+                "ueiTinCombo": "345634563456_345345345",
+                "status": "ACTIVE",
+                "organizationId": 1,
+                "createdAt": "2024-07-11T03:15:13.050Z",
+                "updatedAt": "2024-07-11T03:15:13.050Z",
+                "subrecipientUploads": [
+                    {
+                        "id": 1,
+                        "subrecipientId": 1,
+                        "uploadId": 1,
+                        "rawSubrecipient": {
+                            "Name": "subrecipient 3",
+                            "EIN__c": "345345345",
+                            "Zip__c": "23432",
+                            "City__c": "hyattsville",
+                            "Zip_4__c": "null",
+                            "Address__c": "lkagfsdj",
+                            "POC_Name__c": "figgy",
+                            "Address_2__c": "null",
+                            "Address_3__c": "null",
+                            "POC_Phone_Number__c": "2342342343",
+                            "POC_Email_Address__c": "test@test",
+                            "State_Abbreviated__c": "MD",
+                            "Recipient_Profile_ID__c": "333",
+                            "Unique_Entity_Identifier__c": "345634563456",
+                        },
+                        "createdAt": "2024-07-11T03:15:13.054Z",
+                        "updatedAt": "2024-07-15T20:06:44.379Z",
+                        "version": "V2024_05_24",
+                    }
+                ],
+            }
+        ]
+    }
 
 
 @pytest.fixture
@@ -292,3 +330,23 @@ def sample_subrecipients_generation_event():
         },
         "outputTemplateId": "template123",
     }
+
+
+@pytest.fixture
+def invalid_json_content():
+    return '{"subrecipients": [{"id": 1, "name": "subrecipient 3" invalid json'
+
+
+@pytest.fixture
+def no_subrecipients_key_json_content():
+    return {"other_key": []}
+
+
+@pytest.fixture
+def no_subrecipients_list_json_content():
+    return {"subrecipients": "not_a_list"}
+
+
+@pytest.fixture
+def empty_subrecipients_list_json_content():
+    return {"subrecipients": []}

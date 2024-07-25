@@ -1,8 +1,7 @@
 from unittest.mock import patch, MagicMock
 from aws_lambda_typing.context import Context
-import structlog
-import tempfile
-from unittest import mock
+import json
+from tempfile import NamedTemporaryFile
 
 from src.functions.subrecipient_treasury_report_gen import handle
 
@@ -96,39 +95,110 @@ class TestHandleIncompleteEventInput:
 
 
 class TestInvalidSubrecipientsFile:
-    def mock_download_s3_object_invalid(
-        self, s3_client, bucket_name, file_key, temp_file, invalid_json_content
-    ):
-        temp_file.write(invalid_json_content.encode())
-        temp_file.seek(0)
-
+    @patch("src.functions.subrecipient_treasury_report_gen.boto3.client")
+    @patch("src.functions.subrecipient_treasury_report_gen.tempfile.NamedTemporaryFile")
     @patch("src.functions.subrecipient_treasury_report_gen.get_logger")
-    def test_handle_invalid_json(
+    def test_invalid_subrecipients_file(
         self,
         mock_get_logger,
-        invalid_subrecipients_json_content,
+        mock_tempfile,
+        mock_boto_client,
+        invalid_json_content,
         sample_subrecipients_generation_event,
-        valid_aws_typing_context: Context,
     ):
+        mock_s3_client = MagicMock()
+        mock_boto_client.return_value = mock_s3_client
         mock_logger = MagicMock()
         mock_get_logger.return_value = mock_logger
 
-        with mock.patch(
-            "src.lib.s3_object_downloader.download_s3_object",
-            side_effect=lambda *args: self.mock_download_s3_object_invalid(
-                *args, invalid_json_content=invalid_subrecipients_json_content
-            ),
-        ):
-            with mock.patch("boto3.client"):
-                with tempfile.NamedTemporaryFile() as recent_subrecipients_file:
-                    with structlog.contextvars.bound_contextvars(
-                        subrecipients_filename=recent_subrecipients_file.name
-                    ):
-                        handle(
-                            sample_subrecipients_generation_event,
-                            valid_aws_typing_context,
-                        )
+        temp_file = NamedTemporaryFile(delete=False)
+        temp_file.write(invalid_json_content.encode())
+        temp_file.seek(0)
+        mock_tempfile.return_value.__enter__.return_value = temp_file
+
+        handle(sample_subrecipients_generation_event, MagicMock())
 
         mock_logger.exception.assert_called_once_with(
-            "Encountered an error parsing subrecipients file"
+            "Subrecipients file for organization org123 and reporting period reporting123 does not contain valid JSON"
+        )
+
+    @patch("src.functions.subrecipient_treasury_report_gen.boto3.client")
+    @patch("src.functions.subrecipient_treasury_report_gen.tempfile.NamedTemporaryFile")
+    @patch("src.functions.subrecipient_treasury_report_gen.get_logger")
+    def test_no_subrecipients_key(
+        self,
+        mock_get_logger,
+        mock_tempfile,
+        mock_boto_client,
+        no_subrecipients_key_json_content,
+        sample_subrecipients_generation_event,
+    ):
+        mock_s3_client = MagicMock()
+        mock_boto_client.return_value = mock_s3_client
+        mock_logger = MagicMock()
+        mock_get_logger.return_value = mock_logger
+
+        temp_file = NamedTemporaryFile(delete=False)
+        temp_file.write(json.dumps(no_subrecipients_key_json_content).encode())
+        temp_file.seek(0)
+        mock_tempfile.return_value.__enter__.return_value = temp_file
+
+        handle(sample_subrecipients_generation_event, MagicMock())
+
+        mock_logger.exception.assert_called_once_with(
+            "Subrecipients file for organization org123 and reporting period reporting123 does not have any subrecipients listed"
+        )
+
+    @patch("src.functions.subrecipient_treasury_report_gen.boto3.client")
+    @patch("src.functions.subrecipient_treasury_report_gen.tempfile.NamedTemporaryFile")
+    @patch("src.functions.subrecipient_treasury_report_gen.get_logger")
+    def test_no_subrecipients_list(
+        self,
+        mock_get_logger,
+        mock_tempfile,
+        mock_boto_client,
+        no_subrecipients_list_json_content,
+        sample_subrecipients_generation_event,
+    ):
+        mock_s3_client = MagicMock()
+        mock_boto_client.return_value = mock_s3_client
+        mock_logger = MagicMock()
+        mock_get_logger.return_value = mock_logger
+
+        temp_file = NamedTemporaryFile(delete=False)
+        temp_file.write(json.dumps(no_subrecipients_list_json_content).encode())
+        temp_file.seek(0)
+        mock_tempfile.return_value.__enter__.return_value = temp_file
+
+        handle(sample_subrecipients_generation_event, MagicMock())
+
+        mock_logger.exception.assert_called_once_with(
+            "Subrecipients file for organization org123 and reporting period reporting123 does not have any subrecipients listed"
+        )
+
+    @patch("src.functions.subrecipient_treasury_report_gen.boto3.client")
+    @patch("src.functions.subrecipient_treasury_report_gen.tempfile.NamedTemporaryFile")
+    @patch("src.functions.subrecipient_treasury_report_gen.get_logger")
+    def test_empty_subrecipients_list(
+        self,
+        mock_get_logger,
+        mock_tempfile,
+        mock_boto_client,
+        empty_subrecipients_list_json_content,
+        sample_subrecipients_generation_event,
+    ):
+        mock_s3_client = MagicMock()
+        mock_boto_client.return_value = mock_s3_client
+        mock_logger = MagicMock()
+        mock_get_logger.return_value = mock_logger
+
+        temp_file = NamedTemporaryFile(delete=False)
+        temp_file.write(json.dumps(empty_subrecipients_list_json_content).encode())
+        temp_file.seek(0)
+        mock_tempfile.return_value.__enter__.return_value = temp_file
+
+        handle(sample_subrecipients_generation_event, MagicMock())
+
+        mock_logger.exception.assert_called_once_with(
+            "Subrecipients file for organization org123 and reporting period reporting123 does not have any subrecipients listed"
         )
