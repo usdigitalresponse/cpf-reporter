@@ -1,7 +1,8 @@
 import type { Upload } from '@prisma/client'
 
-import { deleteUploadFile, s3PutSignedUrl, getSignedUrl } from 'src/lib/aws'
+import { deleteUploadFile, s3PutSignedUrl, getSignedUrl, startStepFunctionExecution } from 'src/lib/aws'
 import { db } from 'src/lib/db'
+import { logger } from 'src/lib/logger'
 
 import {
   updateOrganization
@@ -16,6 +17,7 @@ import {
   downloadUploadFile,
   Upload as UploadRelationResolver,
   getUploadsByExpenditureCategory,
+  sendTreasuryReport
 } from './uploads'
 import type { StandardScenario } from './uploads.scenarios'
 
@@ -25,11 +27,13 @@ import type { StandardScenario } from './uploads.scenarios'
 //       https://redwoodjs.com/docs/testing#testing-services
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
+jest.mock('src/lib/logger')
 jest.mock('src/lib/aws', () => ({
   deleteUploadFile: jest.fn(),
   s3PutSignedUrl: jest.fn(),
   getSignedUrl: jest.fn(),
   getS3UploadFileKey: jest.fn(),
+  startStepFunctionExecution: jest.fn(),
 }))
 
 describe('uploads', () => {
@@ -211,7 +215,6 @@ describe('downloads', () => {
 })
 
 describeScenario<StandardScenario>('uploadCheck', 'getUploads', (getScenario) => {
-
   let scenario: StandardScenario
 
   beforeEach(async () => {
@@ -244,5 +247,56 @@ describeScenario<StandardScenario>('uploadCheck', 'getUploads', (getScenario) =>
       const result = await getUploadsByExpenditureCategory();
       expect(Object.keys(result).length).toEqual(2);
       expect(Object.keys(result).sort()).toEqual(['2A', '1A'].sort());
+  })
+})
+
+describe('treasury report', () => {
+  beforeEach(() => {
+    jest.resetAllMocks()
+    process.env.TREASURY_STEP_FUNCTION_ARN = 'test-arn'
+  })
+  
+  scenario('successfully sends a treasury report', async (scenario: StandardScenario) => {
+    mockCurrentUser(scenario.user.one)
+    const mockOrganization = scenario.organization.one
+    const mockReportingPeriod = scenario.reportingPeriod.one
+    const uploadsByExpenditureCategory = await getUploadsByExpenditureCategory()
+
+    const input = JSON.stringify({
+      reportingPeriod: mockReportingPeriod.name,
+      organization: mockOrganization.name,
+      email: scenario.user.one.email,
+      uploadsByExpenditureCategory,
+    })
+    const result = await sendTreasuryReport()
+  
+    expect(result).toBe(true)
+    expect(startStepFunctionExecution).toHaveBeenCalledWith(
+      'test-arn',
+      undefined,
+      input,
+      ''
+    )
+    expect(logger.info).toHaveBeenCalledWith(uploadsByExpenditureCategory)
+    expect(logger.info).toHaveBeenCalledWith('Sending Treasury Report') 
+  })
+
+  scenario('handles errors and returns false', async (scenario: StandardScenario) => {
+    mockCurrentUser(scenario.user.one)
+    db.organization.findFirst = jest.fn().mockRejectedValue(new Error('Database error'))
+
+    const result = await sendTreasuryReport()
+
+    expect(result).toBe(false)
+    expect(logger.error).toHaveBeenCalledWith(expect.any(Error), 'Error sending Treasury Report')
+  })
+
+  scenario('handles missing TREASURY_STEP_FUNCTION_ARN', async (scenario: StandardScenario) => {
+    mockCurrentUser(scenario.user.one)
+    delete process.env.TREASURY_STEP_FUNCTION_ARN
+    const result = await sendTreasuryReport()
+
+    expect(result).toBe(false)
+    expect(logger.error).toHaveBeenCalledWith(expect.any(Error), 'Error sending Treasury Report')
   })
 })
