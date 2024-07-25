@@ -203,6 +203,7 @@ export type Mutation = {
   deleteUser: User;
   deleteValidationRules: ValidationRules;
   downloadUploadFile: Scalars['String'];
+  sendTreasuryReport: Scalars['Boolean'];
   updateAgency: Agency;
   updateExpenditureCategory: ExpenditureCategory;
   updateInputTemplate: InputTemplate;
@@ -1142,6 +1143,7 @@ export type MutationResolvers<ContextType = RedwoodGraphQLContext, ParentType ex
   deleteUser: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationdeleteUserArgs, 'id'>>;
   deleteValidationRules: Resolver<ResolversTypes['ValidationRules'], ParentType, ContextType, RequireFields<MutationdeleteValidationRulesArgs, 'id'>>;
   downloadUploadFile: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationdownloadUploadFileArgs, 'id'>>;
+  sendTreasuryReport: OptArgsResolverFn<ResolversTypes['Boolean'], ParentType, ContextType>;
   updateAgency: Resolver<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationupdateAgencyArgs, 'id' | 'input'>>;
   updateExpenditureCategory: Resolver<ResolversTypes['ExpenditureCategory'], ParentType, ContextType, RequireFields<MutationupdateExpenditureCategoryArgs, 'id' | 'input'>>;
   updateInputTemplate: Resolver<ResolversTypes['InputTemplate'], ParentType, ContextType, RequireFields<MutationupdateInputTemplateArgs, 'id' | 'input'>>;
@@ -1186,6 +1188,7 @@ export type MutationRelationResolvers<ContextType = RedwoodGraphQLContext, Paren
   deleteUser?: RequiredResolverFn<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationdeleteUserArgs, 'id'>>;
   deleteValidationRules?: RequiredResolverFn<ResolversTypes['ValidationRules'], ParentType, ContextType, RequireFields<MutationdeleteValidationRulesArgs, 'id'>>;
   downloadUploadFile?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationdownloadUploadFileArgs, 'id'>>;
+  sendTreasuryReport?: RequiredResolverFn<ResolversTypes['Boolean'], ParentType, ContextType>;
   updateAgency?: RequiredResolverFn<ResolversTypes['Agency'], ParentType, ContextType, RequireFields<MutationupdateAgencyArgs, 'id' | 'input'>>;
   updateExpenditureCategory?: RequiredResolverFn<ResolversTypes['ExpenditureCategory'], ParentType, ContextType, RequireFields<MutationupdateExpenditureCategoryArgs, 'id' | 'input'>>;
   updateInputTemplate?: RequiredResolverFn<ResolversTypes['InputTemplate'], ParentType, ContextType, RequireFields<MutationupdateInputTemplateArgs, 'id' | 'input'>>;
