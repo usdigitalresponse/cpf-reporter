@@ -592,13 +592,13 @@ module "lambda_function-subrecipientTreasuryReportGen" {
     DD_LOGS_INJECTION = "true"
   })
 
-  // Triggers -- TODO uncomment the below when step function code is added
-  # allowed_triggers = {
-  #   StepFunctionTrigger = {
-  #     principal  = "states.amazonaws.com"
-  #     source_arn = put_correct_trigger_here.arn
-  #   }
-  # }
+  allowed_triggers = {
+    StepFunctionTrigger = {
+      principal  = "states.amazonaws.com"
+      source_arn = module.step_function.arn
+    }
+  
+  }
 }
 
 module "lambda_function-treasuryReportGeneration" {
@@ -693,6 +693,10 @@ module "lambda_function-treasuryReportGeneration" {
     S3BucketNotification = {
       principal  = "s3.amazonaws.com"
       source_arn = module.reporting_data_bucket.bucket_arn
+    }
+    StepFunctionTrigger = {
+      principal  = "states.amazonaws.com"
+      source_arn = module.step_function.arn
     }
   }
 }
