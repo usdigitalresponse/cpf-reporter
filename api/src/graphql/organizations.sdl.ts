@@ -23,6 +23,15 @@ export const schema = gql`
     name: String
   }
 
+  input NewTreasuryGenerationInput {
+    organizationId: Int
+    payload: JSON!
+  }
+
+  type TreasuryReportGenerationPayload {
+    response: JSON
+  }
+
   type Mutation {
     createOrganization(input: CreateOrganizationInput!): Organization!
       @requireAuth
@@ -34,6 +43,9 @@ export const schema = gql`
     createOrganizationAgencyAdmin(
       input: CreateOrgAgencyAdminInput!
     ): CreateOrgAgencyAdminPayload @requireAuth
+    kickOffTreasuryReportGeneration(
+      input: NewTreasuryGenerationInput!
+    ): TreasuryReportGenerationPayload @requireAuth
   }
 
   input CreateOrgAgencyAdminInput {

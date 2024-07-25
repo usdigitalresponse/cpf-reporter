@@ -3,6 +3,7 @@ import type {
   QueryResolvers,
   MutationResolvers,
   OrganizationRelationResolvers,
+  Agency,
 } from 'types/graphql'
 
 import { db } from 'src/lib/db'
@@ -73,6 +74,34 @@ export const getOrCreateOrganization = async (orgName, reportingPeriodName) => {
     logger.error(error, `Error getting or creating organization: ${orgName}`)
   }
 }
+
+export const kickOffTreasuryReportGeneration: MutationResolvers['kickOffTreasuryReportGeneration'] =
+  async ({ input }) => {
+    let { organizationId } = input
+    const { payload } = input
+
+    if (!organizationId) {
+      logger.info('Using current user agency to determine organization')
+      organizationId = (context.currentUser.agency as Agency).organizationId
+    }
+    // Get the organization
+    const organization = await db.organization.findUnique({
+      where: { id: organizationId },
+    })
+
+    if (!organization) {
+      throw new Error(`Organization with id ${organizationId} not found`)
+    }
+
+    // Do something with the payload
+    logger.info(
+      `Kicking off treasury report generation for ${organization.name}`
+    )
+    logger.info(`Payload: ${JSON.stringify(payload)}`)
+
+    // Return the payload
+    return { response: payload }
+  }
 
 export const createOrganizationAgencyAdmin: MutationResolvers['createOrganizationAgencyAdmin'] =
   async ({ input }) => {
