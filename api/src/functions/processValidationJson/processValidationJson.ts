@@ -1,5 +1,5 @@
 import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
-import { Prisma } from '@prisma/client'
+import { Prisma, Version } from '@prisma/client'
 import { S3Handler, S3ObjectCreatedNotificationEvent } from 'aws-lambda'
 
 import aws from 'src/lib/aws'
@@ -45,6 +45,7 @@ type ResultSchema = {
   }[]
   projectUseCode: string
   subrecipients: Subrecipient[]
+  versionString: string
 }
 
 type UploadValidationS3Client = {
@@ -196,12 +197,46 @@ export const processRecord = async (
     }
 
     // If we passed validation, we will save the subrecipient info into our DB
-    if (passed) {
+    if (passed && result.subrecipients?.length) {
+      const organizationId = extractOrganizationIdFromKey(key)
       result.subrecipients.forEach((subrecipient) =>
-        saveSubrecipientInfo(subrecipient, key, uploadId)
+        saveSubrecipientInfo(
+          subrecipient,
+          key,
+          uploadId,
+          result.versionString,
+          organizationId
+        )
       )
+
+      let reportingPeriod
       try {
-        // TODO upload a subrecipients JSON file to S3
+        reportingPeriod = (
+          await db.upload.findUnique({
+            where: { id: uploadId },
+            include: { reportingPeriod: true },
+          })
+        ).reportingPeriod
+      } catch (err) {
+        logger.error(`Could not find reporting period for upload ${uploadId}`)
+        throw new Error('Error determining reporting period for upload')
+      }
+
+      try {
+        const subrecipientKey = `/${organizationId}/${reportingPeriod.id}/subrecipients`
+        const { startDate, endDate } = reportingPeriod
+        const subrecipientsWithUploads = await db.subrecipient.findMany({
+          where: { createdAt: { lte: endDate, gte: startDate } },
+          include: { subrecipientUploads: true },
+        })
+        const subrecipients = {
+          subrecipients: subrecipientsWithUploads,
+        }
+        await aws.sendPutObjectToS3Bucket(
+          bucket,
+          subrecipientKey,
+          JSON.stringify(subrecipients)
+        )
       } catch (err) {
         logger.error(`Error saving subrecipients JSON file to S3: ${err}`)
         throw new Error('Error saving subrecipient info to S3')
@@ -228,8 +263,18 @@ export const processRecord = async (
 async function saveSubrecipientInfo(
   subrecipientInput: Subrecipient,
   key: string,
-  uploadId: number
+  uploadId: number,
+  versionString: string,
+  organizationId: number
 ) {
+  let version = Version[versionString]
+  if (!version) {
+    version = Version.V2024_05_24
+    logger.error(
+      `Error obtaining version from version passed in results ${versionString}, falling back on ${version}`
+    )
+  }
+
   try {
     const ueiTinCombo = `${subrecipientInput.Unique_Entity_Identifier__c}_${subrecipientInput.EIN__c}`
     // Per documentation here: https://www.prisma.io/docs/orm/prisma-client/queries/crud#update-or-create-records
@@ -239,7 +284,7 @@ async function saveSubrecipientInfo(
       create: {
         name: subrecipientInput.Name,
         ueiTinCombo,
-        organizationId: extractOrganizationIdFromKey(key),
+        organizationId,
       },
       update: {},
     })
@@ -248,7 +293,7 @@ async function saveSubrecipientInfo(
         subrecipientId: subrecipient.id,
         uploadId,
         rawSubrecipient: subrecipientInput,
-        version: 'V2024_05_24', // TODO -- we should pass the version enum through on the `ResultsSchema` as well, for now just using the latest one
+        version,
       },
       update: {
         rawSubrecipient: subrecipientInput,
