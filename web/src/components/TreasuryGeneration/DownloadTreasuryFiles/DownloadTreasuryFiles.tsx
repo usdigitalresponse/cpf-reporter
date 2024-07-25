@@ -13,7 +13,8 @@ const DOWNLOAD_TREASURY_FILE = gql`
 
 const DownloadTreasuryFiles = () => {
   const [downloadTreasuryFile] = useMutation(DOWNLOAD_TREASURY_FILE, {
-    onCompleted: (fileLink) => {
+    onCompleted: ({ downloadTreasuryFile }) => {
+      const { fileLink } = downloadTreasuryFile
       console.log(fileLink)
       console.log('Opening treasury file link in new tab..')
       window.open(fileLink, '_blank').focus()
@@ -25,7 +26,7 @@ const DownloadTreasuryFiles = () => {
   const onClick = (event) => {
     console.log(event.target.getAttribute('name'))
     downloadTreasuryFile({
-      variables: { fileType: event.target.getAttribute('name') },
+      variables: { input: { fileType: event.target.getAttribute('name') } },
     })
   }
 
