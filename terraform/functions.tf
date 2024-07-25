@@ -301,6 +301,17 @@ module "lambda_function-graphql" {
         "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
       ]
     }
+    AllowDownloadTreasuryCSVFiles = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:HeadObject",
+      ]
+      resources = [
+        # Path: treasuryreports/{organization_id}/{reporting_period_id}/{filename}.csv
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.csv",
+      ]
+    }
   }
 
   // Artifacts
