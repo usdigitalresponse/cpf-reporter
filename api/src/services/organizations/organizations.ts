@@ -86,6 +86,10 @@ export const downloadTreasuryFile: MutationResolvers['downloadTreasuryFile'] =
       where: { id: organizationId },
     })
 
+    if (!organization) {
+      throw new Error(`Organization with id ${organizationId} not found`)
+    }
+
     // Retrieve the signed URL for the treasury file
     logger.info(`Downloading treasury file for ${fileType}`)
     const url = await aws.getTreasurySignedUrl(

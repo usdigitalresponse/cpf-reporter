@@ -1,5 +1,7 @@
 import type { Organization } from '@prisma/client'
 
+import { getTreasurySignedUrl } from 'src/lib/aws'
+
 import {
   organizations,
   organization,
@@ -7,6 +9,7 @@ import {
   updateOrganization,
   deleteOrganization,
   getOrCreateOrganization,
+  downloadTreasuryFile,
 } from './organizations'
 import type { StandardScenario } from './organizations.scenarios'
 
@@ -15,6 +18,10 @@ import type { StandardScenario } from './organizations.scenarios'
 //           Please refer to the RedwoodJS Testing Docs:
 //       https://redwoodjs.com/docs/testing#testing-services
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
+
+jest.mock('src/lib/aws', () => ({
+  getTreasurySignedUrl: jest.fn(),
+}))
 
 describe('organizations', () => {
   scenario(
@@ -83,4 +90,53 @@ describe('organizations', () => {
 
     expect(result).toEqual(null)
   })
+})
+
+describe('downloads', () => {
+  scenario('returns a download link', async (scenario: StandardScenario) => {
+    mockCurrentUser({
+      id: 1,
+      email: 'admin@usdr.dev',
+      role: 'USDR_ADMIN',
+      roles: ['USDR_ADMIN'],
+      agencyId: 1,
+      name: 'Admin',
+      agency: {
+        id: 1,
+        name: 'USDR',
+        code: 'USDR',
+        organizationId: scenario.organization.one.id,
+      },
+      createdAt: '2022-02-02T00:00:00Z',
+      updatedAt: '2022-02-02T00:00:00Z',
+      uploaded: [],
+    })
+    await downloadTreasuryFile({ input: { fileType: '1A' } })
+    expect(getTreasurySignedUrl).toHaveBeenCalled()
+  })
+  scenario(
+    'throws error when invalid organization is provided',
+    async (_scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: 1,
+        email: 'admin@usdr.dev',
+        role: 'USDR_ADMIN',
+        roles: ['USDR_ADMIN'],
+        agencyId: 1,
+        name: 'Admin',
+        agency: {
+          id: 1,
+          name: 'USDR',
+          code: 'USDR',
+          organizationId: 99999,
+        },
+        createdAt: '2022-02-02T00:00:00Z',
+        updatedAt: '2022-02-02T00:00:00Z',
+        uploaded: [],
+      })
+      await expect(
+        downloadTreasuryFile({ input: { fileType: '1A' } })
+      ).rejects.toThrow('Organization with id 99999 not found')
+    }
+  )
 })
