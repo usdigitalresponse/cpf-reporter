@@ -67,7 +67,7 @@ module "lambda_function-subrecipientTreasuryReportGen" {
   allowed_triggers = {
     StepFunctionTrigger = {
       principal  = "states.amazonaws.com"
-      source_arn = module.step_function.arn
+      source_arn = module.treasury_generation_step_function.state_machine_arn
     }
 
   }
@@ -168,7 +168,7 @@ module "lambda_function-treasuryReportGeneration" {
     }
     StepFunctionTrigger = {
       principal  = "states.amazonaws.com"
-      source_arn = module.step_function.arn
+      source_arn = module.treasury_generation_step_function.state_machine_arn
     }
   }
 }
