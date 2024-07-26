@@ -1,6 +1,6 @@
 import type { Organization } from '@prisma/client'
 
-import { getTreasurySignedUrl } from 'src/lib/aws'
+import { getTreasurySignedUrl, startStepFunctionExecution } from 'src/lib/aws'
 
 import {
   organizations,
@@ -10,6 +10,7 @@ import {
   deleteOrganization,
   getOrCreateOrganization,
   downloadTreasuryFile,
+  kickOffTreasuryReportGeneration,
 } from './organizations'
 import type { StandardScenario } from './organizations.scenarios'
 
@@ -21,6 +22,7 @@ import type { StandardScenario } from './organizations.scenarios'
 
 jest.mock('src/lib/aws', () => ({
   getTreasurySignedUrl: jest.fn(),
+  startStepFunctionExecution: jest.fn(),
 }))
 
 describe('organizations', () => {
@@ -92,7 +94,7 @@ describe('organizations', () => {
   })
 })
 
-describe('downloads', () => {
+describe('download treasury file', () => {
   scenario('returns a download link', async (scenario: StandardScenario) => {
     mockCurrentUser({
       id: 1,
@@ -136,6 +138,88 @@ describe('downloads', () => {
       })
       await expect(
         downloadTreasuryFile({ input: { fileType: '1A' } })
+      ).rejects.toThrow('Organization with id 99999 not found')
+    }
+  )
+})
+
+describe('kickOff Treasury file generation', () => {
+  scenario(
+    'successful kickoff with a valid organization',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: 1,
+        email: 'admin@usdr.dev',
+        role: 'USDR_ADMIN',
+        roles: ['USDR_ADMIN'],
+        agencyId: 1,
+        name: 'Admin',
+        agency: {
+          id: 1,
+          name: 'USDR',
+          code: 'USDR',
+          organizationId: scenario.organization.one.id,
+        },
+        createdAt: '2022-02-02T00:00:00Z',
+        updatedAt: '2022-02-02T00:00:00Z',
+        uploaded: [],
+      })
+      await kickOffTreasuryReportGeneration({
+        input: { organizationId: scenario.organization.one.id, payload: {} },
+      })
+      expect(startStepFunctionExecution).toHaveBeenCalled()
+    }
+  )
+  scenario(
+    'successful kickoff with current user organization',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: 1,
+        email: 'admin@usdr.dev',
+        role: 'USDR_ADMIN',
+        roles: ['USDR_ADMIN'],
+        agencyId: 1,
+        name: 'Admin',
+        agency: {
+          id: 1,
+          name: 'USDR',
+          code: 'USDR',
+          organizationId: scenario.organization.one.id,
+        },
+        createdAt: '2022-02-02T00:00:00Z',
+        updatedAt: '2022-02-02T00:00:00Z',
+        uploaded: [],
+      })
+      await kickOffTreasuryReportGeneration({
+        input: { payload: {} },
+      })
+      expect(startStepFunctionExecution).toHaveBeenCalled()
+    }
+  )
+  scenario(
+    'throws error when invalid organization is provided',
+    async (_scenario: StandardScenario) => {
+      mockCurrentUser({
+        id: 1,
+        email: 'admin@usdr.dev',
+        role: 'USDR_ADMIN',
+        roles: ['USDR_ADMIN'],
+        agencyId: 1,
+        name: 'Admin',
+        agency: {
+          id: 1,
+          name: 'USDR',
+          code: 'USDR',
+          organizationId: 99999,
+        },
+        createdAt: '2022-02-02T00:00:00Z',
+        updatedAt: '2022-02-02T00:00:00Z',
+        uploaded: [],
+      })
+      await expect(
+        kickOffTreasuryReportGeneration({
+          input: { organizationId: 99999, payload: {} },
+        })
       ).rejects.toThrow('Organization with id 99999 not found')
     }
   )

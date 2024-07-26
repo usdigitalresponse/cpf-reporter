@@ -120,14 +120,19 @@ export const kickOffTreasuryReportGeneration: MutationResolvers['kickOffTreasury
       throw new Error(`Organization with id ${organizationId} not found`)
     }
 
-    // Do something with the payload
+    // kick off the step function for treasury report generation
     logger.info(
       `Kicking off treasury report generation for ${organization.name}`
     )
-    logger.info(`Payload: ${JSON.stringify(payload)}`)
+    const response = await aws.startStepFunctionExecution(
+      process.env.TREASURY_STEP_FUNCTION_ARN,
+      `manual-treasury-report-generation-${Date.now()}`,
+      payload,
+      `${organizationId}-${Date.now()}`
+    )
 
-    // Return the payload
-    return { response: payload }
+    // Return the step function execution response
+    return { response: JSON.stringify(response) }
   }
 
 export const createOrganizationAgencyAdmin: MutationResolvers['createOrganizationAgencyAdmin'] =

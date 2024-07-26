@@ -29,7 +29,7 @@ export const schema = gql`
   }
 
   type TreasuryReportGenerationPayload {
-    response: JSON
+    response: String
   }
 
   input DownloadTreasuryFileInput {

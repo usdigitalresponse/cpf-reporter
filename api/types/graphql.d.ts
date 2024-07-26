@@ -701,7 +701,7 @@ export type TreasuryFilePayload = {
 
 export type TreasuryReportGenerationPayload = {
   __typename?: 'TreasuryReportGenerationPayload';
-  response?: Maybe<Scalars['JSON']>;
+  response?: Maybe<Scalars['String']>;
 };
 
 export type UpdateAgencyInput = {
@@ -1513,12 +1513,12 @@ export type TreasuryFilePayloadRelationResolvers<ContextType = RedwoodGraphQLCon
 };
 
 export type TreasuryReportGenerationPayloadResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['TreasuryReportGenerationPayload'] = ResolversParentTypes['TreasuryReportGenerationPayload']> = {
-  response: OptArgsResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
+  response: OptArgsResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type TreasuryReportGenerationPayloadRelationResolvers<ContextType = RedwoodGraphQLContext, ParentType extends ResolversParentTypes['TreasuryReportGenerationPayload'] = ResolversParentTypes['TreasuryReportGenerationPayload']> = {
-  response?: RequiredResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
+  response?: RequiredResolverFn<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
