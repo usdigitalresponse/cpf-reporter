@@ -1,133 +1,131 @@
 module "step_function" {
   source = "terraform-aws-modules/step-functions/aws"
 
-  name       = "generate-treasury-report"
-  definition = <<EOF
-{
-  "Comment": "Generate all the files for a treasury report",
-  "StartAt": "Parallel",
-  "States": {
-    "Parallel": {
-      "Type": "Parallel",
-      "End": true,
-      "Branches": [
-        {
-          "StartAt": "Generate Project 1A File",
-          "States": {
-            "Generate Project 1A File": {
-              "Type": "Task",
-              "Resource": "arn:aws:states:::lambda:invoke",
-              "OutputPath": "$.Payload",
-              "Parameters": {
-                "Payload.$": "$",
-                "FunctionName": "${module.lambda_function-treasuryReportGeneration["1A"].lambda_function_arn}"
-              },
-              "Retry": [
-                {
-                  "ErrorEquals": [
-                    "Lambda.ServiceException",
-                    "Lambda.AWSLambdaException",
-                    "Lambda.SdkClientException",
-                    "Lambda.TooManyRequestsException"
-                  ],
-                  "IntervalSeconds": 1,
-                  "MaxAttempts": 2,
-                  "BackoffRate": 2
-                }
-              ],
-              "End": true
+  name = "generate-treasury-report"
+  definition = jsonencode({
+    "Comment" : "Generate all the files for a treasury report",
+    "StartAt" : "Parallel",
+    "States" : {
+      "Parallel" : {
+        "Type" : "Parallel",
+        "End" : true,
+        "Branches" : [
+          {
+            "StartAt" : "Generate Project 1A File",
+            "States" : {
+              "Generate Project 1A File" : {
+                "Type" : "Task",
+                "Resource" : "arn:aws:states:::lambda:invoke",
+                "OutputPath" : "$.Payload",
+                "Parameters" : {
+                  "Payload.$" : "$",
+                  "FunctionName" : module.lambda_function-treasuryReportGeneration["1A"].lambda_function_arn
+                },
+                "Retry" : [
+                  {
+                    "ErrorEquals" : [
+                      "Lambda.ServiceException",
+                      "Lambda.AWSLambdaException",
+                      "Lambda.SdkClientException",
+                      "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds" : 1,
+                    "MaxAttempts" : 2,
+                    "BackoffRate" : 2
+                  }
+                ],
+                "End" : true
+              }
+            }
+          },
+          {
+            "StartAt" : "Generate Project 1B File",
+            "States" : {
+              "Generate Project 1B File" : {
+                "Type" : "Task",
+                "Resource" : "arn:aws:states:::lambda:invoke",
+                "OutputPath" : "$.Payload",
+                "Parameters" : {
+                  "Payload.$" : "$",
+                  "FunctionName" : module.lambda_function-treasuryReportGeneration["1B"].lambda_function_arn
+                },
+                "Retry" : [
+                  {
+                    "ErrorEquals" : [
+                      "Lambda.ServiceException",
+                      "Lambda.AWSLambdaException",
+                      "Lambda.SdkClientException",
+                      "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds" : 1,
+                    "MaxAttempts" : 2,
+                    "BackoffRate" : 2
+                  }
+                ],
+                "End" : true
+              }
+            }
+          },
+          {
+            "StartAt" : "Generate Project 1C File",
+            "States" : {
+              "Generate Project 1C File" : {
+                "Type" : "Task",
+                "Resource" : "arn:aws:states:::lambda:invoke",
+                "OutputPath" : "$.Payload",
+                "Parameters" : {
+                  "Payload.$" : "$",
+                  "FunctionName" : module.lambda_function-treasuryReportGeneration["1C"].lambda_function_arn
+                },
+                "Retry" : [
+                  {
+                    "ErrorEquals" : [
+                      "Lambda.ServiceException",
+                      "Lambda.AWSLambdaException",
+                      "Lambda.SdkClientException",
+                      "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds" : 1,
+                    "MaxAttempts" : 2,
+                    "BackoffRate" : 2
+                  }
+                ],
+                "End" : true
+              }
+            }
+          },
+          {
+            "StartAt" : "Generate Subrecipient File",
+            "States" : {
+              "Generate Subrecipient File" : {
+                "Type" : "Task",
+                "Resource" : "arn:aws:states:::lambda:invoke",
+                "OutputPath" : "$.Payload",
+                "Parameters" : {
+                  "Payload.$" : "$",
+                  "FunctionName" : module.lambda_function-subrecipientTreasuryReportGen.lambda_function_arn
+                },
+                "Retry" : [
+                  {
+                    "ErrorEquals" : [
+                      "Lambda.ServiceException",
+                      "Lambda.AWSLambdaException",
+                      "Lambda.SdkClientException",
+                      "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds" : 1,
+                    "MaxAttempts" : 2,
+                    "BackoffRate" : 2
+                  }
+                ],
+                "End" : true
+              }
             }
           }
-        },
-        {
-          "StartAt": "Generate Project 1B File",
-          "States": {
-            "Generate Project 1B File": {
-              "Type": "Task",
-              "Resource": "arn:aws:states:::lambda:invoke",
-              "OutputPath": "$.Payload",
-              "Parameters": {
-                "Payload.$": "$",
-                "FunctionName": "${module.lambda_function-treasuryReportGeneration["1B"].lambda_function_arn}"
-              },
-              "Retry": [
-                {
-                  "ErrorEquals": [
-                    "Lambda.ServiceException",
-                    "Lambda.AWSLambdaException",
-                    "Lambda.SdkClientException",
-                    "Lambda.TooManyRequestsException"
-                  ],
-                  "IntervalSeconds": 1,
-                  "MaxAttempts": 2,
-                  "BackoffRate": 2
-                }
-              ],
-              "End": true
-            }
-          }
-        },
-        {
-          "StartAt": "Generate Project 1C File",
-          "States": {
-            "Generate Project 1C File": {
-              "Type": "Task",
-              "Resource": "arn:aws:states:::lambda:invoke",
-              "OutputPath": "$.Payload",
-              "Parameters": {
-                "Payload.$": "$",
-                "FunctionName": "${module.lambda_function-treasuryReportGeneration["1C"].lambda_function_arn}"
-              },
-              "Retry": [
-                {
-                  "ErrorEquals": [
-                    "Lambda.ServiceException",
-                    "Lambda.AWSLambdaException",
-                    "Lambda.SdkClientException",
-                    "Lambda.TooManyRequestsException"
-                  ],
-                  "IntervalSeconds": 1,
-                  "MaxAttempts": 2,
-                  "BackoffRate": 2
-                }
-              ],
-              "End": true
-            }
-          }
-        },
-        {
-          "StartAt": "Generate Subrecipient File",
-          "States": {
-            "Generate Subrecipient File": {
-              "Type": "Task",
-              "Resource": "arn:aws:states:::lambda:invoke",
-              "OutputPath": "$.Payload",
-              "Parameters": {
-                "Payload.$": "$",
-                "FunctionName": "${module.lambda_function-subrecipientTreasuryReportGen.lambda_function_arn}"
-              },
-              "Retry": [
-                {
-                  "ErrorEquals": [
-                    "Lambda.ServiceException",
-                    "Lambda.AWSLambdaException",
-                    "Lambda.SdkClientException",
-                    "Lambda.TooManyRequestsException"
-                  ],
-                  "IntervalSeconds": 1,
-                  "MaxAttempts": 2,
-                  "BackoffRate": 2
-                }
-              ],
-              "End": true
-            }
-          }
-        }
-      ]
+        ]
+      }
     }
-  }
-}
-EOF
+  })
 
   service_integrations = {
     lambda = {
