@@ -1,4 +1,4 @@
-module "step_function" {
+module "treasury_generation_step_function" {
   source = "terraform-aws-modules/step-functions/aws"
 
   name = "generate-treasury-report"

@@ -312,6 +312,16 @@ module "lambda_function-graphql" {
         "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.csv",
       ]
     }
+
+    AllowStepFunctionInvocation = {
+      effect = "Allow"
+      actions = [
+        "states:StartExecution"
+      ]
+      resources = [
+        module.treasury_generation_step_function.state_machine_arn
+      ]
+    }
   }
 
   // Artifacts
