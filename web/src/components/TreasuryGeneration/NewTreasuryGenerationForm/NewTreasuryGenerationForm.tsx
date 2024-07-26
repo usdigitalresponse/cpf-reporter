@@ -26,17 +26,9 @@ const NewTreasuryGenerationForm = (props: NewOrganizationFormProps) => {
     formMethods.reset()
   }
 
-  const onSubmit = (data) => {
-    const { payload } = data
-
-    onSave({
-      payload,
-    })
-  }
-
   return (
     <Form
-      onSubmit={onSubmit}
+      onSubmit={({ payload }) => onSave({ payload })}
       formMethods={formMethods}
       error={error}
       className={hasErrors ? 'was-validated' : ''}
