@@ -1,5 +1,5 @@
 import tempfile
-from typing import IO, Any, Dict
+from typing import Any, Dict
 
 import boto3
 import structlog
@@ -8,7 +8,7 @@ from aws_lambda_typing.context import Context
 from mypy_boto3_s3.client import S3Client
 
 from src.lib.logging import reset_contextvars, get_logger
-from src.lib.s3_object_downloader import download_s3_object
+from src.lib.s3_helper import download_s3_object, check_key_exists
 
 BUCKET_NAME = "cpf-reporter"
 
@@ -38,6 +38,7 @@ def handle(event: Dict[str, Any], context: Context):
     organization_id = ...
     reporting_period_id = ...
     output_template_id = ...
+    user_id = ...
 
     try:
         reporting_period_id = event["organization"]["preferences"][
@@ -45,14 +46,12 @@ def handle(event: Dict[str, Any], context: Context):
         ]
         organization_id = event["organization"]["id"]
         output_template_id = event["outputTemplateId"]
+        user_id = event["user"]["id"]
     except KeyError as e:
         logger.exception(
             f"Exception getting reporting period or organization id from event -- missing field: {e}"
         )
         return
-
-    # For format, remove when using
-    print(output_template_id)
 
     subrecipients_file_key = f"/{organization_id}/{reporting_period_id}/subrecipients"
 
@@ -70,7 +69,7 @@ def handle(event: Dict[str, Any], context: Context):
                 recent_subrecipients_file,
             )
 
-    recent_subrecipients_file.seek(0)
+        recent_subrecipients_file.seek(0)
     try:
         recent_subrecipients = json.load(recent_subrecipients_file)
     except json.JSONDecodeError:
@@ -87,12 +86,36 @@ def handle(event: Dict[str, Any], context: Context):
 
     logger.info("The 'subrecipients' list is not empty.")
 
-    subrecipient_template = generate_subrecipient_template(
-        recent_subrecipients_file=recent_subrecipients_file
+    output_file = tempfile.NamedTemporaryFile()
+    upload_template_location_minus_filetype = f"/treasuryreports/{organization_id}/{reporting_period_id}/{user_id}/CPFSubrecipientTemplate"
+    upload_template_xlsx_key = f"{upload_template_location_minus_filetype}.xlsx"
+    # upload_template_csv_key = f"/{upload_template_location_minus_filetype}.csv"
+    download_subrecipient_template_to_output_file(
+        s3_client, output_file, output_template_id, upload_template_xlsx_key
     )
+
+    subrecipient_template = generate_subrecipient_template(
+        recent_subrecipients=recent_subrecipients, output_file=output_file
+    )
+    # Save subrecipient_template to S3
     print(subrecipient_template)
 
-    # Save subrecipient_template to S3
+    output_file.close()
+    recent_subrecipients_file.close()
+
+
+def download_subrecipient_template_to_output_file(
+    s3_client, output_file, output_template_id, upload_template_xlsx_key
+):
+    output_template_key = f"/treasuryreports/output-templates/{output_template_id}/CPFSubrecipientTemplate.xlsx"
+    if check_key_exists(
+        client=s3_client, bucket=BUCKET_NAME, key=upload_template_xlsx_key
+    ):
+        download_s3_object(
+            s3_client, BUCKET_NAME, upload_template_xlsx_key, output_file
+        )
+    else:
+        download_s3_object(s3_client, BUCKET_NAME, output_template_key, output_file)
 
 
 def no_subrecipients_in_file(recent_subrecipients):
@@ -103,6 +126,8 @@ def no_subrecipients_in_file(recent_subrecipients):
     )
 
 
-def generate_subrecipient_template(recent_subrecipients_file: IO[bytes]):
-    print(recent_subrecipients_file)
+def generate_subrecipient_template(recent_subrecipients, output_file):
+    # Load outputfile with openpyxl
+    # Go through recent_subrecipients, cast each one to a SubrecipientRow and add them to the output file
+    print(recent_subrecipients, output_file)
     return None

@@ -11,7 +11,7 @@ from mypy_boto3_s3.client import S3Client
 
 from src.lib.logging import get_logger, reset_contextvars
 from src.lib.workbook_validator import validate
-from src.lib.s3_object_downloader import download_s3_object
+from src.lib.s3_helper import download_s3_object
 
 type ValidationResults = Dict[str, Union[List[Dict[str, str]], str, None]]
 

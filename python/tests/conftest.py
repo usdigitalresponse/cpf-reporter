@@ -329,6 +329,9 @@ def sample_subrecipients_generation_event():
             "preferences": {"current_reporting_period_id": "reporting123"},
         },
         "outputTemplateId": "template123",
+        "user": {
+            "id": 1,
+        },
     }
 
 
