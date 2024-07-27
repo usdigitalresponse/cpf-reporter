@@ -89,7 +89,6 @@ export type CreateReportingPeriodInput = {
   endDate: Scalars['DateTime'];
   inputTemplateId: Scalars['Int'];
   name: Scalars['String'];
-  organizationId: Scalars['Int'];
   outputTemplateId: Scalars['Int'];
   startDate: Scalars['DateTime'];
 };
@@ -424,7 +423,6 @@ export type Organization = {
   name: Scalars['String'];
   preferences?: Maybe<Scalars['JSON']>;
   projects: Array<Maybe<Project>>;
-  reportingPeriods: Array<Maybe<ReportingPeriod>>;
   subrecipients: Array<Maybe<Subrecipient>>;
   users: Array<Maybe<User>>;
 };
@@ -607,8 +605,6 @@ export type ReportingPeriod = {
   inputTemplate: InputTemplate;
   inputTemplateId: Scalars['Int'];
   name: Scalars['String'];
-  organization: Organization;
-  organizationId: Scalars['Int'];
   outputTemplate: OutputTemplate;
   outputTemplateId: Scalars['Int'];
   projects: Array<Maybe<Project>>;
@@ -698,7 +694,6 @@ export type UpdateReportingPeriodInput = {
   endDate?: InputMaybe<Scalars['DateTime']>;
   inputTemplateId?: InputMaybe<Scalars['Int']>;
   name?: InputMaybe<Scalars['String']>;
-  organizationId?: InputMaybe<Scalars['Int']>;
   outputTemplateId?: InputMaybe<Scalars['Int']>;
   startDate?: InputMaybe<Scalars['DateTime']>;
 };
@@ -889,7 +884,7 @@ export type FindOrganizationQueryVariables = Exact<{
 }>;
 
 
-export type FindOrganizationQuery = { __typename?: 'Query', organization?: { __typename?: 'Organization', id: number, preferences?: Prisma.JsonValue | null, reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, name: string } | null> } | null, agencies: Array<{ __typename?: 'Agency', id: number, name: string }> };
+export type FindOrganizationQuery = { __typename?: 'Query', organization?: { __typename?: 'Organization', id: number, preferences?: Prisma.JsonValue | null } | null, agencies: Array<{ __typename?: 'Agency', id: number, name: string }> };
 
 export type FindOrganizationsVariables = Exact<{ [key: string]: never; }>;
 
@@ -901,7 +896,7 @@ export type EditReportingPeriodByIdVariables = Exact<{
 }>;
 
 
-export type EditReportingPeriodById = { __typename?: 'Query', reportingPeriod?: { __typename?: 'ReportingPeriod', id: number, name: string, startDate: string, endDate: string, organizationId: number, inputTemplateId: number, outputTemplateId: number, createdAt: string, updatedAt: string } | null };
+export type EditReportingPeriodById = { __typename?: 'Query', reportingPeriod?: { __typename?: 'ReportingPeriod', id: number, name: string, startDate: string, endDate: string, inputTemplateId: number, outputTemplateId: number, createdAt: string, updatedAt: string } | null };
 
 export type UpdateReportingPeriodMutationVariables = Exact<{
   id: Scalars['Int'];
@@ -909,7 +904,7 @@ export type UpdateReportingPeriodMutationVariables = Exact<{
 }>;
 
 
-export type UpdateReportingPeriodMutation = { __typename?: 'Mutation', updateReportingPeriod: { __typename?: 'ReportingPeriod', id: number, name: string, startDate: string, endDate: string, organizationId: number, inputTemplateId: number, outputTemplateId: number, createdAt: string, updatedAt: string } };
+export type UpdateReportingPeriodMutation = { __typename?: 'Mutation', updateReportingPeriod: { __typename?: 'ReportingPeriod', id: number, name: string, startDate: string, endDate: string, inputTemplateId: number, outputTemplateId: number, createdAt: string, updatedAt: string } };
 
 export type CreateReportingPeriodMutationVariables = Exact<{
   input: CreateReportingPeriodInput;
@@ -930,12 +925,12 @@ export type FindReportingPeriodByIdVariables = Exact<{
 }>;
 
 
-export type FindReportingPeriodById = { __typename?: 'Query', reportingPeriod?: { __typename?: 'ReportingPeriod', id: number, name: string, startDate: string, endDate: string, organizationId: number, inputTemplateId: number, outputTemplateId: number, createdAt: string, updatedAt: string } | null };
+export type FindReportingPeriodById = { __typename?: 'Query', reportingPeriod?: { __typename?: 'ReportingPeriod', id: number, name: string, startDate: string, endDate: string, inputTemplateId: number, outputTemplateId: number, createdAt: string, updatedAt: string } | null };
 
 export type FindReportingPeriodsVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FindReportingPeriods = { __typename?: 'Query', reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, name: string, startDate: string, endDate: string, organizationId: number, inputTemplateId: number, outputTemplateId: number, createdAt: string, updatedAt: string }> };
+export type FindReportingPeriods = { __typename?: 'Query', reportingPeriods: Array<{ __typename?: 'ReportingPeriod', id: number, name: string, startDate: string, endDate: string, inputTemplateId: number, outputTemplateId: number, createdAt: string, updatedAt: string }> };
 
 export type ReportingPeriodsQueryVariables = Exact<{ [key: string]: never; }>;
 

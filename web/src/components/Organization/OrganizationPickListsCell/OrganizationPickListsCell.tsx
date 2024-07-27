@@ -22,10 +22,6 @@ export const QUERY = gql`
     organization: organization(id: $organizationId) {
       id
       preferences
-      reportingPeriods {
-        id
-        name
-      }
     }
     agencies: agenciesAvailableForUpload {
       id
