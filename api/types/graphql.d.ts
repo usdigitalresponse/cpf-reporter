@@ -108,7 +108,6 @@ export type CreateReportingPeriodInput = {
   endDate: Scalars['DateTime'];
   inputTemplateId: Scalars['Int'];
   name: Scalars['String'];
-  organizationId: Scalars['Int'];
   outputTemplateId: Scalars['Int'];
   startDate: Scalars['DateTime'];
 };
@@ -444,7 +443,6 @@ export type Organization = {
   name: Scalars['String'];
   preferences?: Maybe<Scalars['JSON']>;
   projects: Array<Maybe<Project>>;
-  reportingPeriods: Array<Maybe<ReportingPeriod>>;
   subrecipients: Array<Maybe<Subrecipient>>;
   users: Array<Maybe<User>>;
 };
@@ -627,8 +625,6 @@ export type ReportingPeriod = {
   inputTemplate: InputTemplate;
   inputTemplateId: Scalars['Int'];
   name: Scalars['String'];
-  organization: Organization;
-  organizationId: Scalars['Int'];
   outputTemplate: OutputTemplate;
   outputTemplateId: Scalars['Int'];
   projects: Array<Maybe<Project>>;
@@ -718,7 +714,6 @@ export type UpdateReportingPeriodInput = {
   endDate?: InputMaybe<Scalars['DateTime']>;
   inputTemplateId?: InputMaybe<Scalars['Int']>;
   name?: InputMaybe<Scalars['String']>;
-  organizationId?: InputMaybe<Scalars['Int']>;
   outputTemplateId?: InputMaybe<Scalars['Int']>;
   startDate?: InputMaybe<Scalars['DateTime']>;
 };
@@ -1210,7 +1205,6 @@ export type OrganizationResolvers<ContextType = RedwoodGraphQLContext, ParentTyp
   name: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   preferences: OptArgsResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   projects: OptArgsResolverFn<Array<Maybe<ResolversTypes['Project']>>, ParentType, ContextType>;
-  reportingPeriods: OptArgsResolverFn<Array<Maybe<ResolversTypes['ReportingPeriod']>>, ParentType, ContextType>;
   subrecipients: OptArgsResolverFn<Array<Maybe<ResolversTypes['Subrecipient']>>, ParentType, ContextType>;
   users: OptArgsResolverFn<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -1222,7 +1216,6 @@ export type OrganizationRelationResolvers<ContextType = RedwoodGraphQLContext, P
   name?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
   preferences?: RequiredResolverFn<Maybe<ResolversTypes['JSON']>, ParentType, ContextType>;
   projects?: RequiredResolverFn<Array<Maybe<ResolversTypes['Project']>>, ParentType, ContextType>;
-  reportingPeriods?: RequiredResolverFn<Array<Maybe<ResolversTypes['ReportingPeriod']>>, ParentType, ContextType>;
   subrecipients?: RequiredResolverFn<Array<Maybe<ResolversTypes['Subrecipient']>>, ParentType, ContextType>;
   users?: RequiredResolverFn<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -1373,8 +1366,6 @@ export type ReportingPeriodResolvers<ContextType = RedwoodGraphQLContext, Parent
   inputTemplate: OptArgsResolverFn<ResolversTypes['InputTemplate'], ParentType, ContextType>;
   inputTemplateId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   name: OptArgsResolverFn<ResolversTypes['String'], ParentType, ContextType>;
-  organization: OptArgsResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
-  organizationId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   outputTemplate: OptArgsResolverFn<ResolversTypes['OutputTemplate'], ParentType, ContextType>;
   outputTemplateId: OptArgsResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   projects: OptArgsResolverFn<Array<Maybe<ResolversTypes['Project']>>, ParentType, ContextType>;
@@ -1393,8 +1384,6 @@ export type ReportingPeriodRelationResolvers<ContextType = RedwoodGraphQLContext
   inputTemplate?: RequiredResolverFn<ResolversTypes['InputTemplate'], ParentType, ContextType>;
   inputTemplateId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   name?: RequiredResolverFn<ResolversTypes['String'], ParentType, ContextType>;
-  organization?: RequiredResolverFn<ResolversTypes['Organization'], ParentType, ContextType>;
-  organizationId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   outputTemplate?: RequiredResolverFn<ResolversTypes['OutputTemplate'], ParentType, ContextType>;
   outputTemplateId?: RequiredResolverFn<ResolversTypes['Int'], ParentType, ContextType>;
   projects?: RequiredResolverFn<Array<Maybe<ResolversTypes['Project']>>, ParentType, ContextType>;
