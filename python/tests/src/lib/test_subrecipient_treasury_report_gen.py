@@ -208,8 +208,23 @@ class TestInvalidSubrecipientsFile:
         )
 
 
-class TestWriteSubrecipientsToOutputFile:
-    def test_write_subrecipients_to_workbook_empty_output_file(
+class TestWriteSubrecipientsToWorkbook:
+
+    def test_write_subrecipients_to_workbook_no_uploads(self, subrecipients_no_uploads, empty_subrecipient_treasury_template):
+        mock_logger = MagicMock()
+
+        write_subrecipients_to_workbook(
+            subrecipients_no_uploads,
+            empty_subrecipient_treasury_template,
+            mock_logger
+        )
+
+        mock_logger.warning.assert_called_once_with(
+            f"Subrecipient in recent uploads file with id 1 and name Bob doesn't have any associated uploads, skipping in treasury report"
+
+        )
+
+    def test_write_subrecipients_to_workbook_empty_output_file_valid_subrecipients(
         self, valid_subrecipients_json_content, empty_subrecipient_treasury_template
     ):
         mock_logger = MagicMock()

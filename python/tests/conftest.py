@@ -357,6 +357,9 @@ def no_subrecipients_list_json_content():
 def empty_subrecipients_list_json_content():
     return {"subrecipients": []}
 
+@pytest.fixture
+def subrecipients_no_uploads():
+    return { "subrecipients": [{"id": 1, "Name": "Bob"}]}
 
 @pytest.fixture
 def empty_subrecipient_treasury_template():

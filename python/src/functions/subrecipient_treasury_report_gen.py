@@ -137,7 +137,7 @@ def write_subrecipients_to_workbook(recent_subrecipients, workbook, logger):
     for subrecipient in recent_subrecipients["subrecipients"]:
         if "subrecipientUploads" not in subrecipient:
             logger.warning(
-                f"Subrecipient in recent uploads file with id {subrecipient.id} and name {subrecipient.Name} doesn't have any associated uploads, skipping in treasury report"
+                f"Subrecipient in recent uploads file with id {subrecipient["id"]} and name {subrecipient["Name"]} doesn't have any associated uploads, skipping in treasury report"
             )
             continue
 

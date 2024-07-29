@@ -24,17 +24,6 @@ def download_s3_object(client: S3Client, bucket: str, key: str, destination: IO[
         raise
 
 
-def check_key_exists(client: S3Client, bucket: str, key: str):
-    try:
-        client.head_object(Bucket=bucket, Key=key)
-        return True
-    except ClientError as e:
-        if e.response["Error"]["Code"] == "404":
-            return False
-        else:
-            raise
-
-
 def upload_generated_file_to_s3(
     client: S3Client, bucket: str, key: str, file: IO[bytes]
 ):
