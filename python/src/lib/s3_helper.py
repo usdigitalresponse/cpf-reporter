@@ -1,6 +1,5 @@
 from src.lib.logging import get_logger
 from mypy_boto3_s3.client import S3Client
-from botocore.exceptions import ClientError
 from typing import IO
 from urllib.parse import unquote_plus
 
