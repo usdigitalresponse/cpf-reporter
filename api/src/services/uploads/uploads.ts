@@ -222,7 +222,7 @@ export const getUploadsByExpenditureCategory = async () => {
   const uploadsByExpenditureCategory = {}
 
   // Get the most recent upload for each expenditure category and agency and set the S3 Object key
-  for (const upload of uploadsForPeriod)  {
+  for (const upload of uploadsForPeriod) {
     // Set the S3 Object key
     const objectKey = getS3UploadFileKey(organization.id, upload)
     upload.objectKey = objectKey
@@ -258,3 +258,42 @@ export const getUploadsByExpenditureCategory = async () => {
 
   return uploadsByExpenditureCategory
 }
+
+export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
+  async () => {
+    try {
+      const organization = await db.organization.findFirst({
+        where: { id: context.currentUser.agency.organizationId },
+      })
+      const reportingPeriod = await db.reportingPeriod.findFirst({
+        where: { id: organization.preferences['current_reporting_period_id'] },
+      })
+      const uploadsByExpenditureCategory =
+        await getUploadsByExpenditureCategory()
+      const arn = process.env.TREASURY_STEP_FUNCTION_ARN
+
+      if (!arn) {
+        throw new Error('TREASURY_STEP_FUNCTION_ARN is not set')
+      }
+      logger.info(uploadsByExpenditureCategory)
+      logger.info('Sending Treasury Report')
+
+      const input = {
+        reportingPeriod: reportingPeriod.name,
+        organization: organization.name,
+        email: context.currentUser.email,
+        uploadsByExpenditureCategory,
+      }
+
+      await aws.startStepFunctionExecution(
+        arn,
+        undefined,
+        JSON.stringify(input),
+        ''
+      )
+      return true
+    } catch (error) {
+      logger.error(error, 'Error sending Treasury Report')
+      return false
+    }
+  }

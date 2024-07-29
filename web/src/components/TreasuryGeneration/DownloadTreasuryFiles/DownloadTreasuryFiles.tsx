@@ -15,8 +15,6 @@ const DownloadTreasuryFiles = () => {
   const [downloadTreasuryFile] = useMutation(DOWNLOAD_TREASURY_FILE, {
     onCompleted: ({ downloadTreasuryFile }) => {
       const { fileLink } = downloadTreasuryFile
-      console.log(fileLink)
-      console.log('Opening treasury file link in new tab..')
       window.open(fileLink, '_blank').focus()
     },
     onError: (error) => {
@@ -24,7 +22,6 @@ const DownloadTreasuryFiles = () => {
     },
   })
   const onClick = (event) => {
-    console.log(event.target.getAttribute('name'))
     downloadTreasuryFile({
       variables: { input: { fileType: event.target.getAttribute('name') } },
     })
