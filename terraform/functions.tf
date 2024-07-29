@@ -357,6 +357,7 @@ module "lambda_function-graphql" {
     DD_LAMBDA_HANDLER                  = "graphql.handler"
     PASSAGE_API_KEY_SECRET_ARN         = data.aws_ssm_parameter.passage_api_key_secret_arn.value
     AUTH_PROVIDER                      = "passage"
+    TREASURY_STEP_FUNCTION_ARN         = module.treasury_generation_step_function.state_machine_arn
   })
 
   // Triggers
