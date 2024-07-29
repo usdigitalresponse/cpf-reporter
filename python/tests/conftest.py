@@ -16,6 +16,9 @@ _SAMPLE_TEMPLATE_1C = "tests/data/treasury/sample_1C_input_pass.xlsm"
 _SAMPLE_TREASURY_OUTPUT_1A_XLSM = "tests/data/treasury/sample_1A_output.xlsx"
 _SAMPLE_TREASURY_OUTPUT_1B_XLSM = "tests/data/treasury/sample_1B_output.xlsx"
 _SAMPLE_TREASURY_OUTPUT_1C_XLSM = "tests/data/treasury/sample_1C_output.xlsx"
+_SAMPLE_SUBRECIPIENT_TEMPLATE_EMPTY = (
+    "tests/data/subrecipient_treasury_template_empty.xlsx"
+)
 
 
 @pytest.fixture
@@ -353,3 +356,8 @@ def no_subrecipients_list_json_content():
 @pytest.fixture
 def empty_subrecipients_list_json_content():
     return {"subrecipients": []}
+
+
+@pytest.fixture
+def empty_subrecipient_treasury_template():
+    return openpyxl.load_workbook(_SAMPLE_SUBRECIPIENT_TEMPLATE_EMPTY)

@@ -3,7 +3,11 @@ from aws_lambda_typing.context import Context
 import json
 from tempfile import NamedTemporaryFile
 
-from src.functions.subrecipient_treasury_report_gen import handle
+from src.functions.subrecipient_treasury_report_gen import (
+    handle,
+    write_subrecipients_to_workbook,
+    FIRST_BLANK_ROW_NUM,
+)
 
 
 class TestHandleNoEventOrNoContext:
@@ -145,7 +149,7 @@ class TestInvalidSubrecipientsFile:
 
         handle(sample_subrecipients_generation_event, MagicMock())
 
-        mock_logger.exception.assert_called_once_with(
+        mock_logger.warning.assert_called_once_with(
             "Subrecipients file for organization org123 and reporting period reporting123 does not have any subrecipients listed"
         )
 
@@ -172,7 +176,7 @@ class TestInvalidSubrecipientsFile:
 
         handle(sample_subrecipients_generation_event, MagicMock())
 
-        mock_logger.exception.assert_called_once_with(
+        mock_logger.warning.assert_called_once_with(
             "Subrecipients file for organization org123 and reporting period reporting123 does not have any subrecipients listed"
         )
 
@@ -199,6 +203,46 @@ class TestInvalidSubrecipientsFile:
 
         handle(sample_subrecipients_generation_event, MagicMock())
 
-        mock_logger.exception.assert_called_once_with(
+        mock_logger.warning.assert_called_once_with(
             "Subrecipients file for organization org123 and reporting period reporting123 does not have any subrecipients listed"
         )
+
+
+class TestWriteSubrecipientsToOutputFile:
+    def test_write_subrecipients_to_workbook_empty_output_file(
+        self, valid_subrecipients_json_content, empty_subrecipient_treasury_template
+    ):
+        mock_logger = MagicMock()
+
+        write_subrecipients_to_workbook(
+            valid_subrecipients_json_content,
+            empty_subrecipient_treasury_template,
+            mock_logger,
+        )
+
+        edited_row = empty_subrecipient_treasury_template["Baseline"][
+            FIRST_BLANK_ROW_NUM
+        ]
+        subrecipient_upload_data = valid_subrecipients_json_content["subrecipients"][0][
+            "subrecipientUploads"
+        ][0]["rawSubrecipient"]
+
+        assert edited_row[1].value == subrecipient_upload_data["Name"]
+        assert (
+            edited_row[2].value == subrecipient_upload_data["Recipient_Profile_ID__c"]
+        )
+        assert edited_row[3].value == subrecipient_upload_data["EIN__c"]
+        assert (
+            edited_row[4].value
+            == subrecipient_upload_data["Unique_Entity_Identifier__c"]
+        )
+        assert edited_row[5].value == subrecipient_upload_data["POC_Name__c"]
+        assert edited_row[6].value == subrecipient_upload_data["POC_Phone_Number__c"]
+        assert edited_row[7].value == subrecipient_upload_data["POC_Email_Address__c"]
+        assert edited_row[8].value == subrecipient_upload_data["Zip__c"]
+        assert edited_row[9].value is None  # Zip4
+        assert edited_row[10].value == subrecipient_upload_data["Address__c"]
+        assert edited_row[11].value is None  # Address line 2
+        assert edited_row[12].value is None  # Address line 3
+        assert edited_row[13].value == subrecipient_upload_data["City__c"]
+        assert edited_row[14].value == subrecipient_upload_data["State_Abbreviated__c"]
