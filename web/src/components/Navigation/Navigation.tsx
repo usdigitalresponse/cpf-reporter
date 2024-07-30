@@ -78,6 +78,17 @@ const Navigation = () => {
                 </NavLink>
               </Nav.Item>
             )}
+            {hasRole(ROLES.USDR_ADMIN) && (
+              <Nav.Item>
+                <NavLink
+                  to={routes.treasuryReportGenerationDeveloperTools()}
+                  activeClassName="active"
+                  className="nav-link"
+                >
+                  Treasury Report Generation Developer Tool
+                </NavLink>
+              </Nav.Item>
+            )}
           </>
         )}
       </Nav>

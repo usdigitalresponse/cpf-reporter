@@ -6,6 +6,7 @@
 //
 // 'src/pages/HomePage/HomePage.js'         -> HomePage
 // 'src/pages/Admin/BooksPage/BooksPage.js' -> AdminBooksPage
+// 'src/pages/DeveloperTools/TreasuryReportGeneration/TreasuryReportGeneration.tsx'  -> DeveloperToolsTreasuryReportGeneration
 
 import { PrivateSet, Router, Route } from '@redwoodjs/router'
 
@@ -47,6 +48,10 @@ const Routes = () => {
             <Route path="/organizations/{id:Int}/edit" page={OrganizationEditOrganizationPage} name="editOrganization" />
             <Route path="/organizations/{id:Int}" page={OrganizationOrganizationPage} name="organization" />
             <Route path="/organizations" page={OrganizationOrganizationsPage} name="organizations" />
+          </PrivateSet>
+          {/* Developer Tools */}
+          <PrivateSet unauthenticated="forbidden" roles="USDR_ADMIN">
+            <Route path="/treasury-report-developer-tools" page={ToolsPageTreasuryReportGenerationPage} name="treasuryReportGenerationDeveloperTools" />
           </PrivateSet>
         </PrivateSet>
         {/* Forbidden page */}
