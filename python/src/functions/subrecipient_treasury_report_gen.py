@@ -32,6 +32,13 @@ def handle(event: Dict[str, Any], context: Context):
             outputTemplateId: <id for the output template to use>
         }
         context: Lambda context
+
+    This function should:
+    1. Parse necessary inputs from the event
+    2. Download a file of recent subrecipients from S3 to put into the output template
+    3. Download the output template itself from S3
+    4. Iterate through recent subrecipients and put their information into the output template
+    5. Upload the output template, in both xlsx and csv formats, to S3
     """
     structlog.contextvars.bind_contextvars(
         lambda_event={"subrecipient_step_function": event}
@@ -110,28 +117,22 @@ def handle(event: Dict[str, Any], context: Context):
     output_file.close()
     recent_subrecipients_file.close()
 
-
-"""
-Helper method to determine if the recent_subrecipients JSON object in 
-the recent subrecipients file downloaded from S3 has actual subrecipients in it or not
-"""
-
-
 def no_subrecipients_in_file(recent_subrecipients):
+    """
+    Helper method to determine if the recent_subrecipients JSON object in 
+    the recent subrecipients file downloaded from S3 has actual subrecipients in it or not
+    """
     return (
         "subrecipients" not in recent_subrecipients
         or not isinstance(recent_subrecipients["subrecipients"], list)
         or len(recent_subrecipients["subrecipients"]) == 0
     )
 
-
-"""
-Given an output template, in the form of a `workbook` preloaded with openpyxl,
-go through a list of `recent_subrecipients` and write information for each of them into the workbook
-"""
-
-
 def write_subrecipients_to_workbook(recent_subrecipients, workbook, logger):
+    """
+    Given an output template, in the form of a `workbook` preloaded with openpyxl,
+    go through a list of `recent_subrecipients` and write information for each of them into the workbook
+    """
     sheet_to_edit = workbook[WORKSHEET_NAME]
     row_to_edit = FIRST_BLANK_ROW_NUM
 
@@ -162,24 +163,19 @@ def write_subrecipients_to_workbook(recent_subrecipients, workbook, logger):
                     f"Did not find information in stored subrecipient data for field {k}"
                 )
 
-        # After we've put in everything for this subrecipient, move to the next row
         row_to_edit += 1
 
-
-"""
-Small helper method to sort subrecipientUploads for a given subrecipient by updated date, 
-and return the most recent one
-"""
-
-
 def get_most_recent_upload(subrecipient):
+    """
+    Small helper method to sort subrecipientUploads for a given subrecipient by updated date, 
+    and return the most recent one
+    """
     subrecipientUploads = subrecipient["subrecipientUploads"]
     subrecipientUploads.sort(
         key=lambda x: datetime.fromisoformat(x["updatedAt"].replace("Z", "+00:00")),
         reverse=True,
     )
     return subrecipientUploads[0]
-
 
 def upload_workbook(
     workbook: Workbook,
@@ -188,6 +184,9 @@ def upload_workbook(
     organization_id: str,
     reporting_period_id: str,
 ):
+    """
+    Handles upload of workbook to S3, both in xlsx and csv formats
+    """
     upload_template_location_minus_filetype = f"/treasuryreports/{organization_id}/{reporting_period_id}/{user_id}/CPFSubrecipientTemplate"
     upload_template_xlsx_key = f"{upload_template_location_minus_filetype}.xlsx"
     upload_template_csv_key = f"/{upload_template_location_minus_filetype}.csv"
