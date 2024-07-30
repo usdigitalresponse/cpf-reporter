@@ -117,9 +117,10 @@ def handle(event: Dict[str, Any], context: Context):
     output_file.close()
     recent_subrecipients_file.close()
 
+
 def no_subrecipients_in_file(recent_subrecipients):
     """
-    Helper method to determine if the recent_subrecipients JSON object in 
+    Helper method to determine if the recent_subrecipients JSON object in
     the recent subrecipients file downloaded from S3 has actual subrecipients in it or not
     """
     return (
@@ -127,6 +128,7 @@ def no_subrecipients_in_file(recent_subrecipients):
         or not isinstance(recent_subrecipients["subrecipients"], list)
         or len(recent_subrecipients["subrecipients"]) == 0
     )
+
 
 def write_subrecipients_to_workbook(recent_subrecipients, workbook, logger):
     """
@@ -165,9 +167,10 @@ def write_subrecipients_to_workbook(recent_subrecipients, workbook, logger):
 
         row_to_edit += 1
 
+
 def get_most_recent_upload(subrecipient):
     """
-    Small helper method to sort subrecipientUploads for a given subrecipient by updated date, 
+    Small helper method to sort subrecipientUploads for a given subrecipient by updated date,
     and return the most recent one
     """
     subrecipientUploads = subrecipient["subrecipientUploads"]
@@ -176,6 +179,7 @@ def get_most_recent_upload(subrecipient):
         reverse=True,
     )
     return subrecipientUploads[0]
+
 
 def upload_workbook(
     workbook: Workbook,
@@ -189,7 +193,7 @@ def upload_workbook(
     """
     upload_template_location_minus_filetype = f"/treasuryreports/{organization_id}/{reporting_period_id}/{user_id}/CPFSubrecipientTemplate"
     upload_template_xlsx_key = f"{upload_template_location_minus_filetype}.xlsx"
-    upload_template_csv_key = f"/{upload_template_location_minus_filetype}.csv"
+    upload_template_csv_key = f"{upload_template_location_minus_filetype}.csv"
 
     with tempfile.NamedTemporaryFile("w") as new_xlsx_file:
         workbook.save(new_xlsx_file.name)

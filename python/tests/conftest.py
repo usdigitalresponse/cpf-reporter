@@ -366,3 +366,14 @@ def subrecipients_no_uploads():
 @pytest.fixture
 def empty_subrecipient_treasury_template():
     return openpyxl.load_workbook(_SAMPLE_SUBRECIPIENT_TEMPLATE_EMPTY)
+
+
+@pytest.fixture
+def sample_subrecipient_uploads_with_dates():
+    return {
+        "subrecipientUploads": [
+            {"id": 1, "updatedAt": "2023-07-01T12:00:00Z"},
+            {"id": 2, "updatedAt": "2023-07-02T12:00:00Z"},
+            {"id": 3, "updatedAt": "2023-06-30T12:00:00Z"},
+        ]
+    }
