@@ -6,15 +6,18 @@ import structlog
 import json
 from aws_lambda_typing.context import Context
 from mypy_boto3_s3.client import S3Client
-from openpyxl import load_workbook
+from openpyxl import load_workbook, Workbook
 from datetime import datetime
 
 from src.lib.logging import reset_contextvars, get_logger
-from src.lib.s3_helper import download_s3_object
+from src.lib.s3_helper import download_s3_object, upload_generated_file_to_s3
 from src.schemas.schema_versions import getSubrecipientRowClass
+from src.lib.workbook_utils import convert_xlsx_to_csv, find_last_populated_row
 
 BUCKET_NAME = "cpf-reporter"
 FIRST_BLANK_ROW_NUM = 8
+WORKSHEET_NAME = "Baseline"
+FIRST_DATA_COLUMN = "B"
 
 
 @reset_contextvars
@@ -102,9 +105,7 @@ def handle(event: Dict[str, Any], context: Context):
         logger=logger,
     )
 
-    # Save subrecipient_template to S3
-    # Remove print line when we're using the user_id field
-    print(user_id)
+    upload_workbook(workbook, s3_client, user_id, organization_id, reporting_period_id)
 
     output_file.close()
     recent_subrecipients_file.close()
@@ -131,7 +132,7 @@ go through a list of `recent_subrecipients` and write information for each of th
 
 
 def write_subrecipients_to_workbook(recent_subrecipients, workbook, logger):
-    sheet_to_edit = workbook["Baseline"]
+    sheet_to_edit = workbook[WORKSHEET_NAME]
     row_to_edit = FIRST_BLANK_ROW_NUM
 
     for subrecipient in recent_subrecipients["subrecipients"]:
@@ -178,3 +179,36 @@ def get_most_recent_upload(subrecipient):
         reverse=True,
     )
     return subrecipientUploads[0]
+
+
+def upload_workbook(
+    workbook: Workbook,
+    s3client: S3Client,
+    user_id: str,
+    organization_id: str,
+    reporting_period_id: str,
+):
+    upload_template_location_minus_filetype = f"/treasuryreports/{organization_id}/{reporting_period_id}/{user_id}/CPFSubrecipientTemplate"
+    upload_template_xlsx_key = f"{upload_template_location_minus_filetype}.xlsx"
+    upload_template_csv_key = f"/{upload_template_location_minus_filetype}.csv"
+
+    with tempfile.NamedTemporaryFile("w") as new_xlsx_file:
+        workbook.save(new_xlsx_file.name)
+        upload_generated_file_to_s3(
+            s3client, BUCKET_NAME, upload_template_xlsx_key, new_xlsx_file
+        )
+
+    with tempfile.NamedTemporaryFile("w") as new_csv_file:
+        convert_xlsx_to_csv(
+            new_csv_file,
+            workbook,
+            find_last_populated_row(
+                workbook[WORKSHEET_NAME], FIRST_BLANK_ROW_NUM, FIRST_DATA_COLUMN
+            ),
+        )
+        upload_generated_file_to_s3(
+            s3client,
+            BUCKET_NAME,
+            upload_template_csv_key,
+            new_csv_file,
+        )
