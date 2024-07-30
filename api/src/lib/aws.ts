@@ -102,7 +102,11 @@ async function sendHeadObjectToS3Bucket(bucketName: string, key: string) {
  * If the upload is new, such as a CreateUploadInput object, the id will be null as it is not from the database.
  * In that case, you can use the optional uploadId field to create the key.
  */
-export function getS3UploadFileKey(organizationId: number, upload: Upload | CreateUploadInput, uploadId?: number) {
+export function getS3UploadFileKey(
+  organizationId: number,
+  upload: Upload | CreateUploadInput,
+  uploadId?: number
+) {
   if ('id' in upload) {
     uploadId = upload.id
   }
@@ -148,6 +152,25 @@ async function s3DeleteObject(key: string) {
  */
 async function getSignedUrl(upload: Upload): Promise<string> {
   const key = getS3UploadFileKey(upload.agency.organizationId, upload)
+  const s3 = getS3Client()
+  const baseParams = { Bucket: REPORTING_DATA_BUCKET_NAME, Key: key }
+  return awsGetSignedUrl(s3, new GetObjectCommand(baseParams), {
+    expiresIn: 60,
+  })
+}
+const OUTPUT_TEMPLATE = {
+  '1A': 'CPF1ABroadbandInfrastructureTemplate',
+  '1B': 'CPF1BDigitalConnectivityTechTemplate',
+  '1C': 'CPF1CMultiPurposeCommunityTemplate',
+  Subrecipient: 'CPFSubrecipientTemplate',
+}
+async function getTreasurySignedUrl(
+  fileType: string,
+  organization_id: number,
+  current_reporting_period_id: string
+): Promise<string> {
+  const key = `treasuryreports/${organization_id}/${current_reporting_period_id}/${OUTPUT_TEMPLATE[fileType]}.csv`
+
   const s3 = getS3Client()
   const baseParams = { Bucket: REPORTING_DATA_BUCKET_NAME, Key: key }
   return awsGetSignedUrl(s3, new GetObjectCommand(baseParams), {
@@ -245,4 +268,5 @@ export default {
   getS3Client,
   startStepFunctionExecution,
   s3DeleteObject,
+  getTreasurySignedUrl,
 }
