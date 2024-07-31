@@ -129,9 +129,7 @@ describe('getS3UploadFileKey', () => {
       updatedAt: '2024-01-26T15:11:27.000Z',
       validations: [],
     }
-    expect(getS3UploadFileKey(10, upload)).toEqual(
-      'uploads/10/2/3/1/test.csv'
-    )
+    expect(getS3UploadFileKey(10, upload)).toEqual('uploads/10/2/3/1/test.csv')
   })
 
   it('should return a valid s3 upload key based on the upload with no id', () => {
