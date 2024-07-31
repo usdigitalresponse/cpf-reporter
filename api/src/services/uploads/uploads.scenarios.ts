@@ -21,13 +21,13 @@ export const standard = defineScenario<
     one: {
       data: {
         name: 'USDR',
-        preferences: {}
+        preferences: {},
       },
     },
     two: {
       data: {
         name: 'Example Organization',
-        preferences: {}
+        preferences: {},
       },
     },
   },
@@ -100,7 +100,7 @@ export const standard = defineScenario<
     }),
   },
   reportingPeriod: {
-    one: (scenario) => ({
+    one: () => ({
       data: {
         name: 'String',
         startDate: '2024-01-26T15:11:27.688Z',
@@ -128,15 +128,15 @@ export const standard = defineScenario<
         name: '1A',
         code: '1A',
         updatedAt: '2024-01-26T15:11:27.000Z',
-      }
+      },
     },
     two: {
       data: {
         name: '2A',
         code: '2A',
         updatedAt: '2024-01-26T15:11:27.000Z',
-      }
-    }
+      },
+    },
   },
   upload: {
     one: (scenario) => ({
@@ -208,7 +208,7 @@ export const standard = defineScenario<
               initiatedById: scenario.user.two.id,
               createdAt: '2024-01-29T18:13:25.000Z',
             },
-          ]
+          ],
         },
         createdAt: '2024-01-21T18:10:17.000Z',
         updatedAt: '2024-01-21T18:10:17.000Z',
@@ -229,14 +229,14 @@ export const standard = defineScenario<
               initiatedById: scenario.user.two.id,
               createdAt: '2024-01-29T18:13:25.000Z',
             },
-          ]
+          ],
         },
         createdAt: '2024-01-21T18:10:17.000Z',
         updatedAt: '2024-01-21T18:10:17.000Z',
       },
     }),
   },
-});
+})
 
 
 export const uploadCheck = defineScenario<
@@ -291,15 +291,16 @@ export const uploadCheck = defineScenario<
     one: (scenario) => {
       console.log(scenario)
       return {
-      data: {
-        name: 'Agency1',
-        organizationId: scenario.organization.one.id,
-        code: 'A1',
-      },
-      include: {
-        organization: true,
-      },
-    }},
+        data: {
+          name: 'Agency1',
+          organizationId: scenario.organization.one.id,
+          code: 'A1',
+        },
+        include: {
+          organization: true,
+        },
+      }
+    },
     two: (scenario) => ({
       data: {
         name: 'Agency2',
@@ -363,15 +364,15 @@ export const uploadCheck = defineScenario<
         name: '1A',
         code: '1A',
         updatedAt: '2024-01-26T15:11:27.000Z',
-      }
+      },
     },
     two: {
       data: {
         name: '2A',
         code: '2A',
         updatedAt: '2024-01-26T15:11:27.000Z',
-      }
-    }
+      },
+    },
   },
   upload: {
     one: (scenario) => ({
@@ -483,7 +484,7 @@ export const uploadCheck = defineScenario<
       },
     }),
   },
-});
+})
 
 export type StandardScenario = ScenarioData<Upload, 'upload'> &
   ScenarioData<User, 'user'> &
