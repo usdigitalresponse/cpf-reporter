@@ -76,7 +76,7 @@ def handle(event: S3Event, context: Context):
 
     s3_client: S3Client = boto3.client("s3")
 
-    project_code = os.getenv("PROJECT_USE_CODE")
+    project_code = event["ProjectType"]
     if project_code == "1A":
         project_use_code = ProjectType._1A
     elif project_code == "1B":
