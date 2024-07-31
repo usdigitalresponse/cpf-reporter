@@ -3,8 +3,10 @@ import type {
   QueryResolvers,
   MutationResolvers,
   OrganizationRelationResolvers,
+  Agency,
 } from 'types/graphql'
 
+import aws from 'src/lib/aws'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 
@@ -73,6 +75,65 @@ export const getOrCreateOrganization = async (orgName, reportingPeriodName) => {
     logger.error(error, `Error getting or creating organization: ${orgName}`)
   }
 }
+
+export const downloadTreasuryFile: MutationResolvers['downloadTreasuryFile'] =
+  async ({ input }) => {
+    const { fileType } = input
+    const { organizationId } = context.currentUser.agency
+
+    // get the organization
+    const organization = await db.organization.findUnique({
+      where: { id: organizationId },
+    })
+
+    if (!organization) {
+      throw new Error(`Organization with id ${organizationId} not found`)
+    }
+
+    // Retrieve the signed URL for the treasury file
+    logger.info(`Downloading treasury file for ${fileType}`)
+    const url = await aws.getTreasurySignedUrl(
+      fileType,
+      organization.id,
+      organization.preferences['current_reporting_period_id']
+    )
+
+    // Return the file link
+    return { fileLink: url }
+  }
+
+export const kickOffTreasuryReportGeneration: MutationResolvers['kickOffTreasuryReportGeneration'] =
+  async ({ input }) => {
+    let { organizationId } = input
+    const { payload } = input
+
+    if (!organizationId) {
+      logger.info('Using current user agency to determine organization')
+      organizationId = (context.currentUser.agency as Agency).organizationId
+    }
+    // Get the organization
+    const organization = await db.organization.findUnique({
+      where: { id: organizationId },
+    })
+
+    if (!organization) {
+      throw new Error(`Organization with id ${organizationId} not found`)
+    }
+
+    // kick off the step function for treasury report generation
+    logger.info(
+      `Kicking off treasury report generation for ${organization.name}`
+    )
+    const response = await aws.startStepFunctionExecution(
+      process.env.TREASURY_STEP_FUNCTION_ARN,
+      `manual-treasury-report-generation-${Date.now()}`,
+      payload,
+      `${organizationId}-${Date.now()}`
+    )
+
+    // Return the step function execution response
+    return { response: JSON.stringify(response) }
+  }
 
 export const createOrganizationAgencyAdmin: MutationResolvers['createOrganizationAgencyAdmin'] =
   async ({ input }) => {
