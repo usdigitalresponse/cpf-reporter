@@ -74,8 +74,8 @@ module "lambda_function-subrecipientTreasuryReportGen" {
 }
 
 module "lambda_function-treasuryProjectFileGeneration" {
-  source   = "terraform-aws-modules/lambda/aws"
-  version  = "6.5.0"
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "6.5.0"
 
   // Metadata
   function_name = "${var.namespace}-treasuryProjectFileGeneration"

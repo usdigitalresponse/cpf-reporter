@@ -19,7 +19,7 @@ module "treasury_generation_step_function" {
                 "OutputPath" : "$.Payload",
                 "Parameters" : {
                   "Payload.$" : "$",
-                  "ProjectType": "1A",
+                  "ProjectType" : "1A",
                   "FunctionName" : module.lambda_function-treasuryProjectFileGeneration.lambda_function_arn
                 },
                 "Retry" : [
@@ -48,7 +48,7 @@ module "treasury_generation_step_function" {
                 "OutputPath" : "$.Payload",
                 "Parameters" : {
                   "Payload.$" : "$",
-                  "ProjectType": "1B",
+                  "ProjectType" : "1B",
                   "FunctionName" : module.lambda_function-treasuryProjectFileGeneration.lambda_function_arn
                 },
                 "Retry" : [
@@ -77,7 +77,7 @@ module "treasury_generation_step_function" {
                 "OutputPath" : "$.Payload",
                 "Parameters" : {
                   "Payload.$" : "$",
-                  "ProjectType": "1C",
+                  "ProjectType" : "1C",
                   "FunctionName" : module.lambda_function-treasuryProjectFileGeneration.lambda_function_arn
                 },
                 "Retry" : [
