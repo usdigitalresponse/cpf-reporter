@@ -24,6 +24,10 @@ describe('organizations', () => {
         'USDR1',
         'Reporting Period 1'
       )
+      const resultGet2 = await getOrCreateOrganization(
+        'USDR2',
+        'Reporting Period 1'
+      )
       const resultCreate = await getOrCreateOrganization(
         'USDR3',
         'Reporting Period 1'
@@ -31,6 +35,7 @@ describe('organizations', () => {
       const resultError = await getOrCreateOrganization('USDR5', 'NO PERIOD')
 
       expect(resultGet.id).toEqual(scenario.organization.one.id)
+      expect(resultGet2.id).toEqual(scenario.organization.two.id)
       expect(resultCreate.name).toEqual('USDR3')
       expect(
         [scenario.organization.one.id, scenario.organization.two.id].includes(
@@ -43,7 +48,7 @@ describe('organizations', () => {
   scenario('returns all organizations', async () => {
     const result = await organizations()
 
-    expect(result.length).toEqual(3)
+    expect(result.length).toEqual(2)
   })
 
   scenario(
