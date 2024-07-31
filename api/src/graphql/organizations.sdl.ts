@@ -4,7 +4,6 @@ export const schema = gql`
     agencies: [Agency]!
     users: [User]!
     name: String!
-    reportingPeriods: [ReportingPeriod]!
     subrecipients: [Subrecipient]!
     projects: [Project]!
     preferences: JSON

@@ -53,7 +53,6 @@ const ReportingPeriodsList = ({ reportingPeriods }: FindReportingPeriods) => {
             <th>Name</th>
             <th>Start date</th>
             <th>End date</th>
-            <th>Organization id</th>
             <th>Input template id</th>
             <th>Output template id</th>
             <th>Created at</th>
@@ -68,7 +67,6 @@ const ReportingPeriodsList = ({ reportingPeriods }: FindReportingPeriods) => {
               <td>{truncate(reportingPeriod.name)}</td>
               <td>{timeTag(reportingPeriod.startDate)}</td>
               <td>{timeTag(reportingPeriod.endDate)}</td>
-              <td>{truncate(reportingPeriod.organizationId)}</td>
               <td>{truncate(reportingPeriod.inputTemplateId)}</td>
               <td>{truncate(reportingPeriod.outputTemplateId)}</td>
               <td>{timeTag(reportingPeriod.createdAt)}</td>

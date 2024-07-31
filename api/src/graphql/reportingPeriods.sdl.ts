@@ -4,8 +4,6 @@ export const schema = gql`
     name: String!
     startDate: DateTime!
     endDate: DateTime!
-    organizationId: Int!
-    organization: Organization!
     inputTemplateId: Int!
     inputTemplate: InputTemplate!
     outputTemplateId: Int!
@@ -27,7 +25,6 @@ export const schema = gql`
     name: String!
     startDate: DateTime!
     endDate: DateTime!
-    organizationId: Int!
     inputTemplateId: Int!
     outputTemplateId: Int!
   }
@@ -36,7 +33,6 @@ export const schema = gql`
     name: String
     startDate: DateTime
     endDate: DateTime
-    organizationId: Int
     inputTemplateId: Int
     outputTemplateId: Int
   }

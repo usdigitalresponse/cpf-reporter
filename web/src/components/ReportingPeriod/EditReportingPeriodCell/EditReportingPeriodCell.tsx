@@ -17,7 +17,6 @@ export const QUERY = gql`
       name
       startDate
       endDate
-      organizationId
       inputTemplateId
       outputTemplateId
       createdAt
@@ -35,7 +34,6 @@ const UPDATE_REPORTING_PERIOD_MUTATION = gql`
       name
       startDate
       endDate
-      organizationId
       inputTemplateId
       outputTemplateId
       createdAt
