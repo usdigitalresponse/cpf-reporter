@@ -73,14 +73,13 @@ module "lambda_function-subrecipientTreasuryReportGen" {
   }
 }
 
-module "lambda_function-treasuryReportGeneration" {
-  for_each = toset(["1A", "1B", "1C"])
+module "lambda_function-treasuryProjectFileGeneration" {
   source   = "terraform-aws-modules/lambda/aws"
   version  = "6.5.0"
 
   // Metadata
-  function_name = "${var.namespace}-treasuryReportGeneration${each.key}"
-  description   = "Creates the Treasury Report for Projects ${each.key}."
+  function_name = "${var.namespace}-treasuryProjectFileGeneration"
+  description   = "Creates the Treasury Report for Projects."
 
   // Networking
   vpc_subnet_ids         = null
@@ -157,7 +156,6 @@ module "lambda_function-treasuryReportGeneration" {
   environment_variables = merge(local.lambda_default_environment_variables, {
     DD_LAMBDA_HANDLER = "src.functions.generate_treasury_report.handle"
     DD_LOGS_INJECTION = "true"
-    PROJECT_USE_CODE  = "${each.key}"
   })
 
   // Triggers

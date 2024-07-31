@@ -19,7 +19,8 @@ module "treasury_generation_step_function" {
                 "OutputPath" : "$.Payload",
                 "Parameters" : {
                   "Payload.$" : "$",
-                  "FunctionName" : module.lambda_function-treasuryReportGeneration["1A"].lambda_function_arn
+                  "ProjectType": "1A",
+                  "FunctionName" : module.lambda_function-treasuryProjectFileGeneration.lambda_function_arn
                 },
                 "Retry" : [
                   {
@@ -47,7 +48,8 @@ module "treasury_generation_step_function" {
                 "OutputPath" : "$.Payload",
                 "Parameters" : {
                   "Payload.$" : "$",
-                  "FunctionName" : module.lambda_function-treasuryReportGeneration["1B"].lambda_function_arn
+                  "ProjectType": "1B",
+                  "FunctionName" : module.lambda_function-treasuryProjectFileGeneration.lambda_function_arn
                 },
                 "Retry" : [
                   {
@@ -75,7 +77,8 @@ module "treasury_generation_step_function" {
                 "OutputPath" : "$.Payload",
                 "Parameters" : {
                   "Payload.$" : "$",
-                  "FunctionName" : module.lambda_function-treasuryReportGeneration["1C"].lambda_function_arn
+                  "ProjectType": "1C",
+                  "FunctionName" : module.lambda_function-treasuryProjectFileGeneration.lambda_function_arn
                 },
                 "Retry" : [
                   {
@@ -129,7 +132,7 @@ module "treasury_generation_step_function" {
 
   service_integrations = {
     lambda = {
-      lambda = [module.lambda_function-treasuryReportGeneration["1A"].lambda_function_arn, module.lambda_function-treasuryReportGeneration["1B"].lambda_function_arn, module.lambda_function-treasuryReportGeneration["1C"].lambda_function_arn, module.lambda_function-subrecipientTreasuryReportGen.lambda_function_arn]
+      lambda = [module.lambda_function-treasuryProjectFileGeneration.lambda_function_arn, module.lambda_function-subrecipientTreasuryReportGen.lambda_function_arn]
     }
   }
 
