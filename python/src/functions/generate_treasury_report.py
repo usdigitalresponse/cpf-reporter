@@ -7,7 +7,6 @@ import csv
 import json
 import tempfile
 from typing import Any, Optional, Set
-import os
 
 import boto3
 import structlog
