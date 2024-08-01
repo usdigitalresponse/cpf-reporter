@@ -1,7 +1,7 @@
 module "treasury_generation_step_function" {
   source = "terraform-aws-modules/step-functions/aws"
 
-  name = "generate-treasury-report"
+  name = "${var.namespace}-generate-treasury-report"
   definition = jsonencode({
     "Comment" : "Generate all the files for a treasury report",
     "StartAt" : "Parallel",
