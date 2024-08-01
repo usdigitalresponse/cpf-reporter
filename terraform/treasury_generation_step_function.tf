@@ -1,5 +1,5 @@
 module "treasury_generation_step_function" {
-  source = "terraform-aws-modules/step-functions/aws"
+  source                    = "terraform-aws-modules/step-functions/aws"
   role_permissions_boundary = local.permissions_boundary_arn
 
   name = "${var.namespace}-generate-treasury-report"
