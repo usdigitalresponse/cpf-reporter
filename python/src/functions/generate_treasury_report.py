@@ -1,12 +1,10 @@
 from datetime import datetime
 from openpyxl import load_workbook, Workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from typing import IO, List, Union, Dict
-from urllib.parse import unquote_plus
-import csv
+from typing import List, Union, Dict
 import json
 import tempfile
-from typing import Any, Optional, Set
+from typing import Any, Set
 
 import boto3
 import structlog
@@ -24,6 +22,8 @@ from src.schemas.schema_versions import (
 )
 from src.schemas.project_types import ProjectType
 from src.lib.workbook_validator import validate_project_sheet
+from src.lib.s3_helper import upload_generated_file_to_s3, download_s3_object
+from src.lib.workbook_utils import convert_xlsx_to_csv
 
 OUTPUT_STARTING_ROW = 8
 OUTPUT_TEMPLATE = {
@@ -115,7 +115,7 @@ def handle(event: S3Event, context: Context):
     #    the template file.
     output_file = tempfile.NamedTemporaryFile()
     if project_agency_id_to_row_map:
-        download_file(
+        download_s3_object(
             s3_client,
             f"treasuryreports/{organization_id}/{current_reporting_period_id}",
             f"{OUTPUT_TEMPLATE[project_use_code]}.xlsx",
@@ -123,7 +123,7 @@ def handle(event: S3Event, context: Context):
         )
         highest_row_num = max(project_agency_id_to_row_map.values())
     else:
-        download_file(
+        download_s3_object(
             s3_client,
             event["Records"][0]["s3"]["bucket"]["name"],
             f"{OUTPUT_TEMPLATE[project_use_code]}.xlsx",
@@ -161,7 +161,7 @@ def handle(event: S3Event, context: Context):
             bucket = objectKey.split("/")[0]
             filename = file_info.get("filename")
             created_at = file_info.get("createdAt")
-            download_file(
+            download_s3_object(
                 s3_client,
                 bucket,
                 filename,
@@ -222,7 +222,7 @@ def get_existing_output_metadata(
     existing_project_agency_id_to_row_number = {}
     with tempfile.NamedTemporaryFile() as existing_file:
         try:
-            download_file(
+            download_s3_object(
                 s3_client,
                 f"treasuryreports/{organization.get("id")}/{organization.get("preferences").get("current_reporting_period_id")}",
                 f"{OUTPUT_TEMPLATE[project_use_code]}.json",
@@ -274,7 +274,7 @@ def get_outdated_projects_to_remove(
             objectKey = file_info.get("objectKey")
             bucket = objectKey.split("/")[0]
             filename = file_info.get("filename")
-            download_file(
+            download_s3_object(
                 s3_client,
                 bucket,
                 filename,
@@ -397,72 +397,3 @@ def combine_project_rows(
                 row=project,
             )
     return highest_row_num
-
-
-def escape_for_csv(text: Optional[str]):
-    if not text:
-        return text
-    text = text.replace("\n", " -- ")
-    text = text.replace("\r", " -- ")
-    return text
-
-
-def convert_xlsx_to_csv(csv_file: IO[bytes], file: IO[bytes], num_rows: int):
-    """
-    Convert xlsx file to csv.
-    """
-    sheet = file["Baseline"]
-    csv_file_handle = csv.writer(csv_file, delimiter=",")
-
-    row_num = 1
-    for eachrow in sheet.rows:
-        if row_num > num_rows:
-            break
-        csv_file_handle.writerow([escape_for_csv(cell.value) for cell in eachrow])
-        row_num = row_num + 1
-
-    return csv_file
-
-
-def download_file(client: S3Client, bucket: str, key: str, destination: IO[bytes]):
-    """Downloads an S3 object to a local file.
-
-    Args:
-        client: Client facilitating download from S3
-        bucket: Name of the S3 bucket containing the workbook
-        key: S3 object key for the file to download
-        destination: File-like object (in binary mode) where the S3 object will be written
-    """
-    logger = get_logger()
-    logger.debug("downloading workbook from s3")
-
-    try:
-        client.download_fileobj(bucket, unquote_plus(key), destination)
-    except:
-        logger.exception("failed to download workbook from S3")
-        raise
-
-
-def upload_generated_file_to_s3(client: S3Client, bucket, key: str, file: IO[bytes]):
-    """Persists workbook validation results to S3.
-
-    Args:
-        client: Client facilitating upload to S3
-        results: Errors resulting from workbook validation.
-    """
-    logger = get_logger()
-
-    logger = logger.bind(upload={"s3": {"bucket": bucket, "key": key}})
-    try:
-        file.seek(0)
-        client.put_object(
-            Body=file,
-            Bucket=bucket,
-            Key=unquote_plus(key),
-            ServerSideEncryption="AES256",
-        )
-    except:
-        logger.exception("failed to upload treasury report to S3")
-        raise
-
-    logger.info("successfully uploaded treasury report results to s3")

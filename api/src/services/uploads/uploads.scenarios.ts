@@ -238,7 +238,6 @@ export const standard = defineScenario<
   },
 })
 
-
 export const uploadCheck = defineScenario<
   | Prisma.OrganizationCreateArgs
   | Prisma.AgencyCreateArgs

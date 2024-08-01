@@ -28,6 +28,7 @@ export default async ({ args }) => {
   }
   console.log(`Organization found: ${organization.name}`)
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const whereClause: any = {
     agency: { organizationId: organization.id },
   }
