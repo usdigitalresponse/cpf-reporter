@@ -55,7 +55,7 @@ resource "aws_ssm_parameter" "ecs_console_secret_database_url" {
     module.postgres.cluster_database_name,
     join("&", [
       "sslmode=verify-full",
-      "sslrootcert=${urlencode("/home/node/app/api/db/rds-combined-ca-bundle.pem")}",
+      "sslrootcert=${urlencode("/home/node/app/api/db/rds-global-bundle.pem")}",
     ])
   )
 }
