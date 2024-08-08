@@ -19,8 +19,7 @@ module "treasury_generation_step_function" {
                 "Resource" : "arn:aws:states:::lambda:invoke",
                 "OutputPath" : "$.Payload",
                 "Parameters" : {
-                  "Payload.$" : "$",
-                  "ProjectType" : "1A",
+                  "Payload.$" : "$.1A",
                   "FunctionName" : module.lambda_function-treasuryProjectFileGeneration.lambda_function_arn
                 },
                 "Retry" : [
@@ -48,8 +47,7 @@ module "treasury_generation_step_function" {
                 "Resource" : "arn:aws:states:::lambda:invoke",
                 "OutputPath" : "$.Payload",
                 "Parameters" : {
-                  "Payload.$" : "$",
-                  "ProjectType" : "1B",
+                  "Payload.$" : "$.1B",
                   "FunctionName" : module.lambda_function-treasuryProjectFileGeneration.lambda_function_arn
                 },
                 "Retry" : [
@@ -77,8 +75,7 @@ module "treasury_generation_step_function" {
                 "Resource" : "arn:aws:states:::lambda:invoke",
                 "OutputPath" : "$.Payload",
                 "Parameters" : {
-                  "Payload.$" : "$",
-                  "ProjectType" : "1C",
+                  "Payload.$" : "$.1C",
                   "FunctionName" : module.lambda_function-treasuryProjectFileGeneration.lambda_function_arn
                 },
                 "Retry" : [
@@ -106,7 +103,7 @@ module "treasury_generation_step_function" {
                 "Resource" : "arn:aws:states:::lambda:invoke",
                 "OutputPath" : "$.Payload",
                 "Parameters" : {
-                  "Payload.$" : "$",
+                  "Payload.$" : "$.Subrecipient",
                   "FunctionName" : module.lambda_function-subrecipientTreasuryReportGen.lambda_function_arn
                 },
                 "Retry" : [
