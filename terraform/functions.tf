@@ -308,7 +308,7 @@ module "lambda_function-graphql" {
         "s3:HeadObject",
       ]
       resources = [
-        # Path: treasuryreports/{organization_id}/{reporting_period_id}/{filename}.csv
+        # Path: treasuryreports{organization_id}/{reporting_period_id}/{filename}.csv
         "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.csv",
       ]
     }
@@ -349,7 +349,7 @@ module "lambda_function-graphql" {
       module.postgres.cluster_database_name,
       join("&", [
         "sslmode=require",
-        "sslcert=${urlencode("/home/node/app/api/db/rds-global-bundle.pem")}",
+        "sslcert=${urlencode("/var/task/rds-global-bundle.pem")}",
         "connection_limit=1", // Can be tuned for parallel query performance: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections#serverless-environments-faas
       ])
     )
@@ -448,7 +448,7 @@ module "lambda_function-processValidationJson" {
       module.postgres.cluster_database_name,
       join("&", [
         "sslmode=require",
-        "sslcert=${urlencode("/home/node/app/api/db/rds-global-bundle.pem")}",
+        "sslcert=${urlencode("/var/task/rds-global-bundle.pem")}",
         "connection_limit=1", // Can be tuned for parallel query performance: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections#serverless-environments-faas
       ])
     )
