@@ -3,7 +3,7 @@ import type {
   MutationResolvers,
   UserRelationResolvers,
   Agency,
-  UpdateUserInput
+  UpdateUserInput,
 } from 'types/graphql'
 
 import {
@@ -17,7 +17,10 @@ import { AuthenticationError } from '@redwoodjs/graphql-server'
 import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
-import { createPassageUser, deletePassageUser } from 'src/services/passage/passage'
+import {
+  createPassageUser,
+  deletePassageUser,
+} from 'src/services/passage/passage'
 
 export const currentUserIsUSDRAdmin = (): boolean => {
   return context.currentUser?.roles?.includes(ROLES.USDR_ADMIN)
@@ -205,15 +208,21 @@ export const updateUser: MutationResolvers['updateUser'] = async ({
     throw new Error('User not found')
   }
 
-  let updatedData: UpdateUserInput & { passageId?: string | null } = { ...input }
+  const updatedData: UpdateUserInput & { passageId?: string | null } = {
+    ...input,
+  }
 
   if (process.env.AUTH_PROVIDER === 'passage') {
-    if (input.isActive === false && user.passageId) {
-      await deletePassageUser(user.passageId)
-      updatedData.passageId = null
-    } else if (input.isActive === true && !user.passageId) {
-      const passageUser = await createPassageUser(user.email)
-      updatedData.passageId = passageUser.id
+    try {
+      if (!input.isActive && user.passageId) {
+        await deletePassageUser(user.passageId)
+        updatedData.passageId = null
+      } else if (input.isActive && !user.passageId) {
+        const passageUser = await createPassageUser(user.email)
+        updatedData.passageId = passageUser.id
+      }
+    } catch (e) {
+      throw new Error('Error updating Passage user')
     }
   }
 
@@ -232,6 +241,7 @@ export const deleteUser: MutationResolvers['deleteUser'] = async ({ id }) => {
       throw new Error('Error deleting Passage user')
     }
   }
+
   return db.user.delete({
     where: { id },
   })
