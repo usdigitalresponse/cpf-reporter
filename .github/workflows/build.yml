@@ -447,6 +447,11 @@ jobs:
           CI: 1
       - name: Zip the built functions
         run: yarn zip-it-and-ship-it $BUILD_OUTPUT_PATH/functions $ARTIFACTS_PATH
+      - name: Add RDS CA bundle to zipped Lambda artifacts
+        run: |
+          for $zipfile in $ARTIFACTS_PATH/*.zip; do
+            zip -ju $zipfile api/db/rds-global-bundle.pem
+          done;
       - name: Compute build artifact checksums
         id: checksums
         run: |
