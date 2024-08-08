@@ -35,10 +35,6 @@ const Navigation = () => {
               </NavLink>
             </Nav.Item>
             <Nav.Item>
-              <div className="nav-link disabled">Subrecipients</div>
-            </Nav.Item>
-            {/* TODO: Use the code below when "Subrecipients" page is ready */}
-            {/* <Nav.Item>
               <NavLink
                 to={routes.subrecipients()}
                 activeClassName="active"
@@ -46,7 +42,7 @@ const Navigation = () => {
               >
                 Subrecipients
               </NavLink>
-            </Nav.Item> */}
+            </Nav.Item>
             {canViewUsersTab && (
               <Nav.Item>
                 <NavLink
