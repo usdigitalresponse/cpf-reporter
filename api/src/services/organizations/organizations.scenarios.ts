@@ -11,7 +11,6 @@ export const standard = defineScenario<
         name: 'Reporting Period 1',
         startDate: '2024-01-12T15:48:11.499Z',
         endDate: '2024-01-12T15:48:11.499Z',
-        organization: { create: { name: 'String' } },
         inputTemplate: {
           create: {
             name: 'String',

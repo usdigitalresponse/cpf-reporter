@@ -12,7 +12,6 @@ export const QUERY = gql`
       name
       startDate
       endDate
-      organizationId
       inputTemplateId
       outputTemplateId
       createdAt

@@ -101,11 +101,6 @@ export const deleteReportingPeriod: MutationResolvers['deleteReportingPeriod'] =
   }
 
 export const ReportingPeriod: ReportingPeriodRelationResolvers = {
-  organization: (_obj, { root }) => {
-    return db.reportingPeriod
-      .findUnique({ where: { id: root?.id } })
-      .organization()
-  },
   inputTemplate: (_obj, { root }) => {
     return db.reportingPeriod
       .findUnique({ where: { id: root?.id } })

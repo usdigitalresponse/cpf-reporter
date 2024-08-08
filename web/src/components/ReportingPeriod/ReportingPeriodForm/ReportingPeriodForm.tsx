@@ -105,24 +105,6 @@ const ReportingPeriodForm = (props: ReportingPeriodFormProps) => {
         <FieldError name="endDate" className="rw-field-error" />
 
         <Label
-          name="organizationId"
-          className="rw-label"
-          errorClassName="rw-label rw-label-error"
-        >
-          Organization id
-        </Label>
-
-        <NumberField
-          name="organizationId"
-          defaultValue={props.reportingPeriod?.organizationId}
-          className="rw-input"
-          errorClassName="rw-input rw-input-error"
-          validation={{ required: true }}
-        />
-
-        <FieldError name="organizationId" className="rw-field-error" />
-
-        <Label
           name="inputTemplateId"
           className="rw-label"
           errorClassName="rw-label rw-label-error"

@@ -70,10 +70,6 @@ const ReportingPeriod = ({ reportingPeriod }: Props) => {
               <td>{timeTag(reportingPeriod.endDate)}</td>
             </tr>
             <tr>
-              <th>Organization id</th>
-              <td>{reportingPeriod.organizationId}</td>
-            </tr>
-            <tr>
               <th>Input template id</th>
               <td>{reportingPeriod.inputTemplateId}</td>
             </tr>
