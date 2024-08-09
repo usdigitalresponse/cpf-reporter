@@ -9,6 +9,7 @@ export const schema = gql`
     updatedAt: DateTime!
     status: SubrecipientStatus
     subrecipientUploads: [SubrecipientUpload]
+    latestSubrecipientUpload: SubrecipientUpload
   }
 
   enum SubrecipientStatus {

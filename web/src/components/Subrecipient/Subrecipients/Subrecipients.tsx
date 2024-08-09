@@ -12,7 +12,7 @@ import { columnDefs } from './columns'
 
 const Subrecipients = ({ subrecipients }) => {
   console.log('subrecipients:', subrecipients)
-  const filterableInputs = ['id', 'ueiTinCombo']
+  const filterableInputs = ['uei', 'tin']
 
   return (
     <TableBuilder
@@ -21,21 +21,6 @@ const Subrecipients = ({ subrecipients }) => {
       filterableInputs={filterableInputs}
     />
   )
-
-  // return (
-  //   <div className="rw-segment rw-table-wrapper-responsive">
-  //     <table className="rw-table">
-  //       <thead>
-  //         <tr>
-  //           <th>Id</th>
-  //           <th>Name</th>
-  //           <th>Start date</th>
-  //         </tr>
-  //       </thead>
-  //       <tbody></tbody>
-  //     </table>
-  //   </div>
-  // )
 }
 
 export default Subrecipients

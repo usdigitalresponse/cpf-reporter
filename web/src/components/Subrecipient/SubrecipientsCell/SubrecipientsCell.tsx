@@ -1,4 +1,4 @@
-// import type { FindSubrecipientsByOrganizationId } from 'types/graphql'
+// import type { FindSubrecipients } from 'types/graphql'
 
 // import { Link, routes } from '@redwoodjs/router'
 import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
@@ -6,12 +6,21 @@ import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 import Subrecipients from 'src/components/Subrecipient/Subrecipients'
 
 export const QUERY = gql`
-  query subrecipients {
+  query FindSubrecipients {
     subrecipients {
       id
       ueiTinCombo
       createdAt
       updatedAt
+      latestSubrecipientUpload {
+        id
+        rawSubrecipient
+        upload {
+          id
+        }
+        createdAt
+        updatedAt
+      }
     }
   }
 `
