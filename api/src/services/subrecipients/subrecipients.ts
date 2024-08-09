@@ -7,7 +7,13 @@ import type {
 import { db } from 'src/lib/db'
 
 export const subrecipients: QueryResolvers['subrecipients'] = () => {
-  return db.subrecipient.findMany()
+  const currentUser = context.currentUser
+
+  return db.subrecipient.findMany({
+    where: {
+      organizationId: currentUser.agency.organizationId,
+    },
+  })
 }
 
 export const subrecipient: QueryResolvers['subrecipient'] = ({ id }) => {
