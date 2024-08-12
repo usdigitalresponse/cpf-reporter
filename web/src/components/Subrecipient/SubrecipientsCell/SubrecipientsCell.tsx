@@ -29,6 +29,7 @@ export const QUERY = gql`
         }
         upload {
           id
+          filename
         }
         createdAt
         updatedAt
@@ -37,6 +38,7 @@ export const QUERY = gql`
         id
         upload {
           id
+          filename
         }
         createdAt
       }

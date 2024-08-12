@@ -12,6 +12,7 @@ interface SubrecipientData {
     id: string
     upload: {
       id: string
+      filename: string
     }
     createdAt: string
   }>
@@ -34,37 +35,56 @@ interface ParsedSubrecipient {
 const columnHelper = createColumnHelper<SubrecipientData>()
 
 function uploadLinksDisplay(row: SubrecipientData) {
+  if (!row.latestSubrecipientUpload) {
+    return <div>No uploads available</div>
+  }
+
   const latestUpload = row.latestSubrecipientUpload
-  const otherUploads = row.subrecipientUploads.filter(
-    (upload) => upload.id !== latestUpload.id
-  )
+  const otherUploads =
+    row.subrecipientUploads?.filter(
+      (upload) => upload.id !== latestUpload.id
+    ) || []
 
   return (
     <>
       <div className="fw-bold mt-8">Latest Upload:</div>
       <div className="mb-8">
-        <Link
-          to={routes.upload({ id: latestUpload.upload.id })}
-          title={`Show upload ${latestUpload.upload.id} detail`}
-          className="link-underline link-underline-opacity-0"
-        >
-          {latestUpload.id}
-        </Link>
-      </div>
-      <br />
-      <div className="fw-bold">Other Uploads:</div>
-      <div>
-        {otherUploads.map((upload) => (
+        {latestUpload.upload ? (
           <Link
-            key={upload.id}
-            to={routes.upload({ id: upload.upload.id })}
-            title={`Show upload ${upload.upload.id} detail`}
-            className="link-underline link-underline-opacity-0 me-2"
+            to={routes.upload({ id: latestUpload.upload.id })}
+            title={`Show upload ${latestUpload.upload.id} detail`}
+            className="link-underline link-underline-opacity-0"
           >
-            {upload.id}
+            {latestUpload.upload.filename}.xlsm
           </Link>
-        ))}
+        ) : (
+          'Upload details not available'
+        )}
       </div>
+
+      {otherUploads.length > 0 && (
+        <>
+          <div className="fw-bold">Other Uploads:</div>
+          <div>
+            {otherUploads.map((upload) =>
+              upload.upload ? (
+                <Link
+                  key={upload.id}
+                  to={routes.upload({ id: upload.upload.id })}
+                  title={`Show upload ${upload.upload.id} detail`}
+                  className="link-underline link-underline-opacity-0 me-2"
+                >
+                  {upload.upload.filename}.xlsm
+                </Link>
+              ) : (
+                <span key={upload.id} className="me-2">
+                  Upload {upload.id} (details not available)
+                </span>
+              )
+            )}
+          </div>
+        </>
+      )}
     </>
   )
 }
@@ -99,35 +119,40 @@ function formatDetails(
     </ul>
   )
 }
+const getUEI = (ueiTinCombo: string) => {
+  const value = ueiTinCombo.split('_')[0]
+  return value ? Number(value) : null
+}
+
+const getTIN = (ueiTinCombo: string) => {
+  const value = ueiTinCombo.split('_')[1]
+  return value ? Number(value) : null
+}
 
 export const columnDefs: ColumnDef<SubrecipientData>[] = [
-  columnHelper.accessor('ueiTinCombo', {
+  columnHelper.accessor((row) => getUEI(row.ueiTinCombo), {
     id: 'uei',
-    cell: (info) => {
-      const value = info.getValue()
-      return typeof value === 'string' ? value.split('_')[0] : ''
-    },
+    cell: (info) => info.getValue() ?? '',
     header: 'UEI',
   }),
-  columnHelper.accessor('ueiTinCombo', {
+  columnHelper.accessor((row) => getTIN(row.ueiTinCombo), {
     id: 'tin',
-    cell: (info) => {
-      const value = info.getValue()
-      return typeof value === 'string' ? value.split('_')[1] : ''
-    },
+    cell: (info) => info.getValue() ?? '',
     header: 'TIN',
   }),
   columnHelper.accessor('latestSubrecipientUpload.parsedSubrecipient', {
     id: 'details',
     header: 'Details',
     cell: (info) => formatDetails(info.getValue()),
+    enableSorting: false,
   }),
   columnHelper.accessor('createdAt', {
     cell: (info) => formatDateString(info.getValue()),
     header: 'Created Date',
   }),
   columnHelper.accessor('latestSubrecipientUpload.updatedAt', {
-    cell: (info) => formatDateString(info.getValue()),
+    cell: (info) =>
+      info.getValue() ? formatDateString(info.getValue() as string) : 'N/A',
     header: 'Last Updated Date',
   }),
   {
