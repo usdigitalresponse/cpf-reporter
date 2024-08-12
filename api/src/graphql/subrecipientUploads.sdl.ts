@@ -9,6 +9,22 @@ export const schema = gql`
     createdAt: DateTime!
     updatedAt: DateTime!
     version: Version!
+    parsedSubrecipient: ParsedSubrecipient
+  }
+
+  type ParsedSubrecipient {
+    name: String!
+    recipientId: String!
+    pocName: String!
+    pocPhoneNumber: String!
+    pocEmailAddress: String!
+    zip5: String!
+    zip4: String!
+    addressLine1: String!
+    addressLine2: String!
+    addressLine3: String!
+    city: String!
+    state: String!
   }
 
   enum Version {
