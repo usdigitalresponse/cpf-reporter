@@ -59,14 +59,7 @@ export const Subrecipient: SubrecipientRelationResolvers = {
       .findUnique({ where: { id: root?.id } })
       .subrecipientUploads()
   },
-  // subrecipientUploads: (_obj, { root }) => {
-  //   return db.subrecipientUpload.findMany({
-  //     where: { subrecipientId: root.id },
-  //     orderBy: { createdAt: 'desc' },
-  //   })
-  // },
   latestSubrecipientUpload: async (_obj, { root }) => {
-    console.log('root is  ', root)
     return db.subrecipientUpload.findFirst({
       where: { subrecipientId: root?.id },
       orderBy: {

@@ -1,40 +1,13 @@
 import { createColumnHelper, ColumnDef } from '@tanstack/react-table'
+import { ParsedSubrecipient, Subrecipient } from 'types/graphql'
 
 import { Link, routes } from '@redwoodjs/router'
 
 import { formatDateString } from 'src/utils'
 
-interface SubrecipientData {
-  ueiTinCombo: string
-  createdAt: string
-  latestSubrecipientUpload: any
-  subrecipientUploads: Array<{
-    id: string
-    upload: {
-      id: string
-      filename: string
-    }
-    createdAt: string
-  }>
-}
-interface ParsedSubrecipient {
-  name: string
-  recipientId: string
-  pocName: string
-  pocPhoneNumber: string
-  pocEmailAddress: string
-  zip5: string
-  zip4: string
-  addressLine1: string
-  addressLine2: string
-  addressLine3: string
-  city: string
-  state: string
-}
+const columnHelper = createColumnHelper<Subrecipient>()
 
-const columnHelper = createColumnHelper<SubrecipientData>()
-
-function uploadLinksDisplay(row: SubrecipientData) {
+function uploadLinksDisplay(row: Subrecipient) {
   if (!row.latestSubrecipientUpload) {
     return <div>No uploads available</div>
   }
@@ -47,8 +20,8 @@ function uploadLinksDisplay(row: SubrecipientData) {
 
   return (
     <>
-      <div className="fw-bold mt-8">Latest Upload:</div>
-      <div className="mb-8">
+      <div className="fw-bold">Latest Upload:</div>
+      <div className="mb-3">
         {latestUpload.upload ? (
           <Link
             to={routes.upload({ id: latestUpload.upload.id })}
@@ -72,7 +45,7 @@ function uploadLinksDisplay(row: SubrecipientData) {
                   key={upload.id}
                   to={routes.upload({ id: upload.upload.id })}
                   title={`Show upload ${upload.upload.id} detail`}
-                  className="link-underline link-underline-opacity-0 me-2"
+                  className="link-underline link-underline-opacity-0"
                 >
                   {upload.upload.filename}.xlsm
                 </Link>
@@ -129,7 +102,7 @@ const getTIN = (ueiTinCombo: string) => {
   return value ? Number(value) : null
 }
 
-export const columnDefs: ColumnDef<SubrecipientData>[] = [
+export const columnDefs: ColumnDef<Subrecipient>[] = [
   columnHelper.accessor((row) => getUEI(row.ueiTinCombo), {
     id: 'uei',
     cell: (info) => info.getValue() ?? '',
