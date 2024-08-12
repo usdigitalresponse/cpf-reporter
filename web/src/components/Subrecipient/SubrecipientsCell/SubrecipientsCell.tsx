@@ -14,13 +14,31 @@ export const QUERY = gql`
       latestSubrecipientUpload {
         id
         parsedSubrecipient {
+          name
+          recipientId
+          pocName
+          pocPhoneNumber
+          pocEmailAddress
+          zip5
+          zip4
           addressLine1
+          addressLine2
+          addressLine3
+          city
+          state
         }
         upload {
           id
         }
         createdAt
         updatedAt
+      }
+      subrecipientUploads {
+        id
+        upload {
+          id
+        }
+        createdAt
       }
     }
   }
@@ -41,7 +59,3 @@ export const Success = ({
 }: CellSuccessProps<FindSubrecipients>) => {
   return <Subrecipients subrecipients={subrecipients} />
 }
-
-// export const Success = ({ subrecipients }: CellSuccessProps) => {
-//   return <Subrecipients subrecipients={subrecipients} />
-// }

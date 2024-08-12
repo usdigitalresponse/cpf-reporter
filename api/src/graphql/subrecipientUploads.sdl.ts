@@ -18,8 +18,8 @@ export const schema = gql`
     pocName: String!
     pocPhoneNumber: String!
     pocEmailAddress: String!
-    zip5: String!
     zip4: String!
+    zip5: String!
     addressLine1: String!
     addressLine2: String!
     addressLine3: String!
