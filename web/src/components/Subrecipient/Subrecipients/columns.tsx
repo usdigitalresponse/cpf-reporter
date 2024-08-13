@@ -3,7 +3,7 @@ import { ParsedSubrecipient, Subrecipient } from 'types/graphql'
 
 import { Link, routes } from '@redwoodjs/router'
 
-import { formatDateString } from 'src/utils'
+import { formatDateString, formatPhoneNumber } from 'src/utils'
 
 const columnHelper = createColumnHelper<Subrecipient>()
 
@@ -71,7 +71,12 @@ function formatDetails(
     { label: 'Name', value: parsedSubrecipient.name },
     { label: 'Recipient ID', value: parsedSubrecipient.recipientId },
     { label: 'POC Name', value: parsedSubrecipient.pocName },
-    { label: 'POC Phone Number', value: parsedSubrecipient.pocPhoneNumber },
+    {
+      label: 'POC Phone Number',
+      value:
+        formatPhoneNumber(parsedSubrecipient.pocPhoneNumber) ||
+        parsedSubrecipient.pocPhoneNumber,
+    },
     { label: 'POC Email Address', value: parsedSubrecipient.pocEmailAddress },
     { label: 'Zip5', value: parsedSubrecipient.zip5 },
     { label: 'Zip4', value: parsedSubrecipient.zip4 },
@@ -92,6 +97,7 @@ function formatDetails(
     </ul>
   )
 }
+
 const getUEI = (ueiTinCombo: string) => {
   const value = ueiTinCombo.split('_')[0]
   return value ? Number(value) : null
