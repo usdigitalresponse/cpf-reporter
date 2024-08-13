@@ -1,4 +1,7 @@
 import type { SubrecipientUpload } from '@prisma/client'
+import type { GraphQLResolveInfo } from 'graphql'
+
+import type { RedwoodGraphQLContext } from '@redwoodjs/graphql-server'
 
 import {
   subrecipientUploads,
@@ -6,6 +9,8 @@ import {
   createSubrecipientUpload,
   updateSubrecipientUpload,
   deleteSubrecipientUpload,
+  parseRawSubrecipient,
+  SubrecipientUpload as SubrecipientUploadRelationResolver,
 } from './subrecipientUploads'
 import type { StandardScenario } from './subrecipientUploads.scenarios'
 
@@ -81,6 +86,29 @@ describe('subrecipientUploads', () => {
       const result = await subrecipientUpload({ id: original.id })
 
       expect(result).toEqual(null)
+    }
+  )
+
+  scenario(
+    'returns parsed subrecipient data when requested',
+    async (scenario: StandardScenario) => {
+      const result = await subrecipientUpload({
+        id: scenario.subrecipientUpload.one.id,
+      })
+      expect(result).toBeDefined()
+      const expectedParsedData = parseRawSubrecipient(result.rawSubrecipient)
+
+      const parsedResult =
+        await SubrecipientUploadRelationResolver.parsedSubrecipient(
+          {},
+          {
+            root: result,
+            context: {} as RedwoodGraphQLContext,
+            info: {} as GraphQLResolveInfo,
+          }
+        )
+
+      expect(parsedResult).toEqual(expectedParsedData)
     }
   )
 })

@@ -41,7 +41,7 @@ export const deleteSubrecipientUpload: MutationResolvers['deleteSubrecipientUplo
     })
   }
 
-const parseRawSubrecipient = (rawData) => {
+export const parseRawSubrecipient = (rawData) => {
   return {
     name: rawData.Name || '',
     recipientId: rawData.Recipient_Profile_ID__c || '',

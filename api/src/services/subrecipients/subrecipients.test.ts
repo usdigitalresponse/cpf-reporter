@@ -1,4 +1,7 @@
 import type { Subrecipient } from '@prisma/client'
+import type { GraphQLResolveInfo } from 'graphql'
+
+import type { RedwoodGraphQLContext } from '@redwoodjs/graphql-server'
 
 import {
   subrecipients,
@@ -6,6 +9,7 @@ import {
   createSubrecipient,
   updateSubrecipient,
   deleteSubrecipient,
+  Subrecipient as SubrecipientResolver,
 } from './subrecipients'
 import type { StandardScenario } from './subrecipients.scenarios'
 
@@ -67,4 +71,28 @@ describe('subrecipients', () => {
 
     expect(result).toEqual(null)
   })
+
+  scenario(
+    'returns the latest subrecipient upload when there are multiple uploads',
+    async (scenario: StandardScenario) => {
+      const result = await subrecipient({ id: scenario.subrecipient.one.id })
+      expect(result).toBeDefined()
+
+      const latestUpload = await SubrecipientResolver.latestSubrecipientUpload(
+        {},
+        {
+          root: result,
+          context: {} as RedwoodGraphQLContext,
+          info: {} as GraphQLResolveInfo,
+        }
+      )
+
+      expect(latestUpload).toBeDefined()
+      expect(latestUpload.version).toEqual('V2024_01_07')
+      expect(latestUpload.rawSubrecipient).toEqual({ data: 'new data' })
+      expect(latestUpload.createdAt).toEqual(
+        new Date('2024-01-07T10:00:00.000Z')
+      )
+    }
+  )
 })
