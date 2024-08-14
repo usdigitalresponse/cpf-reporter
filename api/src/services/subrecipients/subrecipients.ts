@@ -63,8 +63,98 @@ export const Subrecipient: SubrecipientRelationResolvers = {
     return db.subrecipientUpload.findFirst({
       where: { subrecipientId: root?.id },
       orderBy: {
-        createdAt: 'desc',
+        updatedAt: 'desc',
       },
     })
+  },
+  latestValidSubrecipientUpload: async (_obj, { root }) => {
+    const latestValidSubrecipientUpload = await db.subrecipientUpload.findFirst(
+      {
+        where: { subrecipientId: root?.id },
+        orderBy: { updatedAt: 'desc' },
+        include: {
+          upload: {
+            include: {
+              validations: {
+                orderBy: { createdAt: 'desc' },
+                take: 1,
+              },
+            },
+          },
+        },
+      }
+    )
+
+    if (
+      latestValidSubrecipientUpload &&
+      latestValidSubrecipientUpload.upload.validations[0]?.passed
+    ) {
+      return latestValidSubrecipientUpload
+    }
+
+    return null
+  },
+  validSubrecipientUploads: async (_obj, { root }) => {
+    const uploads = await db.subrecipientUpload.findMany({
+      where: {
+        subrecipientId: root?.id,
+        upload: {
+          validations: { some: { passed: true } },
+        },
+      },
+      orderBy: { updatedAt: 'desc' },
+      include: {
+        upload: {
+          include: {
+            validations: {
+              orderBy: { createdAt: 'desc' },
+              take: 1,
+            },
+          },
+        },
+      },
+    })
+
+    const transformedUploads = uploads.map((upload) => ({
+      ...upload,
+      upload: {
+        ...upload.upload,
+        latestValidation: upload.upload.validations[0] || null,
+      },
+    }))
+
+    // Only include parsedSubrecipient for the latest upload
+    // if (transformedUploads.length > 0) {
+    //   transformedUploads[0].parsedSubrecipient = await getParsedSubrecipient(transformedUploads[0])
+    // }
+
+    return transformedUploads
+  },
+  invalidAndProcessingSubrecipientUploads: async (_obj, { root }) => {
+    const uploads = await db.subrecipientUpload.findMany({
+      where: {
+        subrecipientId: root?.id,
+        upload: {
+          validations: {
+            some: {
+              OR: [{ passed: false }, { results: { equals: null } }],
+            },
+          },
+        },
+      },
+      orderBy: { updatedAt: 'desc' },
+      include: {
+        upload: {
+          include: {
+            validations: {
+              orderBy: { createdAt: 'desc' },
+              take: 1,
+            },
+          },
+        },
+      },
+    })
+
+    return uploads
   },
 }

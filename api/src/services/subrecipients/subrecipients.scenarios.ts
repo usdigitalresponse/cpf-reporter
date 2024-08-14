@@ -16,6 +16,7 @@ export const standard = defineScenario<Prisma.SubrecipientCreateArgs>({
               rawSubrecipient: { data: 'old data' },
               version: 'V2023_12_12',
               createdAt: '2023-12-09T14:50:18.317Z',
+              updatedAt: '2023-12-09T14:52:18.317Z',
               upload: {
                 create: {
                   filename: 'old_upload.xlsx',
@@ -55,6 +56,7 @@ export const standard = defineScenario<Prisma.SubrecipientCreateArgs>({
               rawSubrecipient: { data: 'new data' },
               version: 'V2024_01_07',
               createdAt: '2024-01-07T10:00:00.000Z',
+              updatedAt: '2024-12-10T14:52:18.317Z',
               upload: {
                 create: {
                   filename: 'new_upload.xlsx',

@@ -90,8 +90,8 @@ describe('subrecipients', () => {
       expect(latestUpload).toBeDefined()
       expect(latestUpload.version).toEqual('V2024_01_07')
       expect(latestUpload.rawSubrecipient).toEqual({ data: 'new data' })
-      expect(latestUpload.createdAt).toEqual(
-        new Date('2024-01-07T10:00:00.000Z')
+      expect(latestUpload.updatedAt).toEqual(
+        new Date('2024-12-10T14:52:18.317Z')
       )
     }
   )

@@ -13,10 +13,56 @@ function uploadLinksDisplay(row: Subrecipient) {
   }
 
   const latestUpload = row.latestSubrecipientUpload
+
+  const isLatestUploadValidationValid =
+    latestUpload.upload?.latestValidation.passed &&
+    latestUpload.upload.latestValidation.results !== null
+
   const otherUploads =
     row.subrecipientUploads?.filter(
       (upload) => upload.id !== latestUpload.id
     ) || []
+
+  if (!isLatestUploadValidationValid) {
+    return (
+      <>
+        <div className="fw-bold">Other Uploads:</div>
+        <div>
+          {latestUpload.upload ? (
+            <Link
+              to={routes.upload({ id: latestUpload.upload.id })}
+              title={`Show upload ${latestUpload.upload.id} detail`}
+              className="link-underline link-underline-opacity-0"
+            >
+              [Invalid] {latestUpload.upload.filename}.xlsm
+            </Link>
+          ) : (
+            'Upload details not available'
+          )}
+        </div>
+        {otherUploads.length > 0 && (
+          <>
+            {otherUploads.map((upload) =>
+              upload.upload ? (
+                <Link
+                  key={upload.id}
+                  to={routes.upload({ id: upload.upload.id })}
+                  title={`Show upload ${upload.upload.id} detail`}
+                  className="link-underline link-underline-opacity-0"
+                >
+                  {upload.upload.filename}.xlsm
+                </Link>
+              ) : (
+                <span key={upload.id} className="me-2">
+                  Upload {upload.id} (details not available)
+                </span>
+              )
+            )}
+          </>
+        )}
+      </>
+    )
+  }
 
   return (
     <>

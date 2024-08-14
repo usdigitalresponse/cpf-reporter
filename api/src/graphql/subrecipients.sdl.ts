@@ -10,6 +10,9 @@ export const schema = gql`
     status: SubrecipientStatus
     subrecipientUploads: [SubrecipientUpload]
     latestSubrecipientUpload: SubrecipientUpload
+    latestValidSubrecipientUpload: SubrecipientUpload
+    validSubrecipientUploads: [SubrecipientUpload!]
+    invalidAndProcessingSubrecipientUploads: [SubrecipientUpload!]
   }
 
   enum SubrecipientStatus {
