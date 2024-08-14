@@ -1,18 +1,18 @@
-import pytest
-from unittest.mock import patch, MagicMock, ANY, call
-from aws_lambda_typing.context import Context
 import json
 from tempfile import NamedTemporaryFile
+from unittest.mock import ANY, MagicMock, call, patch
+
+import pytest
+from aws_lambda_typing.context import Context
 from openpyxl import Workbook
 
 from src.functions.subrecipient_treasury_report_gen import (
-    handle,
-    write_subrecipients_to_workbook,
     FIRST_BLANK_ROW_NUM,
-    upload_workbook,
     WORKSHEET_NAME,
-    BUCKET_NAME,
     get_most_recent_upload,
+    handle,
+    upload_workbook,
+    write_subrecipients_to_workbook,
 )
 
 
@@ -271,27 +271,25 @@ class TestUploadSubrecipientWorkbook:
     @patch("src.functions.subrecipient_treasury_report_gen.upload_generated_file_to_s3")
     @patch("src.functions.subrecipient_treasury_report_gen.convert_xlsx_to_csv")
     def test_upload_workbook(
-        self, mock_convert_xlsx_to_csv, mock_upload_generated_file_to_s3
+        self, mock_convert_xlsx_to_csv, mock_upload_generated_file_to_s3, monkeypatch
     ):
+        monkeypatch.setenv("REPORTING_DATA_BUCKET_NAME", "test-cpf-reporter")
         mock_s3_client = MagicMock()
         workbook = Workbook()
         workbook.create_sheet(WORKSHEET_NAME)
-        user_id = "test_user"
-        organization_id = "test_org"
-        reporting_period_id = "test_period"
-        upload_template_location_minus_filetype = f"/treasuryreports/{organization_id}/{reporting_period_id}/{user_id}/CPFSubrecipientTemplate"
+        organization_id = 99
+        reporting_period_id = 88
+        upload_template_location_minus_filetype = f"/treasuryreports/{organization_id}/{reporting_period_id}/CPFSubrecipientTemplate"
         upload_template_xlsx_key = f"{upload_template_location_minus_filetype}.xlsx"
         upload_template_csv_key = f"{upload_template_location_minus_filetype}.csv"
 
-        upload_workbook(
-            workbook, mock_s3_client, user_id, organization_id, reporting_period_id
-        )
+        upload_workbook(workbook, mock_s3_client, organization_id, reporting_period_id)
 
         mock_convert_xlsx_to_csv.assert_called_once()
 
         calls = [
-            call(mock_s3_client, BUCKET_NAME, upload_template_xlsx_key, ANY),
-            call(mock_s3_client, BUCKET_NAME, upload_template_csv_key, ANY),
+            call(mock_s3_client, "test-cpf-reporter", upload_template_xlsx_key, ANY),
+            call(mock_s3_client, "test-cpf-reporter", upload_template_csv_key, ANY),
         ]
         mock_upload_generated_file_to_s3.assert_has_calls(calls, any_order=True)
 

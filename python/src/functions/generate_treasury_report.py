@@ -123,11 +123,6 @@ def process_event(payload: ProjectLambdaPayload, logger):
     ProjectRowSchema = getSchemaByProject(VERSION, project_use_code)
 
     organization = payload.organization
-    organization_id = payload.organization.id
-    current_reporting_period_id = (
-        payload.organization.preferences.current_reporting_period_id
-    )
-    user = payload.user
 
     # If the treasury report file exists, download it and store the data
     # If it doesn't exist, download the output template
