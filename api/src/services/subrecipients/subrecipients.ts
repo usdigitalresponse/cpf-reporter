@@ -131,16 +131,9 @@ export const Subrecipient: SubrecipientRelationResolvers = {
     return transformedUploads
   },
   invalidAndProcessingSubrecipientUploads: async (_obj, { root }) => {
-    const uploads = await db.subrecipientUpload.findMany({
+    const subrecipientUploads = await db.subrecipientUpload.findMany({
       where: {
         subrecipientId: root?.id,
-        upload: {
-          validations: {
-            some: {
-              OR: [{ passed: false }, { results: { equals: null } }],
-            },
-          },
-        },
       },
       orderBy: { updatedAt: 'desc' },
       include: {
@@ -155,6 +148,14 @@ export const Subrecipient: SubrecipientRelationResolvers = {
       },
     })
 
-    return uploads
+    // Filter the subrecipientUploads based on the latest validation of their associated upload
+    const invalidAndProcessingUploads = subrecipientUploads.filter(
+      (subrecipientUpload) => {
+        const latestValidation = subrecipientUpload.upload.validations[0]
+        return latestValidation && latestValidation.passed === false
+      }
+    )
+
+    return invalidAndProcessingUploads
   },
 }

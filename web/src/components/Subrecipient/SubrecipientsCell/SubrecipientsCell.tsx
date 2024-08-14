@@ -11,6 +11,19 @@ export const QUERY = gql`
       ueiTinCombo
       createdAt
       updatedAt
+      latestValidSubrecipientUpload {
+        id
+        upload {
+          id
+          filename
+          latestValidation {
+            passed
+            results
+          }
+        }
+        createdAt
+        updatedAt
+      }
       validSubrecipientUploads {
         id
         upload {
@@ -40,52 +53,6 @@ export const QUERY = gql`
     }
   }
 `
-
-// export const QUERY = gql`
-//   query FindSubrecipients {
-//     subrecipients {
-//       id
-//       ueiTinCombo
-//       createdAt
-//       updatedAt
-//       latestSubrecipientUpload {
-//         id
-//         parsedSubrecipient {
-//           name
-//           recipientId
-//           pocName
-//           pocPhoneNumber
-//           pocEmailAddress
-//           zip5
-//           zip4
-//           addressLine1
-//           addressLine2
-//           addressLine3
-//           city
-//           state
-//         }
-//         upload {
-//           id
-//           filename
-//           latestValidation {
-//             passed
-//             results
-//           }
-//         }
-//         createdAt
-//         updatedAt
-//       }
-//       subrecipientUploads {
-//         id
-//         upload {
-//           id
-//           filename
-//         }
-//         createdAt
-//       }
-//     }
-//   }
-// `
 
 export const Loading = () => <div>Loading...</div>
 

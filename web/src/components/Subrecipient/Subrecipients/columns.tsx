@@ -8,99 +8,66 @@ import { formatDateString, formatPhoneNumber } from 'src/utils'
 const columnHelper = createColumnHelper<Subrecipient>()
 
 function uploadLinksDisplay(row: Subrecipient) {
-  if (!row.latestSubrecipientUpload) {
-    return <div>No uploads available</div>
-  }
-
-  const latestUpload = row.latestSubrecipientUpload
-
-  const isLatestUploadValidationValid =
-    latestUpload.upload?.latestValidation.passed &&
-    latestUpload.upload.latestValidation.results !== null
-
-  const otherUploads =
-    row.subrecipientUploads?.filter(
-      (upload) => upload.id !== latestUpload.id
-    ) || []
-
-  if (!isLatestUploadValidationValid) {
-    return (
-      <>
-        <div className="fw-bold">Other Uploads:</div>
-        <div>
-          {latestUpload.upload ? (
-            <Link
-              to={routes.upload({ id: latestUpload.upload.id })}
-              title={`Show upload ${latestUpload.upload.id} detail`}
-              className="link-underline link-underline-opacity-0"
-            >
-              [Invalid] {latestUpload.upload.filename}.xlsm
-            </Link>
-          ) : (
-            'Upload details not available'
-          )}
-        </div>
-        {otherUploads.length > 0 && (
-          <>
-            {otherUploads.map((upload) =>
-              upload.upload ? (
-                <Link
-                  key={upload.id}
-                  to={routes.upload({ id: upload.upload.id })}
-                  title={`Show upload ${upload.upload.id} detail`}
-                  className="link-underline link-underline-opacity-0"
-                >
-                  {upload.upload.filename}.xlsm
-                </Link>
-              ) : (
-                <span key={upload.id} className="me-2">
-                  Upload {upload.id} (details not available)
-                </span>
-              )
-            )}
-          </>
-        )}
-      </>
-    )
-  }
+  const {
+    latestValidSubrecipientUpload,
+    validSubrecipientUploads,
+    invalidAndProcessingSubrecipientUploads,
+  } = row
 
   return (
     <>
-      <div className="fw-bold">Latest Upload:</div>
+      <div className="fw-bold">Latest Valid Upload:</div>
       <div className="mb-3">
-        {latestUpload.upload ? (
-          <Link
-            to={routes.upload({ id: latestUpload.upload.id })}
-            title={`Show upload ${latestUpload.upload.id} detail`}
-            className="link-underline link-underline-opacity-0"
-          >
-            {latestUpload.upload.filename}.xlsm
-          </Link>
-        ) : (
-          'Upload details not available'
-        )}
+        {latestValidSubrecipientUpload &&
+          latestValidSubrecipientUpload.upload && (
+            <Link
+              to={routes.upload({
+                id: latestValidSubrecipientUpload.upload.id,
+              })}
+              title={`Show upload ${latestValidSubrecipientUpload.upload.id} detail`}
+              className="link-underline link-underline-opacity-0"
+            >
+              {latestValidSubrecipientUpload.upload.filename}.xlsm
+            </Link>
+          )}
       </div>
 
-      {otherUploads.length > 0 && (
+      {validSubrecipientUploads.length > 1 && (
         <>
-          <div className="fw-bold">Other Uploads:</div>
+          <div className="fw-bold">Other Valid Uploads:</div>
+          <div className="mb-3">
+            {validSubrecipientUploads.slice(1).map((upload) => (
+              <Link
+                key={upload.id}
+                to={routes.upload({ id: upload.upload.id })}
+              >
+                {upload.upload.filename}.xlsm
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
+
+      {invalidAndProcessingSubrecipientUploads.length > 0 && (
+        <>
+          <div className="fw-bold">All Other Uploads:</div>
           <div>
-            {otherUploads.map((upload) =>
-              upload.upload ? (
-                <Link
-                  key={upload.id}
-                  to={routes.upload({ id: upload.upload.id })}
-                  title={`Show upload ${upload.upload.id} detail`}
-                  className="link-underline link-underline-opacity-0"
-                >
-                  {upload.upload.filename}.xlsm
-                </Link>
-              ) : (
-                <span key={upload.id} className="me-2">
-                  Upload {upload.id} (details not available)
-                </span>
-              )
-            )}
+            {invalidAndProcessingSubrecipientUploads.map((upload) => (
+              <Link
+                key={upload.id}
+                to={routes.upload({ id: upload.upload.id })}
+              >
+                {upload.upload.latestValidation.passed === false &&
+                upload.upload.latestValidation.results !== null
+                  ? '[Invalid] '
+                  : ''}
+                {upload.upload.latestValidation.passed === false &&
+                upload.upload.latestValidation.results === null
+                  ? '[Processing] '
+                  : ''}
+                {upload.upload.filename}.xlsm
+              </Link>
+            ))}
           </div>
         </>
       )}
