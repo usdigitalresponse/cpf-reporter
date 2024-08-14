@@ -8,29 +8,31 @@ import { formatDateString, formatPhoneNumber } from 'src/utils'
 const columnHelper = createColumnHelper<Subrecipient>()
 
 function uploadLinksDisplay(row: Subrecipient) {
-  const {
-    latestValidSubrecipientUpload,
-    validSubrecipientUploads,
-    invalidAndProcessingSubrecipientUploads,
-  } = row
+  const { validSubrecipientUploads, invalidSubrecipientUploads } = row
+  console.log('row', invalidSubrecipientUploads)
 
   return (
     <>
-      <div className="fw-bold">Latest Valid Upload:</div>
-      <div className="mb-3">
-        {latestValidSubrecipientUpload &&
-          latestValidSubrecipientUpload.upload && (
-            <Link
-              to={routes.upload({
-                id: latestValidSubrecipientUpload.upload.id,
-              })}
-              title={`Show upload ${latestValidSubrecipientUpload.upload.id} detail`}
-              className="link-underline link-underline-opacity-0"
-            >
-              {latestValidSubrecipientUpload.upload.filename}.xlsm
-            </Link>
-          )}
-      </div>
+      {validSubrecipientUploads.length > 0 &&
+        validSubrecipientUploads[0].upload && (
+          <>
+            <div className="fw-bold">Latest Valid Upload:</div>
+            <div className="mb-3">
+              {validSubrecipientUploads.length > 0 &&
+                validSubrecipientUploads[0].upload && (
+                  <Link
+                    to={routes.upload({
+                      id: validSubrecipientUploads[0].upload.id,
+                    })}
+                    title={`Show upload ${validSubrecipientUploads[0].upload.id} detail`}
+                    className="link-underline link-underline-opacity-0"
+                  >
+                    {validSubrecipientUploads[0].upload.filename}.xlsm
+                  </Link>
+                )}
+            </div>
+          </>
+        )}
 
       {validSubrecipientUploads.length > 1 && (
         <>
@@ -48,24 +50,16 @@ function uploadLinksDisplay(row: Subrecipient) {
         </>
       )}
 
-      {invalidAndProcessingSubrecipientUploads.length > 0 && (
+      {invalidSubrecipientUploads.length > 0 && (
         <>
-          <div className="fw-bold">All Other Uploads:</div>
+          <div className="fw-bold">Other Uploads:</div>
           <div>
-            {invalidAndProcessingSubrecipientUploads.map((upload) => (
+            {invalidSubrecipientUploads.map((upload) => (
               <Link
                 key={upload.id}
                 to={routes.upload({ id: upload.upload.id })}
               >
-                {upload.upload.latestValidation.passed === false &&
-                upload.upload.latestValidation.results !== null
-                  ? '[Invalid] '
-                  : ''}
-                {upload.upload.latestValidation.passed === false &&
-                upload.upload.latestValidation.results === null
-                  ? '[Processing] '
-                  : ''}
-                {upload.upload.filename}.xlsm
+                [Invalid] {upload.upload.filename}.xlsm
               </Link>
             ))}
           </div>
@@ -132,20 +126,32 @@ export const columnDefs: ColumnDef<Subrecipient>[] = [
     cell: (info) => info.getValue() ?? '',
     header: 'TIN',
   }),
-  columnHelper.accessor('latestSubrecipientUpload.parsedSubrecipient', {
+  columnHelper.accessor('validSubrecipientUploads', {
     id: 'details',
     header: 'Details',
-    cell: (info) => formatDetails(info.getValue()),
+    cell: (info) => {
+      const uploads = info.getValue()
+      if (uploads && uploads.length > 0 && uploads[0].parsedSubrecipient) {
+        return formatDetails(uploads[0].parsedSubrecipient)
+      }
+      return 'No details available'
+    },
     enableSorting: false,
   }),
   columnHelper.accessor('createdAt', {
     cell: (info) => formatDateString(info.getValue()),
     header: 'Created Date',
   }),
-  columnHelper.accessor('latestSubrecipientUpload.updatedAt', {
-    cell: (info) =>
-      info.getValue() ? formatDateString(info.getValue() as string) : 'N/A',
+  columnHelper.accessor('validSubrecipientUploads', {
+    id: 'lastUpdatedDate',
     header: 'Last Updated Date',
+    cell: (info) => {
+      const uploads = info.getValue()
+      if (uploads && uploads.length > 0 && uploads[0].updatedAt) {
+        return formatDateString(uploads[0].updatedAt)
+      }
+      return 'N/A'
+    },
   }),
   {
     accessorFn: uploadLinksDisplay,
