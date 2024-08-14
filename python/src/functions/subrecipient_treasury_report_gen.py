@@ -13,27 +13,17 @@ from pydantic import BaseModel
 from src.lib.constants import OUTPUT_TEMPLATE_FILENAME_BY_PROJECT
 from src.lib.logging import get_logger, reset_contextvars
 from src.lib.s3_helper import download_s3_object, upload_generated_file_to_s3
-from src.lib.treasury_generation_common import get_output_template
+from src.lib.treasury_generation_common import (
+    OrganizationObj,
+    UserObj,
+    get_output_template,
+)
 from src.lib.workbook_utils import convert_xlsx_to_csv, find_last_populated_row
 from src.schemas.schema_versions import getSubrecipientRowClass
 
 FIRST_BLANK_ROW_NUM = 8
 WORKSHEET_NAME = "Baseline"
 FIRST_DATA_COLUMN = "B"
-
-
-class PreferencesObj(BaseModel):
-    current_reporting_period_id: int
-
-
-class OrganizationObj(BaseModel):
-    id: int
-    preferences: PreferencesObj
-
-
-class UserObj(BaseModel):
-    id: int
-    email: str
 
 
 class SubrecipientLambdaPayload(BaseModel):

@@ -2,9 +2,24 @@ import os
 from typing import IO
 
 from mypy_boto3_s3.client import S3Client
+from pydantic import BaseModel
 
 from src.lib.constants import OUTPUT_TEMPLATE_FILENAME_BY_PROJECT
 from src.lib.logging import get_logger
+
+
+class PreferencesObj(BaseModel):
+    current_reporting_period_id: int
+
+
+class OrganizationObj(BaseModel):
+    id: int
+    preferences: PreferencesObj
+
+
+class UserObj(BaseModel):
+    id: int
+    email: str
 
 
 def get_output_template(
