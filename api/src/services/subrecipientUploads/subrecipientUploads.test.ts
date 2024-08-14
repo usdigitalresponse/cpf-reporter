@@ -43,17 +43,14 @@ describe('subrecipientUploads', () => {
     async (scenario: StandardScenario) => {
       const result = await createSubrecipientUpload({
         input: {
-          subrecipientId: scenario.subrecipientUpload.two.subrecipientId,
-          ueiTinCombo: 'String',
+          subrecipientId: scenario.subrecipient.one.id,
           rawSubrecipient: { foo: 'bar' },
           version: 'V2023_12_12',
+          uploadId: scenario.subrecipientUpload.two.uploadId,
         },
       })
 
-      expect(result.subrecipientId).toEqual(
-        scenario.subrecipientUpload.two.subrecipientId
-      )
-      expect(result.ueiTinCombo).toEqual('String')
+      expect(result.subrecipientId).toEqual(scenario.subrecipient.one.id)
       expect(result.rawSubrecipient).toEqual({ foo: 'bar' })
       expect(result.version).toEqual('V2023_12_12')
     }
@@ -67,10 +64,11 @@ describe('subrecipientUploads', () => {
       })) as SubrecipientUpload
       const result = await updateSubrecipientUpload({
         id: original.id,
-        input: { ueiTinCombo: 'String2' },
+        input: { rawSubrecipient: { boo: 'baz' } },
       })
 
-      expect(result.ueiTinCombo).toEqual('String2')
+      expect(result.rawSubrecipient).toEqual({ boo: 'baz' })
+      expect(result.updatedAt).not.toEqual(original.updatedAt)
     }
   )
 

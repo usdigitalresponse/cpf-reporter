@@ -1,5 +1,5 @@
 import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
-import { Prisma } from '@prisma/client'
+import { Prisma, Version } from '@prisma/client'
 import { S3Handler, S3ObjectCreatedNotificationEvent } from 'aws-lambda'
 
 import aws from 'src/lib/aws'
@@ -26,6 +26,15 @@ type Response = {
   statusCode: number
 }
 
+type Subrecipient = {
+  Name: string
+  EIN__c: string
+  Unique_Entity_Identifier__c: string
+  // Look at SubrecipientRow in the latest Python schema file for the full range of what we can pull out here if needed
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any
+}
+
 type ResultSchema = {
   errors: {
     severity: Severity
@@ -35,6 +44,8 @@ type ResultSchema = {
     col?: string
   }[]
   projectUseCode: string
+  subrecipients: Subrecipient[]
+  versionString: string
 }
 
 type UploadValidationS3Client = {
@@ -117,7 +128,9 @@ export const processRecord = async (
     const result: ResultSchema = JSON.parse(strBody) || []
 
     // when the results array is empty then we know the file has passed validations
-    const passed = (result?.errors || []).filter((e) => e.severity == Severity.Error).length === 0
+    const passed =
+      (result?.errors || []).filter((e) => e.severity == Severity.Error)
+        .length === 0
 
     const uploadId = extractUploadIdFromKey(key)
 
@@ -183,6 +196,53 @@ export const processRecord = async (
       throw new Error('Error updating validation record')
     }
 
+    // If we passed validation, we will save the subrecipient info into our DB
+    if (passed && result.subrecipients?.length) {
+      const organizationId = extractOrganizationIdFromKey(key)
+      result.subrecipients.forEach((subrecipient) =>
+        saveSubrecipientInfo(
+          subrecipient,
+          key,
+          uploadId,
+          result.versionString,
+          organizationId
+        )
+      )
+
+      let reportingPeriod
+      try {
+        reportingPeriod = (
+          await db.upload.findUnique({
+            where: { id: uploadId },
+            include: { reportingPeriod: true },
+          })
+        ).reportingPeriod
+      } catch (err) {
+        logger.error(`Could not find reporting period for upload ${uploadId}`)
+        throw new Error('Error determining reporting period for upload')
+      }
+
+      try {
+        const subrecipientKey = `/${organizationId}/${reportingPeriod.id}/subrecipients`
+        const { startDate, endDate } = reportingPeriod
+        const subrecipientsWithUploads = await db.subrecipient.findMany({
+          where: { createdAt: { lte: endDate, gte: startDate } },
+          include: { subrecipientUploads: true },
+        })
+        const subrecipients = {
+          subrecipients: subrecipientsWithUploads,
+        }
+        await aws.sendPutObjectToS3Bucket(
+          bucket,
+          subrecipientKey,
+          JSON.stringify(subrecipients)
+        )
+      } catch (err) {
+        logger.error(`Error saving subrecipients JSON file to S3: ${err}`)
+        throw new Error('Error saving subrecipient info to S3')
+      }
+    }
+
     // Delete the errors.json file from S3
     try {
       await s3Client.send(
@@ -200,14 +260,76 @@ export const processRecord = async (
   }
 }
 
+async function saveSubrecipientInfo(
+  subrecipientInput: Subrecipient,
+  key: string,
+  uploadId: number,
+  versionString: string,
+  organizationId: number
+) {
+  let version = Version[versionString]
+  if (!version) {
+    version = Version.V2024_05_24
+    logger.error(
+      `Error obtaining version from version passed in results ${versionString}, falling back on ${version}`
+    )
+  }
+
+  try {
+    const ueiTinCombo = `${subrecipientInput.Unique_Entity_Identifier__c}_${subrecipientInput.EIN__c}`
+    // Per documentation here: https://www.prisma.io/docs/orm/prisma-client/queries/crud#update-or-create-records
+    // providing an empty `update` block in `upsert` is essentially a "findOrCreate" operation, which works as long as you're selecting on a field that is unique
+    const subrecipient = await db.subrecipient.upsert({
+      where: { ueiTinCombo },
+      create: {
+        name: subrecipientInput.Name,
+        ueiTinCombo,
+        organizationId,
+      },
+      update: {},
+    })
+    await db.subrecipientUpload.upsert({
+      create: {
+        subrecipientId: subrecipient.id,
+        uploadId,
+        rawSubrecipient: subrecipientInput,
+        version,
+      },
+      update: {
+        rawSubrecipient: subrecipientInput,
+      },
+      where: {
+        subrecipientId_uploadId: { subrecipientId: subrecipient.id, uploadId },
+      },
+    })
+  } catch (err) {
+    logger.error(
+      `Error saving subrecipient: ${err} - key: ${key} - subrecipient: ${subrecipientInput.Name}`
+    )
+    throw new Error('Error saving subrecipient')
+  }
+}
+
 function extractUploadIdFromKey(key: string): number {
   logger.debug(`Extracting upload_id from key: ${key}`)
+  const match = matchRegex(key)
+  logger.info(`Extracted upload_id: ${match.groups.upload_id}`)
+  return parseInt(match.groups.upload_id)
+}
+
+function extractOrganizationIdFromKey(key: string): number {
+  logger.debug(`Extracting organization id from key: ${key}`)
+  const match = matchRegex(key)
+  logger.info(`Extracted organization_id: ${match.groups.organization_id}`)
+  return parseInt(match.groups.organization_id)
+}
+
+function matchRegex(key: string): RegExpMatchArray {
   const regex =
     /uploads\/(?<organization_id>\w+)\/(?<agency_id>\w+)\/(?<reporting_period_id>\w+)\/(?<upload_id>\w+)\/(?<filename>.+)/
   const match = key.match(regex)
   if (!match) {
     throw new Error('Invalid key format')
   }
-  logger.info(`Extracted upload_id: ${match.groups.upload_id}`)
-  return parseInt(match.groups.upload_id)
+  return match
 }

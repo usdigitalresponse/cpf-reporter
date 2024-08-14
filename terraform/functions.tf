@@ -301,6 +301,27 @@ module "lambda_function-graphql" {
         "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
       ]
     }
+    AllowDownloadTreasuryCSVFiles = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:HeadObject",
+      ]
+      resources = [
+        # Path: treasuryreports/{organization_id}/{reporting_period_id}/{filename}.csv
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.csv",
+      ]
+    }
+
+    AllowStepFunctionInvocation = {
+      effect = "Allow"
+      actions = [
+        "states:StartExecution"
+      ]
+      resources = [
+        module.treasury_generation_step_function.state_machine_arn
+      ]
+    }
   }
 
   // Artifacts
@@ -336,6 +357,7 @@ module "lambda_function-graphql" {
     DD_LAMBDA_HANDLER                  = "graphql.handler"
     PASSAGE_API_KEY_SECRET_ARN         = data.aws_ssm_parameter.passage_api_key_secret_arn.value
     AUTH_PROVIDER                      = "passage"
+    TREASURY_STEP_FUNCTION_ARN         = module.treasury_generation_step_function.state_machine_arn
   })
 
   // Triggers

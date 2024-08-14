@@ -20,6 +20,8 @@ import { toast } from '@redwoodjs/web/toast'
 
 import OrganizationPickListsCell from 'src/components/Organization/OrganizationPickListsCell'
 
+const FILE_SIZE_THRESHOLD = 5 * 1048576 // 5 MB in bytes
+
 const CREATE_UPLOAD = gql`
   mutation CreateUploadMutation($input: CreateUploadInput!) {
     createUpload(input: $input) {
@@ -59,6 +61,11 @@ const UploadForm = ({ error, loading }: UploadFormProps) => {
   })
 
   const onSubmit = async (data) => {
+    if (data.file[0].size > FILE_SIZE_THRESHOLD) {
+      toast.error('Upload should not be larger than 5MB')
+      return
+    }
+
     data.filename = data.file[0].name
     data.agencyId = parseInt(data.agencyId)
     data.reportingPeriodId = parseInt(data.reportingPeriodId)

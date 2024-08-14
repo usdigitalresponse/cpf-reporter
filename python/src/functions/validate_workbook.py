@@ -11,6 +11,7 @@ from mypy_boto3_s3.client import S3Client
 
 from src.lib.logging import get_logger, reset_contextvars
 from src.lib.workbook_validator import validate
+from src.lib.s3_helper import download_s3_object
 
 type ValidationResults = Dict[str, Union[List[Dict[str, str]], str, None]]
 
@@ -32,7 +33,7 @@ def handle(event: S3Event, context: Context):
     s3_client: S3Client = boto3.client("s3")
     with tempfile.NamedTemporaryFile() as file:
         with structlog.contextvars.bound_contextvars(workbook_filename=file.name):
-            download_workbook(
+            download_s3_object(
                 s3_client,
                 event["Records"][0]["s3"]["bucket"]["name"],
                 event["Records"][0]["s3"]["object"]["key"],
@@ -49,25 +50,6 @@ def handle(event: S3Event, context: Context):
     )
 
 
-def download_workbook(client: S3Client, bucket: str, key: str, destination: IO[bytes]):
-    """Downloads an S3 object to a local file.
-
-    Args:
-        client: Client facilitating download from S3
-        bucket: Name of the S3 bucket containing the workbook
-        key: S3 object key for the file to download
-        destination: File-like object (in binary mode) where the S3 object will be written
-    """
-    logger = get_logger()
-    logger.debug("downloading workbook from s3")
-
-    try:
-        client.download_fileobj(bucket, unquote_plus(key), destination)
-    except:
-        logger.exception("failed to download workbook from S3")
-        raise
-
-
 def validate_workbook(file: IO[bytes]) -> ValidationResults:
     """Wrapper for workbook validation with logging.
 
@@ -81,7 +63,7 @@ def validate_workbook(file: IO[bytes]) -> ValidationResults:
     logger.debug("validating workbook")
 
     try:
-        errors, project_use_code = validate(file)
+        errors, project_use_code, subrecipients, version_string = validate(file)
     except:
         logger.exception("unhandled exception validating workbook")
         raise
@@ -90,6 +72,8 @@ def validate_workbook(file: IO[bytes]) -> ValidationResults:
     results: ValidationResults = {
         "errors": list(map(lambda x: x.__dict__, errors)),
         "projectUseCode": project_use_code,
+        "subrecipients": subrecipients,
+        "versionString": version_string,
     }
     return results
 
