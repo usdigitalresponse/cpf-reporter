@@ -2,6 +2,7 @@ import json
 import os
 import tempfile
 from datetime import datetime
+from typing import Any, Dict
 
 import boto3
 import structlog
@@ -33,7 +34,7 @@ class SubrecipientLambdaPayload(BaseModel):
 
 
 @reset_contextvars
-def handle(event: SubrecipientLambdaPayload, context: Context):
+def handle(event: Dict[str, Any], context: Context):
     """Lambda handler for generating subrecipients file for treasury report
 
     Args:
@@ -53,13 +54,13 @@ def handle(event: SubrecipientLambdaPayload, context: Context):
     logger.info("received new invocation event from step function")
     if not event or not context:
         logger.exception("Missing event or context")
-        return
+        return {"statusCode": 400, "body": "Bad Request - No event or context"}
 
     try:
         payload = SubrecipientLambdaPayload.model_validate(event)
     except Exception:
         logger.exception("Exception parsing Subrecipient event payload")
-        return {"statusCode": 400, "body": "Bad Request"}
+        return {"statusCode": 400, "body": "Bad Request - payload validation failed"}
 
     try:
         process_event(payload, logger)
@@ -70,7 +71,9 @@ def handle(event: SubrecipientLambdaPayload, context: Context):
     return {"statusCode": 200, "body": "Success"}
 
 
-def process_event(payload: SubrecipientLambdaPayload, logger):
+def process_event(
+    payload: SubrecipientLambdaPayload, logger: structlog.stdlib.BoundLogger
+):
     """
     This function should:
     1. Parse necessary inputs from the event
@@ -79,20 +82,9 @@ def process_event(payload: SubrecipientLambdaPayload, logger):
     4. Iterate through recent subrecipients and put their information into the output template
     5. Upload the output template, in both xlsx and csv formats, to S3
     """
-    organization_id = ...
-    reporting_period_id = ...
-    output_template_id = ...
-    try:
-        reporting_period_id = (
-            payload.organization.preferences.current_reporting_period_id
-        )
-        organization_id = payload.organization.id
-        output_template_id = payload.outputTemplateId
-    except KeyError as e:
-        logger.exception(
-            f"Exception getting reporting period or organization id from event -- missing field: {e}"
-        )
-        return
+    organization_id = payload.organization.id
+    reporting_period_id = payload.organization.preferences.current_reporting_period_id
+    output_template_id = payload.outputTemplateId
 
     s3_client: S3Client = boto3.client("s3")
 
