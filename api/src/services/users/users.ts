@@ -70,7 +70,7 @@ export const runPermissionsCreateOrUpdateValidations = async (input) => {
   const { currentUser } = context
 
   validateWithSync(() => {
-    if (!currentUser?.roles?.includes(ROLES.ORGANIZATION_ADMIN))
+    if (currentUser?.roles?.includes(ROLES.ORGANIZATION_STAFF))
       throw new AuthenticationError("You don't have permission to do that")
   })
 
