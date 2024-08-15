@@ -63,9 +63,6 @@ export const Subrecipient: SubrecipientRelationResolvers = {
     const uploads = await db.subrecipientUpload.findMany({
       where: {
         subrecipientId: root?.id,
-        upload: {
-          validations: { some: { passed: true } },
-        },
       },
       orderBy: { updatedAt: 'desc' },
       include: {
@@ -80,20 +77,17 @@ export const Subrecipient: SubrecipientRelationResolvers = {
       },
     })
 
-    return uploads
+    // Filter the uploads to only include those where the latest validation passed
+    return uploads.filter(
+      (upload) =>
+        upload.upload.validations.length > 0 &&
+        upload.upload.validations[0].passed === true
+    )
   },
   invalidSubrecipientUploads: async (_obj, { root }) => {
     const subrecipientUploads = await db.subrecipientUpload.findMany({
       where: {
         subrecipientId: root?.id,
-        upload: {
-          validations: {
-            some: {
-              passed: false,
-              results: { not: null },
-            },
-          },
-        },
       },
       orderBy: { updatedAt: 'desc' },
       include: {
@@ -102,38 +96,18 @@ export const Subrecipient: SubrecipientRelationResolvers = {
             validations: {
               orderBy: { createdAt: 'desc' },
               take: 1,
-              where: {
-                passed: false,
-                results: { not: null },
-              },
             },
           },
         },
       },
     })
-    return subrecipientUploads || []
 
-    // const subrecipientUploads = await db.subrecipientUpload.findMany({
-    //   where: {
-    //     subrecipientId: root?.id,
-    //   },
-    //   orderBy: { updatedAt: 'desc' },
-    //   include: {
-    //     upload: {
-    //       include: {
-    //         validations: {
-    //           orderBy: { createdAt: 'desc' },
-    //           take: 1,
-    //           where: {
-    //             passed: false,
-    //             results: { not: null },
-    //           },
-    //         },
-    //       },
-    //     },
-    //   },
-    // })
-    // console.log('subrecipientUploads', subrecipientUploads)
-    // return subrecipientUploads
+    // Filter the uploads to only include those where the latest validation is failed and has results
+    return subrecipientUploads.filter(
+      (upload) =>
+        upload.upload.validations.length > 0 &&
+        upload.upload.validations[0].passed === false &&
+        upload.upload.validations[0].results !== null
+    )
   },
 }

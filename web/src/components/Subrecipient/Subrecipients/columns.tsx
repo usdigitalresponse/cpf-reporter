@@ -1,73 +1,10 @@
 import { createColumnHelper, ColumnDef } from '@tanstack/react-table'
 import { ParsedSubrecipient, Subrecipient } from 'types/graphql'
 
-import { Link, routes } from '@redwoodjs/router'
-
+import SubrecipientTableUploadLinksDisplay from 'src/components/Subrecipient/SubrecipientTableUploadLinksDisplay/SubrecipientTableUploadLinksDisplay'
 import { formatDateString, formatPhoneNumber } from 'src/utils'
 
 const columnHelper = createColumnHelper<Subrecipient>()
-
-function uploadLinksDisplay(row: Subrecipient) {
-  const { validSubrecipientUploads, invalidSubrecipientUploads } = row
-  console.log('row', invalidSubrecipientUploads)
-
-  return (
-    <>
-      {validSubrecipientUploads.length > 0 &&
-        validSubrecipientUploads[0].upload && (
-          <>
-            <div className="fw-bold">Latest Valid Upload:</div>
-            <div className="mb-3">
-              {validSubrecipientUploads.length > 0 &&
-                validSubrecipientUploads[0].upload && (
-                  <Link
-                    to={routes.upload({
-                      id: validSubrecipientUploads[0].upload.id,
-                    })}
-                    title={`Show upload ${validSubrecipientUploads[0].upload.id} detail`}
-                    className="link-underline link-underline-opacity-0"
-                  >
-                    {validSubrecipientUploads[0].upload.filename}.xlsm
-                  </Link>
-                )}
-            </div>
-          </>
-        )}
-
-      {validSubrecipientUploads.length > 1 && (
-        <>
-          <div className="fw-bold">Other Valid Uploads:</div>
-          <div className="mb-3">
-            {validSubrecipientUploads.slice(1).map((upload) => (
-              <Link
-                key={upload.id}
-                to={routes.upload({ id: upload.upload.id })}
-              >
-                {upload.upload.filename}.xlsm
-              </Link>
-            ))}
-          </div>
-        </>
-      )}
-
-      {invalidSubrecipientUploads.length > 0 && (
-        <>
-          <div className="fw-bold">Other Uploads:</div>
-          <div>
-            {invalidSubrecipientUploads.map((upload) => (
-              <Link
-                key={upload.id}
-                to={routes.upload({ id: upload.upload.id })}
-              >
-                [Invalid] {upload.upload.filename}.xlsm
-              </Link>
-            ))}
-          </div>
-        </>
-      )}
-    </>
-  )
-}
 
 function formatDetails(
   parsedSubrecipient: ParsedSubrecipient | null | undefined
@@ -154,10 +91,14 @@ export const columnDefs: ColumnDef<Subrecipient>[] = [
     },
   }),
   {
-    accessorFn: uploadLinksDisplay,
-    cell: (info) => info.getValue(),
     id: 'links',
     header: 'Upload Links',
+    cell: ({ row }) => (
+      <SubrecipientTableUploadLinksDisplay
+        validSubrecipientUploads={row.original.validSubrecipientUploads}
+        invalidSubrecipientUploads={row.original.invalidSubrecipientUploads}
+      />
+    ),
     enableSorting: false,
   },
 ]
