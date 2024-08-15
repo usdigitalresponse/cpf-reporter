@@ -1,6 +1,12 @@
 import { Subrecipient } from 'types/graphql'
 
-import { Link, routes } from '@redwoodjs/router'
+import { useMutation } from '@redwoodjs/web'
+
+const DOWNLOAD_UPLOAD_FILE = gql`
+  mutation downloadUploadFile($id: Int!) {
+    downloadUploadFile(id: $id)
+  }
+`
 
 interface SubrecipientTableUploadLinksDisplayProps {
   validSubrecipientUploads: Subrecipient['validSubrecipientUploads']
@@ -11,6 +17,19 @@ const SubrecipientTableUploadLinksDisplay = ({
   validSubrecipientUploads,
   invalidSubrecipientUploads,
 }: SubrecipientTableUploadLinksDisplayProps) => {
+  const [downloadUploadFile] = useMutation(DOWNLOAD_UPLOAD_FILE, {
+    onCompleted: ({ downloadUploadFile }) => {
+      window.open(downloadUploadFile, '_blank').focus()
+    },
+    onError: (error) => {
+      console.error('Error downloading upload file', error)
+    },
+  })
+
+  const handleFileDownload = (id: number) => {
+    downloadUploadFile({ variables: { id } })
+  }
+
   return (
     <>
       {validSubrecipientUploads.length > 0 &&
@@ -18,15 +37,15 @@ const SubrecipientTableUploadLinksDisplay = ({
           <>
             <div className="fw-bold">Latest Valid Upload:</div>
             <div className="mb-3">
-              <Link
-                to={routes.upload({
-                  id: validSubrecipientUploads[0].upload.id,
-                })}
-                title={`Show upload ${validSubrecipientUploads[0].upload.id} detail`}
-                className="link-underline link-underline-opacity-0"
+              <button
+                onClick={() =>
+                  handleFileDownload(validSubrecipientUploads[0].upload.id)
+                }
+                title={`Download upload ${validSubrecipientUploads[0].upload.id}`}
+                className="btn btn-link p-0"
               >
                 {validSubrecipientUploads[0].upload.filename}.xlsm
-              </Link>
+              </button>
             </div>
           </>
         )}
@@ -36,12 +55,13 @@ const SubrecipientTableUploadLinksDisplay = ({
           <div className="fw-bold">Other Valid Uploads:</div>
           <div className="mb-3">
             {validSubrecipientUploads.slice(1).map((upload) => (
-              <Link
+              <button
                 key={upload.id}
-                to={routes.upload({ id: upload.upload.id })}
+                onClick={() => handleFileDownload(upload.upload.id)}
+                className="btn btn-link p-0"
               >
                 {upload.upload.filename}.xlsm
-              </Link>
+              </button>
             ))}
           </div>
         </>
@@ -52,12 +72,13 @@ const SubrecipientTableUploadLinksDisplay = ({
           <div className="fw-bold">Invalid Uploads:</div>
           <div>
             {invalidSubrecipientUploads.map((upload) => (
-              <Link
+              <button
                 key={upload.id}
-                to={routes.upload({ id: upload.upload.id })}
+                onClick={() => handleFileDownload(upload.upload.id)}
+                className="btn btn-link p-0"
               >
                 {upload.upload.filename}.xlsm
-              </Link>
+              </button>
             ))}
           </div>
         </>

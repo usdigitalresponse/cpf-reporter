@@ -42,26 +42,22 @@ function formatDetails(
   )
 }
 
-const getUEI = (ueiTinCombo: string) => {
-  const value = ueiTinCombo.split('_')[0]
-  return value ? Number(value) : null
-}
+const getUEI = (ueiTinCombo: string) => ueiTinCombo.split('_')[0]
 
-const getTIN = (ueiTinCombo: string) => {
-  const value = ueiTinCombo.split('_')[1]
-  return value ? Number(value) : null
-}
+const getTIN = (ueiTinCombo: string) => ueiTinCombo.split('_')[1]
 
 export const columnDefs: ColumnDef<Subrecipient>[] = [
   columnHelper.accessor((row) => getUEI(row.ueiTinCombo), {
     id: 'uei',
     cell: (info) => info.getValue() ?? '',
     header: 'UEI',
+    enableSorting: false,
   }),
   columnHelper.accessor((row) => getTIN(row.ueiTinCombo), {
     id: 'tin',
     cell: (info) => info.getValue() ?? '',
     header: 'TIN',
+    enableSorting: false,
   }),
   columnHelper.accessor('validSubrecipientUploads', {
     id: 'details',
