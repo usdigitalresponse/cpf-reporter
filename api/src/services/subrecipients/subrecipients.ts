@@ -77,11 +77,10 @@ export const Subrecipient: SubrecipientRelationResolvers = {
       },
     })
 
-    // Filter the uploads to only include those where the latest validation passed
     return uploads.filter(
       (upload) =>
         upload.upload.validations.length > 0 &&
-        upload.upload.validations[0].passed === true
+        upload.upload.validations[0].passed
     )
   },
   invalidSubrecipientUploads: async (_obj, { root }) => {
@@ -102,12 +101,11 @@ export const Subrecipient: SubrecipientRelationResolvers = {
       },
     })
 
-    // Filter the uploads to only include those where the latest validation is failed and has results
     return subrecipientUploads.filter(
       (upload) =>
         upload.upload.validations.length > 0 &&
-        upload.upload.validations[0].passed === false &&
-        upload.upload.validations[0].results !== null
+        upload.upload.validations[0].results !== null &&
+        !upload.upload.validations[0].passed
     )
   },
 }

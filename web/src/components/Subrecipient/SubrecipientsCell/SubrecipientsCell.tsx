@@ -10,21 +10,6 @@ export const QUERY = gql`
       id
       ueiTinCombo
       createdAt
-      updatedAt
-      subrecipientUploads {
-        id
-        createdAt
-        updatedAt
-        upload {
-          id
-          filename
-          validations {
-            passed
-            results
-            createdAt
-          }
-        }
-      }
       validSubrecipientUploads {
         id
         parsedSubrecipient {
@@ -44,11 +29,6 @@ export const QUERY = gql`
         upload {
           id
           filename
-          validations {
-            passed
-            results
-            createdAt
-          }
         }
         createdAt
         updatedAt
@@ -58,11 +38,6 @@ export const QUERY = gql`
         upload {
           id
           filename
-          validations {
-            passed
-            results
-            createdAt
-          }
         }
         createdAt
         updatedAt

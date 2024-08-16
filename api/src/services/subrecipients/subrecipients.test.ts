@@ -21,6 +21,7 @@ import type { StandardScenario } from './subrecipients.scenarios'
 
 describe('subrecipients', () => {
   scenario('returns all subrecipients', async (scenario: StandardScenario) => {
+    mockCurrentUser(scenario.user.one)
     const result = await subrecipients()
 
     expect(result.length).toEqual(Object.keys(scenario.subrecipient).length)
@@ -65,7 +66,7 @@ describe('subrecipients', () => {
 
   scenario('deletes a subrecipient', async (scenario: StandardScenario) => {
     const original = (await deleteSubrecipient({
-      id: scenario.subrecipient.one.id,
+      id: scenario.subrecipient.two.id,
     })) as Subrecipient
     const result = await subrecipient({ id: original.id })
 
@@ -73,12 +74,12 @@ describe('subrecipients', () => {
   })
 
   scenario(
-    'returns the latest subrecipient upload when there are multiple uploads',
+    'returns all valid subrecipient uploads',
     async (scenario: StandardScenario) => {
       const result = await subrecipient({ id: scenario.subrecipient.one.id })
       expect(result).toBeDefined()
 
-      const latestUpload = await SubrecipientResolver.latestSubrecipientUpload(
+      const validUploads = await SubrecipientResolver.validSubrecipientUploads(
         {},
         {
           root: result,
@@ -87,11 +88,37 @@ describe('subrecipients', () => {
         }
       )
 
-      expect(latestUpload).toBeDefined()
-      expect(latestUpload.version).toEqual('V2024_01_07')
-      expect(latestUpload.rawSubrecipient).toEqual({ data: 'new data' })
-      expect(latestUpload.updatedAt).toEqual(
-        new Date('2024-12-10T14:52:18.317Z')
+      expect(validUploads).toBeDefined()
+      expect(validUploads.length).toBe(1)
+      expect(validUploads[0].upload.filename).toBe('latest_validation_valid')
+      expect(validUploads[0].upload.validations[0].passed).toBe(true)
+    }
+  )
+
+  scenario(
+    'returns all invalid subrecipient uploads',
+    async (scenario: StandardScenario) => {
+      const result = await subrecipient({ id: scenario.subrecipient.one.id })
+      expect(result).toBeDefined()
+
+      const invalidUploads =
+        await SubrecipientResolver.invalidSubrecipientUploads(
+          {},
+          {
+            root: result,
+            context: {} as RedwoodGraphQLContext,
+            info: {} as GraphQLResolveInfo,
+          }
+        )
+
+      expect(invalidUploads).toBeDefined()
+      expect(invalidUploads.length).toBe(1)
+      expect(invalidUploads[0].upload.filename).toBe(
+        'latest_validation_invalid'
+      )
+      expect(invalidUploads[0].upload.validations[0].passed).toBe(false)
+      expect(invalidUploads[0].upload.validations[0].results).toEqual(
+        '{errors: { severity: err }}'
       )
     }
   )
