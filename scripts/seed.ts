@@ -100,7 +100,6 @@ export default async () => {
       endDate: new Date(),
       inputTemplateId: lastInputTemplateId,
       outputTemplateId: lastOutputTemplateId,
-      organizationId: organizationRecord.id,
     }
     const reportingPeriod = await db.reportingPeriod.create({
       data: reportingPeriodData,
@@ -113,7 +112,7 @@ export default async () => {
         preferences: {
           current_reporting_period_id: reportingPeriod.id,
         },
-      }
+      },
     })
 
     const expendtitureCategoriesData = [

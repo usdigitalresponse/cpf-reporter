@@ -4,39 +4,19 @@ from typing import Type, Union
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 from src.schemas.project_types import ProjectType
-from src.schemas.schema_V2024_04_01 import (
-    METADATA_BY_SHEET as V2024_04_01_Metadata,
-)
-from src.schemas.schema_V2024_04_01 import (
-    CoverSheetRow as V2024_04_01_CoverSheetRow,
-)
-from src.schemas.schema_V2024_04_01 import (
-    Project1ARow as V2024_04_01_Project1ARow,
-)
-from src.schemas.schema_V2024_04_01 import (
-    Project1BRow as V2024_04_01_Project1BRow,
-)
-from src.schemas.schema_V2024_04_01 import (
-    Project1CRow as V2024_04_01_Project1CRow,
-)
+from src.schemas.schema_V2024_04_01 import METADATA_BY_SHEET as V2024_04_01_Metadata
+from src.schemas.schema_V2024_04_01 import CoverSheetRow as V2024_04_01_CoverSheetRow
+from src.schemas.schema_V2024_04_01 import Project1ARow as V2024_04_01_Project1ARow
+from src.schemas.schema_V2024_04_01 import Project1BRow as V2024_04_01_Project1BRow
+from src.schemas.schema_V2024_04_01 import Project1CRow as V2024_04_01_Project1CRow
 from src.schemas.schema_V2024_04_01 import (
     SubrecipientRow as V2024_04_01_SubrecipientRow,
 )
-from src.schemas.schema_V2024_05_24 import (
-    METADATA_BY_SHEET as V2024_05_24_Metadata,
-)
-from src.schemas.schema_V2024_05_24 import (
-    CoverSheetRow as V2024_05_24_CoverSheetRow,
-)
-from src.schemas.schema_V2024_05_24 import (
-    Project1ARow as V2024_05_24_Project1ARow,
-)
-from src.schemas.schema_V2024_05_24 import (
-    Project1BRow as V2024_05_24_Project1BRow,
-)
-from src.schemas.schema_V2024_05_24 import (
-    Project1CRow as V2024_05_24_Project1CRow,
-)
+from src.schemas.schema_V2024_05_24 import METADATA_BY_SHEET as V2024_05_24_Metadata
+from src.schemas.schema_V2024_05_24 import CoverSheetRow as V2024_05_24_CoverSheetRow
+from src.schemas.schema_V2024_05_24 import Project1ARow as V2024_05_24_Project1ARow
+from src.schemas.schema_V2024_05_24 import Project1BRow as V2024_05_24_Project1BRow
+from src.schemas.schema_V2024_05_24 import Project1CRow as V2024_05_24_Project1CRow
 from src.schemas.schema_V2024_05_24 import (
     SubrecipientRow as V2024_05_24_SubrecipientRow,
 )
@@ -77,7 +57,7 @@ class Version(Enum):
     V2024_05_24 = "v:20240524"
 
     @classmethod
-    def active_version(cls):
+    def active_version(cls) -> "Version":
         return cls.V2024_05_24
 
     @classmethod
@@ -144,8 +124,8 @@ def getCoverSheetRowClass(version_string: str) -> CoverSheetRow:
 
 
 def getSchemaByProject(
-    version_string: str, project_type: ProjectType
-) -> Type[Union[Project1ARow, Project1BRow, Project1CRow]]:
+    version_string: Version, project_type: ProjectType
+) -> Union[Project1ARow, Project1BRow, Project1CRow]:
     version = getVersionFromString(version_string)
     match project_type:
         case ProjectType._1A:
