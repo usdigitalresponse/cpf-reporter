@@ -117,6 +117,14 @@ def handle(event: Dict[str, Any], context: Context):
     output_file.close()
     recent_subrecipients_file.close()
 
+    return {
+        "statusCode": 200,
+        "Payload": {
+            "organization_id": organization_id,
+            "reporting_period_id": reporting_period_id,
+        }
+    }
+
 
 def no_subrecipients_in_file(recent_subrecipients):
     """
