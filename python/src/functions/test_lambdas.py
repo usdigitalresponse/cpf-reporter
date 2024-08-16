@@ -1,7 +1,6 @@
 """
 A collection of functions used for lambda testing
 """
-import os
 from typing import Any
 
 from aws_lambda_typing.context import Context
