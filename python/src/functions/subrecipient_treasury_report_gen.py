@@ -1,23 +1,36 @@
+import json
+import os
 import tempfile
+from datetime import datetime
 from typing import Any, Dict
 
 import boto3
 import structlog
-import json
 from aws_lambda_typing.context import Context
 from mypy_boto3_s3.client import S3Client
-from openpyxl import load_workbook, Workbook
-from datetime import datetime
+from openpyxl import Workbook, load_workbook
+from pydantic import BaseModel
 
-from src.lib.logging import reset_contextvars, get_logger
+from src.lib.constants import OUTPUT_TEMPLATE_FILENAME_BY_PROJECT
+from src.lib.logging import get_logger, reset_contextvars
 from src.lib.s3_helper import download_s3_object, upload_generated_file_to_s3
-from src.schemas.schema_versions import getSubrecipientRowClass
+from src.lib.treasury_generation_common import (
+    OrganizationObj,
+    UserObj,
+    get_output_template,
+)
 from src.lib.workbook_utils import convert_xlsx_to_csv, find_last_populated_row
+from src.schemas.schema_versions import getSubrecipientRowClass
 
-BUCKET_NAME = "cpf-reporter"
 FIRST_BLANK_ROW_NUM = 8
 WORKSHEET_NAME = "Baseline"
 FIRST_DATA_COLUMN = "B"
+
+
+class SubrecipientLambdaPayload(BaseModel):
+    organization: OrganizationObj
+    user: UserObj
+    outputTemplateId: int
 
 
 @reset_contextvars
@@ -33,12 +46,6 @@ def handle(event: Dict[str, Any], context: Context):
         }
         context: Lambda context
 
-    This function should:
-    1. Parse necessary inputs from the event
-    2. Download a file of recent subrecipients from S3 to put into the output template
-    3. Download the output template itself from S3
-    4. Iterate through recent subrecipients and put their information into the output template
-    5. Upload the output template, in both xlsx and csv formats, to S3
     """
     structlog.contextvars.bind_contextvars(
         lambda_event={"subrecipient_step_function": event}
@@ -47,25 +54,37 @@ def handle(event: Dict[str, Any], context: Context):
     logger.info("received new invocation event from step function")
     if not event or not context:
         logger.exception("Missing event or context")
-        return
-
-    organization_id = ...
-    reporting_period_id = ...
-    output_template_id = ...
-    user_id = ...
+        return {"statusCode": 400, "body": "Bad Request - No event or context"}
 
     try:
-        reporting_period_id = event["organization"]["preferences"][
-            "current_reporting_period_id"
-        ]
-        organization_id = event["organization"]["id"]
-        output_template_id = event["outputTemplateId"]
-        user_id = event["user"]["id"]
-    except KeyError as e:
-        logger.exception(
-            f"Exception getting reporting period or organization id from event -- missing field: {e}"
-        )
-        return
+        payload = SubrecipientLambdaPayload.model_validate(event)
+    except Exception:
+        logger.exception("Exception parsing Subrecipient event payload")
+        return {"statusCode": 400, "body": "Bad Request - payload validation failed"}
+
+    try:
+        process_event(payload, logger)
+    except Exception:
+        logger.exception("Exception processing Subrecipient file generation event")
+        return {"statusCode": 500, "body": "Internal Server Error"}
+
+    return {"statusCode": 200, "body": "Success"}
+
+
+def process_event(
+    payload: SubrecipientLambdaPayload, logger: structlog.stdlib.BoundLogger
+):
+    """
+    This function should:
+    1. Parse necessary inputs from the event
+    2. Download a file of recent subrecipients from S3 to put into the output template
+    3. Download the output template itself from S3
+    4. Iterate through recent subrecipients and put their information into the output template
+    5. Upload the output template, in both xlsx and csv formats, to S3
+    """
+    organization_id = payload.organization.id
+    reporting_period_id = payload.organization.preferences.current_reporting_period_id
+    output_template_id = payload.outputTemplateId
 
     s3_client: S3Client = boto3.client("s3")
 
@@ -75,8 +94,8 @@ def handle(event: Dict[str, Any], context: Context):
         ):
             download_s3_object(
                 s3_client,
-                BUCKET_NAME,
-                f"/{organization_id}/{reporting_period_id}/subrecipients",
+                os.environ["REPORTING_DATA_BUCKET_NAME"],
+                f"treasuryreports/{organization_id}/{reporting_period_id}/subrecipients",
                 recent_subrecipients_file,
             )
 
@@ -98,12 +117,7 @@ def handle(event: Dict[str, Any], context: Context):
         return
 
     output_file = tempfile.NamedTemporaryFile()
-    download_s3_object(
-        s3_client,
-        BUCKET_NAME,
-        f"/treasuryreports/output-templates/{output_template_id}/CPFSubrecipientTemplate.xlsx",
-        output_file,
-    )
+    get_output_template(s3_client, output_template_id, "Subrecipient", output_file)
 
     workbook = load_workbook(filename=output_file)
     write_subrecipients_to_workbook(
@@ -112,7 +126,7 @@ def handle(event: Dict[str, Any], context: Context):
         logger=logger,
     )
 
-    upload_workbook(workbook, s3_client, user_id, organization_id, reporting_period_id)
+    upload_workbook(workbook, s3_client, organization_id, reporting_period_id)
 
     output_file.close()
     recent_subrecipients_file.close()
@@ -184,21 +198,21 @@ def get_most_recent_upload(subrecipient):
 def upload_workbook(
     workbook: Workbook,
     s3client: S3Client,
-    user_id: str,
-    organization_id: str,
-    reporting_period_id: str,
+    organization_id: int,
+    reporting_period_id: int,
 ):
     """
     Handles upload of workbook to S3, both in xlsx and csv formats
     """
-    upload_template_location_minus_filetype = f"/treasuryreports/{organization_id}/{reporting_period_id}/{user_id}/CPFSubrecipientTemplate"
-    upload_template_xlsx_key = f"{upload_template_location_minus_filetype}.xlsx"
-    upload_template_csv_key = f"{upload_template_location_minus_filetype}.csv"
+    filekey_without_extension = f"treasuryreports/{organization_id}/{reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT['Subrecipient']}"
 
     with tempfile.NamedTemporaryFile("w") as new_xlsx_file:
         workbook.save(new_xlsx_file.name)
         upload_generated_file_to_s3(
-            s3client, BUCKET_NAME, upload_template_xlsx_key, new_xlsx_file
+            s3client,
+            os.environ["REPORTING_DATA_BUCKET_NAME"],
+            f"{filekey_without_extension}.xlsx",
+            new_xlsx_file,
         )
 
     with tempfile.NamedTemporaryFile("w") as new_csv_file:
@@ -211,7 +225,7 @@ def upload_workbook(
         )
         upload_generated_file_to_s3(
             s3client,
-            BUCKET_NAME,
-            upload_template_csv_key,
+            os.environ["REPORTING_DATA_BUCKET_NAME"],
+            f"{filekey_without_extension}.csv",
             new_csv_file,
         )
