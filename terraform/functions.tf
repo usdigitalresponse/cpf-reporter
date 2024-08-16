@@ -308,7 +308,7 @@ module "lambda_function-graphql" {
         "s3:HeadObject",
       ]
       resources = [
-        # Path: treasuryreports{organization_id}/{reporting_period_id}/{filename}.csv
+        # Path: treasuryreports/{organization_id}/{reporting_period_id}/{filename}.csv
         "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.csv",
       ]
     }
