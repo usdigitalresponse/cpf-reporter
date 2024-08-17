@@ -7,7 +7,7 @@ import zipfile
 import boto3
 from aws_lambda_typing.context import Context
 from mypy_boto3_s3.client import S3Client
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 from src.lib.logging import get_logger, reset_contextvars
 
@@ -26,7 +26,7 @@ class CreateArchiveLambdaPayload(BaseModel):
     The function is called from a parallel step function, so we expect a list of payloads.
     We want to check that all payloads have the only one organization_id and reporting_period_id
     """
-    payloads: list[ClientLambdaPayload]
+    payloads: list[ClientLambdaPayload] = Field(alias="Payload")
 
     @field_validator("payloads")
     @classmethod
@@ -58,7 +58,6 @@ def handle(event: dict[str, Any], _context: Context):
     logger.info("Received new invocation event from step function")
     logger.info(json.dumps(event))
     logger.info("Extracting payload")
-    payloads = event["Payload"]
 
     try:
         payload = CreateArchiveLambdaPayload.model_validate(event)

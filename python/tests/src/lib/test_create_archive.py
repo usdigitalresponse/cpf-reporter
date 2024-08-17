@@ -37,7 +37,7 @@ def test_create_archive_lambda_payload():
         {"organization_id": "1234", "reporting_period_id": "5678"},
         {"organization_id": "1234", "reporting_period_id": "5678"},
     ]
-    payload = CreateArchiveLambdaPayload.model_validate({"payloads": data})
+    payload = CreateArchiveLambdaPayload.model_validate({"Payload": data})
     assert payload.organization_id == "1234"
     assert payload.reporting_period_id == "5678"
 
@@ -48,4 +48,4 @@ def test_create_archive_lambda_payload_failed():
         {"organization_id": "1235", "reporting_period_id": "5678"},
     ]
     with pytest.raises(ValueError):
-        payload = CreateArchiveLambdaPayload.model_validate(data)
+        payload = CreateArchiveLambdaPayload.model_validate({"Payload": data})
