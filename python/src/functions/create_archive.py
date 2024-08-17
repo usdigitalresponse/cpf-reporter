@@ -1,14 +1,49 @@
 import os
 import tempfile
+import json
 from typing import Any
 import zipfile
 
 import boto3
 from aws_lambda_typing.context import Context
 from mypy_boto3_s3.client import S3Client
+from pydantic import BaseModel, field_validator
+
 from src.lib.logging import get_logger, reset_contextvars
 
-S3_BUCKET = os.environ.get("S3_BUCKET", "test_bucket")
+S3_BUCKET = os.environ.get("REPORTING_DATA_BUCKET_NAME", "test_bucket")
+
+
+class ClientLambdaPayload(BaseModel):
+    organization_id: str
+    reporting_period_id: str
+
+
+class CreateArchiveLambdaPayload(BaseModel):
+    """
+    Model to wrap the validation for the create archive lambda.
+
+    The function is called from a parallel step function, so we expect a list of payloads.
+    We want to check that all payloads have the only one organization_id and reporting_period_id
+    """
+    payloads: list[ClientLambdaPayload]
+
+    @field_validator("payloads")
+    @classmethod
+    def validate_payloads(cls, payloads: list[ClientLambdaPayload]) -> list[ClientLambdaPayload]:
+        if len({p.organization_id for p in payloads}) != 1:
+            raise ValueError("All payloads must have the same organization_id")
+        if len({p.reporting_period_id for p in payloads}) != 1:
+            raise ValueError("All payloads must have the same organization_id")
+        return payloads
+
+    @property
+    def organization_id(self) -> str:
+        return self.payloads[0].organization_id
+
+    @property
+    def reporting_period_id(self) -> str:
+        return self.payloads[0].reporting_period_id
 
 
 @reset_contextvars
@@ -21,25 +56,29 @@ def handle(event: dict[str, Any], _context: Context):
     """
     logger = get_logger()
     logger.info("Received new invocation event from step function")
-    logger.info(event)
+    logger.info(json.dumps(event))
     logger.info("Extracting payload")
     payloads = event["Payload"]
 
-    # all payloads should have the same org_id and reporting_period_ids
-    organization_ids = {p["organization_id"] for p in payloads if p["organization_id"]}
-    reporting_period_ids = {p["reporting_period_id"] for p in payloads if p["reporting_period_id"]}
+    try:
+        payload = CreateArchiveLambdaPayload.model_validate(event)
+    except Exception:
+        logger.exception("Exception parsing Create Archive event payload")
+        return {"statusCode": 400, "body": "Bad Request - payload validation failed"}
 
-    if len(organization_ids) != 1:
-        raise ValueError("All payloads must have the same organization_id")
-    if len(reporting_period_ids) != 1:
-        raise ValueError("All payloads must have the same reporting_period_id")
+    organization_id = payload.organization_id
+    reporting_period_id = payload.reporting_period_id
 
-    organization_id = organization_ids.pop()
-    reporting_period_id = reporting_period_ids.pop()
     logger.info(
         f"Creating archive for organization_id: {organization_id}, reporting_period_id: {reporting_period_id}"
     )
-    create_archive(organization_id, reporting_period_id, boto3.client("s3"), logger)
+
+    try:
+        create_archive(organization_id, reporting_period_id, boto3.client("s3"), logger)
+    except Exception:
+        logger.exception("Exception creating archive")
+        return {"statusCode": 500, "body": "Internal Server Error - unable to create archive"}
+
     return {
         "statusCode": 200,
         "Payload": {
@@ -50,14 +89,14 @@ def handle(event: dict[str, Any], _context: Context):
 
 
 def create_archive(
-    org_id: str, reportiong_period_id: str, s3_client: S3Client, logger=None
+    org_id: str, reporting_period_id: str, s3_client: S3Client, logger=None
 ):
     """Create a zip archive of CSV files in S3"""
 
     if logger is None:
         logger = get_logger()
 
-    target_key = f"treasuryreports/{org_id}/{reportiong_period_id}/"
+    target_key = f"treasuryreports/{org_id}/{reporting_period_id}/"
     logger.info(f"Creating archive for {target_key}")
     # find all file names in the target key with the CSV suffix
     paginator = s3_client.get_paginator("list_objects_v2")
