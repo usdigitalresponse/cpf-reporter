@@ -48,4 +48,4 @@ def test_create_archive_lambda_payload_failed():
         {"organization_id": "1235", "reporting_period_id": "5678"},
     ]
     with pytest.raises(ValueError):
-        payload = CreateArchiveLambdaPayload.model_validate({"Payload": data})
+        CreateArchiveLambdaPayload.model_validate({"Payload": data})
