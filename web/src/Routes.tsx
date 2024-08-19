@@ -8,7 +8,9 @@
 // 'src/pages/Admin/BooksPage/BooksPage.js' -> AdminBooksPage
 // 'src/pages/DeveloperTools/TreasuryReportGeneration/TreasuryReportGeneration.tsx'  -> DeveloperToolsTreasuryReportGeneration
 
-import { PrivateSet, Router, Route } from '@redwoodjs/router'
+import { Set, PrivateSet, Router, Route } from '@redwoodjs/router'
+
+import ScaffoldLayout from 'src/layouts/ScaffoldLayout'
 
 import { useAuth } from './auth'
 import AuthenticatedLayout from './layouts/AuthenticatedLayout/AuthenticatedLayout'
@@ -50,6 +52,13 @@ const Routes = () => {
           <Route path="/organizations/{id:Int}/edit" page={OrganizationEditOrganizationPage} name="editOrganization" />
           <Route path="/organizations/{id:Int}" page={OrganizationOrganizationPage} name="organization" />
           <Route path="/organizations" page={OrganizationOrganizationsPage} name="organizations" />
+        </PrivateSet>
+        {/* OutputTemplates */}
+        <PrivateSet unauthenticated="forbidden" roles="USDR_ADMIN">
+          <Route path="/output-templates/new" page={OutputTemplateNewOutputTemplatePage} name="newOutputTemplate" />
+          <Route path="/output-templates/{id:Int}/edit" page={OutputTemplateEditOutputTemplatePage} name="editOutputTemplate" />
+          <Route path="/output-templates/{id:Int}" page={OutputTemplateOutputTemplatePage} name="outputTemplate" />
+          <Route path="/output-templates" page={OutputTemplateOutputTemplatesPage} name="outputTemplates" />
         </PrivateSet>
         {/* Developer Tools */}
         <PrivateSet unauthenticated="forbidden" roles="USDR_ADMIN">

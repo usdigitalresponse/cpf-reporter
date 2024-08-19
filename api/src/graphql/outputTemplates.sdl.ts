@@ -4,7 +4,7 @@ export const schema = gql`
     name: String!
     version: String!
     effectiveDate: DateTime!
-    rulesGeneratedAt: DateTime!
+    rulesGeneratedAt: DateTime
     createdAt: DateTime!
     updatedAt: DateTime!
     reportingPeriods: [ReportingPeriod]!
@@ -19,7 +19,7 @@ export const schema = gql`
     name: String!
     version: String!
     effectiveDate: DateTime!
-    rulesGeneratedAt: DateTime!
+    rulesGeneratedAt: DateTime
   }
 
   input UpdateOutputTemplateInput {
