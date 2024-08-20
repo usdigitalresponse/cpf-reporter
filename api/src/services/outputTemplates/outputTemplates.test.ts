@@ -42,12 +42,20 @@ describe('outputTemplates', () => {
         name: 'String',
         version: 'String',
         effectiveDate: '2024-08-19T20:09:50.481Z',
+        filenames: {
+          CPF1A: 'String',
+          CPF1B: 'String',
+          CPF1C: 'String',
+          CPFSubrecipient: 'String',
+        },
       },
     })
 
-    expect(result.name).toEqual('String')
-    expect(result.version).toEqual('String')
-    expect(result.effectiveDate).toEqual(new Date('2024-08-19T20:09:50.481Z'))
+    expect(result.outputTemplate.name).toEqual('String')
+    expect(result.outputTemplate.version).toEqual('String')
+    expect(result.outputTemplate.effectiveDate).toEqual(
+      new Date('2024-08-19T00:00:00.000Z')
+    )
   })
 
   scenario('updates a outputTemplate', async (scenario: StandardScenario) => {
