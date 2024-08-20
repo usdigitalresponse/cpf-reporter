@@ -34,19 +34,15 @@ const Navigation = () => {
         )}
         {hasRole(ROLES.USDR_ADMIN) && (
           <Nav.Item>
-            <div className="nav-link disabled">Subrecipients</div>
+            <NavLink
+              to={routes.subrecipients()}
+              activeClassName="active"
+              className="nav-link"
+            >
+              Subrecipients
+            </NavLink>
           </Nav.Item>
         )}
-        {/* TODO: Use the code below when "Subrecipients" page is ready */}
-        {/* <Nav.Item>
-              <NavLink
-                to={routes.subrecipients()}
-                activeClassName="active"
-                className="nav-link"
-              >
-                Subrecipients
-              </NavLink>
-            </Nav.Item> */}
         {canViewAdminTabs && (
           <Nav.Item>
             <NavLink
