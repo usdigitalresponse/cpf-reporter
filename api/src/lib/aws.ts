@@ -113,16 +113,30 @@ export function getS3UploadFileKey(
   return `uploads/${organizationId}/${upload.agencyId}/${upload.reportingPeriodId}/${uploadId}/${upload.filename}`
 }
 
-export async function s3PutSignedUrl(
+export async function s3UploadFilePutSignedUrl(
   upload: CreateUploadInput,
   uploadId: number,
   organizationId: number
 ): Promise<string> {
-  const s3 = getS3Client()
   const key = getS3UploadFileKey(organizationId, upload, uploadId)
+  const url = await generateSignedUrl(key)
+  return url
+}
+
+export async function s3OutputTemplatePutSignedUrl(
+  outputTemplateId: number,
+  fileName: string
+): Promise<string> {
+  const key = `treasuryreports/output-templates/${outputTemplateId}/${fileName}`
+  const url = await generateSignedUrl(key)
+  return url
+}
+
+export async function generateSignedUrl(Key: string): Promise<string> {
+  const s3 = getS3Client()
   const baseParams: PutObjectCommandInput = {
     Bucket: REPORTING_DATA_BUCKET_NAME,
-    Key: key,
+    Key,
     ContentType: 'application/vnd.ms-excel.sheet.macroenabled.12',
     ServerSideEncryption: 'AES256',
   }
