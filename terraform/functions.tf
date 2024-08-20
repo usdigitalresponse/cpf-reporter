@@ -288,6 +288,8 @@ module "lambda_function-graphql" {
       resources = [
         # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm
         "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
+        # Path: "treasuryreports/output-templates/{output_template_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.xlsx"
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/output-templates/*/*.xlsx",
       ]
     }
     AllowDownloadXLSMFiles = {
@@ -310,6 +312,17 @@ module "lambda_function-graphql" {
       resources = [
         # Path: treasuryreports/{organization_id}/{reporting_period_id}/{filename}.csv
         "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.csv",
+      ]
+    }
+    AllowDownloadTreasuryOutputTemplates = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:HeadObject",
+      ]
+      resources = [
+        # Path: "treasuryreports/output-templates/{output_template_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.xlsx"
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/output-templates/*/*.xlsx",
       ]
     }
 
