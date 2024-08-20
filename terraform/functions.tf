@@ -348,7 +348,8 @@ module "lambda_function-graphql" {
       module.postgres.cluster_port,
       module.postgres.cluster_database_name,
       join("&", [
-        "sslmode=verify",
+        "sslmode=require",
+        "sslcert=${urlencode("/var/task/rds-global-bundle.pem")}",
         "connection_limit=1", // Can be tuned for parallel query performance: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections#serverless-environments-faas
       ])
     )
@@ -446,7 +447,8 @@ module "lambda_function-processValidationJson" {
       module.postgres.cluster_port,
       module.postgres.cluster_database_name,
       join("&", [
-        "sslmode=verify",
+        "sslmode=require",
+        "sslcert=${urlencode("/var/task/rds-global-bundle.pem")}",
         "connection_limit=1", // Can be tuned for parallel query performance: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections#serverless-environments-faas
       ])
     )
@@ -536,4 +538,113 @@ module "lambda_function-cpfValidation" {
       source_arn = module.reporting_data_bucket.bucket_arn
     }
   }
+}
+
+
+module "lambda_function-cpfCreateArchive" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "4.2.0"
+
+  // Metadata
+  function_name = "${var.namespace}-cpfCreateArchive"
+  description   = "Reacts to SQS events and generates archive files of CSV's."
+
+  // Networking
+  vpc_subnet_ids         = null
+  vpc_security_group_ids = null
+  attach_network_policy  = false
+
+  // Permissions
+  role_permissions_boundary         = local.permissions_boundary_arn
+  attach_cloudwatch_logs_policy     = true
+  cloudwatch_logs_retention_in_days = var.log_retention_in_days
+  attach_policy_jsons               = length(local.lambda_default_execution_policies) > 0
+  number_of_policy_jsons            = length(local.lambda_default_execution_policies)
+  policy_jsons                      = local.lambda_default_execution_policies
+  attach_policy_statements          = true
+  policy_statements = {
+    AllowDownloadExcelObjects = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:HeadObject",
+      ]
+      resources = [
+        # Path: treasuryreports/{organization_id}/{reporting_period_id}/{filename}.csv
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.csv",
+      ]
+    }
+    AllowUploadZipArchive = {
+      effect = "Allow"
+      actions = [
+        "s3:PutObject"
+      ]
+      resources = [
+        # Path: treasuryreports/{organization_id}/{reporting_period_id}/{filename}.zip
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.zip",
+      ]
+    }
+    AllowSQSReceive = {
+      effect = "Allow"
+      actions = [
+        "sqs:ReceiveMessage",
+        "sqs:DeleteMessage",
+      ]
+      resources = [module.archive_sqs_queue.queue_arn]
+    }
+  }
+
+  // Artifacts
+  publish        = true
+  create_package = false
+  s3_existing_package = {
+    bucket = aws_s3_object.lambda_artifact-python.bucket
+    key    = aws_s3_object.lambda_artifact-python.key
+  }
+
+  // Runtime
+  handler       = var.datadog_enabled ? local.datadog_lambda_py_handler : "src.functions.create_archive.handle"
+  runtime       = var.lambda_py_runtime
+  architectures = [var.lambda_arch]
+  layers        = local.lambda_py_layer_arns
+  timeout       = 60 # 1 minute, in seconds
+  memory_size   = 512
+  environment_variables = merge(local.lambda_default_environment_variables, {
+    DD_LAMBDA_HANDLER = "src.functions.create_archive.handle"
+    DD_LOGS_INJECTION = "true"
+    S3_BUCKET         = "${module.reporting_data_bucket.bucket_arn}"
+  })
+
+  // Triggers
+  event_source_mapping = {
+    sqs = {
+      event_source_arn        = module.archive_sqs_queue.queue_arn
+      function_response_types = ["ReportBatchItemFailures"]
+      scaling_config = {
+        maximum_concurrency = 20
+      }
+    }
+  }
+}
+
+module "archive_sqs_queue" {
+  source  = "terraform-aws-modules/sqs/aws"
+  version = "4.2.0"
+
+  name            = "treasury-request-archive"
+  use_name_prefix = true
+
+  # Primary queue
+  visibility_timeout_seconds = 900 # 15 MINUTES
+  delay_seconds              = 20
+  receive_wait_time_seconds  = 20
+  message_retention_seconds  = 10080 # 7 days, in seconds
+  max_message_size           = 1024  # 1 KiB, in bytes
+  sqs_managed_sse_enabled    = true
+  create_queue_policy        = true
+
+  # Dead-letter queue
+  create_dlq                    = true
+  dlq_message_retention_seconds = 1209600 # 14 days, in seconds
+  dlq_sqs_managed_sse_enabled   = true
 }

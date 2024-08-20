@@ -4,7 +4,10 @@ from typing import BinaryIO
 import openpyxl
 import pytest
 from aws_lambda_typing.context import Context
+
+from src.functions.subrecipient_treasury_report_gen import SubrecipientLambdaPayload
 from src.lib.output_template_comparator import CPFFileArchive
+from src.lib.treasury_generation_common import OrganizationObj, PreferencesObj, UserObj
 
 _SAMPLE_VALID_XLSM = "tests/data/sample_valid.xlsm"
 _SAMPLE_VALID_XLSM_V2024_05_24 = "tests/data/sample_valid_V2024_05_24.xlsm"
@@ -238,14 +241,14 @@ def template_workbook_two():
 
 @pytest.fixture
 def cpf_file_archive(sample_template):
-    cpf_archive_file = zipfile.ZipFile("test.zip", "w")
+    cpf_archive_file = zipfile.ZipFile("_tmp_test.zip", "w")
     cpf_archive_file.writestr("2024-05-19/TestFile.xlsx", sample_template.read())
     return CPFFileArchive(cpf_archive_file)
 
 
 @pytest.fixture
 def cpf_file_archive_two(sample_template):
-    cpf_archive_file = zipfile.ZipFile("test.zip", "w")
+    cpf_archive_file = zipfile.ZipFile("_tmp_test.zip", "w")
     cpf_archive_file.writestr("2024-05-19/TestFile.xlsx", sample_template.read())
     cpf_archive_file.writestr("2024-05-19/TestFile2.xlsx", sample_template.read())
     return CPFFileArchive(cpf_archive_file)
@@ -328,14 +331,23 @@ def valid_subrecipients_json_content():
 def sample_subrecipients_generation_event():
     return {
         "organization": {
-            "id": "org123",
-            "preferences": {"current_reporting_period_id": "reporting123"},
+            "id": 12,
+            "preferences": {"current_reporting_period_id": 34},
         },
-        "outputTemplateId": "template123",
-        "user": {
-            "id": 1,
-        },
+        "user": {"id": 56, "email": "a@example.com"},
+        "outputTemplateId": 78,
     }
+
+@pytest.fixture
+def sample_subrecipients_lambda_payload():
+    return SubrecipientLambdaPayload(
+        organization=OrganizationObj(
+            id=99,
+            preferences=PreferencesObj(current_reporting_period_id=123),
+        ),
+        user=UserObj(id=456, email="foo@example.com"),
+        outputTemplateId=789,
+    )
 
 
 @pytest.fixture

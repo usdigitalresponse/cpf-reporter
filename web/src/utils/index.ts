@@ -36,3 +36,27 @@ export function formatDateString(dateString) {
 
   return `${month} ${day} ${year}, ${formattedHours}:${minutes}:${seconds} ${ampm}`
 }
+
+/**
+ * Formats a phone number string into a standardized format.
+ *
+ * This function takes a phone number string as input and formats it into
+ * the standard North American format: (XXX) XXX-XXXX
+ * If the international code (1) is present, it's formatted as (+1) (XXX) XXX-XXXX.
+ *
+ * @param {string} phoneNumberString - The input phone number string.
+ * @returns {string|null} The formatted phone number string or null if invalid.
+ *
+ * Example outputs:
+ * - With international code:    "+1 (555) 123-4567"
+ * - Without international code: "(555) 123-4567"
+ */
+export function formatPhoneNumber(phoneNumberString: string) {
+  const cleaned = ('' + phoneNumberString).replace(/\D/g, '')
+  const match = cleaned.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/)
+  if (match) {
+    const intlCode = match[1] ? '+1 ' : ''
+    return [intlCode, '(', match[2], ') ', match[3], '-', match[4]].join('')
+  }
+  return null
+}
