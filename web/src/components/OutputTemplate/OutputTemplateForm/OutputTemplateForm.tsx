@@ -1,6 +1,6 @@
 import type {
   EditOutputTemplateById,
-  UpdateOutputTemplateInput,
+  CreateOutputTemplateInput,
 } from 'types/graphql'
 
 import type { RWGqlError } from '@redwoodjs/forms'
@@ -20,13 +20,30 @@ const formatDatetime = (value) => {
     return value.replace(/:\d{2}\.\d{3}\w/, '')
   }
 }
+type Files = {
+  fileCPF1A: File
+  fileCPF1B: File
+  fileCPF1C: File
+  fileCPFSubrecipient: File
+}
 
-type FormOutputTemplate = NonNullable<EditOutputTemplateById['outputTemplate']>
+type FileNames = {
+  filenames: {
+    CPF1A: string
+    CPF1B: string
+    CPF1C: string
+    CPFSubrecipient: string
+  }
+}
+type FormOutputTemplate =
+  | NonNullable<EditOutputTemplateById['outputTemplate']> &
+      Files &
+      (FileNames | null)
 
 interface OutputTemplateFormProps {
   outputTemplate?: EditOutputTemplateById['outputTemplate']
   onSave: (
-    data: UpdateOutputTemplateInput,
+    data: CreateOutputTemplateInput,
     id?: FormOutputTemplate['id']
   ) => void
   error: RWGqlError
@@ -35,6 +52,11 @@ interface OutputTemplateFormProps {
 
 const OutputTemplateForm = (props: OutputTemplateFormProps) => {
   const onSubmit = (data: FormOutputTemplate) => {
+    const CPF1A = data.fileCPF1A[0].name
+    const CPF1B = data.fileCPF1B[0].name
+    const CPF1C = data.fileCPF1C[0].name
+    const CPFSubrecipient = data.fileCPFSubrecipient[0].name
+    data.filenames = { CPF1A, CPF1B, CPF1C, CPFSubrecipient }
     props.onSave(data, props?.outputTemplate?.id)
   }
 
@@ -162,14 +184,14 @@ const OutputTemplateForm = (props: OutputTemplateFormProps) => {
         />
 
         <Label
-          name="fileSubrecipient"
+          name="fileCPFSubrecipient"
           className="rw-label"
           errorClassName="rw-label rw-label-error"
         >
           CPFSubrecipientTemplate
         </Label>
         <FileField
-          name="fileSubrecipient"
+          name="fileCPFSubrecipient"
           validation={{ required: true }}
           accept=".xlsx"
           className="form-control mt-3"
