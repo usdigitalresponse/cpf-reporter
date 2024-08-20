@@ -6,6 +6,7 @@ import {
   createOutputTemplate,
   updateOutputTemplate,
   deleteOutputTemplate,
+  getOrCreateOutputTemplate,
 } from './outputTemplates'
 import type { StandardScenario } from './outputTemplates.scenarios'
 
@@ -16,6 +17,18 @@ import type { StandardScenario } from './outputTemplates.scenarios'
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
 describe('outputTemplates', () => {
+  scenario('gets or creates output template', async () => {
+    const result = await getOrCreateOutputTemplate({
+      name: 'NEW TEMPLATE',
+      version: '1.0.0',
+      effectiveDate: '2023-12-07T18:17:34.958Z',
+    })
+
+    expect(result.name).toEqual('NEW TEMPLATE')
+    expect(result.version).toEqual('1.0.0')
+    expect(result.effectiveDate).toEqual(new Date('2023-12-07T00:00:00.000Z'))
+    expect(result.updatedAt).toBeDefined()
+  })
   scenario(
     'returns all outputTemplates',
     async (scenario: StandardScenario) => {
