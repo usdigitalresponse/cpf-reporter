@@ -49,7 +49,20 @@ export const standard = defineScenario<
   subrecipientUpload: {
     one: (scenario) => ({
       data: {
-        rawSubrecipient: { foo: 'bar' },
+        rawSubrecipient: {
+          Name: 'Test Organization',
+          Recipient_Profile_ID__c: '12345',
+          POC_Name__c: 'John Doe',
+          POC_Phone_Number__c: '123-456-7890',
+          POC_Email_Address__c: 'john.doe@example.com',
+          Zip__c: '12345',
+          Zip_4__c: '6789',
+          Address__c: '123 Main St',
+          Address_2__c: 'Suite 456',
+          Address_3__c: 'null',
+          City__c: 'Testville',
+          State_Abbreviated__c: 'TS',
+        },
         version: 'V2023_12_12',
         subrecipient: {
           create: {
@@ -105,7 +118,20 @@ export const standard = defineScenario<
     }),
     two: (scenario) => ({
       data: {
-        rawSubrecipient: { foo: 'bar' },
+        rawSubrecipient: {
+          Name: 'Test Organization2',
+          Recipient_Profile_ID__c: '67890',
+          POC_Name__c: 'Jane Doe',
+          POC_Phone_Number__c: '098-765-4321',
+          POC_Email_Address__c: 'jane.doe@example.com',
+          Zip__c: '09876',
+          Zip_4__c: '6789',
+          Address__c: '456 Main St',
+          Address_2__c: 'Suite 789',
+          Address_3__c: 'null',
+          City__c: 'Testtown',
+          State_Abbreviated__c: 'TT',
+        },
         version: 'V2023_12_12',
         subrecipient: {
           create: {
