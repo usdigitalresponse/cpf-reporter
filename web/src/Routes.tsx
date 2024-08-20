@@ -8,9 +8,7 @@
 // 'src/pages/Admin/BooksPage/BooksPage.js' -> AdminBooksPage
 // 'src/pages/DeveloperTools/TreasuryReportGeneration/TreasuryReportGeneration.tsx'  -> DeveloperToolsTreasuryReportGeneration
 
-import { Set, PrivateSet, Router, Route } from '@redwoodjs/router'
-
-import ScaffoldLayout from 'src/layouts/ScaffoldLayout'
+import { PrivateSet, Router, Route } from '@redwoodjs/router'
 
 import { useAuth } from './auth'
 import AuthenticatedLayout from './layouts/AuthenticatedLayout/AuthenticatedLayout'
