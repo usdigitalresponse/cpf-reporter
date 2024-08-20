@@ -15,6 +15,7 @@ export const QUERY = gql`
       name
       agencyId
       role
+      isActive
       createdAt
       updatedAt
     }
@@ -28,6 +29,7 @@ const UPDATE_USER_MUTATION = gql`
       name
       agencyId
       role
+      isActive
       createdAt
       updatedAt
     }

@@ -1,12 +1,14 @@
 import Button from 'react-bootstrap/Button'
 import Table from 'react-bootstrap/Table'
-import type { FindUsersByOrganizationId } from 'types/graphql'
+import { ROLES } from 'api/src/lib/constants'
+import { useAuth } from 'web/src/auth'
 
 import { Link, routes } from '@redwoodjs/router'
+import { timeTag, truncate, formatEnum } from 'src/lib/formatters';
 
-import { timeTag, truncate, formatEnum } from 'src/lib/formatters'
+const UsersList = ({ usersByOrganization, updateUser, usersUpdating }) => {
+  const currentUserIsOrgAdmin = useAuth().hasRole(ROLES.ORGANIZATION_ADMIN);
 
-const UsersList = ({ usersByOrganization }: FindUsersByOrganizationId) => {
   return (
     <Table striped bordered>
       <thead>
@@ -20,25 +22,44 @@ const UsersList = ({ usersByOrganization }: FindUsersByOrganizationId) => {
         </tr>
       </thead>
       <tbody>
-        {usersByOrganization.map((user) => (
-          <tr key={user.id}>
-            <td>{truncate(user.email)}</td>
-            <td>{truncate(user.name)}</td>
-            <td>{formatEnum(user.role)}</td>
-            <td>{truncate(user.agency?.name)}</td>
-            <td>{timeTag(user.createdAt)}</td>
-            <td>
-              <Link
-                to={routes.editUser({ id: user.id })}
-                title={'Edit user ' + user.id}
-              >
-                <Button size="sm" variant="secondary">
-                  Edit
-                </Button>
-              </Link>
-            </td>
-          </tr>
-        ))}
+        {usersByOrganization.map((user) => {
+          const userName = user.isActive ? user.name : user.name + ' (Deactivated)';
+          const deactivateTitle = user.isActive ? 'Deactivate user ' + user.id : 'Reactivate user ' + user.id;
+          const deactivateLabel = user.isActive ? 'Deactivate' : 'Reactivate';
+
+          return (
+            <tr key={user.id}>
+              <td>{truncate(user.email)}</td>
+              <td>{truncate(userName)}</td>
+              <td>{formatEnum(user.role)}</td>
+              <td>{truncate(user.agency?.name)}</td>
+              <td>{timeTag(user.createdAt)}</td>
+              <td>
+                <div className="d-grid gap-2 d-xl-block">
+                  <Link
+                    to={routes.editUser({ id: user.id })}
+                    className="btn btn-secondary btn-sm me-xl-2"
+                    title={'Edit user ' + user.id}
+                  >
+                    Edit
+                  </Link>
+
+                  {currentUserIsOrgAdmin && user.role !== ROLES.USDR_ADMIN && (
+                    <Button
+                      size="sm"
+                      variant="outline-secondary"
+                      title={deactivateTitle}
+                      onClick={() => updateUser({ ...user, isActive: !user.isActive })}
+                      disabled={usersUpdating.has(user.id)}
+                    >
+                      {deactivateLabel}
+                    </Button>
+                  )}
+                </div>
+              </td>
+            </tr>
+          )
+        })}
       </tbody>
     </Table>
   )
