@@ -181,7 +181,7 @@ export const updateOrganization: MutationResolvers['updateOrganization'] = ({
   id,
   input,
 }) => {
-  if (input.preferences) {
+  if (input.preferences && typeof input.preferences === 'string') {
     input.preferences = JSON.parse(input.preferences)
   }
   return db.organization.update({
