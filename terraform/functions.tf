@@ -348,7 +348,8 @@ module "lambda_function-graphql" {
       module.postgres.cluster_port,
       module.postgres.cluster_database_name,
       join("&", [
-        "sslmode=verify",
+        "sslmode=require",
+        "sslcert=${urlencode("/var/task/rds-global-bundle.pem")}",
         "connection_limit=1", // Can be tuned for parallel query performance: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections#serverless-environments-faas
       ])
     )
@@ -446,7 +447,8 @@ module "lambda_function-processValidationJson" {
       module.postgres.cluster_port,
       module.postgres.cluster_database_name,
       join("&", [
-        "sslmode=verify",
+        "sslmode=require",
+        "sslcert=${urlencode("/var/task/rds-global-bundle.pem")}",
         "connection_limit=1", // Can be tuned for parallel query performance: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections#serverless-environments-faas
       ])
     )
