@@ -9,6 +9,7 @@ export const QUERY = gql`
     organization: organization(id: $id) {
       id
       name
+      preferences
     }
   }
 `

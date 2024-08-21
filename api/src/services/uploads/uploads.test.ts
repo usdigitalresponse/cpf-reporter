@@ -2,7 +2,7 @@ import type { Upload } from '@prisma/client'
 
 import {
   deleteUploadFile,
-  s3PutSignedUrl,
+  s3UploadFilePutSignedUrl,
   getSignedUrl,
   startStepFunctionExecution,
 } from 'src/lib/aws'
@@ -33,7 +33,7 @@ import type { StandardScenario } from './uploads.scenarios'
 jest.mock('src/lib/logger')
 jest.mock('src/lib/aws', () => ({
   deleteUploadFile: jest.fn(),
-  s3PutSignedUrl: jest.fn(),
+  s3UploadFilePutSignedUrl: jest.fn(),
   getSignedUrl: jest.fn(),
   getS3UploadFileKey: jest.fn(),
   startStepFunctionExecution: jest.fn(),
@@ -120,7 +120,7 @@ describe('uploads', () => {
       },
     })
 
-    expect(s3PutSignedUrl).toHaveBeenCalled()
+    expect(s3UploadFilePutSignedUrl).toHaveBeenCalled()
     expect(result.filename).toEqual('String')
     expect(result.uploadedById).toEqual(scenario.upload.one.uploadedById)
     expect(result.agencyId).toEqual(scenario.upload.two.agencyId)

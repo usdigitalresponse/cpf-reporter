@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 from src.lib.constants import OUTPUT_TEMPLATE_FILENAME_BY_PROJECT
 from src.lib.logging import get_logger
+from src.lib.s3_helper import download_s3_object
 
 
 class PreferencesObj(BaseModel):
@@ -39,10 +40,11 @@ def get_output_template(
     logger.debug("downloading output template from s3")
 
     try:
-        s3_client.download_fileobj(
+        download_s3_object(
+            client=s3_client,
             bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
             key=f"treasuryreports/output-templates/{output_template_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.xlsx",
-            file=destination,
+            destination=destination,
         )
     except:
         logger.exception("failed to download output template from S3")

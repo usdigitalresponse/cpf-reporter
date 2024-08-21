@@ -84,6 +84,27 @@ const EditOrganizationForm = (props: EditOrganizationFormProps) => {
           className="error-message offset-2 invalid-feedback"
         />
       </div>
+      <div className="row mb-3">
+        <Label
+          name="preferences"
+          className="form-label col-sm-2 col-form-label"
+        >
+          Organization Preferences
+        </Label>
+        <div className="col-sm-6">
+          <TextField
+            name="preferences"
+            defaultValue={JSON.stringify(organization?.preferences)}
+            className="form-control"
+            errorClassName="form-control is-invalid"
+            validation={{ required: 'This field is required' }}
+          />
+        </div>
+        <FieldError
+          name="preferences"
+          className="error-message offset-2 invalid-feedback"
+        />
+      </div>
       <div className="row">
         <div className="offset-2 col-sm-6">
           <Submit disabled={loading} className="btn btn-primary me-2">
