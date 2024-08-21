@@ -1,9 +1,10 @@
+import { useState } from 'react'
+
 import type { FindUsersByOrganizationId } from 'types/graphql'
 
 import { Link, routes } from '@redwoodjs/router'
 import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
-import { useMutation } from '@redwoodjs/web';
-import { useState } from 'react';
+import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
 import Users from 'src/components/User/Users'
@@ -15,7 +16,7 @@ export const QUERY = gql`
       email
       name
       agency {
-        id,
+        id
         name
       }
       role
@@ -53,21 +54,21 @@ export const Failure = ({ error }: CellFailureProps) => (
 
 export const Success = ({
   usersByOrganization,
-  queryResult: { refetch }
+  queryResult: { refetch },
 }: CellSuccessProps<FindUsersByOrganizationId>) => {
-  const [usersUpdating, setUsersUpdating] = useState(new Set());
+  const [usersUpdating, setUsersUpdating] = useState(new Set())
   const [updateUserMutation] = useMutation(UPDATE_USER_MUTATION, {
     onCompleted: () => {
-      toast.success('User updated');
+      toast.success('User updated')
     },
     onError: (error) => {
-      toast.error(error.message);
-    }
-  });
+      toast.error(error.message)
+    },
+  })
 
   const updateUser = async (user) => {
-    const { email, name, role, isActive } = user;
-    setUsersUpdating(usersUpdating.add(user.id));
+    const { email, name, role, isActive } = user
+    setUsersUpdating(usersUpdating.add(user.id))
 
     await updateUserMutation({
       variables: {
@@ -77,19 +78,21 @@ export const Success = ({
           email,
           role,
           agencyId: user.agency.id,
-          isActive
-        }
-      }
+          isActive,
+        },
+      },
     })
 
-    usersUpdating.delete(user.id);
-    setUsersUpdating(new Set(usersUpdating));
-    refetch();
+    usersUpdating.delete(user.id)
+    setUsersUpdating(new Set(usersUpdating))
+    refetch()
   }
 
-  return <Users
-    usersByOrganization={usersByOrganization}
-    updateUser={updateUser}
-    usersUpdating={usersUpdating}
-  />
+  return (
+    <Users
+      usersByOrganization={usersByOrganization}
+      updateUser={updateUser}
+      usersUpdating={usersUpdating}
+    />
+  )
 }

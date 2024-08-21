@@ -1,15 +1,16 @@
+import { ROLES } from 'api/src/lib/constants'
 import Button from 'react-bootstrap/Button'
 import Table from 'react-bootstrap/Table'
-import { ROLES } from 'api/src/lib/constants'
 import { useAuth } from 'web/src/auth'
 
 import { Link, routes } from '@redwoodjs/router'
-import { timeTag, truncate, formatEnum } from 'src/lib/formatters';
+
+import { timeTag, truncate, formatEnum } from 'src/lib/formatters'
 
 const UsersList = ({ usersByOrganization, updateUser, usersUpdating }) => {
-  const { hasRole } = useAuth();
-  const currentUserIsOrgAdmin = hasRole(ROLES.ORGANIZATION_ADMIN);
-  const currentUserIsUSDRAdmin = hasRole(ROLES.USDR_ADMIN); 
+  const { hasRole } = useAuth()
+  const currentUserIsOrgAdmin = hasRole(ROLES.ORGANIZATION_ADMIN)
+  const currentUserIsUSDRAdmin = hasRole(ROLES.USDR_ADMIN)
 
   return (
     <Table striped bordered>
@@ -25,13 +26,19 @@ const UsersList = ({ usersByOrganization, updateUser, usersUpdating }) => {
       </thead>
       <tbody>
         {usersByOrganization.map((user) => {
-          const userName = user.isActive ? user.name : user.name + ' (Deactivated)';
-          const deactivateTitle = user.isActive ? 'Deactivate user ' + user.id : 'Reactivate user ' + user.id;
-          const deactivateLabel = user.isActive ? 'Deactivate' : 'Reactivate';
+          const userName = user.isActive
+            ? user.name
+            : user.name + ' (Deactivated)'
+          const deactivateTitle = user.isActive
+            ? 'Deactivate user ' + user.id
+            : 'Reactivate user ' + user.id
+          const deactivateLabel = user.isActive ? 'Deactivate' : 'Reactivate'
 
           // Actions
-          const editAccess = currentUserIsUSDRAdmin || user.role !== ROLES.USDR_ADMIN;
-          const deactivateAccess = currentUserIsOrgAdmin && user.role !== ROLES.USDR_ADMIN;
+          const editAccess =
+            currentUserIsUSDRAdmin || user.role !== ROLES.USDR_ADMIN
+          const deactivateAccess =
+            currentUserIsOrgAdmin && user.role !== ROLES.USDR_ADMIN
 
           return (
             <tr key={user.id}>
@@ -57,7 +64,9 @@ const UsersList = ({ usersByOrganization, updateUser, usersUpdating }) => {
                       size="sm"
                       variant="outline-secondary"
                       title={deactivateTitle}
-                      onClick={() => updateUser({ ...user, isActive: !user.isActive })}
+                      onClick={() =>
+                        updateUser({ ...user, isActive: !user.isActive })
+                      }
                       disabled={usersUpdating.has(user.id)}
                     >
                       {deactivateLabel}

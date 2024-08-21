@@ -13,7 +13,7 @@ import {
   TextField,
   SelectField,
   Submit,
-  Controller
+  Controller,
 } from '@redwoodjs/forms'
 import { useQuery } from '@redwoodjs/web'
 
@@ -165,9 +165,9 @@ const UserForm = (props: UserFormProps) => {
             defaultValue={user?.role}
             className="form-select"
           >
-            {hasRole(ROLES.USDR_ADMIN) && ( 
+            {hasRole(ROLES.USDR_ADMIN) && (
               <option value={ROLES.USDR_ADMIN}>USDR admin</option>
-            )}       
+            )}
             <option value={ROLES.ORGANIZATION_ADMIN}>Organization admin</option>
             <option value={ROLES.ORGANIZATION_STAFF}>Organization staff</option>
           </SelectField>
@@ -214,9 +214,7 @@ const UserForm = (props: UserFormProps) => {
       </div>
 
       <div className="row mb-3">
-        <Label className="form-label col-sm-2 col-form-label">
-          Status
-        </Label>
+        <Label className="form-label col-sm-2 col-form-label">Status</Label>
 
         <div className="col-sm-6 d-flex align-items-center">
           <Controller
