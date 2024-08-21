@@ -18,7 +18,7 @@ export default async ({ args }) => {
   console.log(`Received following arguments: ${Object.keys(args)}`)
 
   const { arn, name, input } = args
-  const result = await aws.startStepFunctionExecution(arn,name, input, '')
+  const result = await aws.startStepFunctionExecution(arn, name, input, '')
   console.log(result)
   console.log(result.body)
-};
+}

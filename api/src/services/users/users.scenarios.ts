@@ -86,6 +86,7 @@ export const standard = defineScenario<
         email: 'uniqueemail1@test.com',
         name: 'String',
         role: 'ORGANIZATION_ADMIN',
+        isActive: true,
         agency: { create: { name: 'String', code: 'String' } },
       },
     },
@@ -94,6 +95,7 @@ export const standard = defineScenario<
         email: 'uniqueemail25@test.com',
         name: 'String',
         role: 'ORGANIZATION_STAFF',
+        isActive: true,
         agency: { connect: { id: scenario.agency.one.id } },
       },
       include: {
@@ -105,6 +107,7 @@ export const standard = defineScenario<
         email: 'uniqueemail350@test.com',
         name: 'String',
         role: 'ORGANIZATION_STAFF',
+        isActive: true,
         agency: { connect: { id: scenario.agency.one.id } },
       },
       include: {
@@ -116,6 +119,7 @@ export const standard = defineScenario<
         email: 'uniqueemail450@test.com',
         name: 'String',
         role: 'ORGANIZATION_STAFF',
+        isActive: true,
         agency: { connect: { id: scenario.agency.three.id } },
       },
       include: {

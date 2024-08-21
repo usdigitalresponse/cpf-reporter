@@ -13,6 +13,7 @@ import {
   TextField,
   SelectField,
   Submit,
+  Controller,
 } from '@redwoodjs/forms'
 import { useQuery } from '@redwoodjs/web'
 
@@ -165,10 +166,10 @@ const UserForm = (props: UserFormProps) => {
             className="form-select"
           >
             {hasRole(ROLES.USDR_ADMIN) && (
-              <option value="USDR_ADMIN">USDR admin</option>
+              <option value={ROLES.USDR_ADMIN}>USDR admin</option>
             )}
-            <option value="ORGANIZATION_ADMIN">Organization admin</option>
-            <option value="ORGANIZATION_STAFF">Organization staff</option>
+            <option value={ROLES.ORGANIZATION_ADMIN}>Organization admin</option>
+            <option value={ROLES.ORGANIZATION_STAFF}>Organization staff</option>
           </SelectField>
         </div>
 
@@ -210,6 +211,53 @@ const UserForm = (props: UserFormProps) => {
           name="agencyId"
           className="error-message offset-2 invalid-feedback"
         />
+      </div>
+
+      <div className="row mb-3">
+        <Label className="form-label col-sm-2 col-form-label">Status</Label>
+
+        <div className="col-sm-6 d-flex align-items-center">
+          <Controller
+            name="isActive"
+            control={formMethods.control}
+            defaultValue={user ? user.isActive : true}
+            disabled={!hasRole(ROLES.ORGANIZATION_ADMIN) || !user}
+            render={({ field: { onChange, name, value, ref, disabled } }) => (
+              <>
+                <div className="form-check form-check-inline">
+                  <input
+                    name={name}
+                    type="radio"
+                    id="userIsActive"
+                    className="form-check-input"
+                    defaultChecked={value}
+                    disabled={disabled}
+                    onChange={() => onChange(true)}
+                    ref={ref}
+                  />
+                  <Label name="userIsActive" className="form-check-label">
+                    Active
+                  </Label>
+                </div>
+                <div className="form-check form-check-inline">
+                  <input
+                    name={name}
+                    type="radio"
+                    id="userIsInactive"
+                    className="form-check-input"
+                    defaultChecked={!value}
+                    disabled={disabled}
+                    onChange={() => onChange(false)}
+                    ref={ref}
+                  />
+                  <Label name="userIsInactive" className="form-check-label">
+                    Inactive
+                  </Label>
+                </div>
+              </>
+            )}
+          />
+        </div>
       </div>
 
       <div className="row">
