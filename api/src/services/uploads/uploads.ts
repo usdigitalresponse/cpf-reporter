@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma, Upload } from '@prisma/client'
 import type {
   QueryResolvers,
   MutationResolvers,
@@ -147,7 +147,7 @@ export const Upload: UploadRelationResolvers = {
     return latestValidation
   },
 }
-
+export type UploadsByEC = Record<string, Record<string, Prisma.Upload>>
 /*
 This function should return the most recent upload for each expenditure category and agency for the `currentUser`'s organization.
 The uploads must be grouped by expenditure category and agency. If there are multiple uploads for the grouping, the most recent upload must be chosen.
@@ -189,7 +189,7 @@ Example:
   ...
 }
 */
-export const getUploadsByExpenditureCategory = async () => {
+export const getUploadsByExpenditureCategory = async (): UploadsByEC => {
   const organization = await db.organization.findFirst({
     where: { id: context.currentUser.agency.organizationId },
   })
@@ -277,7 +277,57 @@ export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
       }
       logger.info(uploadsByExpenditureCategory)
       logger.info('Sending Treasury Report')
+      /*
 
+class ProjectLambdaPayload(BaseModel):
+    organization: OrganizationObj
+    user: UserObj
+    outputTemplateId: int
+    ProjectType: str
+    uploadsToAdd: Dict[AgencyId, UploadObj]
+    uploadsToRemove: Dict[AgencyId, UploadObj]
+
+class SubrecipientLambdaPayload(BaseModel):
+    organization: OrganizationObj
+    user: UserObj
+    outputTemplateId: int
+
+class CreateArchiveLambdaPayload(BaseModel):
+    organization: OrganizationObj
+
+        {
+          "1A": {
+            "organization": {
+              "id": 1,
+              "preferences": {
+                "current_reporting_period_id": 1
+              }
+            },
+            "user": {
+              "email": "foo@example.com",
+              "id": 1
+            },
+            "outputTemplateId": 1,
+            "ProjectType": "1A",
+            "uploadsToAdd": {
+              "1": {
+                "id": 1,
+                "filename": "file1.csv",
+                "objectKey": "uploads/1/1/1/1/file1.csv",
+                ...
+              },
+              "2": {
+                "id": 2,
+                "filename": "file2.csv",
+                "objectKey": "uploads/1/2/1/2/file2.csv",
+                ...
+              }
+            },
+            "uploadsToRemove": {}
+            }
+          }
+        }
+      */
       const input = {
         reportingPeriod: reportingPeriod.name,
         organization: organization.name,

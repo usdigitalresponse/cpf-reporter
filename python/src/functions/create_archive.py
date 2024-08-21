@@ -1,49 +1,22 @@
+import json
 import os
 import tempfile
-import json
-from typing import Any
 import zipfile
+from typing import Any
 
 import boto3
 from aws_lambda_typing.context import Context
 from mypy_boto3_s3.client import S3Client
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel
 
 from src.lib.logging import get_logger, reset_contextvars
+from src.lib.treasury_generation_common import OrganizationObj
 
 S3_BUCKET = os.environ.get("REPORTING_DATA_BUCKET_NAME", "test_bucket")
 
 
-class ClientLambdaPayload(BaseModel):
-    organization_id: str
-    reporting_period_id: str
-
-
 class CreateArchiveLambdaPayload(BaseModel):
-    """
-    Model to wrap the validation for the create archive lambda.
-
-    The function is called from a parallel step function, so we expect a list of payloads.
-    We want to check that all payloads have the only one organization_id and reporting_period_id
-    """
-    payloads: list[ClientLambdaPayload] = Field(alias="Payload")
-
-    @field_validator("payloads")
-    @classmethod
-    def validate_payloads(cls, payloads: list[ClientLambdaPayload]) -> list[ClientLambdaPayload]:
-        if len({p.organization_id for p in payloads}) != 1:
-            raise ValueError("All payloads must have the same organization_id")
-        if len({p.reporting_period_id for p in payloads}) != 1:
-            raise ValueError("All payloads must have the same organization_id")
-        return payloads
-
-    @property
-    def organization_id(self) -> str:
-        return self.payloads[0].organization_id
-
-    @property
-    def reporting_period_id(self) -> str:
-        return self.payloads[0].reporting_period_id
+    organization: OrganizationObj
 
 
 @reset_contextvars
@@ -65,8 +38,8 @@ def handle(event: dict[str, Any], _context: Context):
         logger.exception("Exception parsing Create Archive event payload")
         return {"statusCode": 400, "body": "Bad Request - payload validation failed"}
 
-    organization_id = payload.organization_id
-    reporting_period_id = payload.reporting_period_id
+    organization_id = payload.organization.id
+    reporting_period_id = payload.organization.preferences.current_reporting_period_id
 
     logger.info(
         f"Creating archive for organization_id: {organization_id}, reporting_period_id: {reporting_period_id}"
@@ -88,7 +61,7 @@ def handle(event: dict[str, Any], _context: Context):
 
 
 def create_archive(
-    org_id: str, reporting_period_id: str, s3_client: S3Client, logger=None
+    org_id: int, reporting_period_id: int, s3_client: S3Client, logger=None
 ):
     """Create a zip archive of CSV files in S3"""
 
