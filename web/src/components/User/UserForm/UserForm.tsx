@@ -165,11 +165,11 @@ const UserForm = (props: UserFormProps) => {
             defaultValue={user?.role}
             className="form-select"
           >
-            {hasRole(ROLES.USDR_ADMIN) && (
-              <option value="USDR_ADMIN">USDR admin</option>
-            )}
-            <option value="ORGANIZATION_ADMIN">Organization admin</option>
-            <option value="ORGANIZATION_STAFF">Organization staff</option>
+            {hasRole(ROLES.USDR_ADMIN) && ( 
+              <option value={ROLES.USDR_ADMIN}>USDR admin</option>
+            )}       
+            <option value={ROLES.ORGANIZATION_ADMIN}>Organization admin</option>
+            <option value={ROLES.ORGANIZATION_STAFF}>Organization staff</option>
           </SelectField>
         </div>
 
