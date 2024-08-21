@@ -15,6 +15,7 @@ export const QUERY = gql`
     organization: organization(id: $id) {
       id
       name
+      preferences
     }
   }
 `
@@ -26,6 +27,7 @@ const UPDATE_ORGANIZATION_MUTATION = gql`
     updateOrganization(id: $id, input: $input) {
       id
       name
+      preferences
     }
   }
 `

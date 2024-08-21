@@ -20,6 +20,7 @@ export const schema = gql`
 
   input UpdateOrganizationInput {
     name: String
+    preferences: JSON
   }
 
   input NewTreasuryGenerationInput {

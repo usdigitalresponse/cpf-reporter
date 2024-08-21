@@ -6,7 +6,7 @@ import type {
 } from 'types/graphql'
 
 import { hasRole } from 'src/lib/auth'
-import { s3PutSignedUrl, getS3UploadFileKey } from 'src/lib/aws'
+import { s3UploadFilePutSignedUrl, getS3UploadFileKey } from 'src/lib/aws'
 import aws from 'src/lib/aws'
 import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
@@ -62,7 +62,7 @@ export const createUpload: MutationResolvers['createUpload'] = async ({
       results: null,
     },
   })
-  const signedUrl = await s3PutSignedUrl(
+  const signedUrl = await s3UploadFilePutSignedUrl(
     upload,
     upload.id,
     context.currentUser.agency.organizationId
