@@ -202,16 +202,18 @@ describe('user writes', () => {
     const email = 'String2@gmail.com'
     const name = 'FDR'
     const role = 'ORGANIZATION_STAFF'
+    const isActive = false
     const original = (await user({ id: scenario.user.one.id })) as User
     const result = await updateUser({
       id: original.id,
-      input: { email, name, role, agencyId: scenario.agency.one.id },
+      input: { email, name, role, agencyId: scenario.agency.one.id, isActive },
     })
 
     expect(result.email).toEqual(email)
     expect(result.name).toEqual(name)
     expect(result.role).toEqual(ROLES.ORGANIZATION_STAFF)
     expect(result.agencyId).toEqual(scenario.agency.one.id)
+    expect(result.isActive).toEqual(false)
   })
 
   scenario('deletes a user', async (scenario: StandardScenario) => {
