@@ -7,7 +7,9 @@ import { Link, routes } from '@redwoodjs/router'
 import { timeTag, truncate, formatEnum } from 'src/lib/formatters';
 
 const UsersList = ({ usersByOrganization, updateUser, usersUpdating }) => {
-  const currentUserIsOrgAdmin = useAuth().hasRole(ROLES.ORGANIZATION_ADMIN);
+  const { hasRole } = useAuth();
+  const currentUserIsOrgAdmin = hasRole(ROLES.ORGANIZATION_ADMIN);
+  const currentUserIsUSDRAdmin = hasRole(ROLES.USDR_ADMIN); 
 
   return (
     <Table striped bordered>
@@ -27,6 +29,10 @@ const UsersList = ({ usersByOrganization, updateUser, usersUpdating }) => {
           const deactivateTitle = user.isActive ? 'Deactivate user ' + user.id : 'Reactivate user ' + user.id;
           const deactivateLabel = user.isActive ? 'Deactivate' : 'Reactivate';
 
+          // Actions
+          const editAccess = currentUserIsUSDRAdmin || user.role !== ROLES.USDR_ADMIN;
+          const deactivateAccess = currentUserIsOrgAdmin && user.role !== ROLES.USDR_ADMIN;
+
           return (
             <tr key={user.id}>
               <td>{truncate(user.email)}</td>
@@ -36,15 +42,17 @@ const UsersList = ({ usersByOrganization, updateUser, usersUpdating }) => {
               <td>{timeTag(user.createdAt)}</td>
               <td>
                 <div className="d-grid gap-2 d-xl-block">
-                  <Link
-                    to={routes.editUser({ id: user.id })}
-                    className="btn btn-secondary btn-sm me-xl-2"
-                    title={'Edit user ' + user.id}
-                  >
-                    Edit
-                  </Link>
+                  {editAccess && (
+                    <Link
+                      to={routes.editUser({ id: user.id })}
+                      className="btn btn-secondary btn-sm me-xl-2"
+                      title={'Edit user ' + user.id}
+                    >
+                      Edit
+                    </Link>
+                  )}
 
-                  {currentUserIsOrgAdmin && user.role !== ROLES.USDR_ADMIN && (
+                  {deactivateAccess && (
                     <Button
                       size="sm"
                       variant="outline-secondary"
