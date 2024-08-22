@@ -311,3 +311,7 @@ variable "passage_app_id" {
   description = "The Passage app ID to use for authentication."
   type        = string
 }
+variable "ca_cert_identifier" {
+  description = "Certificate Authority identifier for RDS Aurora Postgres cluster instances."
+  type        = string
+}

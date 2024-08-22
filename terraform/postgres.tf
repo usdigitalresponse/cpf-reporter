@@ -50,6 +50,7 @@ module "postgres" {
   auto_minor_version_upgrade = true
   engine_mode                = "provisioned"
   storage_encrypted          = true
+  ca_cert_identifier         = var.ca_cert_identifier
 
   vpc_id                         = data.aws_ssm_parameter.vpc_id.value
   subnets                        = local.private_subnet_ids
