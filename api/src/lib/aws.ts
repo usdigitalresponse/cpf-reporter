@@ -251,15 +251,14 @@ async function startStepFunctionExecution(
   arn: string,
   name?: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  input?: any,
-  traceHeader?: string
+  input?: any
 ): Promise<StartExecutionCommandOutput> {
   let client: SFNClient
   const command = new StartExecutionCommand({
     stateMachineArn: arn,
     name,
     input: input ?? '{}',
-    traceHeader,
+    traceHeader: process.env._X_AMZN_TRACE_ID,
   })
   if (process.env.LOCALSTACK_HOSTNAME) {
     console.log('------------ USING LOCALSTACK FOR SFN ------------')

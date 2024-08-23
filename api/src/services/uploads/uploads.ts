@@ -5,6 +5,7 @@ import type {
   MutationResolvers,
   UploadRelationResolvers,
 } from 'types/graphql'
+import { v4 as uuidv4 } from 'uuid'
 
 import { CurrentUser } from 'src/lib/auth'
 import { hasRole } from 'src/lib/auth'
@@ -368,9 +369,8 @@ export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
 
       await aws.startStepFunctionExecution(
         arn,
-        undefined,
-        JSON.stringify(input),
-        ''
+        `Force-kick-off-${uuidv4()}`,
+        JSON.stringify(input)
       )
       return true
     } catch (error) {
