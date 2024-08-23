@@ -11,7 +11,7 @@ import { logger } from 'src/lib/logger'
  * Represents the user attributes returned by the decoding the
  * Authentication provider's JWT together with an optional list of roles.
  */
-interface CurrentUser extends User {
+export interface CurrentUser extends User {
   roles?: string[]
 }
 /**
