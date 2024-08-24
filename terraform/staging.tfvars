@@ -24,6 +24,7 @@ postgres_prevent_destroy           = true
 postgres_snapshot_before_destroy   = true
 postgres_apply_changes_immediately = true
 postgres_query_logging_enabled     = true
+postgres_ca_cert_identifier        = "rds-ca-rsa2048-g1"
 
 // General Lambda options
 lambda_log_level  = "debug"

@@ -29,7 +29,6 @@ describe('outputTemplates', () => {
     expect(result.effectiveDate).toEqual(new Date('2023-12-07T00:00:00.000Z'))
     expect(result.updatedAt).toBeDefined()
   })
-
   scenario(
     'returns all outputTemplates',
     async (scenario: StandardScenario) => {
@@ -55,19 +54,21 @@ describe('outputTemplates', () => {
       input: {
         name: 'String',
         version: 'String',
-        effectiveDate: '2023-12-07T18:17:34.958Z',
-        rulesGeneratedAt: '2023-12-07T18:17:34.958Z',
-        updatedAt: '2023-12-07T18:17:34.958Z',
+        effectiveDate: '2024-08-19T20:09:50.481Z',
+        filenames: {
+          CPF1A: 'String',
+          CPF1B: 'String',
+          CPF1C: 'String',
+          CPFSubrecipient: 'String',
+        },
       },
     })
 
-    expect(result.name).toEqual('String')
-    expect(result.version).toEqual('String')
-    expect(result.effectiveDate).toEqual(new Date('2023-12-07T00:00:00.000Z'))
-    expect(result.rulesGeneratedAt).toEqual(
-      new Date('2023-12-07T18:17:34.958Z')
+    expect(result.outputTemplate.name).toEqual('String')
+    expect(result.outputTemplate.version).toEqual('String')
+    expect(result.outputTemplate.effectiveDate).toEqual(
+      new Date('2024-08-19T00:00:00.000Z')
     )
-    expect(result.updatedAt).toEqual(new Date('2023-12-07T18:17:34.958Z'))
   })
 
   scenario('updates a outputTemplate', async (scenario: StandardScenario) => {

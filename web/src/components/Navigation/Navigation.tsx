@@ -76,6 +76,15 @@ const Navigation = () => {
             </Nav.Item>
             <Nav.Item>
               <NavLink
+                to={routes.outputTemplates()}
+                activeClassName="active"
+                className="nav-link"
+              >
+                Output Templates
+              </NavLink>
+            </Nav.Item>
+            <Nav.Item>
+              <NavLink
                 to={routes.treasuryReportGenerationDeveloperTools()}
                 activeClassName="active"
                 className="nav-link"
