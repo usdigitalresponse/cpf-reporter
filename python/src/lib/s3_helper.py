@@ -1,5 +1,6 @@
-from src.lib.logging import get_logger
+from botocore.exceptions import ClientError
 from mypy_boto3_s3.client import S3Client
+from src.lib.logging import get_logger
 from typing import IO
 from urllib.parse import unquote_plus
 
@@ -50,3 +51,38 @@ def upload_generated_file_to_s3(
         raise
 
     logger.info("successfully uploaded file to s3")
+
+
+def get_presigned_url(
+        s3_client: S3Client,
+        bucket: str,
+        key: str,
+        expiration_time: int = 60 * 60,  #  1 hour
+):
+    logger = get_logger()
+    try:
+        response = s3_client.head_object(
+            bucket = bucket,
+            key = key,
+        )
+    except ClientError as e:
+        if logger:
+            logger.error(e)
+        return None
+
+    try:
+        response =  s3_client.generate_presigned_url(
+            "get_object",
+            Params={
+                "Bucket": bucket,
+                "Key": key,
+            },
+            ExpiresIn=expiration_time
+        )
+    except ClientError as e:
+        if logger:
+            logger.error(e)
+        return None
+    
+    return response
+

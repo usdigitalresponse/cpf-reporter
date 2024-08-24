@@ -315,3 +315,36 @@ variable "postgres_ca_cert_identifier" {
   description = "Certificate Authority identifier for RDS Aurora Postgres cluster instances."
   type        = string
 }
+
+// email
+
+variable "email_enabled" {
+  description = "If email should be enabled"
+  type        = bool
+  default     = false
+}
+
+variable "domain_name" {
+  type = string
+  default = "yourdomain.com"
+}
+
+variable "ses_sandbox_mode_email_recipients" {
+  description = "List of email addresses to verify so that they may receive emails when SES is in sandbox mode. ONLY USE THIS FOR DEVELOPMENT PURPOSES!"
+  type        = list(string)
+  default     = []
+}
+
+variable "notifications_email_address" {
+  description = "SES domain from which email notifications should be sent."
+  type        = string
+  validation {
+    condition     = length(split("@", var.notifications_email_address)) == 2
+    error_message = "Email address must contain exactly one @ sign."
+  }
+}
+
+variable "ses_configuration_set_default" {
+  description = "Name of the configuration set that should be used for all emails sent through SES."
+  type        = string
+}
