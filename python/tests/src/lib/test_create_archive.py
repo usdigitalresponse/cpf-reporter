@@ -36,8 +36,10 @@ def test_create_archive_creates_zip():
 
 def test_create_archive_lambda_payload():
     organizationObj = {
-        "id": 1234,
-        "preferences": {"current_reporting_period_id": 5678},
+        "organization": {
+            "id": 1234,
+            "preferences": {"current_reporting_period_id": 5678},
+        }
     }
     try:
         CreateArchiveLambdaPayload.model_validate(organizationObj)
