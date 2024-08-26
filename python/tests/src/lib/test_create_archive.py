@@ -36,8 +36,8 @@ def test_create_archive_creates_zip():
 
 def test_create_archive_lambda_payload():
     organizationObj = {
-        "id": "1234",
-        "preferences": {"current_reporting_period_id": "5678"},
+        "id": 1234,
+        "preferences": {"current_reporting_period_id": 5678},
     }
     try:
         CreateArchiveLambdaPayload.model_validate(organizationObj)
@@ -50,7 +50,7 @@ def test_create_archive_lambda_payload():
 def test_create_archive_lambda_payload_failed():
     organizationObj = {
         # "id": "1234", Missing a required field
-        "preferences": {"current_reporting_period_id": "5678"},
+        "preferences": {"current_reporting_period_id": 5678},
     }
     with pytest.raises(ValidationError):
         CreateArchiveLambdaPayload.model_validate(organizationObj)
