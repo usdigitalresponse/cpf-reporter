@@ -6,7 +6,7 @@ import type {
   Agency,
 } from 'types/graphql'
 
-import aws from 'src/lib/aws'
+import { getTreasurySignedUrl, startStepFunctionExecution } from 'src/lib/aws'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 
@@ -92,7 +92,7 @@ export const downloadTreasuryFile: MutationResolvers['downloadTreasuryFile'] =
 
     // Retrieve the signed URL for the treasury file
     logger.info(`Downloading treasury file for ${fileType}`)
-    const url = await aws.getTreasurySignedUrl(
+    const url = await getTreasurySignedUrl(
       fileType,
       organization.id,
       organization.preferences['current_reporting_period_id']
@@ -124,7 +124,7 @@ export const kickOffTreasuryReportGeneration: MutationResolvers['kickOffTreasury
     logger.info(
       `Kicking off treasury report generation for ${organization.name}`
     )
-    const response = await aws.startStepFunctionExecution(
+    const response = await startStepFunctionExecution(
       process.env.TREASURY_STEP_FUNCTION_ARN,
       `manual-treasury-report-generation-${Date.now()}`,
       payload,
