@@ -21,6 +21,9 @@ import {
   Upload as UploadRelationResolver,
   getUploadsByExpenditureCategory,
   sendTreasuryReport,
+  SubrecipientLambdaPayload,
+  ProjectLambdaPayload,
+  CreateArchiveLambdaPayload,
 } from './uploads'
 import type { StandardScenario } from './uploads.scenarios'
 
@@ -32,10 +35,10 @@ import type { StandardScenario } from './uploads.scenarios'
 
 jest.mock('src/lib/logger')
 jest.mock('src/lib/aws', () => ({
+  ...jest.requireActual('src/lib/aws'),
   deleteUploadFile: jest.fn(),
   s3UploadFilePutSignedUrl: jest.fn(),
   getSignedUrl: jest.fn(),
-  getS3UploadFileKey: jest.fn(),
   startStepFunctionExecution: jest.fn(),
 }))
 jest.mock('uuid', () => ({
@@ -280,17 +283,64 @@ describe('treasury report', () => {
       mockCurrentUser(scenario.user.one)
       const mockOrganization = scenario.organization.one
       const mockReportingPeriod = scenario.reportingPeriod.one
-      const uploadsByExpenditureCategory =
-        await getUploadsByExpenditureCategory(
-          mockOrganization,
-          mockReportingPeriod
-        )
+      const mockUpload = scenario.upload.two
+      const mockUser = scenario.user.one
+
+      const projectPayload: ProjectLambdaPayload = {
+        '1A': {
+          organization: {
+            id: mockOrganization.id,
+            preferences: {
+              current_reporting_period_id: mockReportingPeriod.id,
+            },
+          },
+          user: {
+            email: mockUser.email,
+            id: mockUser.id,
+          },
+          outputTemplateId: mockReportingPeriod.outputTemplateId,
+          ProjectType: '1A',
+          uploadsToAdd: {
+            [mockUpload.agencyId]: {
+              objectKey: `uploads/${mockOrganization.id}/${mockUpload.agencyId}/${mockReportingPeriod.id}/${mockUpload.id}/${mockUpload.filename}`,
+              createdAt: mockUpload.createdAt,
+              filename: mockUpload.filename,
+            },
+          },
+          uploadsToRemove: {},
+        },
+      }
+      const subrecipientPayload: SubrecipientLambdaPayload = {
+        Subrecipient: {
+          organization: {
+            id: mockOrganization.id,
+            preferences: {
+              current_reporting_period_id: mockReportingPeriod.id,
+            },
+          },
+          user: {
+            email: mockUser.email,
+            id: mockUser.id,
+          },
+          outputTemplateId: mockReportingPeriod.outputTemplateId,
+        },
+      }
+
+      const zipPayload: CreateArchiveLambdaPayload = {
+        zip: {
+          organization: {
+            id: mockOrganization.id,
+            preferences: {
+              current_reporting_period_id: mockReportingPeriod.id,
+            },
+          },
+        },
+      }
 
       const input = JSON.stringify({
-        reportingPeriod: mockReportingPeriod.name,
-        organization: mockOrganization.name,
-        email: scenario.user.one.email,
-        uploadsByExpenditureCategory,
+        ...projectPayload,
+        ...subrecipientPayload,
+        ...zipPayload,
       })
       const result = await sendTreasuryReport()
 
@@ -300,8 +350,6 @@ describe('treasury report', () => {
         `Force-kick-off-00000000-0000-0000-0000-000000000000`,
         input
       )
-      expect(logger.info).toHaveBeenCalledWith(uploadsByExpenditureCategory)
-      expect(logger.info).toHaveBeenCalledWith('Sending Treasury Report')
     }
   )
 

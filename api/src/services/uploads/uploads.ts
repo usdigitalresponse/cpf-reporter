@@ -9,8 +9,12 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { CurrentUser } from 'src/lib/auth'
 import { hasRole } from 'src/lib/auth'
-import { s3UploadFilePutSignedUrl, getS3UploadFileKey } from 'src/lib/aws'
-import aws from 'src/lib/aws'
+import {
+  s3UploadFilePutSignedUrl,
+  getSignedUrl,
+  getS3UploadFileKey,
+  startStepFunctionExecution,
+} from 'src/lib/aws'
 import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
@@ -118,7 +122,7 @@ export const downloadUploadFile: MutationResolvers['downloadUploadFile'] =
       throw new ValidationError(`Upload with id ${id} not found`)
     }
     logger.info(`Downloading file for upload ${id}`)
-    const signedUrl = await aws.getSignedUrl(upload)
+    const signedUrl = await getSignedUrl(upload)
     return signedUrl
   }
 
@@ -190,12 +194,15 @@ type InfoForArchive = {
 This type should be similar to the following python class:
 class ProjectLambdaPayload(BaseModel):
 */
-type ProjectLambdaPayload = Record<
+export type ProjectLambdaPayload = Record<
   ExpenditureCategoryCode,
   UploadInfoForProject
 >
-type SubrecipientLambdaPayload = Record<'Subrecipient', InfoForSubrecipient>
-type CreateArchiveLambdaPayload = Record<'zip', InfoForArchive>
+export type SubrecipientLambdaPayload = Record<
+  'Subrecipient',
+  InfoForSubrecipient
+>
+export type CreateArchiveLambdaPayload = Record<'zip', InfoForArchive>
 
 export const getUploadsByExpenditureCategory = async (
   organization: Organization,
@@ -209,7 +216,7 @@ export const getUploadsByExpenditureCategory = async (
   // Get the most recent upload for each expenditure category and agency and set the S3 Object key
   for (const upload of validUploadsInPeriod) {
     const uploadPayload: UploadPayload = {
-      objectKey: getS3UploadFileKey(organization.id, upload),
+      objectKey: await getS3UploadFileKey(organization.id, upload),
       createdAt: upload.createdAt,
       filename: upload.filename,
     }
@@ -361,7 +368,7 @@ export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
         ...createArchiveLambdaPayload,
       }
 
-      await aws.startStepFunctionExecution(
+      await startStepFunctionExecution(
         process.env.TREASURY_STEP_FUNCTION_ARN,
         `Force-kick-off-${uuidv4()}`,
         JSON.stringify(input)
