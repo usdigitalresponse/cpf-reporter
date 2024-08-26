@@ -99,4 +99,3 @@ def create_archive(
 
             s3_client.upload_file(file.name, S3_BUCKET, upload_key)
             logger.info(f"Uploaded archive file to {upload_key}")
-            logger.info(f"Uploaded archive file to {upload_key}")
