@@ -17,19 +17,46 @@ export const standard = defineScenario<
   | Prisma.ReportingPeriodCreateArgs
   | Prisma.UploadCreateArgs
 >({
-  organization: {
+  reportingPeriod: {
     one: {
       data: {
-        name: 'USDR',
-        preferences: {},
+        name: 'String',
+        startDate: '2024-01-26T15:11:27.688Z',
+        endDate: '2024-01-26T15:11:27.688Z',
+        inputTemplate: {
+          create: {
+            name: 'String',
+            version: 'String',
+            effectiveDate: '2024-01-26T15:11:27.688Z',
+          },
+        },
+        outputTemplate: {
+          create: {
+            name: 'String',
+            version: 'String',
+            effectiveDate: '2024-01-26T15:11:27.688Z',
+          },
+        },
       },
     },
-    two: {
+  },
+  organization: {
+    one: (scenario) => ({
+      data: {
+        name: 'USDR',
+        preferences: {
+          current_reporting_period_id: scenario.reportingPeriod.one.id,
+        },
+      },
+    }),
+    two: (scenario) => ({
       data: {
         name: 'Example Organization',
-        preferences: {},
+        preferences: {
+          current_reporting_period_id: scenario.reportingPeriod.one.id,
+        },
       },
-    },
+    }),
   },
   agency: {
     one: (scenario) => ({
@@ -96,29 +123,6 @@ export const standard = defineScenario<
       },
       include: {
         agency: true,
-      },
-    }),
-  },
-  reportingPeriod: {
-    one: () => ({
-      data: {
-        name: 'String',
-        startDate: '2024-01-26T15:11:27.688Z',
-        endDate: '2024-01-26T15:11:27.688Z',
-        inputTemplate: {
-          create: {
-            name: 'String',
-            version: 'String',
-            effectiveDate: '2024-01-26T15:11:27.688Z',
-          },
-        },
-        outputTemplate: {
-          create: {
-            name: 'String',
-            version: 'String',
-            effectiveDate: '2024-01-26T15:11:27.688Z',
-          },
-        },
       },
     }),
   },
