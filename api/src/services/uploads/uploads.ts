@@ -355,12 +355,6 @@ export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
       const createArchiveLambdaPayload: CreateArchiveLambdaPayload =
         await getCreateArchiveLambdaPayload(organization)
 
-      const arn = process.env.TREASURY_STEP_FUNCTION_ARN
-
-      if (!arn) {
-        throw new Error('TREASURY_STEP_FUNCTION_ARN is not set')
-      }
-
       const input = {
         ...projectLambdaPayload,
         ...subrecipientLambdaPayload,
@@ -368,7 +362,7 @@ export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
       }
 
       await aws.startStepFunctionExecution(
-        arn,
+        process.env.TREASURY_STEP_FUNCTION_ARN,
         `Force-kick-off-${uuidv4()}`,
         JSON.stringify(input)
       )
