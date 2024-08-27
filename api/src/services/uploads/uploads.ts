@@ -363,6 +363,11 @@ export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
         await getCreateArchiveLambdaPayload(organization)
 
       const input = {
+        '1A': {},
+        '1B': {},
+        '1C': {},
+        Subrecipient: {},
+        zip: {},
         ...projectLambdaPayload,
         ...subrecipientLambdaPayload,
         ...createArchiveLambdaPayload,
