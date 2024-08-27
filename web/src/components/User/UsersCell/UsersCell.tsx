@@ -8,6 +8,7 @@ import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
 import Users from 'src/components/User/Users'
+import { UPDATE_USER_MUTATION } from '../EditUserCell';
 
 export const QUERY = gql`
   query FindUsersByOrganizationId($organizationId: Int!) {
@@ -27,13 +28,6 @@ export const QUERY = gql`
   }
 `
 
-const UPDATE_USER_MUTATION = gql`
-  mutation UpdateUserMutation($id: Int!, $input: UpdateUserInput!) {
-    updateUser(id: $id, input: $input) {
-      id
-    }
-  }
-`
 
 export const Loading = () => <div>Loading...</div>
 

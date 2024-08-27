@@ -221,8 +221,7 @@ const UserForm = (props: UserFormProps) => {
             name="isActive"
             control={formMethods.control}
             defaultValue={user ? user.isActive : true}
-            disabled={!hasRole(ROLES.ORGANIZATION_ADMIN) || !user}
-            render={({ field: { onChange, name, value, ref, disabled } }) => (
+            render={({ field: { onChange, name, value, ref } }) => (
               <>
                 <div className="form-check form-check-inline">
                   <input
@@ -231,7 +230,7 @@ const UserForm = (props: UserFormProps) => {
                     id="userIsActive"
                     className="form-check-input"
                     defaultChecked={value}
-                    disabled={disabled}
+                    disabled={!user}
                     onChange={() => onChange(true)}
                     ref={ref}
                   />
@@ -246,7 +245,7 @@ const UserForm = (props: UserFormProps) => {
                     id="userIsInactive"
                     className="form-check-input"
                     defaultChecked={!value}
-                    disabled={disabled}
+                    disabled={!user}
                     onChange={() => onChange(false)}
                     ref={ref}
                   />
