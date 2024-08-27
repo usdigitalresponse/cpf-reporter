@@ -338,6 +338,11 @@ describe('treasury report', () => {
       }
 
       const input = JSON.stringify({
+        '1A': {},
+        '1B': {},
+        '1C': {},
+        Subrecipient: {},
+        zip: {},
         ...projectPayload,
         ...subrecipientPayload,
         ...zipPayload,
