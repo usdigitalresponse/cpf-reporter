@@ -1,5 +1,6 @@
 import { APIGatewayEvent } from 'aws-lambda'
 import type { User } from 'types/graphql'
+import { getPassageClient } from 'src/services/passage/passage'
 
 import { Decoded } from '@redwoodjs/api'
 import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
@@ -54,7 +55,13 @@ export const getCurrentUser = async (
       user.roles = [`${user.role}`]
       return user
     } else if (process.env.AUTH_PROVIDER === 'passage') {
-      const passageId = event.requestContext.authorizer?.claims?.sub
+      let passageId;
+      if (process.env.NODE_ENV === 'development') {
+        const passage = await getPassageClient()
+        passageId = await passage.validAuthToken(token)
+      } else {
+        passageId = event.requestContext.authorizer?.claims?.sub
+      }
 
       if (!passageId) {
         logger.error({ custom: event }, 'Passage ID not included.')
