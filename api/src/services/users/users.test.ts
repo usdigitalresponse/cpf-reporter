@@ -25,6 +25,16 @@ import type { StandardScenario } from './users.scenarios'
 //       https://redwoodjs.com/docs/testing#testing-services
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
+const mockPassageUser = {
+  create: jest.fn(),
+  activate: jest.fn(),
+  delete: jest.fn(),
+}
+
+jest.mock('@passageidentity/passage-node', () => {
+  return jest.fn().mockImplementation(() => ({ user: mockPassageUser }))
+})
+
 describe('user queries', () => {
   scenario('gets or creates a user', async (scenario: StandardScenario) => {
     const result = await getOrCreateUsers(
@@ -174,7 +184,14 @@ describe('user queries', () => {
 })
 
 describe('user writes', () => {
-  scenario('creates a user', async (scenario: StandardScenario) => {
+  let oldAuthProvider = process.env.AUTH_PROVIDER
+
+  afterEach(() => {
+    process.env.AUTH_PROVIDER = oldAuthProvider
+    Object.values(mockPassageUser).forEach((mock) => mock.mockReset());
+  })
+
+  scenario('creates a user <local auth>', async (scenario: StandardScenario) => {
     mockCurrentUser({
       id: scenario.user.one.id,
       email: scenario.user.one.email,
@@ -193,7 +210,32 @@ describe('user writes', () => {
     expect(result.email).toEqual('uniqueemail2@test.com')
   })
 
-  scenario('updates a user', async (scenario: StandardScenario) => {
+  scenario('creates a user <passage auth>', async (scenario: StandardScenario) => {
+    process.env.AUTH_PROVIDER = 'passage';
+
+    const passageUser = { id: 'new-id-1' };
+    mockPassageUser.create.mockReturnValue(passageUser)
+    mockPassageUser.activate.mockReturnValue(passageUser);
+
+    mockCurrentUser({
+      id: scenario.user.one.id,
+      email: scenario.user.one.email,
+      roles: ['USDR_ADMIN'],
+    })
+
+    const result = await createUser({
+      input: {
+        email: 'uniqueemail2@test.com',
+        name: 'String',
+        agencyId: scenario.agency.one.id,
+        role: 'USDR_ADMIN',
+      },
+    })
+
+    expect(result.passageId).toEqual('new-id-1');
+  })
+
+  scenario('updates a user <local auth>', async (scenario: StandardScenario) => {
     mockCurrentUser({
       id: scenario.user.one.id,
       email: scenario.user.one.email,
@@ -213,10 +255,62 @@ describe('user writes', () => {
     expect(result.name).toEqual(name)
     expect(result.role).toEqual(ROLES.ORGANIZATION_STAFF)
     expect(result.agencyId).toEqual(scenario.agency.one.id)
-    expect(result.isActive).toEqual(false)
+    expect(result.isActive).toEqual(false);
   })
 
-  scenario('deletes a user', async (scenario: StandardScenario) => {
+  scenario('updates a user <passage auth> - deactivate', async (scenario: StandardScenario) => {
+    process.env.AUTH_PROVIDER = 'passage';
+
+    mockCurrentUser({
+      id: scenario.user.one.id,
+      email: scenario.user.one.email,
+      roles: ['USDR_ADMIN'],
+    })
+    const email = 'String2@gmail.com'
+    const name = 'FDR'
+    const role = 'ORGANIZATION_STAFF'
+    const isActive = false
+    const original = (await user({ id: scenario.user.one.id })) as User
+    const result = await updateUser({
+      id: original.id,
+      input: { email, name, role, agencyId: scenario.agency.one.id, isActive },
+    })
+
+    expect(result.isActive).toEqual(false);
+    expect(result.passageId).toEqual(null);
+    expect(mockPassageUser.delete).toHaveBeenCalledWith(original.passageId);
+  })
+
+  scenario('updates a user <passage auth> - activate', async (scenario: StandardScenario) => {
+    process.env.AUTH_PROVIDER = 'passage';
+
+    const passageUser = { id: 'new-id-1' };
+    mockPassageUser.create.mockReturnValue(passageUser)
+    mockPassageUser.activate.mockReturnValue(passageUser);
+
+    mockCurrentUser({
+      id: scenario.user.one.id,
+      email: scenario.user.one.email,
+      roles: ['USDR_ADMIN'],
+    })
+    const original = (await user({ id: scenario.user.inactive.id })) as User
+    const result = await updateUser({
+      id: original.id,
+      input: {
+        email: original.email,
+        name: original.name,
+        role: original.role,
+        agencyId: original.agencyId,
+        isActive: true
+      },
+    })
+
+    expect(result.isActive).toEqual(true);
+    expect(result.passageId).toEqual('new-id-1');
+    expect(mockPassageUser.create).toHaveBeenCalledWith({ email: original.email });
+  })
+
+  scenario('deletes a user <local auth>', async (scenario: StandardScenario) => {
     mockCurrentUser({
       id: scenario.user.one.id,
       email: scenario.user.one.email,
@@ -228,6 +322,22 @@ describe('user writes', () => {
     const result = await user({ id: original.id })
 
     expect(result).toEqual(null)
+    expect(mockPassageUser.delete).not.toHaveBeenCalled();
+  })
+
+  scenario('deletes a user <passage auth>', async (scenario: StandardScenario) => {
+    process.env.AUTH_PROVIDER = 'passage';
+
+    mockCurrentUser({
+      id: scenario.user.one.id,
+      email: scenario.user.one.email,
+      roles: ['USDR_ADMIN'],
+    })
+    const original = (await deleteUser({
+      id: scenario.user.one.id,
+    })) as User
+
+    expect(mockPassageUser.delete).toHaveBeenCalledWith(original.passageId);
   })
 })
 

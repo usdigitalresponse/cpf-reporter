@@ -233,7 +233,7 @@ export const updateUser: MutationResolvers['updateUser'] = async ({
 }
 
 export const deleteUser: MutationResolvers['deleteUser'] = async ({ id }) => {
-  const user = db.user.findUnique({ where: { id } })
+  const user = await db.user.findUnique({ where: { id } })
   if (process.env.AUTH_PROVIDER == 'passage') {
     try {
       await deletePassageUser(user.passageId)
