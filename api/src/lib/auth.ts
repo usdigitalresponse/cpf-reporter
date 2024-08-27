@@ -1,12 +1,12 @@
 import { APIGatewayEvent } from 'aws-lambda'
 import type { User } from 'types/graphql'
-import { getPassageClient } from 'src/services/passage/passage'
 
 import { Decoded } from '@redwoodjs/api'
 import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
 
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
+import { getPassageClient } from 'src/services/passage/passage'
 
 /**
  * Represents the user attributes returned by the decoding the
@@ -55,7 +55,7 @@ export const getCurrentUser = async (
       user.roles = [`${user.role}`]
       return user
     } else if (process.env.AUTH_PROVIDER === 'passage') {
-      let passageId;
+      let passageId
       if (process.env.NODE_ENV === 'development') {
         const passage = await getPassageClient()
         passageId = await passage.validAuthToken(token)

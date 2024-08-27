@@ -195,8 +195,8 @@ export const createUser: MutationResolvers['createUser'] = async ({
     async (db) => {
       const userInput: CreateUserInput & { passageId?: string | null } = {
         ...input,
-        passageId: null
-      };
+        passageId: null,
+      }
 
       if (process.env.AUTH_PROVIDER === 'passage') {
         logger.info(`Creating Passage user for ${userInput.email}`)
