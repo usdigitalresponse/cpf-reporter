@@ -1,0 +1,143 @@
+{
+    "Comment": "Test Run local Lambda Function",
+    "StartAt": "Parallel",
+    "States": {
+      "Parallel" : {
+        "Type" : "Parallel",
+        "Next" : "RunLocalTestLambda",
+        "Branches" : [
+          {
+            "StartAt" : "Generate Project 1A File",
+            "States" : {
+              "Generate Project 1A File" : {
+                "Type" : "Task",
+                "Resource" : "arn:aws:states:::lambda:invoke",
+                "Parameters" : {
+                  "FunctionName" : "arn:aws:lambda:us-west-2:000000000000:function:localstack-lambda-project-1A",
+                  "Payload.$" : "$$.Execution.Input.['1A']"
+                },
+                "Retry" : [
+                  {
+                    "ErrorEquals" : [
+                      "Lambda.ServiceException",
+                      "Lambda.AWSLambdaException",
+                      "Lambda.SdkClientException",
+                      "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds" : 1,
+                    "MaxAttempts" : 2,
+                    "BackoffRate" : 2
+                  }
+                ],
+                "End" : true
+              }
+            }
+          },
+          {
+            "StartAt" : "Generate Project 1B File",
+            "States" : {
+              "Generate Project 1B File" : {
+                "Type" : "Task",
+                "Resource" : "arn:aws:states:::lambda:invoke",
+                "Parameters" : {
+                  "FunctionName" : "arn:aws:lambda:us-west-2:000000000000:function:localstack-lambda-project-1B",
+                  "Payload.$" : "$$.Execution.Input.['1B']"
+                },
+                "Retry" : [
+                  {
+                    "ErrorEquals" : [
+                      "Lambda.ServiceException",
+                      "Lambda.AWSLambdaException",
+                      "Lambda.SdkClientException",
+                      "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds" : 1,
+                    "MaxAttempts" : 2,
+                    "BackoffRate" : 2
+                  }
+                ],
+                "End" : true
+              }
+            }
+          },
+          {
+            "StartAt" : "Generate Project 1C File",
+            "States" : {
+              "Generate Project 1C File" : {
+                "Type" : "Task",
+                "Resource" : "arn:aws:states:::lambda:invoke",
+                "Parameters" : {
+                  "FunctionName" : "arn:aws:lambda:us-west-2:000000000000:function:localstack-lambda-project-1C",
+                  "Payload.$" : "$$.Execution.Input.['1C']"
+                },
+                "Retry" : [
+                  {
+                    "ErrorEquals" : [
+                      "Lambda.ServiceException",
+                      "Lambda.AWSLambdaException",
+                      "Lambda.SdkClientException",
+                      "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds" : 1,
+                    "MaxAttempts" : 2,
+                    "BackoffRate" : 2
+                  }
+                ],
+                "End" : true
+              }
+            }
+          },
+          {
+            "StartAt" : "Generate Subrecipient File",
+            "States" : {
+              "Generate Subrecipient File" : {
+                "Type" : "Task",
+                "Resource" : "arn:aws:states:::lambda:invoke",
+                "Parameters" : {
+                  "FunctionName" : "arn:aws:lambda:us-west-2:000000000000:function:localstack-lambda-subrecipient",
+                  "Payload.$" : "$$.Execution.Input.Subrecipient"
+                },
+                "Retry" : [
+                  {
+                    "ErrorEquals" : [
+                      "Lambda.ServiceException",
+                      "Lambda.AWSLambdaException",
+                      "Lambda.SdkClientException",
+                      "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds" : 1,
+                    "MaxAttempts" : 2,
+                    "BackoffRate" : 2
+                  }
+                ],
+                "End" : true
+              }
+            }
+          }
+        ]
+      },
+        "RunLocalTestLambda" : {
+            "Type" : "Task",
+            "Resource" : "arn:aws:states:::lambda:invoke",
+            "OutputPath" : "$.Payload",
+            "Parameters" : {
+              "Payload.$" : "$$.Execution.Input.zip",
+              "FunctionName" : "arn:aws:lambda:us-west-2:000000000000:function:localstack-lambda-zip"
+            },
+            "Retry" : [
+              {
+                "ErrorEquals" : [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds" : 1,
+                "MaxAttempts" : 3,
+                "BackoffRate" : 2
+              }
+            ],
+            "End" : true
+        }
+    }
+}
