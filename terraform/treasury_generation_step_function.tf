@@ -17,9 +17,8 @@ module "treasury_generation_step_function" {
               "Generate Project 1A File" : {
                 "Type" : "Task",
                 "Resource" : "arn:aws:states:::lambda:invoke",
-                "OutputPath" : "$.Payload",
                 "Parameters" : {
-                  "Payload.$" : "$.1A",
+                  "Payload.$" : "$$.Execution.Input.['1A']",
                   "FunctionName" : module.lambda_function-treasuryProjectFileGeneration.lambda_function_arn
                 },
                 "Retry" : [
@@ -45,9 +44,8 @@ module "treasury_generation_step_function" {
               "Generate Project 1B File" : {
                 "Type" : "Task",
                 "Resource" : "arn:aws:states:::lambda:invoke",
-                "OutputPath" : "$.Payload",
                 "Parameters" : {
-                  "Payload.$" : "$.1B",
+                  "Payload.$" : "$$.Execution.Input.['1B']",
                   "FunctionName" : module.lambda_function-treasuryProjectFileGeneration.lambda_function_arn
                 },
                 "Retry" : [
@@ -73,9 +71,8 @@ module "treasury_generation_step_function" {
               "Generate Project 1C File" : {
                 "Type" : "Task",
                 "Resource" : "arn:aws:states:::lambda:invoke",
-                "OutputPath" : "$.Payload",
                 "Parameters" : {
-                  "Payload.$" : "$.1C",
+                  "Payload.$" : "$$.Execution.Input.['1C']",
                   "FunctionName" : module.lambda_function-treasuryProjectFileGeneration.lambda_function_arn
                 },
                 "Retry" : [
@@ -101,9 +98,8 @@ module "treasury_generation_step_function" {
               "Generate Subrecipient File" : {
                 "Type" : "Task",
                 "Resource" : "arn:aws:states:::lambda:invoke",
-                "OutputPath" : "$.Payload",
                 "Parameters" : {
-                  "Payload.$" : "$.Subrecipient",
+                  "Payload.$" : "$$.Execution.Input.Subrecipient",
                   "FunctionName" : module.lambda_function-subrecipientTreasuryReportGen.lambda_function_arn
                 },
                 "Retry" : [
@@ -128,10 +124,9 @@ module "treasury_generation_step_function" {
       "CreateTreasuryZipfile" : {
         "Type" : "Task",
         "Resource" : "arn:aws:states:::lambda:invoke",
-        "OutputPath" : "$.Payload",
         "Parameters" : {
           "FunctionName" : module.lambda_function-cpfCreateArchive.lambda_function_arn,
-          "Payload.$" : "$.zip"
+          "Payload.$" : "$$.Execution.Input.zip"
         },
         "Retry" : [
           {
