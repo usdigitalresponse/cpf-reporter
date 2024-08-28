@@ -130,7 +130,7 @@ export const standard = defineScenario<
         agency: true,
       },
     }),
-    inactive: (scenario) => ({
+    inactive: () => ({
       data: {
         email: 'uniqueemail550@test.com',
         name: 'String',
