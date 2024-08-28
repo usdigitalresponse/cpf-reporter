@@ -1,4 +1,5 @@
 import os
+from enum import Enum
 from typing import IO
 
 from mypy_boto3_s3.client import S3Client
@@ -21,6 +22,17 @@ class OrganizationObj(BaseModel):
 class UserObj(BaseModel):
     id: int
     email: str
+
+class OutputFileType(Enum):
+    XLSX = "xlsx"
+    CSV = "csv"
+    JSON = "json"
+
+
+def get_generated_output_file_key(
+    file_type: OutputFileType, project: str, organization: OrganizationObj
+) -> str:
+    return f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.{file_type}"
 
 
 def get_output_template(
