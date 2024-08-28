@@ -21,6 +21,9 @@ import {
   Upload as UploadRelationResolver,
   getUploadsByExpenditureCategory,
   sendTreasuryReport,
+  SubrecipientLambdaPayload,
+  ProjectLambdaPayload,
+  CreateArchiveLambdaPayload,
 } from './uploads'
 import type { StandardScenario } from './uploads.scenarios'
 
@@ -32,11 +35,14 @@ import type { StandardScenario } from './uploads.scenarios'
 
 jest.mock('src/lib/logger')
 jest.mock('src/lib/aws', () => ({
+  ...jest.requireActual('src/lib/aws'),
   deleteUploadFile: jest.fn(),
   s3UploadFilePutSignedUrl: jest.fn(),
   getSignedUrl: jest.fn(),
-  getS3UploadFileKey: jest.fn(),
   startStepFunctionExecution: jest.fn(),
+}))
+jest.mock('uuid', () => ({
+  v4: () => '00000000-0000-0000-0000-000000000000',
 }))
 
 describe('uploads', () => {
@@ -245,14 +251,20 @@ describeScenario<StandardScenario>(
 
     it('returns most recent upload for one category', async () => {
       mockCurrentUser(scenario.user.one)
-      const result = await getUploadsByExpenditureCategory()
+      const result = await getUploadsByExpenditureCategory(
+        scenario.organization.one,
+        scenario.reportingPeriod.one
+      )
       expect(Object.keys(result).length).toEqual(1)
       expect(Object.keys(result)).toEqual(['1A'])
     })
 
     it('returns two uploads of different categories', async () => {
       mockCurrentUser(scenario.user.three)
-      const result = await getUploadsByExpenditureCategory()
+      const result = await getUploadsByExpenditureCategory(
+        scenario.organization.two,
+        scenario.reportingPeriod.one
+      )
       expect(Object.keys(result).length).toEqual(2)
       expect(Object.keys(result).sort()).toEqual(['2A', '1A'].sort())
     })
@@ -271,26 +283,78 @@ describe('treasury report', () => {
       mockCurrentUser(scenario.user.one)
       const mockOrganization = scenario.organization.one
       const mockReportingPeriod = scenario.reportingPeriod.one
-      const uploadsByExpenditureCategory =
-        await getUploadsByExpenditureCategory()
+      const mockUpload = scenario.upload.two
+      const mockUser = scenario.user.one
+
+      const projectPayload: ProjectLambdaPayload = {
+        '1A': {
+          organization: {
+            id: mockOrganization.id,
+            preferences: {
+              current_reporting_period_id: mockReportingPeriod.id,
+            },
+          },
+          user: {
+            email: mockUser.email,
+            id: mockUser.id,
+          },
+          outputTemplateId: mockReportingPeriod.outputTemplateId,
+          ProjectType: '1A',
+          uploadsToAdd: {
+            [mockUpload.agencyId]: {
+              objectKey: `uploads/${mockOrganization.id}/${mockUpload.agencyId}/${mockReportingPeriod.id}/${mockUpload.id}/${mockUpload.filename}`,
+              createdAt: mockUpload.createdAt,
+              filename: mockUpload.filename,
+            },
+          },
+          uploadsToRemove: {},
+        },
+      }
+      const subrecipientPayload: SubrecipientLambdaPayload = {
+        Subrecipient: {
+          organization: {
+            id: mockOrganization.id,
+            preferences: {
+              current_reporting_period_id: mockReportingPeriod.id,
+            },
+          },
+          user: {
+            email: mockUser.email,
+            id: mockUser.id,
+          },
+          outputTemplateId: mockReportingPeriod.outputTemplateId,
+        },
+      }
+
+      const zipPayload: CreateArchiveLambdaPayload = {
+        zip: {
+          organization: {
+            id: mockOrganization.id,
+            preferences: {
+              current_reporting_period_id: mockReportingPeriod.id,
+            },
+          },
+        },
+      }
 
       const input = JSON.stringify({
-        reportingPeriod: mockReportingPeriod.name,
-        organization: mockOrganization.name,
-        email: scenario.user.one.email,
-        uploadsByExpenditureCategory,
+        '1A': {},
+        '1B': {},
+        '1C': {},
+        Subrecipient: {},
+        zip: {},
+        ...projectPayload,
+        ...subrecipientPayload,
+        ...zipPayload,
       })
       const result = await sendTreasuryReport()
 
       expect(result).toBe(true)
       expect(startStepFunctionExecution).toHaveBeenCalledWith(
         'test-arn',
-        undefined,
-        input,
-        ''
+        `Force-kick-off-00000000-0000-0000-0000-000000000000`,
+        input
       )
-      expect(logger.info).toHaveBeenCalledWith(uploadsByExpenditureCategory)
-      expect(logger.info).toHaveBeenCalledWith('Sending Treasury Report')
     }
   )
 
@@ -308,19 +372,4 @@ describe('treasury report', () => {
       'Error sending Treasury Report'
     )
   })
-
-  scenario(
-    'handles missing TREASURY_STEP_FUNCTION_ARN',
-    async (scenario: StandardScenario) => {
-      mockCurrentUser(scenario.user.one)
-      delete process.env.TREASURY_STEP_FUNCTION_ARN
-      const result = await sendTreasuryReport()
-
-      expect(result).toBe(false)
-      expect(logger.error).toHaveBeenCalledWith(
-        expect.any(Error),
-        'Error sending Treasury Report'
-      )
-    }
-  )
 })

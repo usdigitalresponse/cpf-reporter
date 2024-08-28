@@ -66,7 +66,7 @@ function getS3Client() {
   return s3
 }
 
-async function sendPutObjectToS3Bucket(
+export async function sendPutObjectToS3Bucket(
   bucketName: string,
   key: string,
   body: StreamingBlobPayloadInputTypes
@@ -151,7 +151,7 @@ export async function deleteUploadFile(upload: Upload) {
   await s3DeleteObject(fileKey)
 }
 
-async function s3DeleteObject(key: string) {
+export async function s3DeleteObject(key: string) {
   const s3 = getS3Client()
   const baseParams: DeleteObjectCommandInput = {
     Bucket: REPORTING_DATA_BUCKET_NAME,
@@ -164,7 +164,7 @@ async function s3DeleteObject(key: string) {
  *  This function is a wrapper around the getSignedUrl function from the @aws-sdk/s3-request-presigner package.
  *  Exists to organize the imports and to make it easier to mock in tests.
  */
-async function getSignedUrl(upload: Upload): Promise<string> {
+export async function getSignedUrl(upload: Upload): Promise<string> {
   const key = getS3UploadFileKey(upload.agency.organizationId, upload)
   const s3 = getS3Client()
   const baseParams = { Bucket: REPORTING_DATA_BUCKET_NAME, Key: key }
@@ -178,7 +178,7 @@ const OUTPUT_TEMPLATE = {
   '1C': 'CPF1CMultiPurposeCommunityTemplate',
   Subrecipient: 'CPFSubrecipientTemplate',
 }
-async function getTreasurySignedUrl(
+export async function getTreasurySignedUrl(
   fileType: string,
   organization_id: number,
   current_reporting_period_id: string
@@ -206,7 +206,7 @@ function getSQSClient() {
   return sqs
 }
 
-async function sendSqsMessage(queueUrl: string, messageBody: unknown) {
+export async function sendSqsMessage(queueUrl: string, messageBody: unknown) {
   const sqs = getSQSClient()
   await sqs.send(
     new SendMessageCommand({
@@ -216,7 +216,7 @@ async function sendSqsMessage(queueUrl: string, messageBody: unknown) {
   )
 }
 
-async function receiveSqsMessage(queueUrl: string) {
+export async function receiveSqsMessage(queueUrl: string) {
   const sqs = getSQSClient()
   // const receiveResp = await sqs.send(new ReceiveMessageCommand({
   //   QueueUrl: process.env.TASK_QUEUE_URL, WaitTimeSeconds: 20, MaxNumberOfMessages: 1,
@@ -247,19 +247,18 @@ async function receiveSqsMessage(queueUrl: string) {
  * @param input
  * @param traceHeader
  */
-async function startStepFunctionExecution(
+export async function startStepFunctionExecution(
   arn: string,
   name?: string,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  input?: any,
-  traceHeader?: string
+  input?: any
 ): Promise<StartExecutionCommandOutput> {
   let client: SFNClient
   const command = new StartExecutionCommand({
     stateMachineArn: arn,
     name,
     input: input ?? '{}',
-    traceHeader,
+    traceHeader: process.env._X_AMZN_TRACE_ID,
   })
   if (process.env.LOCALSTACK_HOSTNAME) {
     console.log('------------ USING LOCALSTACK FOR SFN ------------')
@@ -271,16 +270,4 @@ async function startStepFunctionExecution(
     client = new SFNClient()
   }
   return await client.send(command)
-}
-
-export default {
-  sendPutObjectToS3Bucket,
-  sendHeadObjectToS3Bucket,
-  getSignedUrl,
-  sendSqsMessage,
-  receiveSqsMessage,
-  getS3Client,
-  startStepFunctionExecution,
-  s3DeleteObject,
-  getTreasurySignedUrl,
 }
