@@ -82,6 +82,10 @@ To use Docker to run the pytest suite, run the following commands (after startin
 - `docker compose -f ./docker-compose.dev.yml run --rm -it python-console /bin/bash` - to go into the python container
   - `poetry run pytest` - to run the pytest suite
 
+To access the local `redwood` and `redwood_test` databases via [psql](https://www.postgresql.org/docs/current/app-psql.html):
+- Database used for local development `PGPASSWORD=redwood psql -h localhost -p 5432 -U redwood -d redwood`
+- Database used by test suites locally: `PGPASSWORD=redwood psql -h localhost -p 5432 -U redwood -d redwood_test`
+
 ## Development
 
 We recommend checking out the [Getting Started with RedwoodJS](./docs/redwood-introduction.md) guide to get familiar with our development patterns.

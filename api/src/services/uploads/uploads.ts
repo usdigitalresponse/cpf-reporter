@@ -1,13 +1,20 @@
 import { Prisma } from '@prisma/client'
+import type { Organization, ReportingPeriod } from '@prisma/client'
 import type {
   QueryResolvers,
   MutationResolvers,
   UploadRelationResolvers,
 } from 'types/graphql'
+import { v4 as uuidv4 } from 'uuid'
 
+import { CurrentUser } from 'src/lib/auth'
 import { hasRole } from 'src/lib/auth'
-import { s3UploadFilePutSignedUrl, getS3UploadFileKey } from 'src/lib/aws'
-import aws from 'src/lib/aws'
+import {
+  s3UploadFilePutSignedUrl,
+  getSignedUrl,
+  getS3UploadFileKey,
+  startStepFunctionExecution,
+} from 'src/lib/aws'
 import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
@@ -115,7 +122,7 @@ export const downloadUploadFile: MutationResolvers['downloadUploadFile'] =
       throw new ValidationError(`Upload with id ${id} not found`)
     }
     logger.info(`Downloading file for upload ${id}`)
-    const signedUrl = await aws.getSignedUrl(upload)
+    const signedUrl = await getSignedUrl(upload)
     return signedUrl
   }
 
@@ -147,116 +154,192 @@ export const Upload: UploadRelationResolvers = {
     return latestValidation
   },
 }
-
-/*
-This function should return the most recent upload for each expenditure category and agency for the `currentUser`'s organization.
-The uploads must be grouped by expenditure category and agency. If there are multiple uploads for the grouping, the most recent upload must be chosen.
-The S3 Object key must be set on each upload object.
-The return value structure should look like the following:
-{
-  EC-Code: {
-    AgencyId: {
-      UploadObject
-    }
+type UploadsWithValidationsAndExpenditureCategory = Prisma.UploadGetPayload<{
+  include: { validations: true; expenditureCategory: true }
+}>
+type ExpenditureCategoryCode = string
+type AgencyId = number
+type OrganizationObj = {
+  id: number
+  preferences: {
+    current_reporting_period_id: number
   }
 }
-Example:
-{
-  '1A': {
-    '1': {
-      id: 1,
-      filename: 'file1.csv',
-      objectKey: 'uploads/1/1/1/1/file1.csv',
-      ...
-    },
-    '2': {
-      id: 2,
-      filename: 'file2.csv',
-      objectKey: 'uploads/1/2/1/2/file2.csv',
-      ...
-    },
-    ...
-  },
-  '1B': {
-    '1': {
-      id: 3,
-      filename: 'file3.csv',
-      objectKey: 'uploads/1/1/1/3/file3.csv',
-      ...
-    },
-    ...
-  },
-  ...
+type UserObj = {
+  email: string
+  id: number
 }
+type UploadPayload = {
+  objectKey: string
+  filename: string
+  createdAt: Date
+}
+type UploadInfoForProject = {
+  organization: OrganizationObj
+  user: UserObj
+  outputTemplateId: number
+  ProjectType: string
+  uploadsToAdd: Partial<Record<AgencyId, UploadPayload>>
+  uploadsToRemove: Partial<Record<AgencyId, UploadPayload>>
+}
+type InfoForSubrecipient = {
+  organization: OrganizationObj
+  user: UserObj
+  outputTemplateId: number
+}
+type InfoForArchive = {
+  organization: OrganizationObj
+}
+/*
+This type should be similar to the following python class:
+class ProjectLambdaPayload(BaseModel):
 */
-export const getUploadsByExpenditureCategory = async () => {
-  const organization = await db.organization.findFirst({
-    where: { id: context.currentUser.agency.organizationId },
-  })
+export type ProjectLambdaPayload = Record<
+  ExpenditureCategoryCode,
+  UploadInfoForProject
+>
+export type SubrecipientLambdaPayload = Record<
+  'Subrecipient',
+  InfoForSubrecipient
+>
+export type CreateArchiveLambdaPayload = Record<'zip', InfoForArchive>
 
-  const reportingPeriod = await db.reportingPeriod.findFirst({
-    where: { id: organization.preferences['current_reporting_period_id'] },
-  })
+export const getUploadsByExpenditureCategory = async (
+  organization: Organization,
+  reportingPeriod: ReportingPeriod
+): Promise<ProjectLambdaPayload> => {
+  const validUploadsInPeriod: UploadsWithValidationsAndExpenditureCategory[] =
+    await getValidUploadsInCurrentPeriod(organization, reportingPeriod)
 
-  // valid upload validations
-  const validUploadIds = await db.uploadValidation.findMany({
-    where: {
-      passed: true,
-      upload: { agency: { organizationId: organization.id } },
-    },
-    select: {
-      uploadId: true,
-    },
-    distinct: ['uploadId'],
-  })
+  const uploadsByEC: ProjectLambdaPayload = {}
 
-  const uploadsForPeriod = await db.upload.findMany({
+  // Get the most recent upload for each expenditure category and agency and set the S3 Object key
+  for (const upload of validUploadsInPeriod) {
+    const uploadPayload: UploadPayload = {
+      objectKey: await getS3UploadFileKey(organization.id, upload),
+      createdAt: upload.createdAt,
+      filename: upload.filename,
+    }
+
+    if (!uploadsByEC[upload.expenditureCategory.code]) {
+      // The EC code was never added. This is the time to initialize it.
+      uploadsByEC[upload.expenditureCategory.code] = {
+        organization: {
+          id: organization.id,
+          preferences: {
+            current_reporting_period_id:
+              organization.preferences['current_reporting_period_id'],
+          },
+        },
+        user: {
+          email: context.currentUser.email,
+          id: context.currentUser.id,
+        },
+        outputTemplateId: reportingPeriod.outputTemplateId,
+        ProjectType: upload.expenditureCategory.code,
+        uploadsToAdd: {},
+        uploadsToRemove: {},
+      }
+
+      // Set the upload to add for this agency
+      uploadsByEC[upload.expenditureCategory.code].uploadsToAdd[
+        upload.agencyId
+      ] = uploadPayload
+
+      continue
+    }
+
+    if (
+      !uploadsByEC[upload.expenditureCategory.code].uploadsToAdd[
+        upload.agencyId
+      ]
+    ) {
+      // The agency was never added. This is the time to initialize it.
+      uploadsByEC[upload.expenditureCategory.code].uploadsToAdd[
+        upload.agencyId
+      ] = uploadPayload
+
+      continue
+    }
+
+    // If the current upload is newer than the one stored, replace it
+    if (
+      upload.createdAt >
+      uploadsByEC[upload.expenditureCategory.code].uploadsToAdd[upload.agencyId]
+        .createdAt
+    ) {
+      uploadsByEC[upload.expenditureCategory.code].uploadsToAdd[
+        upload.agencyId
+      ] = uploadPayload
+    }
+  }
+
+  return uploadsByEC
+}
+
+export const getValidUploadsInCurrentPeriod = async (
+  organization: Organization,
+  reportingPeriod: ReportingPeriod
+): Promise<UploadsWithValidationsAndExpenditureCategory[]> => {
+  /* Step 1: Identify uploads in the given reporting period */
+  const uploadsInPeriod = await db.upload.findMany({
     where: {
       reportingPeriodId: reportingPeriod.id,
       agency: { organizationId: organization.id },
-      id: { in: validUploadIds.map((v) => v.uploadId) },
     },
-    include: { expenditureCategory: true },
+    include: { validations: true, expenditureCategory: true },
   })
 
-  const uploadsByExpenditureCategory = {}
+  /* Step 2: Filter out uploads whose latest validation is not passed */
+  const validUploadsInPeriod = uploadsInPeriod
+    .filter((upload) => {
+      const latestValidation = upload.validations.reduce((latest, current) =>
+        current.createdAt > latest.createdAt ? current : latest
+      )
+      return latestValidation.passed
+    })
+    .map((upload) => upload)
 
-  // Get the most recent upload for each expenditure category and agency and set the S3 Object key
-  for (const upload of uploadsForPeriod) {
-    // Set the S3 Object key
-    const objectKey = getS3UploadFileKey(organization.id, upload)
-    upload.objectKey = objectKey
+  return validUploadsInPeriod
+}
 
-    // Filter the uploads by expenditure category of the current upload.
-    const uploadsByAgency =
-      uploadsByExpenditureCategory[upload.expenditureCategory.code]
-
-    if (!uploadsByAgency) {
-      // The EC code was never added. This is the time to initialize it.
-      uploadsByExpenditureCategory[upload.expenditureCategory.code] = {}
-
-      // Set the upload for this agency
-      uploadsByExpenditureCategory[upload.expenditureCategory.code][
-        upload.agencyId
-      ] = upload
-    } else {
-      if (!uploadsByAgency[upload.agencyId]) {
-        // The agency was never added. This is the time to initialize it.
-        uploadsByExpenditureCategory[upload.expenditureCategory.code][
-          upload.agencyId
-        ] = upload
-      } else {
-        // If the current upload is newer than the one stored, replace it
-        if (upload.createdAt > uploadsByAgency[upload.agencyId].createdAt) {
-          uploadsByExpenditureCategory[upload.expenditureCategory.code][
-            upload.agencyId
-          ] = upload
-        }
-      }
-    }
+export const getSubrecipientLambdaPayload = async (
+  organization: Organization,
+  user: CurrentUser,
+  reportingPeriod: ReportingPeriod
+): Promise<SubrecipientLambdaPayload> => {
+  return {
+    Subrecipient: {
+      organization: {
+        id: organization.id,
+        preferences: {
+          current_reporting_period_id:
+            organization.preferences['current_reporting_period_id'],
+        },
+      },
+      user: {
+        email: user.email,
+        id: user.id,
+      },
+      outputTemplateId: reportingPeriod.outputTemplateId,
+    },
   }
+}
 
-  return uploadsByExpenditureCategory
+export const getCreateArchiveLambdaPayload = async (
+  organization: Organization
+): Promise<CreateArchiveLambdaPayload> => {
+  return {
+    zip: {
+      organization: {
+        id: organization.id,
+        preferences: {
+          current_reporting_period_id:
+            organization.preferences['current_reporting_period_id'],
+        },
+      },
+    },
+  }
 }
 
 export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
@@ -268,28 +351,32 @@ export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
       const reportingPeriod = await db.reportingPeriod.findFirst({
         where: { id: organization.preferences['current_reporting_period_id'] },
       })
-      const uploadsByExpenditureCategory =
-        await getUploadsByExpenditureCategory()
-      const arn = process.env.TREASURY_STEP_FUNCTION_ARN
-
-      if (!arn) {
-        throw new Error('TREASURY_STEP_FUNCTION_ARN is not set')
-      }
-      logger.info(uploadsByExpenditureCategory)
-      logger.info('Sending Treasury Report')
+      const projectLambdaPayload: ProjectLambdaPayload =
+        await getUploadsByExpenditureCategory(organization, reportingPeriod)
+      const subrecipientLambdaPayload: SubrecipientLambdaPayload =
+        await getSubrecipientLambdaPayload(
+          organization,
+          context.currentUser,
+          reportingPeriod
+        )
+      const createArchiveLambdaPayload: CreateArchiveLambdaPayload =
+        await getCreateArchiveLambdaPayload(organization)
 
       const input = {
-        reportingPeriod: reportingPeriod.name,
-        organization: organization.name,
-        email: context.currentUser.email,
-        uploadsByExpenditureCategory,
+        '1A': {},
+        '1B': {},
+        '1C': {},
+        Subrecipient: {},
+        zip: {},
+        ...projectLambdaPayload,
+        ...subrecipientLambdaPayload,
+        ...createArchiveLambdaPayload,
       }
 
-      await aws.startStepFunctionExecution(
-        arn,
-        undefined,
-        JSON.stringify(input),
-        ''
+      await startStepFunctionExecution(
+        process.env.TREASURY_STEP_FUNCTION_ARN,
+        `Force-kick-off-${uuidv4()}`,
+        JSON.stringify(input)
       )
       return true
     } catch (error) {
