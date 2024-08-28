@@ -131,9 +131,6 @@ module "lambda_function-treasuryProjectFileGeneration" {
         "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
       ]
     }
-
-
-
     AllowDownloadJsonMetadata = {
       effect = "Allow"
       actions = [
@@ -157,9 +154,6 @@ module "lambda_function-treasuryProjectFileGeneration" {
         "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.json",
       ]
     }
-
-
-
     AllowDownloadTreasuryOutputTemplates = {
       effect = "Allow"
       actions = [
