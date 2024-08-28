@@ -185,12 +185,12 @@ describe('user queries', () => {
 
 describe('user writes', () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    jest.clearAllMocks()
   })
 
   describe('<Local Auth>', () => {
     beforeAll(() => {
-      process.env.AUTH_PROVIDER = 'local';
+      process.env.AUTH_PROVIDER = 'local'
     })
 
     scenario('creates a user', async (scenario: StandardScenario) => {
@@ -225,14 +225,20 @@ describe('user writes', () => {
       const original = (await user({ id: scenario.user.one.id })) as User
       const result = await updateUser({
         id: original.id,
-        input: { email, name, role, agencyId: scenario.agency.one.id, isActive },
+        input: {
+          email,
+          name,
+          role,
+          agencyId: scenario.agency.one.id,
+          isActive,
+        },
       })
 
       expect(result.email).toEqual(email)
       expect(result.name).toEqual(name)
       expect(result.role).toEqual(ROLES.ORGANIZATION_STAFF)
       expect(result.agencyId).toEqual(scenario.agency.one.id)
-      expect(result.isActive).toEqual(false);
+      expect(result.isActive).toEqual(false)
     })
 
     scenario('deletes a user', async (scenario: StandardScenario) => {
@@ -247,21 +253,21 @@ describe('user writes', () => {
       const result = await user({ id: original.id })
 
       expect(result).toEqual(null)
-      expect(mockPassageUser.delete).not.toHaveBeenCalled();
+      expect(mockPassageUser.delete).not.toHaveBeenCalled()
     })
   })
 
   describe('<Passage Auth>', () => {
     beforeAll(() => {
-      process.env.AUTH_PROVIDER = 'passage';
+      process.env.AUTH_PROVIDER = 'passage'
       process.env.PASSAGE_API_KEY = 'fake_api_key'
       process.env.PASSAGE_APP_ID = 'fake_app_id'
     })
 
     scenario('creates a user', async (scenario: StandardScenario) => {
-      const passageUser = { id: 'new-id-1' };
+      const passageUser = { id: 'new-id-1' }
       mockPassageUser.create.mockReturnValue(passageUser)
-      mockPassageUser.activate.mockReturnValue(passageUser);
+      mockPassageUser.activate.mockReturnValue(passageUser)
 
       mockCurrentUser({
         id: scenario.user.one.id,
@@ -278,58 +284,66 @@ describe('user writes', () => {
         },
       })
 
-      expect(result.passageId).toEqual('new-id-1');
+      expect(result.passageId).toEqual('new-id-1')
     })
 
-    scenario('updates a user - deactivate', async (scenario: StandardScenario) => {
-      mockCurrentUser({
-        id: scenario.user.one.id,
-        email: scenario.user.one.email,
-        roles: ['USDR_ADMIN'],
-      })
-      const original = (await user({ id: scenario.user.one.id })) as User
-      const result = await updateUser({
-        id: original.id,
-        input: {
+    scenario(
+      'updates a user - deactivate',
+      async (scenario: StandardScenario) => {
+        mockCurrentUser({
+          id: scenario.user.one.id,
+          email: scenario.user.one.email,
+          roles: ['USDR_ADMIN'],
+        })
+        const original = (await user({ id: scenario.user.one.id })) as User
+        const result = await updateUser({
+          id: original.id,
+          input: {
+            email: original.email,
+            name: original.name,
+            role: original.role,
+            agencyId: original.agencyId,
+            isActive: false,
+          },
+        })
+
+        expect(result.isActive).toEqual(false)
+        expect(result.passageId).toEqual(null)
+        expect(mockPassageUser.delete).toHaveBeenCalledWith(original.passageId)
+      }
+    )
+
+    scenario(
+      'updates a user - activate',
+      async (scenario: StandardScenario) => {
+        const passageUser = { id: 'new-id-1' }
+        mockPassageUser.create.mockReturnValue(passageUser)
+        mockPassageUser.activate.mockReturnValue(passageUser)
+
+        mockCurrentUser({
+          id: scenario.user.one.id,
+          email: scenario.user.one.email,
+          roles: ['USDR_ADMIN'],
+        })
+        const original = (await user({ id: scenario.user.inactive.id })) as User
+        const result = await updateUser({
+          id: original.id,
+          input: {
+            email: original.email,
+            name: original.name,
+            role: original.role,
+            agencyId: original.agencyId,
+            isActive: true,
+          },
+        })
+
+        expect(result.isActive).toEqual(true)
+        expect(result.passageId).toEqual('new-id-1')
+        expect(mockPassageUser.create).toHaveBeenCalledWith({
           email: original.email,
-          name: original.name,
-          role: original.role,
-          agencyId: original.agencyId,
-          isActive: false
-        },
-      })
-
-      expect(result.isActive).toEqual(false);
-      expect(result.passageId).toEqual(null);
-      expect(mockPassageUser.delete).toHaveBeenCalledWith(original.passageId);
-    })
-
-    scenario('updates a user - activate', async (scenario: StandardScenario) => {
-      const passageUser = { id: 'new-id-1' };
-      mockPassageUser.create.mockReturnValue(passageUser)
-      mockPassageUser.activate.mockReturnValue(passageUser);
-
-      mockCurrentUser({
-        id: scenario.user.one.id,
-        email: scenario.user.one.email,
-        roles: ['USDR_ADMIN'],
-      })
-      const original = (await user({ id: scenario.user.inactive.id })) as User
-      const result = await updateUser({
-        id: original.id,
-        input: {
-          email: original.email,
-          name: original.name,
-          role: original.role,
-          agencyId: original.agencyId,
-          isActive: true
-        },
-      })
-
-      expect(result.isActive).toEqual(true);
-      expect(result.passageId).toEqual('new-id-1');
-      expect(mockPassageUser.create).toHaveBeenCalledWith({ email: original.email });
-    })
+        })
+      }
+    )
 
     scenario('deletes a user', async (scenario: StandardScenario) => {
       mockCurrentUser({
@@ -341,7 +355,7 @@ describe('user writes', () => {
         id: scenario.user.one.id,
       })) as User
 
-      expect(mockPassageUser.delete).toHaveBeenCalledWith(original.passageId);
+      expect(mockPassageUser.delete).toHaveBeenCalledWith(original.passageId)
     })
   })
 })
