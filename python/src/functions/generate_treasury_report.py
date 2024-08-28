@@ -73,6 +73,10 @@ def handle(event: ProjectLambdaPayload, context: Context):
     logger = get_logger()
     logger.info("received new invocation event from step function")
 
+    if not event or not context:
+        logger.exception("Missing event or context")
+        return {"statusCode": 400, "body": "Bad Request - No event or context"}
+
     try:
         payload = ProjectLambdaPayload.model_validate(event)
     except Exception:

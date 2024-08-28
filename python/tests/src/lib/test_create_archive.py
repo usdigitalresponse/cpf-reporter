@@ -1,12 +1,14 @@
-import pytest
 from unittest.mock import ANY, MagicMock
 
-from src.functions.create_archive import create_archive, CreateArchiveLambdaPayload
+import pytest
+from pydantic import ValidationError
+
+from src.functions.create_archive import CreateArchiveLambdaPayload, create_archive
 
 
 def test_create_archive_creates_zip():
-    org_id = "1234"
-    reportiong_period_id = "5678"
+    org_id = 1234
+    reporting_period_id = 5678
     s3_client = MagicMock()
     logger = MagicMock()
 
@@ -24,7 +26,7 @@ def test_create_archive_creates_zip():
     }
 
     # Call the function
-    create_archive(org_id, reportiong_period_id, s3_client, logger)
+    create_archive(org_id, reporting_period_id, s3_client, logger)
 
     # Assert that the file was attempted to be created
     s3_client.upload_file.assert_called_with(
@@ -33,19 +35,24 @@ def test_create_archive_creates_zip():
 
 
 def test_create_archive_lambda_payload():
-    data = [
-        {"organization_id": "1234", "reporting_period_id": "5678"},
-        {"organization_id": "1234", "reporting_period_id": "5678"},
-    ]
-    payload = CreateArchiveLambdaPayload.model_validate({"Payload": data})
-    assert payload.organization_id == "1234"
-    assert payload.reporting_period_id == "5678"
+    organizationObj = {
+        "organization": {
+            "id": 1234,
+            "preferences": {"current_reporting_period_id": 5678},
+        }
+    }
+    try:
+        CreateArchiveLambdaPayload.model_validate(organizationObj)
+    except ValidationError:
+        pytest.fail(
+            "CreateArchiveLambdaPayload.model_validate raised ValidationError unexpectedly"
+        )
 
 
 def test_create_archive_lambda_payload_failed():
-    data = [
-        {"organization_id": "1234", "reporting_period_id": "5678"},
-        {"organization_id": "1235", "reporting_period_id": "5678"},
-    ]
-    with pytest.raises(ValueError):
-        CreateArchiveLambdaPayload.model_validate({"Payload": data})
+    organizationObj = {
+        # "id": "1234", Missing a required field
+        "preferences": {"current_reporting_period_id": 5678},
+    }
+    with pytest.raises(ValidationError):
+        CreateArchiveLambdaPayload.model_validate(organizationObj)

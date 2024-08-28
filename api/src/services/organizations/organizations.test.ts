@@ -21,6 +21,7 @@ import type { StandardScenario } from './organizations.scenarios'
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
 
 jest.mock('src/lib/aws', () => ({
+  ...jest.requireActual('src/lib/aws'),
   getTreasurySignedUrl: jest.fn(),
   startStepFunctionExecution: jest.fn(),
 }))
