@@ -9,7 +9,6 @@ import { timeTag, truncate, formatEnum } from 'src/lib/formatters'
 
 const UsersList = ({ usersByOrganization, updateUser, usersUpdating }) => {
   const { hasRole } = useAuth()
-  const currentUserIsOrgAdmin = hasRole(ROLES.ORGANIZATION_ADMIN)
   const currentUserIsUSDRAdmin = hasRole(ROLES.USDR_ADMIN)
 
   return (
@@ -26,6 +25,7 @@ const UsersList = ({ usersByOrganization, updateUser, usersUpdating }) => {
       </thead>
       <tbody>
         {usersByOrganization.map((user) => {
+          // Labels
           const userName = user.isActive
             ? user.name
             : user.name + ' (Deactivated)'
@@ -35,10 +35,10 @@ const UsersList = ({ usersByOrganization, updateUser, usersUpdating }) => {
           const deactivateLabel = user.isActive ? 'Deactivate' : 'Reactivate'
 
           // Actions
-          const editAccess =
+          const hasEditAccess =
             currentUserIsUSDRAdmin || user.role !== ROLES.USDR_ADMIN
-          const deactivateAccess =
-            currentUserIsOrgAdmin && user.role !== ROLES.USDR_ADMIN
+          const hasDeactivateAccess =
+            currentUserIsUSDRAdmin || user.role !== ROLES.USDR_ADMIN
 
           return (
             <tr key={user.id}>
@@ -49,7 +49,7 @@ const UsersList = ({ usersByOrganization, updateUser, usersUpdating }) => {
               <td>{timeTag(user.createdAt)}</td>
               <td>
                 <div className="d-grid gap-2 d-xl-block">
-                  {editAccess && (
+                  {hasEditAccess && (
                     <Link
                       to={routes.editUser({ id: user.id })}
                       className="btn btn-secondary btn-sm me-xl-2"
@@ -59,7 +59,7 @@ const UsersList = ({ usersByOrganization, updateUser, usersUpdating }) => {
                     </Link>
                   )}
 
-                  {deactivateAccess && (
+                  {hasDeactivateAccess && (
                     <Button
                       size="sm"
                       variant="outline-secondary"

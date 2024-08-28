@@ -6,6 +6,7 @@ import { AuthenticationError, ForbiddenError } from '@redwoodjs/graphql-server'
 
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
+import { getPassageClient } from 'src/services/passage/passage'
 
 /**
  * Represents the user attributes returned by the decoding the
@@ -54,7 +55,13 @@ export const getCurrentUser = async (
       user.roles = [`${user.role}`]
       return user
     } else if (process.env.AUTH_PROVIDER === 'passage') {
-      const passageId = event.requestContext.authorizer?.claims?.sub
+      let passageId
+      if (process.env.NODE_ENV === 'development') {
+        const passage = await getPassageClient()
+        passageId = await passage.validAuthToken(token)
+      } else {
+        passageId = event.requestContext.authorizer?.claims?.sub
+      }
 
       if (!passageId) {
         logger.error({ custom: event }, 'Passage ID not included.')
