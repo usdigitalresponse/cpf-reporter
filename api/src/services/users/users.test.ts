@@ -353,9 +353,10 @@ describe('user writes', () => {
         email: scenario.user.one.email,
         roles: ['USDR_ADMIN'],
       })
-      const original = (await deleteUser({
+      await deleteUser({
         id: scenario.user.one.id,
-      })) as User
+      }))
+          expect(mockPassageUser.delete).toHaveBeenCalledWith(scenario.user.one.passageId)
 
       expect(mockPassageUser.delete).toHaveBeenCalledWith(original.passageId)
     })
