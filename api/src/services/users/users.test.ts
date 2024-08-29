@@ -284,8 +284,8 @@ describe('user writes', () => {
       })
 
       expect(result.passageId).toEqual('new-id-1')
-      expect(mockPassageUser.create).to.haveBeenCalled()
-      expect(mockPassageUser.activate).to.haveBeenCalled()
+      expect(mockPassageUser.create).toHaveBeenCalled()
+      expect(mockPassageUser.activate).toHaveBeenCalled()
     })
 
     scenario(
@@ -353,11 +353,8 @@ describe('user writes', () => {
         email: scenario.user.one.email,
         roles: ['USDR_ADMIN'],
       })
-      await deleteUser({
-        id: scenario.user.one.id,
-      }))
-expect(mockPassageUser.delete).toHaveBeenCalledWith(scenario.user.one.passageId)
-
+      await deleteUser({ id: scenario.user.one.id })
+      expect(mockPassageUser.delete).toHaveBeenCalledWith(scenario.user.one.passageId)
     })
   })
 })
