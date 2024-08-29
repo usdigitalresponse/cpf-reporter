@@ -222,9 +222,8 @@ describe('user writes', () => {
       const name = 'FDR'
       const role = 'ORGANIZATION_STAFF'
       const isActive = false
-      const original = (await user({ id: scenario.user.one.id })) as User
       const result = await updateUser({
-        id: original.id,
+        id: scenario.user.one.id,
         input: {
           email,
           name,
@@ -285,6 +284,8 @@ describe('user writes', () => {
       })
 
       expect(result.passageId).toEqual('new-id-1')
+      expect(mockPassageUser.create).to.haveBeenCalled()
+      expect(mockPassageUser.activate).to.haveBeenCalled()
     })
 
     scenario(
@@ -295,7 +296,7 @@ describe('user writes', () => {
           email: scenario.user.one.email,
           roles: ['USDR_ADMIN'],
         })
-        const original = (await user({ id: scenario.user.one.id })) as User
+        const original = scenario.user.one
         const result = await updateUser({
           id: original.id,
           input: {
@@ -325,7 +326,7 @@ describe('user writes', () => {
           email: scenario.user.one.email,
           roles: ['USDR_ADMIN'],
         })
-        const original = (await user({ id: scenario.user.inactive.id })) as User
+        const original = scenario.user.inactive
         const result = await updateUser({
           id: original.id,
           input: {
@@ -342,6 +343,7 @@ describe('user writes', () => {
         expect(mockPassageUser.create).toHaveBeenCalledWith({
           email: original.email,
         })
+        expect(mockPassageUser.activate).toHaveBeenCalled()
       }
     )
 
