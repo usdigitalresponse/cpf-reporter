@@ -28,8 +28,21 @@ module "lambda_function-subrecipientTreasuryReportGen" {
         "s3:HeadObject",
       ]
       resources = [
+        # These are temporary files shared across services containing subrecipient data.
         # Path: /{organization_id}/{reporting_period_id}/subrecipients
         "${module.reporting_data_bucket.bucket_arn}/*/*/subrecipients",
+      ]
+    }
+    AllowDownloadTreasuryOutputTemplates = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:HeadObject",
+      ]
+      resources = [
+        # These are empty output templates that can then be used to fill data.
+        # Path: treasuryreports/output-templates/{output_template_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.xlsx
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/output-templates/*/*.xlsx",
       ]
     }
     AllowUploadCSVReport = {
@@ -38,8 +51,20 @@ module "lambda_function-subrecipientTreasuryReportGen" {
         "s3:PutObject"
       ]
       resources = [
-        # Path: /treasuryreports/{organization_id}/{reporting_period_id}/{userId}/CPFSubrecipientTemplate.csv
-        "${module.reporting_data_bucket.bucket_arn}/treasuryReports/*/*/*/CPFSubrecipientTemplate.csv",
+        # These are completed CSV version of the subrecipient file that can be submitted to treasury.
+        # Path: /treasuryreports/{organization_id}/{reporting_period_id}/CPFSubrecipientTemplate.csv
+        "${module.reporting_data_bucket.bucket_arn}/treasuryReports/*/*/*.csv",
+      ]
+    }
+    AllowUploadXLSXReport = {
+      effect = "Allow"
+      actions = [
+        "s3:PutObject"
+      ]
+      resources = [
+        # These are completed XLSX version of the subrecipient file that can be submitted to treasury.
+        # Path: /treasuryreports/{organization_id}/{reporting_period_id}/CPFSubrecipientTemplate.xlsx
+        "${module.reporting_data_bucket.bucket_arn}/treasuryReports/*/*/*.xlsx",
       ]
     }
   }
@@ -94,45 +119,85 @@ module "lambda_function-treasuryProjectFileGeneration" {
   policy_jsons                      = local.lambda_default_execution_policies
   attach_policy_statements          = true
   policy_statements = {
-    AllowDownloadExcelObjects = {
+    AllowDownloadXLSMUploads = {
       effect = "Allow"
       actions = [
         "s3:GetObject",
         "s3:HeadObject",
       ]
       resources = [
-        # Path: treasuryreports/{organization_id}/{reporting_period_id}/{filename}.xlsm
-        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.xlsm",
+        # These are workbooks uploaded by partners that contain the information which eventually end up in a treasury report.
+        # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm
+        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
       ]
     }
-    AllowUploadXlsxObjects = {
+    AllowDownloadJsonMetadata = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:HeadObject",
+      ]
+      resources = [
+        # These are metadata about previously generated project (1A, 1B, or 1C) output files.
+        # Path: treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project_use_code]}.json
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.json",
+      ]
+    }
+    AllowUploadJsonMetadata = {
       effect = "Allow"
       actions = [
         "s3:PutObject"
       ]
       resources = [
-        # Path: uploads/{organization_id}/{reporting_period_id}/{filename}.xlsx
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*.xlsx",
+        # These are metadata about previously generated project (1A, 1B, or 1C) output files.
+        # Path: treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project_use_code]}.json
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.json",
       ]
     }
-    AllowUploadCsvObjects = {
+    AllowDownloadTreasuryOutputTemplates = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:HeadObject",
+      ]
+      resources = [
+        # These are empty output templates that can then be used to fill data.
+        # Path: treasuryreports/output-templates/{output_template_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.xlsx
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/output-templates/*/*.xlsx",
+      ]
+    }
+    AllowUploadCSVReport = {
       effect = "Allow"
       actions = [
         "s3:PutObject"
       ]
       resources = [
-        # Path: uploads/{organization_id}/{reporting_period_id}/{filename}.csv
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*.csv",
+        # These are completed CSV version of the project (1A, 1B, or 1C) file that can be submitted to treasury.
+        # Path: /treasuryreports/{organization_id}/{reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.csv
+        "${module.reporting_data_bucket.bucket_arn}/treasuryReports/*/*/*.csv",
       ]
     }
-    AllowUploadJsonObjects = {
+    AllowUploadXLSXReport = {
       effect = "Allow"
       actions = [
         "s3:PutObject"
       ]
       resources = [
-        # Path: uploads/{organization_id}/{reporting_period_id}/{filename}.json
-        "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*.json",
+        # These are completed XLSX version of the project (1A, 1B, or 1C) file that can be submitted to treasury.
+        # Path: /treasuryreports/{organization_id}/{reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.xlsx
+        "${module.reporting_data_bucket.bucket_arn}/treasuryReports/*/*/*.xlsx",
+      ]
+    }
+    AllowDownloadXLSXReport = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:HeadObject",
+      ]
+      resources = [
+        # These are completed XLSX version of the project (1A, 1B, or 1C) file that can be submitted to treasury.
+        # Path: /treasuryreports/{organization_id}/{reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.xlsx
+        "${module.reporting_data_bucket.bucket_arn}/treasuryReports/*/*/*.xlsx",
       ]
     }
   }
@@ -156,6 +221,7 @@ module "lambda_function-treasuryProjectFileGeneration" {
     DD_LAMBDA_HANDLER = "src.functions.generate_treasury_report.handle"
     DD_LOGS_INJECTION = "true"
   })
+
 
   // Triggers
   allowed_triggers = {
