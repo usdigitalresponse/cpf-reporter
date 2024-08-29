@@ -30,7 +30,7 @@ def upload_generated_file_to_s3(
     client: S3Client,
     bucket: str,
     key: str,
-    file: Union[IO[bytes], tempfile._TemporaryFileWrapper[str]],
+    file: Union[IO[bytes], tempfile._TemporaryFileWrapper],
 ):
     """Persists file to S3.
 
