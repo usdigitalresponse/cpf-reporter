@@ -32,7 +32,7 @@ class OutputFileType(Enum):
 def get_generated_output_file_key(
     file_type: OutputFileType, project: str, organization: OrganizationObj
 ) -> str:
-    return f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.{file_type}"
+    return f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.{file_type.value}"
 
 
 def get_output_template(
