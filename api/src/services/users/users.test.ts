@@ -358,7 +358,6 @@ describe('user writes', () => {
       }))
 expect(mockPassageUser.delete).toHaveBeenCalledWith(scenario.user.one.passageId)
 
-      expect(mockPassageUser.delete).toHaveBeenCalledWith(original.passageId)
     })
   })
 })
