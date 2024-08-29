@@ -15,6 +15,7 @@ from src.functions.subrecipient_treasury_report_gen import (
     upload_workbook,
     write_subrecipients_to_workbook,
 )
+from src.lib.treasury_generation_common import OrganizationObj
 
 
 class TestHandleNoEventOrNoContext:
@@ -281,13 +282,19 @@ class TestUploadSubrecipientWorkbook:
         mock_s3_client = MagicMock()
         workbook = Workbook()
         workbook.create_sheet(WORKSHEET_NAME)
-        organization_id = 99
-        reporting_period_id = 88
-        upload_template_location_minus_filetype = f"treasuryreports/{organization_id}/{reporting_period_id}/CPFSubrecipientTemplate"
+        organization_raw = {
+            "id": 99,
+            "preferences": {"current_reporting_period_id": 88},
+        }
+        organization = OrganizationObj.model_validate(organization_raw)
+
+        upload_template_location_minus_filetype = (
+            "treasuryreports/99/88/CPFSubrecipientTemplate"
+        )
         upload_template_xlsx_key = f"{upload_template_location_minus_filetype}.xlsx"
         upload_template_csv_key = f"{upload_template_location_minus_filetype}.csv"
 
-        upload_workbook(workbook, mock_s3_client, organization_id, reporting_period_id)
+        upload_workbook(workbook, mock_s3_client, organization)
 
         mock_convert_xlsx_to_csv.assert_called_once()
 
