@@ -356,7 +356,7 @@ describe('user writes', () => {
       await deleteUser({
         id: scenario.user.one.id,
       }))
-          expect(mockPassageUser.delete).toHaveBeenCalledWith(scenario.user.one.passageId)
+expect(mockPassageUser.delete).toHaveBeenCalledWith(scenario.user.one.passageId)
 
       expect(mockPassageUser.delete).toHaveBeenCalledWith(original.passageId)
     })
