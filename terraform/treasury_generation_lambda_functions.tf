@@ -247,9 +247,6 @@ data "aws_ses_domain_identity" "notifications" {
   domain = split("@", var.notifications_email_address)[1]
 }
 
-data "aws_sesv2_configuration_set" "default" {
-  configuration_set_name = var.ses_configuration_set_default
-}
 module "lambda_function-email-presigned-url" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "6.5.0"
@@ -289,13 +286,9 @@ module "lambda_function-email-presigned-url" {
         "ses:SendEmail",
         "ses:SendRawEmail"
       ]
-      resources = concat(
-        [
-          data.aws_ses_domain_identity.notifications.arn,
-          data.aws_sesv2_configuration_set.default.arn,
-        ],
-        values(aws_ses_email_identity.sandbox_mode_recipients)[*].arn,
-      )
+      resources = [
+        data.aws_ses_domain_identity.notifications.arn,
+      ]
       conditions = [
         {
           test     = "StringLike"
