@@ -88,6 +88,7 @@ export const standard = defineScenario<
         role: 'ORGANIZATION_ADMIN',
         isActive: true,
         agency: { create: { name: 'String', code: 'String' } },
+        passageId: 'id-1',
       },
     },
     two: (scenario) => ({
@@ -97,6 +98,7 @@ export const standard = defineScenario<
         role: 'ORGANIZATION_STAFF',
         isActive: true,
         agency: { connect: { id: scenario.agency.one.id } },
+        passageId: 'id-2',
       },
       include: {
         agency: true,
@@ -109,6 +111,7 @@ export const standard = defineScenario<
         role: 'ORGANIZATION_STAFF',
         isActive: true,
         agency: { connect: { id: scenario.agency.one.id } },
+        passageId: 'id-3',
       },
       include: {
         agency: true,
@@ -121,6 +124,20 @@ export const standard = defineScenario<
         role: 'ORGANIZATION_STAFF',
         isActive: true,
         agency: { connect: { id: scenario.agency.three.id } },
+        passageId: 'id-4',
+      },
+      include: {
+        agency: true,
+      },
+    }),
+    inactive: () => ({
+      data: {
+        email: 'uniqueemail550@test.com',
+        name: 'String',
+        role: 'ORGANIZATION_STAFF',
+        isActive: false,
+        agency: { create: { name: 'String', code: 'String' } },
+        passageId: null,
       },
       include: {
         agency: true,
