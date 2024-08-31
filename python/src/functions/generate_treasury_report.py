@@ -12,12 +12,13 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import BaseModel
 
-from src.lib.constants import OUTPUT_TEMPLATE_FILENAME_BY_PROJECT
 from src.lib.logging import get_logger, reset_contextvars
 from src.lib.s3_helper import download_s3_object, upload_generated_file_to_s3
 from src.lib.treasury_generation_common import (
     OrganizationObj,
+    OutputFileType,
     UserObj,
+    get_generated_output_file_key,
     get_output_template,
 )
 from src.lib.workbook_utils import convert_xlsx_to_csv
@@ -72,6 +73,10 @@ def handle(event: ProjectLambdaPayload, context: Context):
     structlog.contextvars.bind_contextvars(lambda_event={"step_function": event})
     logger = get_logger()
     logger.info("received new invocation event from step function")
+
+    if not event or not context:
+        logger.exception("Missing event or context")
+        return {"statusCode": 400, "body": "Bad Request - No event or context"}
 
     try:
         payload = ProjectLambdaPayload.model_validate(event)
@@ -173,6 +178,10 @@ def process_event(payload: ProjectLambdaPayload, logger):
             with tempfile.NamedTemporaryFile() as file:
                 # Download projects from S3
                 created_at = file_info.createdAt
+
+                # TODO: Add a verification to ensure that the objectKey here is formatted correctly.
+                # Path must be: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm
+
                 download_s3_object(
                     s3_client,
                     os.environ["REPORTING_DATA_BUCKET_NAME"],
@@ -196,13 +205,16 @@ def process_event(payload: ProjectLambdaPayload, logger):
 
         ### 5) Save data
         # Output XLSX file
-        file_destination_prefix = f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project_use_code]}"
         with tempfile.NamedTemporaryFile("w") as new_output_file:
             output_workbook.save(new_output_file.name)
             upload_generated_file_to_s3(
                 client=s3_client,
                 bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
-                key=f"{file_destination_prefix}.xlsx",
+                key=get_generated_output_file_key(
+                    file_type=OutputFileType.XLSX,
+                    project=project_use_code,
+                    organization=organization,
+                ),
                 file=new_output_file,
             )
         # Output CSV file for treasury
@@ -211,16 +223,24 @@ def process_event(payload: ProjectLambdaPayload, logger):
             upload_generated_file_to_s3(
                 client=s3_client,
                 bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
-                key=f"{file_destination_prefix}.csv",
+                key=get_generated_output_file_key(
+                    file_type=OutputFileType.CSV,
+                    project=project_use_code,
+                    organization=organization,
+                ),
                 file=csv_file,
             )
         # Store project_id_agency_id to row number in a json file
         with tempfile.NamedTemporaryFile("w") as json_file:
-            json_file = json.dump(project_agency_id_to_row_map)
+            json.dump(project_agency_id_to_row_map, fp=json_file)
             upload_generated_file_to_s3(
                 client=s3_client,
                 bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
-                key=f"{file_destination_prefix}.json",
+                key=get_generated_output_file_key(
+                    file_type=OutputFileType.JSON,
+                    project=project_use_code,
+                    organization=organization,
+                ),
                 file=json_file,
             )
 
@@ -240,7 +260,11 @@ def download_output_file(
         download_s3_object(
             client=s3_client,
             bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
-            key=f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project_use_code]}.xlsx",
+            key=get_generated_output_file_key(
+                file_type=OutputFileType.XLSX,
+                project=project_use_code,
+                organization=organization,
+            ),
             destination=output_file,
         )
         highest_row_num = max(project_agency_id_to_row_map.values())
@@ -268,7 +292,11 @@ def get_existing_output_metadata(
             download_s3_object(
                 s3_client,
                 os.environ["REPORTING_DATA_BUCKET_NAME"],
-                f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project_use_code]}.json",
+                get_generated_output_file_key(
+                    file_type=OutputFileType.JSON,
+                    project=project_use_code,
+                    organization=organization,
+                ),
                 existing_file,
             )
         except Exception:

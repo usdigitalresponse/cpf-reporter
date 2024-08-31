@@ -2,7 +2,7 @@ import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Prisma, Version } from '@prisma/client'
 import { S3Handler, S3ObjectCreatedNotificationEvent } from 'aws-lambda'
 
-import aws from 'src/lib/aws'
+import { getS3Client, sendPutObjectToS3Bucket } from 'src/lib/aws'
 import { db, getPrismaClient } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 
@@ -56,7 +56,7 @@ type UploadValidationS3Client = {
 export const handler: S3Handler = async (
   event: S3ObjectCreatedNotificationEvent
 ): Promise<Response> => {
-  const s3 = aws.getS3Client()
+  const s3 = getS3Client()
   if (process.env.LOCALSTACK_HOSTNAME) {
     /*
     This allows us to easily test this function during local development by making a GET request as follows:
@@ -232,7 +232,7 @@ export const processRecord = async (
         const subrecipients = {
           subrecipients: subrecipientsWithUploads,
         }
-        await aws.sendPutObjectToS3Bucket(
+        await sendPutObjectToS3Bucket(
           bucket,
           subrecipientKey,
           JSON.stringify(subrecipients)

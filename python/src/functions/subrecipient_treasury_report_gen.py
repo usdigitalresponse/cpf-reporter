@@ -11,12 +11,13 @@ from mypy_boto3_s3.client import S3Client
 from openpyxl import Workbook, load_workbook
 from pydantic import BaseModel
 
-from src.lib.constants import OUTPUT_TEMPLATE_FILENAME_BY_PROJECT
 from src.lib.logging import get_logger, reset_contextvars
 from src.lib.s3_helper import download_s3_object, upload_generated_file_to_s3
 from src.lib.treasury_generation_common import (
     OrganizationObj,
+    OutputFileType,
     UserObj,
+    get_generated_output_file_key,
     get_output_template,
 )
 from src.lib.workbook_utils import convert_xlsx_to_csv, find_last_populated_row
@@ -126,7 +127,7 @@ def process_event(
         logger=logger,
     )
 
-    upload_workbook(workbook, s3_client, organization_id, reporting_period_id)
+    upload_workbook(workbook, s3_client, payload.organization)
 
     output_file.close()
     recent_subrecipients_file.close()
@@ -206,20 +207,22 @@ def get_most_recent_upload(subrecipient):
 def upload_workbook(
     workbook: Workbook,
     s3client: S3Client,
-    organization_id: int,
-    reporting_period_id: int,
+    organization: OrganizationObj,
 ):
     """
     Handles upload of workbook to S3, both in xlsx and csv formats
     """
-    filekey_without_extension = f"treasuryreports/{organization_id}/{reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT['Subrecipient']}"
 
     with tempfile.NamedTemporaryFile("w") as new_xlsx_file:
         workbook.save(new_xlsx_file.name)
         upload_generated_file_to_s3(
             s3client,
             os.environ["REPORTING_DATA_BUCKET_NAME"],
-            f"{filekey_without_extension}.xlsx",
+            get_generated_output_file_key(
+                file_type=OutputFileType.XLSX,
+                project="Subrecipient",
+                organization=organization,
+            ),
             new_xlsx_file,
         )
 
@@ -234,6 +237,10 @@ def upload_workbook(
         upload_generated_file_to_s3(
             s3client,
             os.environ["REPORTING_DATA_BUCKET_NAME"],
-            f"{filekey_without_extension}.csv",
+            get_generated_output_file_key(
+                file_type=OutputFileType.CSV,
+                project="Subrecipient",
+                organization=organization,
+            ),
             new_csv_file,
         )

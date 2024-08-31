@@ -3,6 +3,7 @@ import type {
   MutationResolvers,
   UserRelationResolvers,
   Agency,
+  CreateUserInput,
   UpdateUserInput,
 } from 'types/graphql'
 
@@ -191,7 +192,20 @@ export const createUser: MutationResolvers['createUser'] = async ({
     'user',
     { email },
     { message: 'This email is already in use', db: db },
-    (db) => db.user.create({ data: input })
+    async (db) => {
+      const userInput: CreateUserInput & { passageId?: string | null } = {
+        ...input,
+        passageId: null,
+      }
+
+      if (process.env.AUTH_PROVIDER === 'passage') {
+        logger.info(`Creating Passage user for ${userInput.email}`)
+        const passageUser = await createPassageUser(userInput.email)
+        userInput.passageId = passageUser.id
+      }
+
+      return db.user.create({ data: userInput })
+    }
   )
 }
 
@@ -233,7 +247,7 @@ export const updateUser: MutationResolvers['updateUser'] = async ({
 }
 
 export const deleteUser: MutationResolvers['deleteUser'] = async ({ id }) => {
-  const user = db.user.findUnique({ where: { id } })
+  const user = await db.user.findUnique({ where: { id } })
   if (process.env.AUTH_PROVIDER == 'passage') {
     try {
       await deletePassageUser(user.passageId)

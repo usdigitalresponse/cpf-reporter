@@ -6,7 +6,7 @@ import Passage from '@passageidentity/passage-node'
 
 import { logger } from 'src/lib/logger'
 
-const getPassageClient = async () => {
+export const getPassageClient = async () => {
   try {
     const passageConfig = {
       appID: process.env.PASSAGE_APP_ID,

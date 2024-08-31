@@ -1,8 +1,11 @@
 from botocore.exceptions import ClientError
 from mypy_boto3_s3.client import S3Client
-from src.lib.logging import get_logger
-from typing import IO
+from mypy_boto3_s3.client import S3Client
+from typing import IO, Union
 from urllib.parse import unquote_plus
+import tempfile
+
+from src.lib.logging import get_logger
 
 
 def download_s3_object(client: S3Client, bucket: str, key: str, destination: IO[bytes]):
@@ -25,7 +28,10 @@ def download_s3_object(client: S3Client, bucket: str, key: str, destination: IO[
 
 
 def upload_generated_file_to_s3(
-    client: S3Client, bucket: str, key: str, file: IO[bytes]
+    client: S3Client,
+    bucket: str,
+    key: str,
+    file: Union[IO[bytes], tempfile._TemporaryFileWrapper],
 ):
     """Persists file to S3.
 
