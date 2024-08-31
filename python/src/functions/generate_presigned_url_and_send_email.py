@@ -6,7 +6,6 @@ from typing import IO, Dict, List, Set, Union
 
 import boto3
 import chevron
-import html2text
 import structlog
 from aws_lambda_typing.context import Context
 from mypy_boto3_s3.client import S3Client
@@ -25,14 +24,11 @@ from src.lib.email import send_email
 
 
 treasury_email_html = """
-Hello,
-
 Your treasury report can be downloaded <a href={url}>here</a>.
 """
 
 treasury_email_text = """
 Hello,
-
 Your treasury report can be downloaded here: {url}.
 """
 
@@ -75,23 +71,31 @@ def handle(event: ProjectLambdaPayload, context: Context):
 
 def generate_email(user: UserObj, presigned_url: str = ""):
     try:
-        with open("base.html") as f:
-            email_html = chevron.render(f, {
-                "tool_name": "CPF",
-                "title": "CPF Treasury Report",
-                "preheader": False,
-                "webview_available": False,
-                "base_url_safe": "",
-                "usdr_logo_url": 'https://grants.usdigitalresponse.org/usdr_logo_transparent.png',
-                "presigned_url": presigned_url,
-                "notifications_url_safe": False,
-                "email_body": treasury_email_html.format(
+        with open("src/static/email_templates/formatted_body.html") as g:
+            email_body = chevron.render(g, {
+                "body_title": 'Hello,',
+                "body_detail": treasury_email_html.format(
                     url = presigned_url
                 ),
             })
-            email_text = treasury_email_text.format(url=presigned_url)
-            subject = "USDR CPF Treasury Report"
-            return email_html, email_text, subject
+            with open("src/static/email_templates/base.html") as f:
+                email_html = chevron.render(f, {
+                    "tool_name": "CPF",
+                    "title": "CPF Treasury Report",
+                    "preheader": False,
+                    "webview_available": False,
+                    "base_url_safe": "",
+                    "usdr_logo_url": 'https://grants.usdigitalresponse.org/usdr_logo_transparent.png',
+                    "presigned_url": presigned_url,
+                    "notifications_url_safe": False,
+                    "email_body": email_body,
+                },
+                partials_dict = {
+                    "email_body": email_body,
+                })
+                email_text = treasury_email_text.format(url=presigned_url)
+                subject = "USDR CPF Treasury Report"
+                return email_html, email_text, subject
     except Exception as e:
         logger = get_logger()
         logger.error(f"Failed to generate treasury email: {e}")
