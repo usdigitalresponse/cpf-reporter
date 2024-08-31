@@ -43,3 +43,6 @@ passage_app_id = "ysWup7gbVOMXhRCwzjXmDnQ8"
 
 // API
 api_domain_name = "api.cpf.grants.usdigitalresponse.org"
+
+// Email for treasury notifications
+notifications_email_address = "grants-notifications@cpf.grants.usdigitalresponse.org"

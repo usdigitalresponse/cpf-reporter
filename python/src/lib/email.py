@@ -34,7 +34,7 @@ def send_email(dest_email: str, email_html: str, email_text: str, subject: str, 
                     "Data": subject,
                 },
             },
-            Source=os.getenv("NODEMAILER_EMAIL"),
+            Source=os.getenv("NOTIFICATIONS_EMAIL"),
         )
     # Display an error if something goes wrong.	
     except ClientError as e:

@@ -74,28 +74,27 @@ def handle(event: ProjectLambdaPayload, context: Context):
 
 
 def generate_email(user: UserObj, presigned_url: str = ""):
-    h = html2text.HTML2Text()
-    h.ignore_links = False
-
-
-    with open("base.html") as f:
-        email_html = chevron.render(f, {
-            "tool_name": "CPF",
-            "title": "CPF Treasury Report",
-            "preheader": False,
-            "webview_available": False,
-            "base_url_safe": "",
-            "usdr_logo_url": 'https://grants.usdigitalresponse.org/usdr_logo_transparent.png',
-            "presigned_url": presigned_url,
-            "notifications_url_safe": False,
-            "email_body": treasury_email_html.format(
-                url = presigned_url
-            ),
-        })
-        email_text = treasury_email_text.format(url=presigned_url)
-        subject = "USDR CPF Treasury Report"
-        return email_html, email_text, subject
-    
+    try:
+        with open("base.html") as f:
+            email_html = chevron.render(f, {
+                "tool_name": "CPF",
+                "title": "CPF Treasury Report",
+                "preheader": False,
+                "webview_available": False,
+                "base_url_safe": "",
+                "usdr_logo_url": 'https://grants.usdigitalresponse.org/usdr_logo_transparent.png',
+                "presigned_url": presigned_url,
+                "notifications_url_safe": False,
+                "email_body": treasury_email_html.format(
+                    url = presigned_url
+                ),
+            })
+            email_text = treasury_email_text.format(url=presigned_url)
+            subject = "USDR CPF Treasury Report"
+            return email_html, email_text, subject
+    except Exception as e:
+        logger = get_logger()
+        logger.error(f"Failed to generate treasury email: {e}")
     return None, None, None
 
 
@@ -105,7 +104,7 @@ def process_event(payload: ProjectLambdaPayload, logger):
     1) Check to see if the s3 object exists:
         treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip
     2) If it does not, raise an exception and quit
-    3) Generate a pre-signed URL (what's the expiration date?)
+    3) Generate a pre-signed URL with an expiration date of 1 hour
     4) Generate an email
     5) Send email to the user
     """
@@ -117,11 +116,17 @@ def process_event(payload: ProjectLambdaPayload, logger):
         s3_client = s3_client,
         bucket = os.getenv("REPORTING_DATA_BUCKET_NAME"),
         key = f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip",
+        expiration_time = 60 * 60,  # 1 hour
     )
     if presigned_url is None:
         raise
     
-    email_html, email_text, subject = generate_email(presigned_url)
+    email_html, email_text, subject = generate_email(
+        user = user,
+        presigned_url = presigned_url,
+    )
+    if not email_html:
+        return False
 
     send_email(
         dest_email = user.email,
