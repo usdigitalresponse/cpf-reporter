@@ -1,19 +1,11 @@
-import json
 import os
-import tempfile
-from datetime import datetime
-from typing import IO, Dict, List, Set, Union
 
 import boto3
 import chevron
 import structlog
 from aws_lambda_typing.context import Context
-from mypy_boto3_s3.client import S3Client
-from openpyxl import Workbook, load_workbook
-from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import BaseModel
 
-from src.lib.constants import OUTPUT_TEMPLATE_FILENAME_BY_PROJECT
 from src.lib.logging import get_logger, reset_contextvars
 from src.lib.s3_helper import get_presigned_url
 from src.lib.treasury_generation_common import (
@@ -112,7 +104,7 @@ def process_event(payload: ProjectLambdaPayload, logger):
     4) Generate an email
     5) Send email to the user
     """
-    s3_client: S3Client = boto3.client("s3")
+    s3_client = boto3.client("s3")
     user = payload.user
     organization = payload.organization
     
