@@ -122,4 +122,9 @@ export const ReportingPeriod: ReportingPeriodRelationResolvers = {
       .findUnique({ where: { id: root?.id } })
       .outputTemplate()
   },
+  certifications: (_obj, { root }) => {
+    return db.reportingPeriod
+      .findUnique({ where: { id: root?.id } })
+      .certifications()
+  },
 }

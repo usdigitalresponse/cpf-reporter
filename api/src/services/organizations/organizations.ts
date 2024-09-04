@@ -226,4 +226,9 @@ export const Organization: OrganizationRelationResolvers = {
   projects: (_obj, { root }) => {
     return db.organization.findUnique({ where: { id: root?.id } }).projects()
   },
+  reportingPeriodCertifications: (_obj, { root }) => {
+    return db.organization
+      .findUnique({ where: { id: root?.id } })
+      .reportingPeriodCertifications()
+  },
 }
