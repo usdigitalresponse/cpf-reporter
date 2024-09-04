@@ -14,6 +14,7 @@ export const schema = gql`
     projects: [Project]!
     validationRulesId: Int
     validationRules: ValidationRules
+    certifications: [ReportingPeriodCertification]!
   }
 
   type Query {
