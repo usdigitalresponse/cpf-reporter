@@ -38,5 +38,6 @@ export const schema = gql`
       input: UpdateReportingPeriodCertificationInput!
     ): ReportingPeriodCertification! @requireAuth
     deleteReportingPeriodCertification(id: Int!): ReportingPeriodCertification!
+      @requireAuth
   }
 `
