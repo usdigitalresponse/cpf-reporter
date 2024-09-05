@@ -354,7 +354,9 @@ describe('user writes', () => {
         roles: ['USDR_ADMIN'],
       })
       await deleteUser({ id: scenario.user.one.id })
-      expect(mockPassageUser.delete).toHaveBeenCalledWith(scenario.user.one.passageId)
+      expect(mockPassageUser.delete).toHaveBeenCalledWith(
+        scenario.user.one.passageId
+      )
     })
   })
 })
