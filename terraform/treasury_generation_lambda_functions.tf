@@ -64,7 +64,7 @@ module "lambda_function-subrecipientTreasuryReportGen" {
       resources = [
         # These are completed CSV version of the subrecipient file that can be submitted to treasury.
         # Path: /treasuryreports/{organization_id}/{reporting_period_id}/CPFSubrecipientTemplate.csv
-        "${module.reporting_data_bucket.bucket_arn}/treasuryReports/*/*/*.csv",
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.csv",
       ]
     }
     AllowUploadXLSXReport = {
@@ -75,7 +75,7 @@ module "lambda_function-subrecipientTreasuryReportGen" {
       resources = [
         # These are completed XLSX version of the subrecipient file that can be submitted to treasury.
         # Path: /treasuryreports/{organization_id}/{reporting_period_id}/CPFSubrecipientTemplate.xlsx
-        "${module.reporting_data_bucket.bucket_arn}/treasuryReports/*/*/*.xlsx",
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.xlsx",
       ]
     }
   }
@@ -196,7 +196,7 @@ module "lambda_function-treasuryProjectFileGeneration" {
       resources = [
         # These are completed CSV version of the project (1A, 1B, or 1C) file that can be submitted to treasury.
         # Path: /treasuryreports/{organization_id}/{reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.csv
-        "${module.reporting_data_bucket.bucket_arn}/treasuryReports/*/*/*.csv",
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.csv",
       ]
     }
     AllowUploadXLSXReport = {
@@ -207,7 +207,7 @@ module "lambda_function-treasuryProjectFileGeneration" {
       resources = [
         # These are completed XLSX version of the project (1A, 1B, or 1C) file that can be submitted to treasury.
         # Path: /treasuryreports/{organization_id}/{reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.xlsx
-        "${module.reporting_data_bucket.bucket_arn}/treasuryReports/*/*/*.xlsx",
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.xlsx",
       ]
     }
     AllowDownloadXLSXReport = {
@@ -219,7 +219,7 @@ module "lambda_function-treasuryProjectFileGeneration" {
       resources = [
         # These are completed XLSX version of the project (1A, 1B, or 1C) file that can be submitted to treasury.
         # Path: /treasuryreports/{organization_id}/{reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.xlsx
-        "${module.reporting_data_bucket.bucket_arn}/treasuryReports/*/*/*.xlsx",
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.xlsx",
       ]
     }
   }
