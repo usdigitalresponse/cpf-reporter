@@ -21,6 +21,17 @@ module "lambda_function-subrecipientTreasuryReportGen" {
   policy_jsons                      = local.lambda_default_execution_policies
   attach_policy_statements          = true
   policy_statements = {
+    AllowListSubrecipientData = {
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket"
+      ]
+      resources = [
+        # This allows the function to check whether subrecipient data-file exists in the path.
+        # Path: /{organization_id}/{reporting_period_id}/*
+        "${module.reporting_data_bucket.bucket_arn}/*/*/*",
+      ]
+    }
     AllowDownloadSubrecipientsFile = {
       effect = "Allow"
       actions = [
