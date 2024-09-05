@@ -18,9 +18,7 @@ export const schema = gql`
   }
 
   input CreateReportingPeriodCertificationInput {
-    organizationId: Int!
     reportingPeriodId: Int!
-    certifiedById: Int!
   }
 
   input UpdateReportingPeriodCertificationInput {

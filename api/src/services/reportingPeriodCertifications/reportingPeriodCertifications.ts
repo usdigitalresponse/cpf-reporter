@@ -1,6 +1,9 @@
 import type { QueryResolvers, MutationResolvers } from 'types/graphql'
 
+import { AuthenticationError } from '@redwoodjs/graphql-server'
+
 import { db } from 'src/lib/db'
+import { currentUserIsUSDRAdmin } from 'src/services/users'
 
 export const reportingPeriodCertifications: QueryResolvers['reportingPeriodCertifications'] =
   () => {
@@ -16,8 +19,21 @@ export const reportingPeriodCertification: QueryResolvers['reportingPeriodCertif
 
 export const createReportingPeriodCertification: MutationResolvers['createReportingPeriodCertification'] =
   ({ input }) => {
+    if (!currentUserIsUSDRAdmin()) {
+      throw new AuthenticationError(
+        "You don't have permission to certify reporting periods."
+      )
+    }
+
+    const { currentUser } = context
+    const organizationId = currentUser.agency.organizationId
+
     return db.reportingPeriodCertification.create({
-      data: input,
+      data: {
+        ...input,
+        organizationId,
+        certifiedById: currentUser.id,
+      },
     })
   }
 
