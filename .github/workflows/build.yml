@@ -274,6 +274,7 @@ jobs:
           name: ${{ env.ATTESTATION_ARTIFACTS_KEY }}
           path: ${{ steps.store-attestations.outputs.path }}
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: ${{ inputs.docker-image-artifacts-retention-days }}
 
   redwood-console-image:
@@ -407,6 +408,7 @@ jobs:
           name: ${{ env.ATTESTATION_ARTIFACTS_KEY }}
           path: ${{ steps.store-attestations.outputs.path }}
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: ${{ inputs.docker-image-artifacts-retention-days }}
 
   api-function-zips:
@@ -481,6 +483,7 @@ jobs:
           name: ${{ env.ARTIFACTS_KEY }}
           path: ${{ env.ARTIFACTS_PATH }}
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: ${{ inputs.api-function-artifact-retention-days }}
 
   python-function-zips:
@@ -566,6 +569,7 @@ jobs:
           name: ${{ env.ARTIFACTS_KEY }}
           path: ${{ env.ARTIFACTS_PATH }}
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: ${{ inputs.python-function-artifact-retention-days }}
 
   web-bundle:
@@ -637,4 +641,5 @@ jobs:
           name: ${{ env.ARTIFACTS_KEY }}
           path: ${{ env.ARTIFACTS_PATH }}
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: ${{ inputs.web-artifact-retention-days }}
