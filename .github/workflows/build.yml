@@ -483,6 +483,7 @@ jobs:
           name: ${{ env.ARTIFACTS_KEY }}
           path: ${{ env.ARTIFACTS_PATH }}
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: ${{ inputs.api-function-artifact-retention-days }}
 
   python-function-zips:
@@ -568,6 +569,7 @@ jobs:
           name: ${{ env.ARTIFACTS_KEY }}
           path: ${{ env.ARTIFACTS_PATH }}
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: ${{ inputs.python-function-artifact-retention-days }}
 
   web-bundle:
@@ -639,4 +641,5 @@ jobs:
           name: ${{ env.ARTIFACTS_KEY }}
           path: ${{ env.ARTIFACTS_PATH }}
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: ${{ inputs.web-artifact-retention-days }}
