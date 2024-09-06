@@ -34,7 +34,7 @@ module "lambda_function-subrecipientTreasuryReportGen" {
         string_like_condition = {
           test     = "StringLike"
           variable = "s3:prefix"
-          values   = "*/*/*"
+          values   = ["*/*/*"]
         }
       }
     }
@@ -196,7 +196,7 @@ module "lambda_function-treasuryProjectFileGeneration" {
         string_like_condition = {
           test     = "StringLike"
           variable = "s3:prefix"
-          values   = "treasuryreports/*/*/*"
+          values   = ["treasuryreports/*/*/*"]
         }
       }
     }
@@ -305,7 +305,7 @@ module "lambda_function-cpfCreateArchive" {
         string_like_condition = {
           test     = "StringLike"
           variable = "s3:prefix"
-          values   = "treasuryreports/*/*/*"
+          values   = ["treasuryreports/*/*/*"]
         }
       }
     }
