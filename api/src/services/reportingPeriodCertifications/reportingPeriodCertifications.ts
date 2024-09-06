@@ -21,7 +21,7 @@ export const createReportingPeriodCertification: MutationResolvers['createReport
   ({ input }) => {
     if (!currentUserIsUSDRAdmin()) {
       throw new AuthenticationError(
-        "You don't have permission to certify reporting periods."
+        "You don't have necessary permissions to certify reporting periods."
       )
     }
 

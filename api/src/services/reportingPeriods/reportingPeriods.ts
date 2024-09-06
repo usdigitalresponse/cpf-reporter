@@ -6,6 +6,7 @@ import type {
 
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
+import { createReportingPeriodCertification } from 'src/services/reportingPeriodCertifications'
 
 export const reportingPeriods: QueryResolvers['reportingPeriods'] = () => {
   return db.reportingPeriod.findMany()
@@ -92,6 +93,49 @@ export const updateReportingPeriod: MutationResolvers['updateReportingPeriod'] =
       where: { id },
     })
   }
+
+export const updateCurrentReportingPeriod = (newReportingPeriodId: number) => {
+  const organizationId = context.currentUser.agency.organizationId
+  const preferences = db.organization.findUnique({
+    where: { id: organizationId },
+  })
+
+  const parsedPreferences = JSON.parse(preferences.preferences)
+  const newPreferences = {
+    ...parsedPreferences,
+    currentReportingPeriod: newReportingPeriodId,
+  }
+
+  // update current reporting period
+  return db.organization.update({
+    data: { preferences: JSON.stringify(newPreferences) },
+    where: { id: organizationId },
+  })
+}
+
+export const certifyReportingPeriodAndOpenNextPeriod = async ({ id }) => {
+  // Create a new reporting period certification
+  createReportingPeriodCertification({ input: id })
+
+  // Update current reporting period
+  const nextReportingPeriod = await findReportingPeriodAfterCurrent(id)
+  updateCurrentReportingPeriod(nextReportingPeriod.id)
+}
+
+export const findReportingPeriodAfterCurrent = async (
+  currentReportingPeriodId: number
+) => {
+  const currentReportingPeriod = await db.reportingPeriod.findUnique({
+    where: { id: currentReportingPeriodId },
+  })
+  const nextReportingPeriod = await db.reportingPeriod.findFirst({
+    where: { startDate: { gt: currentReportingPeriod.startDate } },
+    orderBy: { startDate: 'asc' },
+  })
+
+  // TODO: Handle case where there is no next reporting period
+  return nextReportingPeriod
+}
 
 export const deleteReportingPeriod: MutationResolvers['deleteReportingPeriod'] =
   ({ id }) => {
