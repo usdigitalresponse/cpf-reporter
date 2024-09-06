@@ -27,10 +27,16 @@ module "lambda_function-subrecipientTreasuryReportGen" {
         "s3:ListBucket"
       ]
       resources = [
-        # This allows the function to check whether subrecipient data-file exists in the path.
-        # Path: /{organization_id}/{reporting_period_id}/*
-        "${module.reporting_data_bucket.bucket_arn}/*/*/*",
+        "${module.reporting_data_bucket.bucket_arn}",
       ]
+      # Path: /{organization_id}/{reporting_period_id}/*
+      condition = {
+        string_like_condition = {
+          test     = "StringLike"
+          variable = "s3:prefix"
+          values   = ["*/*/*"]
+        }
+      }
     }
     AllowDownloadSubrecipientsFile = {
       effect = "Allow"
@@ -183,10 +189,16 @@ module "lambda_function-treasuryProjectFileGeneration" {
         "s3:ListBucket"
       ]
       resources = [
-        # This allows the function to check whether objects exist in the path.
-        # Path: treasuryreports/{organization_id}/{reporting_period_id}/*
-        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*",
+        "${module.reporting_data_bucket.bucket_arn}",
       ]
+      # Path: treasuryreports/{organization_id}/{reporting_period_id}/*
+      condition = {
+        string_like_condition = {
+          test     = "StringLike"
+          variable = "s3:prefix"
+          values   = ["treasuryreports/*/*/*"]
+        }
+      }
     }
     AllowUploadCSVReport = {
       effect = "Allow"
@@ -286,9 +298,16 @@ module "lambda_function-cpfCreateArchive" {
         "s3:ListBucket"
       ]
       resources = [
-        # Path: treasuryreports/{organization_id}/{reporting_period_id}/*
-        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*",
+        "${module.reporting_data_bucket.bucket_arn}",
       ]
+      # Path: treasuryreports/{organization_id}/{reporting_period_id}/*
+      condition = {
+        string_like_condition = {
+          test     = "StringLike"
+          variable = "s3:prefix"
+          values   = ["treasuryreports/*/*/*"]
+        }
+      }
     }
     AllowDownloadExcelObjects = {
       effect = "Allow"
