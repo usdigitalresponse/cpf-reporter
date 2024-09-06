@@ -297,10 +297,9 @@ module "lambda_function-cpfCreateArchive" {
         "${module.reporting_data_bucket.bucket_arn}",
       ]
       condition = {
-        StringEquals = {
-          # Path: treasuryreports/{organization_id}/{reporting_period_id}/*
-          "s3:prefix" = "treasuryreports/*/*/*"
-        }
+        test = "StringLike"
+        variable = "s3:prefix"
+        values = "treasuryreports/*/*/*"
       }
     }
     AllowDownloadExcelObjects = {
