@@ -29,11 +29,11 @@ module "lambda_function-subrecipientTreasuryReportGen" {
       resources = [
         "${module.reporting_data_bucket.bucket_arn}",
       ]
+      # Path: /{organization_id}/{reporting_period_id}/*
       condition = {
-        StringEquals = {
-          # Path: /{organization_id}/{reporting_period_id}/*
-          "s3:prefix" = "*/*/*"
-        }
+        test = "StringLike"
+        variable = "s3:prefix"
+        values = "*/*/*"
       }
     }
     AllowDownloadSubrecipientsFile = {
@@ -189,11 +189,11 @@ module "lambda_function-treasuryProjectFileGeneration" {
       resources = [
         "${module.reporting_data_bucket.bucket_arn}",
       ]
+      # Path: treasuryreports/{organization_id}/{reporting_period_id}/*
       condition = {
-        StringEquals = {
-          # Path: treasuryreports/{organization_id}/{reporting_period_id}/*
-          "s3:prefix" = "treasuryreports/*/*/*"
-        }
+        test = "StringLike"
+        variable = "s3:prefix"
+        values = "treasuryreports/*/*/*"
       }
     }
     AllowUploadCSVReport = {
@@ -296,6 +296,7 @@ module "lambda_function-cpfCreateArchive" {
       resources = [
         "${module.reporting_data_bucket.bucket_arn}",
       ]
+      # Path: treasuryreports/{organization_id}/{reporting_period_id}/*
       condition = {
         test = "StringLike"
         variable = "s3:prefix"
