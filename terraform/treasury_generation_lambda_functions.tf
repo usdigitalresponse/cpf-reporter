@@ -31,9 +31,9 @@ module "lambda_function-subrecipientTreasuryReportGen" {
       ]
       # Path: /{organization_id}/{reporting_period_id}/*
       condition = {
-        test = "StringLike"
+        test     = "StringLike"
         variable = "s3:prefix"
-        values = "*/*/*"
+        values   = "*/*/*"
       }
     }
     AllowDownloadSubrecipientsFile = {
@@ -191,9 +191,9 @@ module "lambda_function-treasuryProjectFileGeneration" {
       ]
       # Path: treasuryreports/{organization_id}/{reporting_period_id}/*
       condition = {
-        test = "StringLike"
+        test     = "StringLike"
         variable = "s3:prefix"
-        values = "treasuryreports/*/*/*"
+        values   = "treasuryreports/*/*/*"
       }
     }
     AllowUploadCSVReport = {
@@ -298,9 +298,9 @@ module "lambda_function-cpfCreateArchive" {
       ]
       # Path: treasuryreports/{organization_id}/{reporting_period_id}/*
       condition = {
-        test = "StringLike"
+        test     = "StringLike"
         variable = "s3:prefix"
-        values = "treasuryreports/*/*/*"
+        values   = "treasuryreports/*/*/*"
       }
     }
     AllowDownloadExcelObjects = {
