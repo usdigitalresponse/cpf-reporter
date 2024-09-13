@@ -5,7 +5,13 @@ from botocore.exceptions import ClientError
 CHARSET = "UTF-8"
 
 
-def send_email(dest_email: str, email_html: str, email_text: str, subject: str, logger):
+def send_email(
+        dest_email: str,
+        email_html: str,
+        email_text: str,
+        subject: str,
+        logger
+)  -> bool:
     # Email user
     email_client = boto3.client("ses")
 

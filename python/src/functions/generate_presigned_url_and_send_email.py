@@ -5,6 +5,7 @@ import chevron
 import structlog
 from aws_lambda_typing.context import Context
 from pydantic import BaseModel
+from typing import Optional, Tuple
 
 from src.lib.logging import get_logger, reset_contextvars
 from src.lib.s3_helper import get_presigned_url
@@ -24,13 +25,13 @@ Hello,
 Your treasury report can be downloaded here: {url}.
 """
 
-class ProjectLambdaPayload(BaseModel):
+class SendTreasuryEmailLambdaPayload(BaseModel):
     organization: OrganizationObj
     user: UserObj
 
 
 @reset_contextvars
-def handle(event: ProjectLambdaPayload, context: Context):
+def handle(event: SendTreasuryEmailLambdaPayload, context: Context):
     """Lambda handler for emailing Treasury reports
 
     Given a user and organization object- send an email to the user that
@@ -47,21 +48,25 @@ def handle(event: ProjectLambdaPayload, context: Context):
     logger.info("received new invocation event from step function")
 
     try:
-        payload = ProjectLambdaPayload.model_validate(event)
+        payload = SendTreasuryEmailLambdaPayload.model_validate(event)
     except Exception:
-        logger.exception("Exception parsing Project event payload")
+        logger.exception("Exception parsing Send Treasury Email event payload")
         return {"statusCode": 400, "body": "Bad Request"}
 
     try:
         process_event(payload, logger)
     except Exception:
-        logger.exception("Exception processing Subrecipient file generation event")
+        logger.exception("Exception processing sending treasury report email")
         return {"statusCode": 500, "body": "Internal Server Error"}
 
     return {"statusCode": 200, "body": "Success"}
 
 
-def generate_email(user: UserObj, presigned_url: str = ""):
+def generate_email(
+        user: UserObj,
+        logger: structlog.stdlib.BoundLogger,
+        presigned_url: str = "",
+) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     try:
         with open("src/static/email_templates/formatted_body.html") as g:
             email_body = chevron.render(g, {
@@ -89,12 +94,14 @@ def generate_email(user: UserObj, presigned_url: str = ""):
                 subject = "USDR CPF Treasury Report"
                 return email_html, email_text, subject
     except Exception as e:
-        logger = get_logger()
         logger.error(f"Failed to generate treasury email: {e}")
     return None, None, None
 
 
-def process_event(payload: ProjectLambdaPayload, logger):
+def process_event(
+        payload: SendTreasuryEmailLambdaPayload,
+        logger: structlog.stdlib.BoundLogger,
+):
     """
     This function is structured as followed:
     1) Check to see if the s3 object exists:
@@ -115,11 +122,12 @@ def process_event(payload: ProjectLambdaPayload, logger):
         expiration_time = 60 * 60,  # 1 hour
     )
     if presigned_url is None:
-        raise
+        raise Exception('Failed to generate signed-URL or file not found')
     
     email_html, email_text, subject = generate_email(
         user = user,
         presigned_url = presigned_url,
+        logger = logger,
     )
     if not email_html:
         return False

@@ -1,6 +1,6 @@
 from botocore.exceptions import ClientError
 from mypy_boto3_s3.client import S3Client
-from typing import IO, Union
+from typing import IO, Optional, Union
 from urllib.parse import unquote_plus
 import tempfile
 
@@ -63,7 +63,7 @@ def get_presigned_url(
         bucket: str,
         key: str,
         expiration_time: int = 60 * 60,  #  1 hour
-):
+) -> Optional[str]:
     logger = get_logger()
     try:
         response = s3_client.head_object(
@@ -71,8 +71,7 @@ def get_presigned_url(
             key = key,
         )
     except ClientError as e:
-        if logger:
-            logger.error(e)
+        logger.error(e)
         return None
 
     try:
@@ -85,8 +84,7 @@ def get_presigned_url(
             ExpiresIn=expiration_time
         )
     except ClientError as e:
-        if logger:
-            logger.error(e)
+        logger.error(e)
         return None
     
     return response
