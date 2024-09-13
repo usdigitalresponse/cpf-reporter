@@ -116,7 +116,7 @@ describe('reportingPeriods', () => {
   })
 
   scenario(
-    'certifies a reporting period and sets the next one as current',
+    'certifies a reporting period and sets the next reporting period as current',
     async (scenario: StandardScenario) => {
       mockCurrentUser(scenario.user.one)
       const result = await certifyReportingPeriodAndOpenNextPeriod({

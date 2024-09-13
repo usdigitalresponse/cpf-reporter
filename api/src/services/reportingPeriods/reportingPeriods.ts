@@ -91,7 +91,6 @@ export const certifyReportingPeriodAndOpenNextPeriod = async ({
   reportingPeriodId: number
 }) => {
   const currentUser = context.currentUser
-  console.log('currentUser', currentUser)
   const organizationId = currentUser?.agency?.organizationId
 
   if (!organizationId) {
@@ -100,17 +99,14 @@ export const certifyReportingPeriodAndOpenNextPeriod = async ({
 
   try {
     const newReportingPeriod = await db.$transaction(async (prisma) => {
-      // Create certification for the current reporting period
-      const certification = await prisma.reportingPeriodCertification.create({
+      await prisma.reportingPeriodCertification.create({
         data: {
           reportingPeriodId,
           organizationId,
           certifiedById: currentUser.id,
         },
       })
-      console.log('certification', certification)
 
-      // Find the next reporting period
       const currentReportingPeriod = await db.reportingPeriod.findUnique({
         where: { id: reportingPeriodId },
       })
@@ -120,12 +116,11 @@ export const certifyReportingPeriodAndOpenNextPeriod = async ({
         )
       }
 
+      // Find the next reporting period
       const nextReportingPeriod = await db.reportingPeriod.findFirst({
         where: { startDate: { gt: currentReportingPeriod.startDate } },
         orderBy: { startDate: 'asc' },
       })
-
-      console.log('nextReportingPeriod', nextReportingPeriod)
 
       const preferences = {
         current_reporting_period_id: nextReportingPeriod?.id || null,
@@ -135,7 +130,6 @@ export const certifyReportingPeriodAndOpenNextPeriod = async ({
         where: { id: organizationId },
       })
 
-      console.log('preferences', preferences)
       return nextReportingPeriod
     })
 
