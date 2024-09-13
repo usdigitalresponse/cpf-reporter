@@ -87,6 +87,7 @@ export const createReportingPeriod: MutationResolvers['createReportingPeriod'] =
 
 export const certifyReportingPeriodAndOpenNextPeriod = async ({ reportingPeriodId }: { reportingPeriodId: number }) => {
   const currentUser = context.currentUser
+  console.log('currentUser', currentUser)
   const organizationId = currentUser?.agency?.organizationId
 
   if (!organizationId) {

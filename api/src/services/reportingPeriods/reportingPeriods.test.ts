@@ -7,7 +7,11 @@ import {
   updateReportingPeriod,
   deleteReportingPeriod,
   getOrCreateReportingPeriod,
+  certifyReportingPeriodAndOpenNextPeriod
 } from './reportingPeriods'
+import {
+  reportingPeriodCertification
+} from '../reportingPeriodCertifications/reportingPeriodCertifications'
 import type { StandardScenario } from './reportingPeriods.scenarios'
 
 // Generated boilerplate tests do not account for all circumstances
@@ -112,5 +116,29 @@ describe('reportingPeriods', () => {
     const result = await reportingPeriod({ id: original.id })
 
     expect(result).toEqual(null)
+  })
+
+  scenario('certifies a reporting period and sets the next one as current', async (scenario: StandardScenario) => {
+    mockCurrentUser(scenario.user.one)
+    const result = await certifyReportingPeriodAndOpenNextPeriod({ reportingPeriodId: scenario.reportingPeriod.one.id })
+
+    expect(result.id).toEqual(scenario.reportingPeriod.two.id)
+    expect(result.startDate.getTime()).toBeGreaterThan(scenario.reportingPeriod.one.endDate.getTime())
+  })
+
+  scenario('sets current reporting period to null when no next period exists', async (scenario: StandardScenario) => {
+    mockCurrentUser(scenario.user.one)
+    const result = await certifyReportingPeriodAndOpenNextPeriod({ reportingPeriodId: scenario.reportingPeriod.two.id })
+
+    expect(result).toBeNull()
+  })
+
+  scenario('prevents certifying the same reporting period twice', async (scenario: StandardScenario) => {
+    mockCurrentUser(scenario.user.one)
+    await certifyReportingPeriodAndOpenNextPeriod({ reportingPeriodId: scenario.reportingPeriod.one.id })
+
+    await expect(
+      certifyReportingPeriodAndOpenNextPeriod({ reportingPeriodId: scenario.reportingPeriod.one.id })
+    ).rejects.toThrow()
   })
 })

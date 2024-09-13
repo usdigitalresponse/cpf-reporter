@@ -28,8 +28,8 @@ export const standard = defineScenario<Prisma.ReportingPeriodCreateArgs>({
     two: {
       data: {
         name: 'String',
-        startDate: '2024-01-12T15:48:11.499Z',
-        endDate: '2024-01-12T15:48:11.499Z',
+        startDate: '2024-01-14T15:48:11.499Z',
+        endDate: '2024-01-14T15:48:11.499Z',
         inputTemplate: {
           create: {
             name: 'INPUT TEMPLATE TWO',
@@ -46,6 +46,42 @@ export const standard = defineScenario<Prisma.ReportingPeriodCreateArgs>({
         },
       },
     },
+  },
+  organization: {
+    one: (scenario) => ({
+      data: {
+        name: 'USDR1',
+        preferences: {
+          current_reporting_period_id: scenario.reportingPeriod.one.id,
+        },
+      },
+    }),
+  },
+  agency: {
+    one: (scenario) => ({
+      data: {
+        name: 'String',
+        code: 'String',
+        organization: {
+          connect: {
+            id: scenario.organization.one.id,
+          },
+        },
+      },
+    }),
+  },
+  user: {
+    one: (scenario) => ({
+      data: {
+        email: 'orgadmin@example.com',
+        name: 'Org Admin',
+        role: 'ORGANIZATION_ADMIN',
+        agency: { connect: { id: scenario.agency.one.id } },
+      },
+      include: {
+        agency: true,
+      },
+    }),
   },
 })
 
