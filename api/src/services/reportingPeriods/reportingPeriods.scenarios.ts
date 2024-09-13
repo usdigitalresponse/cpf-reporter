@@ -1,8 +1,19 @@
-import type { Prisma, ReportingPeriod } from '@prisma/client'
+import type {
+  Prisma,
+  ReportingPeriod,
+  Organization,
+  Agency,
+  User,
+} from '@prisma/client'
 
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
-export const standard = defineScenario<Prisma.ReportingPeriodCreateArgs>({
+export const standard = defineScenario<
+  | Prisma.ReportingPeriodCreateArgs
+  | Prisma.OrganizationCreateArgs
+  | Prisma.AgencyCreateArgs
+  | Prisma.UserCreateArgs
+>({
   reportingPeriod: {
     one: {
       data: {
@@ -85,4 +96,10 @@ export const standard = defineScenario<Prisma.ReportingPeriodCreateArgs>({
   },
 })
 
-export type StandardScenario = ScenarioData<ReportingPeriod, 'reportingPeriod'>
+export type StandardScenario = ScenarioData<
+  ReportingPeriod,
+  'reportingPeriod'
+> &
+  ScenarioData<Organization, 'organization'> &
+  ScenarioData<Agency, 'agency'> &
+  ScenarioData<User, 'user'>

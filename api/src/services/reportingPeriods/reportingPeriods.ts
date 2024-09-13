@@ -85,7 +85,11 @@ export const createReportingPeriod: MutationResolvers['createReportingPeriod'] =
     })
   }
 
-export const certifyReportingPeriodAndOpenNextPeriod = async ({ reportingPeriodId }: { reportingPeriodId: number }) => {
+export const certifyReportingPeriodAndOpenNextPeriod = async ({
+  reportingPeriodId,
+}: {
+  reportingPeriodId: number
+}) => {
   const currentUser = context.currentUser
   console.log('currentUser', currentUser)
   const organizationId = currentUser?.agency?.organizationId
@@ -111,7 +115,9 @@ export const certifyReportingPeriodAndOpenNextPeriod = async ({ reportingPeriodI
         where: { id: reportingPeriodId },
       })
       if (!currentReportingPeriod) {
-        throw new Error(`Reporting period with id ${reportingPeriodId} not found`)
+        throw new Error(
+          `Reporting period with id ${reportingPeriodId} not found`
+        )
       }
 
       const nextReportingPeriod = await db.reportingPeriod.findFirst({
@@ -121,7 +127,9 @@ export const certifyReportingPeriodAndOpenNextPeriod = async ({ reportingPeriodI
 
       console.log('nextReportingPeriod', nextReportingPeriod)
 
-      const preferences = { current_reporting_period_id: nextReportingPeriod?.id || null }
+      const preferences = {
+        current_reporting_period_id: nextReportingPeriod?.id || null,
+      }
       await db.organization.update({
         data: { preferences },
         where: { id: organizationId },
@@ -134,7 +142,9 @@ export const certifyReportingPeriodAndOpenNextPeriod = async ({ reportingPeriodI
     return newReportingPeriod
   } catch (err) {
     // If anything goes wrong, the transaction will be rolled back
-    throw new Error(`Couldn't certify reporting period with id ${reportingPeriodId}`)
+    throw new Error(
+      `Couldn't certify reporting period with id ${reportingPeriodId}`
+    )
   }
 }
 
