@@ -21,6 +21,23 @@ module "lambda_function-subrecipientTreasuryReportGen" {
   policy_jsons                      = local.lambda_default_execution_policies
   attach_policy_statements          = true
   policy_statements = {
+    AllowListSubrecipientData = {
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket"
+      ]
+      resources = [
+        "${module.reporting_data_bucket.bucket_arn}",
+      ]
+      # Path: /{organization_id}/{reporting_period_id}/*
+      condition = {
+        string_like_condition = {
+          test     = "StringLike"
+          variable = "s3:prefix"
+          values   = ["*/*/*"]
+        }
+      }
+    }
     AllowDownloadSubrecipientsFile = {
       effect = "Allow"
       actions = [
@@ -166,6 +183,23 @@ module "lambda_function-treasuryProjectFileGeneration" {
         "${module.reporting_data_bucket.bucket_arn}/treasuryreports/output-templates/*/*.xlsx",
       ]
     }
+    AllowListReportObjects = {
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket"
+      ]
+      resources = [
+        "${module.reporting_data_bucket.bucket_arn}",
+      ]
+      # Path: treasuryreports/{organization_id}/{reporting_period_id}/*
+      condition = {
+        string_like_condition = {
+          test     = "StringLike"
+          variable = "s3:prefix"
+          values   = ["treasuryreports/*/*/*"]
+        }
+      }
+    }
     AllowUploadCSVReport = {
       effect = "Allow"
       actions = [
@@ -258,6 +292,23 @@ module "lambda_function-cpfCreateArchive" {
   policy_jsons                      = local.lambda_default_execution_policies
   attach_policy_statements          = true
   policy_statements = {
+    AllowListReportObjects = {
+      effect = "Allow"
+      actions = [
+        "s3:ListBucket"
+      ]
+      resources = [
+        "${module.reporting_data_bucket.bucket_arn}",
+      ]
+      # Path: treasuryreports/{organization_id}/{reporting_period_id}/*
+      condition = {
+        string_like_condition = {
+          test     = "StringLike"
+          variable = "s3:prefix"
+          values   = ["treasuryreports/*/*/*"]
+        }
+      }
+    }
     AllowDownloadExcelObjects = {
       effect = "Allow"
       actions = [
