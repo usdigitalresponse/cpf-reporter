@@ -85,6 +85,58 @@ export const createReportingPeriod: MutationResolvers['createReportingPeriod'] =
     })
   }
 
+export const certifyReportingPeriodAndOpenNextPeriod = async ({ reportingPeriodId }: { reportingPeriodId: number }) => {
+  const currentUser = context.currentUser
+  const organizationId = currentUser?.agency?.organizationId
+
+  if (!organizationId) {
+    throw new Error('Current user must be associated with an organization')
+  }
+
+  try {
+    const newReportingPeriod = await db.$transaction(async (prisma) => {
+      // Create certification for the current reporting period
+      const certification = await prisma.reportingPeriodCertification.create({
+        data: {
+          reportingPeriodId,
+          organizationId,
+          certifiedById: currentUser.id,
+        },
+      })
+      console.log('certification', certification)
+
+      // Find the next reporting period
+      const currentReportingPeriod = await db.reportingPeriod.findUnique({
+        where: { id: reportingPeriodId },
+      })
+      if (!currentReportingPeriod) {
+        throw new Error(`Reporting period with id ${reportingPeriodId} not found`)
+      }
+
+      const nextReportingPeriod = await db.reportingPeriod.findFirst({
+        where: { startDate: { gt: currentReportingPeriod.startDate } },
+        orderBy: { startDate: 'asc' },
+      })
+
+      console.log('nextReportingPeriod', nextReportingPeriod)
+
+      const preferences = { current_reporting_period_id: nextReportingPeriod?.id || null }
+      await db.organization.update({
+        data: { preferences },
+        where: { id: organizationId },
+      })
+
+      console.log('preferences', preferences)
+      return nextReportingPeriod
+    })
+
+    return newReportingPeriod
+  } catch (err) {
+    // If anything goes wrong, the transaction will be rolled back
+    throw new Error(`Couldn't certify reporting period with id ${reportingPeriodId}`)
+  }
+}
+
 export const updateReportingPeriod: MutationResolvers['updateReportingPeriod'] =
   ({ id, input }) => {
     return db.reportingPeriod.update({

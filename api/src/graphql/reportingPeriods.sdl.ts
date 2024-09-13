@@ -41,6 +41,7 @@ export const schema = gql`
   type Mutation {
     createReportingPeriod(input: CreateReportingPeriodInput!): ReportingPeriod!
       @requireAuth
+    certifyReportingPeriodAndOpenNextPeriod(reportingPeriodId: Int!): ReportingPeriod @requireAuth(roles: ["USDR_ADMIN", "ORGANIZATION_ADMIN"])
     updateReportingPeriod(
       id: Int!
       input: UpdateReportingPeriodInput!
