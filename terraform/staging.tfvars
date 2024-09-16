@@ -42,3 +42,6 @@ passage_app_id = "OjNe5PvwdKm6rmcFc1WfPIBa"
 
 // API
 api_domain_name = "api.staging.cpf.usdr.dev"
+
+// Email for treasury notifications
+notifications_email_address = "grants-notifications@staging.cpf.usdr.dev"
