@@ -7,6 +7,7 @@ from typing import IO, Dict, List, Set, Union
 import boto3
 import structlog
 from aws_lambda_typing.context import Context
+from botocore.exceptions import ClientError
 from mypy_boto3_s3.client import S3Client
 from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
@@ -93,7 +94,7 @@ def handle(event: ProjectLambdaPayload, context: Context):
     return {"statusCode": 200, "body": "Success"}
 
 
-def process_event(payload: ProjectLambdaPayload, logger):
+def process_event(payload: ProjectLambdaPayload, logger: structlog.stdlib.BoundLogger):
     """
     This function is structured as followed:
     1) Load the metadata
@@ -137,6 +138,7 @@ def process_event(payload: ProjectLambdaPayload, logger):
         s3_client=s3_client,
         organization=organization,
         project_use_code=project_use_code,
+        logger=logger,
     )
 
     ### 2) Download the existing output XLSX file. If it doesn't exist, download
@@ -149,6 +151,7 @@ def process_event(payload: ProjectLambdaPayload, logger):
             project_agency_id_to_row_map=project_agency_id_to_row_map,
             output_file=output_file,
             output_template_id=payload.outputTemplateId,
+            logger=logger,
         )
 
         output_workbook = load_workbook(filename=output_file, read_only=True)
@@ -181,13 +184,20 @@ def process_event(payload: ProjectLambdaPayload, logger):
 
                 # TODO: Add a verification to ensure that the objectKey here is formatted correctly.
                 # Path must be: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm
-
-                download_s3_object(
-                    s3_client,
-                    os.environ["REPORTING_DATA_BUCKET_NAME"],
-                    file_info.objectKey,
-                    file,
-                )
+                try:
+                    download_s3_object(
+                        s3_client,
+                        os.environ["REPORTING_DATA_BUCKET_NAME"],
+                        file_info.objectKey,
+                        file,
+                    )
+                except ClientError as e:
+                    error = e.response.get("Error") or {}
+                    if error.get("Code") == "NoSuchKey":
+                        logger.exception(
+                            f"Expected to find an upload with key: {file_info.objectKey}"
+                        )
+                    raise
                 # Load workbook
                 wb = load_workbook(filename=file, read_only=True)
                 # Get and combine project rows
@@ -251,22 +261,29 @@ def download_output_file(
     organization: OrganizationObj,
     project_use_code: str,
     output_template_id: int,
+    logger: structlog.stdlib.BoundLogger,
 ) -> int:
     highest_row_num = None
     if project_agency_id_to_row_map:
         """
         Output file already exists, download it
         """
-        download_s3_object(
-            client=s3_client,
-            bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
-            key=get_generated_output_file_key(
-                file_type=OutputFileType.XLSX,
-                project=project_use_code,
-                organization=organization,
-            ),
-            destination=output_file,
-        )
+        try:
+            download_s3_object(
+                client=s3_client,
+                bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+                key=get_generated_output_file_key(
+                    file_type=OutputFileType.XLSX,
+                    project=project_use_code,
+                    organization=organization,
+                ),
+                destination=output_file,
+            )
+        except ClientError as e:
+            error = e.response.get("Error") or {}
+            if error.get("Code") == "NoSuchKey":
+                logger.exception("Expected to find an existing treasury output report")
+                raise
         highest_row_num = max(project_agency_id_to_row_map.values())
     else:
         """
@@ -285,6 +302,7 @@ def get_existing_output_metadata(
     s3_client,
     organization: OrganizationObj,
     project_use_code: str,
+    logger: structlog.stdlib.BoundLogger,
 ) -> Dict[str, int]:
     existing_project_agency_id_to_row_number = {}
     with tempfile.NamedTemporaryFile() as existing_file:
@@ -299,8 +317,16 @@ def get_existing_output_metadata(
                 ),
                 existing_file,
             )
-        except Exception:
-            existing_file = None
+        except ClientError as e:
+            error = e.response.get("Error") or {}
+            if error.get("Code") == "NoSuchKey":
+                logger.info(
+                    "There is no existing metadata file for this treasury report"
+                )
+                existing_file = None
+            else:
+                raise
+
         if existing_file:
             existing_project_agency_id_to_row_number = json.load(existing_file)
 
@@ -333,6 +359,7 @@ def get_outdated_projects_to_remove(
     s3_client,
     uploads_by_agency_id: Dict[AgencyId, UploadObj],
     ProjectRowSchema: Union[Project1ARow, Project1BRow, Project1CRow],
+    logger: structlog.stdlib.BoundLogger,
 ):
     """
     Open the files in the outdated_file_info_list and get the projects to
@@ -342,12 +369,20 @@ def get_outdated_projects_to_remove(
     for agency_id, file_info in uploads_by_agency_id.items():
         with tempfile.NamedTemporaryFile() as file:
             # Download projects from S3
-            download_s3_object(
-                s3_client,
-                os.environ["REPORTING_DATA_BUCKET_NAME"],
-                file_info.objectKey,
-                file,
-            )
+            try:
+                download_s3_object(
+                    client=s3_client,
+                    bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+                    key=file_info.objectKey,
+                    destination=file,
+                )
+            except ClientError as e:
+                error = e.response.get("Error") or {}
+                if error.get("Code") == "NoSuchKey":
+                    logger.exception(
+                        f"Expected to find an upload with key: {file_info.objectKey}"
+                    )
+                raise
             # Load workbook
             outdated_wb = load_workbook(filename=file, read_only=True)
             project_agency_ids_to_remove = project_agency_ids_to_remove.union(
