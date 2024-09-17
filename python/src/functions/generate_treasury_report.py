@@ -88,7 +88,7 @@ def handle(event: ProjectLambdaPayload, context: Context):
     try:
         process_event(payload, logger)
     except Exception:
-        logger.exception("Exception processing Subrecipient file generation event")
+        logger.exception("Exception processing Project file generation event")
         return {"statusCode": 500, "body": "Internal Server Error"}
 
     return {"statusCode": 200, "body": "Success"}
@@ -163,6 +163,7 @@ def process_event(payload: ProjectLambdaPayload, logger: structlog.stdlib.BoundL
             s3_client=s3_client,
             uploads_by_agency_id=payload.uploadsToRemove,
             ProjectRowSchema=ProjectRowSchema,
+            logger=logger,
         )
 
         # Delete rows corresponding to project_agency_ids_to_remove in the existing output file
@@ -193,7 +194,7 @@ def process_event(payload: ProjectLambdaPayload, logger: structlog.stdlib.BoundL
                     )
                 except ClientError as e:
                     error = e.response.get("Error") or {}
-                    if error.get("Code") == "NoSuchKey":
+                    if error.get("Code") == "404":
                         logger.exception(
                             f"Expected to find an upload with key: {file_info.objectKey}"
                         )
@@ -281,7 +282,7 @@ def download_output_file(
             )
         except ClientError as e:
             error = e.response.get("Error") or {}
-            if error.get("Code") == "NoSuchKey":
+            if error.get("Code") == "404":
                 logger.exception("Expected to find an existing treasury output report")
                 raise
         highest_row_num = max(project_agency_id_to_row_map.values())
@@ -319,7 +320,7 @@ def get_existing_output_metadata(
             )
         except ClientError as e:
             error = e.response.get("Error") or {}
-            if error.get("Code") == "NoSuchKey":
+            if error.get("Code") == "404":
                 logger.info(
                     "There is no existing metadata file for this treasury report"
                 )
@@ -378,7 +379,7 @@ def get_outdated_projects_to_remove(
                 )
             except ClientError as e:
                 error = e.response.get("Error") or {}
-                if error.get("Code") == "NoSuchKey":
+                if error.get("Code") == "404":
                     logger.exception(
                         f"Expected to find an upload with key: {file_info.objectKey}"
                     )
