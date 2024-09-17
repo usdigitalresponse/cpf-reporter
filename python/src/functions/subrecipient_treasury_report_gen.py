@@ -103,7 +103,7 @@ def process_event(
                 )
             except ClientError as e:
                 error = e.response.get("Error") or {}
-                if error.get("Code") == "NoSuchKey":
+                if error.get("Code") == "404":
                     logger.info(
                         f"No subrecipients for organization {organization_id} and reporting period {reporting_period_id}"
                     )

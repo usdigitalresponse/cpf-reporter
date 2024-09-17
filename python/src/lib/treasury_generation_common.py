@@ -61,7 +61,7 @@ def get_output_template(
         )
     except ClientError as e:
         error = e.response.get("Error") or {}
-        if error.get("Code") == "NoSuchKey":
+        if error.get("Code") == "404":
             logger.exception(
                 f"Cannot find any output template with ID: {output_template_id} and project: {project}"
             )
