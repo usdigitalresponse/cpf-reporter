@@ -154,7 +154,7 @@ def process_event(payload: ProjectLambdaPayload, logger: structlog.stdlib.BoundL
             logger=logger,
         )
 
-        output_workbook = load_workbook(filename=output_file, read_only=True)
+        output_workbook = load_workbook(filename=output_file, read_only=False)
         output_sheet = output_workbook["Baseline"]
 
         ### 3) Open files in the uploadsToRemove parameter.
