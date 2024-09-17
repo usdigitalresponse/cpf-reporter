@@ -53,7 +53,7 @@ type UploadValidationS3Client = {
   send: (command: GetObjectCommand | DeleteObjectCommand) => Promise<any>
 }
 
-export const handler: S3Handler = async (
+export const handler = async (
   event: S3ObjectCreatedNotificationEvent
 ): Promise<Response> => {
   const s3 = getS3Client()
