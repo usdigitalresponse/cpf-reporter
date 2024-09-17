@@ -1,6 +1,6 @@
 import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Prisma, Version } from '@prisma/client'
-import { S3Handler, S3ObjectCreatedNotificationEvent } from 'aws-lambda'
+import { S3ObjectCreatedNotificationEvent } from 'aws-lambda'
 
 import { getS3Client, sendPutObjectToS3Bucket } from 'src/lib/aws'
 import { db, getPrismaClient } from 'src/lib/db'
