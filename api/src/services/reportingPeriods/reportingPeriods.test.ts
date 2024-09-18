@@ -131,14 +131,14 @@ describe('reportingPeriods', () => {
   )
 
   scenario(
-    'sets current reporting period to null when no next period exists',
+    'prevents certifying when no next period exists',
     async (scenario: StandardScenario) => {
       mockCurrentUser(scenario.user.one)
-      const result = await certifyReportingPeriodAndOpenNextPeriod({
-        reportingPeriodId: scenario.reportingPeriod.two.id,
-      })
-
-      expect(result).toBeNull()
+      await expect(
+        certifyReportingPeriodAndOpenNextPeriod({
+          reportingPeriodId: scenario.reportingPeriod.two.id,
+        })
+      ).rejects.toThrow('No next reporting period found')
     }
   )
 

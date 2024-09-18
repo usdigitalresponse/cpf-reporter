@@ -99,14 +99,6 @@ export const certifyReportingPeriodAndOpenNextPeriod = async ({
 
   try {
     const newReportingPeriod = await db.$transaction(async (prisma) => {
-      await prisma.reportingPeriodCertification.create({
-        data: {
-          reportingPeriodId,
-          organizationId,
-          certifiedById: currentUser.id,
-        },
-      })
-
       const currentReportingPeriod = await db.reportingPeriod.findUnique({
         where: { id: reportingPeriodId },
       })
@@ -121,9 +113,20 @@ export const certifyReportingPeriodAndOpenNextPeriod = async ({
         where: { startDate: { gt: currentReportingPeriod.startDate } },
         orderBy: { startDate: 'asc' },
       })
+      if (!nextReportingPeriod) {
+        throw new Error('No next reporting period found')
+      }
+
+      await prisma.reportingPeriodCertification.create({
+        data: {
+          reportingPeriodId,
+          organizationId,
+          certifiedById: currentUser.id,
+        },
+      })
 
       const preferences = {
-        current_reporting_period_id: nextReportingPeriod?.id || null,
+        current_reporting_period_id: nextReportingPeriod.id,
       }
       await db.organization.update({
         data: { preferences },
@@ -136,6 +139,9 @@ export const certifyReportingPeriodAndOpenNextPeriod = async ({
     return newReportingPeriod
   } catch (err) {
     // If anything goes wrong, the transaction will be rolled back
+    if (err instanceof Error) {
+      throw err
+    }
     throw new Error(
       `Couldn't certify reporting period with id ${reportingPeriodId}`
     )
