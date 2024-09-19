@@ -216,7 +216,7 @@ def process_event(payload: ProjectLambdaPayload, logger: structlog.stdlib.BoundL
 
         ### 5) Save data
         # Output XLSX file
-        with tempfile.NamedTemporaryFile("r+") as new_output_file:
+        with tempfile.NamedTemporaryFile("rb+") as new_output_file:
             output_workbook.save(new_output_file.name)
             upload_generated_file_to_s3(
                 client=s3_client,
@@ -229,7 +229,7 @@ def process_event(payload: ProjectLambdaPayload, logger: structlog.stdlib.BoundL
                 file=new_output_file,
             )
         # Output CSV file for treasury
-        with tempfile.NamedTemporaryFile("r+") as csv_file:
+        with tempfile.NamedTemporaryFile("rb+") as csv_file:
             convert_xlsx_to_csv(csv_file, output_workbook, highest_row_num)
             upload_generated_file_to_s3(
                 client=s3_client,
