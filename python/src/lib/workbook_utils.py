@@ -19,7 +19,7 @@ def escape_for_csv(text: Optional[str]):
 
 
 def convert_xlsx_to_csv(
-    csv_file: _TemporaryFileWrapper[str],
+    csv_file: "_TemporaryFileWrapper[str]",
     file: Workbook,
     num_rows: int,
 ):
