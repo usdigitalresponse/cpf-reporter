@@ -10,6 +10,7 @@ from pydantic import (
     condecimal,
     conint,
     constr,
+    field_serializer,
     field_validator,
 )
 
@@ -242,6 +243,7 @@ class BaseProjectRow(BaseModel):
     Current_Period_Obligation__c: condecimal(max_digits=12, decimal_places=2) = Field(
         ...,
         serialization_alias="Current Period Obligation",
+
         json_schema_extra={
             "column": "L",
             "treasury_report_col_1A": "K",
@@ -608,6 +610,20 @@ class BaseProjectRow(BaseModel):
             except ValueError:
                 raise ValueError(f"Date {v} is not in 'mm/dd/yyyy' format.")
         return v
+
+    @field_serializer(
+        "Projected_Con_Start_Date__c",
+        "Projected_Con_Completion__c",
+        "Projected_Init_of_Operations__c",
+        "Actual_Con_Start_Date__c",
+        "Actual_Con_Completion__c",
+        "Actual_operations_date__c",
+    )
+    def serialize_mm_dd_yyyy_dates(self, value: datetime) -> str:
+        if value:
+            return value.strftime("%m/%d/%Y")
+        else:
+            return ""
 
     @field_validator(
         "Project_Name__c",
