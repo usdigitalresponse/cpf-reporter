@@ -20,6 +20,14 @@ export const organization: QueryResolvers['organization'] = ({ id }) => {
   })
 }
 
+export const organizationOfCurrentUser: QueryResolvers['organizationOfCurrentUser'] =
+  async () => {
+    const organizationId = context.currentUser.agency.organizationId
+    return db.organization.findUnique({
+      where: { id: organizationId },
+    })
+  }
+
 export const createOrganization: MutationResolvers['createOrganization'] = ({
   input,
 }) => {

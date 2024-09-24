@@ -13,6 +13,7 @@ export const schema = gql`
   type Query {
     organizations: [Organization!]! @requireAuth
     organization(id: Int!): Organization @requireAuth
+    organizationOfCurrentUser: Organization @requireAuth
   }
 
   input CreateOrganizationInput {

@@ -1,17 +1,26 @@
-import type { FindReportingPeriods } from 'types/graphql'
+import type { FindReportingPeriodsWithCertification } from 'types/graphql'
 
 import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web'
 
 import ReportingPeriods from 'src/components/ReportingPeriod/ReportingPeriods'
 
-// TODO: Add missing information about reporting period certifications
 export const QUERY = gql`
-  query FindReportingPeriods {
-    reportingPeriods {
+  query FindReportingPeriodsWithCertification {
+    reportingPeriodsWithCertification {
       id
       name
       startDate
       endDate
+      certificationForOrganization {
+        createdAt
+        certifiedBy {
+          email
+        }
+      }
+    }
+    organizationOfCurrentUser {
+      id
+      preferences
     }
   }
 `
@@ -25,7 +34,13 @@ export const Failure = ({ error }: CellFailureProps) => (
 )
 
 export const Success = ({
-  reportingPeriods,
-}: CellSuccessProps<FindReportingPeriods>) => {
-  return <ReportingPeriods reportingPeriods={reportingPeriods} />
+  reportingPeriodsWithCertification,
+  organizationOfCurrentUser,
+}: CellSuccessProps<FindReportingPeriodsWithCertification>) => {
+  return (
+    <ReportingPeriods
+      reportingPeriods={reportingPeriodsWithCertification}
+      organizationOfCurrentUser={organizationOfCurrentUser}
+    />
+  )
 }

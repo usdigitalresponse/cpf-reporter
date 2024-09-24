@@ -11,6 +11,25 @@ export const reportingPeriods: QueryResolvers['reportingPeriods'] = () => {
   return db.reportingPeriod.findMany()
 }
 
+export const reportingPeriodsWithCertification = async () => {
+  const organizationId = context.currentUser?.agency?.organizationId
+
+  const reportingPeriods = await db.reportingPeriod.findMany({
+    include: {
+      certifications: {
+        where: { organizationId },
+        include: { certifiedBy: true },
+      },
+    },
+    orderBy: { startDate: 'desc' },
+  })
+
+  return reportingPeriods.map((period) => ({
+    ...period,
+    certificationForOrganization: period.certifications[0] || null,
+  }))
+}
+
 export const reportingPeriod: QueryResolvers['reportingPeriod'] = ({ id }) => {
   return db.reportingPeriod.findUnique({
     where: { id },

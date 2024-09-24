@@ -1,15 +1,51 @@
-import type { FindReportingPeriods } from 'types/graphql'
-
 import { Link, routes } from '@redwoodjs/router'
+import { useMutation } from '@redwoodjs/web'
 
 import { timeTag, truncate } from 'src/lib/formatters'
 
-const ReportingPeriodsList = ({ reportingPeriods }: FindReportingPeriods) => {
-  /*
-    If certified, this should display: "[Date Certified] by [email of user who certified]" ex: "07/01/2024 by email@email.org"
-    If Current reporting period, a button should display that says "Certify Reporting Period"
-  */
-  const certificationDisplay = (reportingPeriod) => {}
+const CERTIFY_REPORTING_PERIOD_MUTATION = gql`
+  mutation CertifyReportingPeriodAndOpenNextPeriod($id: Int!) {
+    certifyReportingPeriodAndOpenNextPeriod(reportingPeriodId: $id) {
+      id
+    }
+  }
+`
+
+const ReportingPeriodsList = ({
+  reportingPeriods,
+  organizationOfCurrentUser,
+}) => {
+  console.log(reportingPeriods)
+  console.log(organizationOfCurrentUser)
+
+  const [certifyReportingPeriod] = useMutation(
+    CERTIFY_REPORTING_PERIOD_MUTATION
+  )
+
+  const certificationDisplay = (reportingPeriod) => {
+    if (
+      reportingPeriod.id ===
+      organizationOfCurrentUser.preferences.current_reporting_period_id
+    ) {
+      return (
+        <button
+          onClick={() =>
+            certifyReportingPeriod({ variables: { id: reportingPeriod.id } })
+          }
+          className="rw-button rw-button-small rw-button-green"
+        >
+          Certify Reporting Period
+        </button>
+      )
+    }
+
+    const certification = reportingPeriod.certificationForOrganization
+    if (certification) {
+      return `${certification.createdAt} by ${certification.certifiedBy.email}`
+    }
+
+    return ''
+  }
 
   return (
     <div className="rw-segment rw-table-wrapper-responsive">
@@ -29,7 +65,7 @@ const ReportingPeriodsList = ({ reportingPeriods }: FindReportingPeriods) => {
               <td>{truncate(reportingPeriod.name)}</td>
               <td>{timeTag(reportingPeriod.startDate)}</td>
               <td>{timeTag(reportingPeriod.endDate)}</td>
-              <td>cerified by:</td>
+              <td>{certificationDisplay(reportingPeriod)}</td>
               <td>{timeTag(reportingPeriod.updatedAt)}</td>
               <td>
                 <nav className="rw-table-actions">

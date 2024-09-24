@@ -15,10 +15,12 @@ export const schema = gql`
     validationRulesId: Int
     validationRules: ValidationRules
     certifications: [ReportingPeriodCertification]!
+    certificationForOrganization: ReportingPeriodCertification
   }
 
   type Query {
     reportingPeriods: [ReportingPeriod!]! @requireAuth
+    reportingPeriodsWithCertification: [ReportingPeriod]! @requireAuth
     reportingPeriod(id: Int!): ReportingPeriod @requireAuth
   }
 
