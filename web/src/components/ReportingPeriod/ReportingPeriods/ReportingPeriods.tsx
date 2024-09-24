@@ -1,7 +1,9 @@
-import { Link, routes } from '@redwoodjs/router'
 import { useMutation } from '@redwoodjs/web'
 
-import { timeTag, truncate } from 'src/lib/formatters'
+import TableBuilder from 'src/components/TableBuilder/TableBuilder'
+import { formatDateString } from 'src/utils'
+
+import { columnDefs } from './columns'
 
 const CERTIFY_REPORTING_PERIOD_MUTATION = gql`
   mutation CertifyReportingPeriodAndOpenNextPeriod($id: Int!) {
@@ -15,12 +17,17 @@ const ReportingPeriodsList = ({
   reportingPeriods,
   organizationOfCurrentUser,
 }) => {
+  const filterableInputs = ['name']
   console.log(reportingPeriods)
   console.log(organizationOfCurrentUser)
 
   const [certifyReportingPeriod] = useMutation(
     CERTIFY_REPORTING_PERIOD_MUTATION
   )
+
+  const handleCertify = (id) => {
+    certifyReportingPeriod({ variables: { id } })
+  }
 
   const certificationDisplay = (reportingPeriod) => {
     if (
@@ -29,10 +36,8 @@ const ReportingPeriodsList = ({
     ) {
       return (
         <button
-          onClick={() =>
-            certifyReportingPeriod({ variables: { id: reportingPeriod.id } })
-          }
-          className="rw-button rw-button-small rw-button-green"
+          onClick={() => handleCertify(reportingPeriod.id)}
+          className="btn btn-primary"
         >
           Certify Reporting Period
         </button>
@@ -41,48 +46,22 @@ const ReportingPeriodsList = ({
 
     const certification = reportingPeriod.certificationForOrganization
     if (certification) {
-      return `${certification.createdAt} by ${certification.certifiedBy.email}`
+      return `${formatDateString(certification.createdAt)} by ${
+        certification.certifiedBy.email
+      }`
     }
 
     return ''
   }
 
+  const columns = columnDefs({ certificationDisplay })
+
   return (
-    <div className="rw-segment rw-table-wrapper-responsive">
-      <table className="rw-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Start date</th>
-            <th>End date</th>
-            <th>Certified At</th>
-            <th>&nbsp;</th>
-          </tr>
-        </thead>
-        <tbody>
-          {reportingPeriods.map((reportingPeriod) => (
-            <tr key={reportingPeriod.id}>
-              <td>{truncate(reportingPeriod.name)}</td>
-              <td>{timeTag(reportingPeriod.startDate)}</td>
-              <td>{timeTag(reportingPeriod.endDate)}</td>
-              <td>{certificationDisplay(reportingPeriod)}</td>
-              <td>{timeTag(reportingPeriod.updatedAt)}</td>
-              <td>
-                <nav className="rw-table-actions">
-                  <Link
-                    to={routes.editReportingPeriod({ id: reportingPeriod.id })}
-                    title={'Edit reportingPeriod ' + reportingPeriod.id}
-                    className="rw-button rw-button-small rw-button-blue"
-                  >
-                    Edit
-                  </Link>
-                </nav>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <TableBuilder
+      data={reportingPeriods}
+      columns={columns}
+      filterableInputs={filterableInputs}
+    />
   )
 }
 
