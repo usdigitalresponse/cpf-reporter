@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
@@ -28,73 +28,76 @@ const ReportingPeriodsList = ({
   const { hasRole } = useAuth()
   const isUSDRAdmin = hasRole('USDR_ADMIN')
 
-  const filterableInputs = ['name']
-  const currentReportingPeriod = reportingPeriods.find(
-    (period) =>
-      period.id ===
-      organizationOfCurrentUser.preferences.current_reporting_period_id
-  )
+  const [showCertificationModal, setShowCertificationModal] = useState(false)
 
-  console.log(reportingPeriods)
-  console.log(organizationOfCurrentUser)
+  const currentReportingPeriod = useMemo(
+    () =>
+      reportingPeriods.find(
+        (period) =>
+          period.id ===
+          organizationOfCurrentUser.preferences.current_reporting_period_id
+      ),
+    [reportingPeriods, organizationOfCurrentUser]
+  )
 
   const [certifyReportingPeriod] = useMutation(
     CERTIFY_REPORTING_PERIOD_MUTATION,
     {
       onCompleted: () => {
         toast.success('Reporting period certified')
+        setShowCertificationModal(false)
       },
       onError: (error) => {
-        toast.error(error.message)
+        toast.error('Could not certify reporting period')
       },
       refetchQueries: [{ query: QUERY }],
     }
   )
-  const [show, setShow] = useState(false)
 
-  const handleClose = () => setShow(false)
-  const handleShow = () => setShow(true)
-
-  const handleCertify = () => {
-    if (currentReportingPeriod.id) {
+  const handleCertify = useCallback(() => {
+    if (currentReportingPeriod?.id) {
       certifyReportingPeriod({ variables: { id: currentReportingPeriod.id } })
-      setShow(false)
     }
-  }
+  }, [currentReportingPeriod, certifyReportingPeriod])
 
-  const canEdit = (reportingPeriod) => {
-    return (
-      hasRole('USDR_ADMIN') &&
-      (reportingPeriod.id === currentReportingPeriod.id ||
-        new Date(reportingPeriod.startDate) >
-          new Date(currentReportingPeriod.endDate))
-    )
-  }
-
-  const certificationDisplay = (reportingPeriod) => {
-    if (reportingPeriod.id === currentReportingPeriod.id) {
+  const canEdit = useCallback(
+    (reportingPeriod) => {
       return (
-        <button
-          // onClick={() => handleCertify(reportingPeriod.id)}
-          onClick={handleShow}
-          className="btn btn-primary"
-        >
-          Certify Reporting Period
-        </button>
+        isUSDRAdmin &&
+        (reportingPeriod.id === currentReportingPeriod?.id ||
+          new Date(reportingPeriod.startDate) >
+            new Date(currentReportingPeriod?.endDate))
       )
-    }
+    },
+    [isUSDRAdmin, currentReportingPeriod]
+  )
 
-    const certification = reportingPeriod.certificationForOrganization
-    if (certification) {
-      return `${formatDateString(certification.createdAt)} by ${
-        certification.certifiedBy.email
-      }`
-    }
+  const certificationDisplay = useCallback(
+    (reportingPeriod) => {
+      if (reportingPeriod.id === currentReportingPeriod?.id) {
+        return (
+          <Button
+            onClick={() => setShowCertificationModal(true)}
+            variant="primary"
+            size="sm"
+          >
+            Certify Reporting Period
+          </Button>
+        )
+      }
 
-    return ''
-  }
+      const certification = reportingPeriod.certificationForOrganization
+      if (certification) {
+        return `${formatDateString(certification.createdAt)} by ${
+          certification.certifiedBy.email
+        }`
+      }
 
-  // const columns = columnDefs({ certificationDisplay })
+      return ''
+    },
+    [currentReportingPeriod, setShowCertificationModal]
+  )
+
   const columns = useMemo(
     () =>
       columnDefs({
@@ -107,19 +110,27 @@ const ReportingPeriodsList = ({
 
   return (
     <>
-      <Modal show={show} onHide={handleClose} centered>
+      <Modal
+        show={showCertificationModal}
+        onHide={() => setShowCertificationModal(false)}
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>Certify Reporting Period</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           Certify the{' '}
-          <span className="fw-bold">{currentReportingPeriod.name}</span> period?
+          <span className="fw-bold">{currentReportingPeriod?.name}</span>{' '}
+          period?
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={handleCertify}>
             Certify
           </Button>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button
+            variant="outline-secondary"
+            onClick={() => setShowCertificationModal(false)}
+          >
             Cancel
           </Button>
         </Modal.Footer>
@@ -127,7 +138,7 @@ const ReportingPeriodsList = ({
       <TableBuilder
         data={reportingPeriods}
         columns={columns}
-        filterableInputs={filterableInputs}
+        filterableInputs={['name']}
       />
     </>
   )

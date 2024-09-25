@@ -1,21 +1,23 @@
 import Button from 'react-bootstrap/Button'
+import { useAuth } from 'web/src/auth'
 
 import { Link, routes } from '@redwoodjs/router'
-import { MetaTags } from '@redwoodjs/web'
 
 import ReportingPeriodsCell from 'src/components/ReportingPeriodsCell'
 
 const ReportingPeriodsPage = () => {
+  const { hasRole } = useAuth()
+
   return (
     <>
-      <MetaTags title="ReportingPeriods" description="ReportingPeriods page" />
-
       <h2>Reporting Periods</h2>
-      <Link to={routes['newReportingPeriod']()}>
-        <Button variant={'primary'} className={'mb-3'}>
-          Create New Reporting Period
-        </Button>
-      </Link>
+      {hasRole('USDR_ADMIN') && (
+        <Link to={routes['newReportingPeriod']()}>
+          <Button variant="primary" className="mb-3">
+            Create New Reporting Period
+          </Button>
+        </Link>
+      )}
       <ReportingPeriodsCell />
     </>
   )
