@@ -66,7 +66,8 @@ describe('organizations', () => {
     async (scenario: StandardScenario) => {
       const result = await organization({ id: scenario.organization.one.id })
 
-      expect(result).toEqual(scenario.organization.one)
+      expect(result.id).toEqual(scenario.organization.one.id)
+      expect(result.reportingPeriod.id).toEqual(scenario.reportingPeriod.one.id)
     }
   )
 

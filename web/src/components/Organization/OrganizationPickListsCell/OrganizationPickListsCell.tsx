@@ -22,6 +22,9 @@ export const QUERY = gql`
     organization: organization(id: $organizationId) {
       id
       preferences
+      reportingPeriod {
+        name
+      }
     }
     agencies: agenciesAvailableForUpload {
       id
@@ -49,7 +52,10 @@ export const Success = ({
   return (
     <div>
       {/* Hard-coding the reporting period name temporarily. Will be resolved by issue #79 */}
-      <p>Reporting Period - April 1st to June 30th - Q2 2024</p>
+      <p>
+        Reporting Period&nbsp;-&nbsp;
+        {organization.reportingPeriod && organization.reportingPeriod.name}
+      </p>
       <HiddenField
         name="reportingPeriodId"
         value={organization.preferences.current_reporting_period_id}

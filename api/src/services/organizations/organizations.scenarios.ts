@@ -1,4 +1,4 @@
-import type { Prisma, Organization } from '@prisma/client'
+import type { Prisma, Organization, ReportingPeriod } from '@prisma/client'
 
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
@@ -48,4 +48,5 @@ export const standard = defineScenario<
   },
 })
 
-export type StandardScenario = ScenarioData<Organization, 'organization'>
+export type StandardScenario = ScenarioData<Organization, 'organization'> &
+  ScenarioData<ReportingPeriod, 'reportingPeriod'>
