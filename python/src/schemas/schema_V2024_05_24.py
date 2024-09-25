@@ -984,9 +984,7 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Desktop Computers (Actual)",
         json_schema_extra={"column": "CM", "treasury_report_col_1B": "BS"},
     )
-    Desktop_Computers_Expenditures_Planned__c: condecimal(
-        max_digits=13, decimal_places=2
-    ) = Field(
+    Desktop_Computers_Expenditures_Planned__c: CustomDecimal_13Digits = Field(
         ...,
         serialization_alias="Desktop Computers Expenditure (Planned)",
         json_schema_extra={"column": "CN", "treasury_report_col_1B": "BT"},
