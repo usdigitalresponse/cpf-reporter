@@ -7,7 +7,6 @@ from pydantic import (
     ConfigDict,
     Field,
     ValidationInfo,
-    condecimal,
     conint,
     constr,
     field_serializer,
@@ -20,7 +19,6 @@ from src.schemas.custom_types import (
     CustomDecimal_12Digits,
     CustomDecimal_13Digits,
     CustomDecimal_15Digits,
-    CustomDecimal_16Digits,
 )
 
 class StateAbbreviation(str, Enum):
