@@ -21,7 +21,7 @@ export const reportingPeriodsWithCertification = async () => {
         include: { certifiedBy: true },
       },
     },
-    orderBy: { startDate: 'desc' },
+    orderBy: { startDate: 'asc' },
   })
 
   return reportingPeriods.map((period) => ({

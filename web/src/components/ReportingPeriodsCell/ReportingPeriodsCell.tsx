@@ -12,8 +12,10 @@ export const QUERY = gql`
       startDate
       endDate
       certificationForOrganization {
+        id
         createdAt
         certifiedBy {
+          id
           email
         }
       }

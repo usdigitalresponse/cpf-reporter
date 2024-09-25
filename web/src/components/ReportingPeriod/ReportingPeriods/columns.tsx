@@ -30,7 +30,7 @@ export const columnDefs = ({ certificationDisplay }) => [
       <Link
         to={routes.editReportingPeriod({ id: info.row.original.id })}
         title={'Edit reportingPeriod ' + info.row.original.id}
-        className="rw-button rw-button-small rw-button-blue"
+        className="btn btn-secondary btn-sm"
       >
         Edit
       </Link>
