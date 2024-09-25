@@ -44,18 +44,16 @@ const Navigation = () => {
           </Nav.Item>
         )}
         {canViewAdminTabs && (
-          <Nav.Item>
-            <NavLink
-              to={routes.users()}
-              activeClassName="active"
-              className="nav-link"
-            >
-              Users
-            </NavLink>
-          </Nav.Item>
-        )}
-        {hasRole(ROLES.USDR_ADMIN) && (
           <>
+            <Nav.Item>
+              <NavLink
+                to={routes.users()}
+                activeClassName="active"
+                className="nav-link"
+              >
+                Users
+              </NavLink>
+            </Nav.Item>
             <Nav.Item>
               <NavLink
                 to={routes.reportingPeriods()}
@@ -65,6 +63,10 @@ const Navigation = () => {
                 Reporting Periods
               </NavLink>
             </Nav.Item>
+          </>
+        )}
+        {hasRole(ROLES.USDR_ADMIN) && (
+          <>
             <Nav.Item>
               <NavLink
                 to={routes.organizations()}

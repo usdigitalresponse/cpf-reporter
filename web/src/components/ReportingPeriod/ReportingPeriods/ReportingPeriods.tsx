@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
+import { useAuth } from 'web/src/auth'
 
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
@@ -24,6 +25,9 @@ const ReportingPeriodsList = ({
   reportingPeriods,
   organizationOfCurrentUser,
 }) => {
+  const { hasRole } = useAuth()
+  const isUSDRAdmin = hasRole('USDR_ADMIN')
+
   const filterableInputs = ['name']
   const currentReportingPeriod = reportingPeriods.find(
     (period) =>
@@ -44,7 +48,6 @@ const ReportingPeriodsList = ({
         toast.error(error.message)
       },
       refetchQueries: [{ query: QUERY }],
-      awaitRefetchQueries: true,
     }
   )
   const [show, setShow] = useState(false)
@@ -57,6 +60,15 @@ const ReportingPeriodsList = ({
       certifyReportingPeriod({ variables: { id: currentReportingPeriod.id } })
       setShow(false)
     }
+  }
+
+  const canEdit = (reportingPeriod) => {
+    return (
+      hasRole('USDR_ADMIN') &&
+      (reportingPeriod.id === currentReportingPeriod.id ||
+        new Date(reportingPeriod.startDate) >
+          new Date(currentReportingPeriod.endDate))
+    )
   }
 
   const certificationDisplay = (reportingPeriod) => {
@@ -82,7 +94,16 @@ const ReportingPeriodsList = ({
     return ''
   }
 
-  const columns = columnDefs({ certificationDisplay })
+  // const columns = columnDefs({ certificationDisplay })
+  const columns = useMemo(
+    () =>
+      columnDefs({
+        certificationDisplay,
+        canEdit,
+        isUSDRAdmin,
+      }),
+    [certificationDisplay, canEdit, isUSDRAdmin]
+  )
 
   return (
     <>
