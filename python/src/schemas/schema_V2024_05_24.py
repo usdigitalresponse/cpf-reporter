@@ -1075,30 +1075,22 @@ class Project1BRow(BaseProjectRow, AddressFields):
         json_schema_extra={"column": "DC", "treasury_report_col_1B": "CI"},
     )
     # Columns below exist on Project1CRow as well as Project1BRow, so they jump in column defs
-    Current_Program_Income_Earned__c: Optional[
-        condecimal(max_digits=15, decimal_places=2)
-    ] = Field(
+    Current_Program_Income_Earned__c: Optional[CustomDecimal_15Digits] = Field(
         default=None,
         serialization_alias="Current Period Program Income Earned",
         json_schema_extra={"column": "DW", "treasury_report_col_1B": "O"},
     )
-    Current_Program_Income_Expended__c: Optional[
-        condecimal(max_digits=15, decimal_places=2)
-    ] = Field(
+    Current_Program_Income_Expended__c: Optional[CustomDecimal_15Digits] = Field(
         default=None,
         serialization_alias="Current Period Program Income Expended",
         json_schema_extra={"column": "DX", "treasury_report_col_1B": "P"},
     )
-    Cumulative_Program_Income_Earned__c: Optional[
-        condecimal(max_digits=15, decimal_places=2)
-    ] = Field(
+    Cumulative_Program_Income_Earned__c: Optional[CustomDecimal_15Digits] = Field(
         default=None,
         serialization_alias="Cumulative Program Income Earned",
         json_schema_extra={"column": "DY", "treasury_report_col_1B": "Q"},
     )
-    Cumulative_Program_Income_Expended__c: Optional[
-        condecimal(max_digits=15, decimal_places=2)
-    ] = Field(
+    Cumulative_Program_Income_Expended__c: Optional[CustomDecimal_15Digits] = Field(
         default=None,
         serialization_alias="Cumulative Program Income Expended",
         json_schema_extra={"column": "DZ", "treasury_report_col_1B": "R"},
@@ -1232,30 +1224,22 @@ class Project1CRow(BaseProjectRow, AddressFields):
         json_schema_extra={"column": "DU", "treasury_report_col_1C": "CA"},
     )
     # Columns below exist on Project1BRow as well as Project1CRow
-    Current_Program_Income_Earned__c: Optional[
-        condecimal(max_digits=15, decimal_places=2)
-    ] = Field(
+    Current_Program_Income_Earned__c: Optional[CustomDecimal_15Digits] = Field(
         default=None,
         serialization_alias="Current Period Program Income Earned",
         json_schema_extra={"column": "DW", "treasury_report_col_1C": "O"},
     )
-    Current_Program_Income_Expended__c: Optional[
-        condecimal(max_digits=15, decimal_places=2)
-    ] = Field(
+    Current_Program_Income_Expended__c: Optional[CustomDecimal_15Digits] = Field(
         default=None,
         serialization_alias="Current Period Program Income Expended",
         json_schema_extra={"column": "DX", "treasury_report_col_1C": "P"},
     )
-    Cumulative_Program_Income_Earned__c: Optional[
-        condecimal(max_digits=15, decimal_places=2)
-    ] = Field(
+    Cumulative_Program_Income_Earned__c: Optional[CustomDecimal_15Digits] = Field(
         default=None,
         serialization_alias="Cumulative Program Income Earned",
         json_schema_extra={"column": "DY", "treasury_report_col_1C": "Q"},
     )
-    Cumulative_Program_Income_Expended__c: Optional[
-        condecimal(max_digits=15, decimal_places=2)
-    ] = Field(
+    Cumulative_Program_Income_Expended__c: Optional[CustomDecimal_15Digits] = Field(
         default=None,
         serialization_alias="Cumulative Program Income Expended",
         json_schema_extra={"column": "DZ", "treasury_report_col_1C": "R"},
