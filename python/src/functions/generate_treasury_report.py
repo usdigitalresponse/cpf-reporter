@@ -447,7 +447,7 @@ def insert_project_row(
         if prop_meta[f"treasury_report_col_{project_use_code}"]:
             row_with_output_cols[
                 prop_meta[f"treasury_report_col_{project_use_code}"]
-            ] = row_dict[prop] if row_dict[prop] else ""
+            ] = str(row_dict[prop]) if row_dict[prop] else ""
 
     for col in row_with_output_cols.keys():
         if sheet:
