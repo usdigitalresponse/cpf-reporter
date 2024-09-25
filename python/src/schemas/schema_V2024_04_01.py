@@ -143,14 +143,14 @@ class BaseProjectRow(BaseModel):
         serialization_alias="Capital Asset Owenership Type",
         json_schema_extra={"column": "F"},
     )
-    Total_CPF_Funding_for_Project__c: condecimal(max_digits=13, decimal_places=2) = (
+    Total_CPF_Funding_for_Project__c: CustomDecimal_13Digits = (
         Field(
             ...,
             serialization_alias="Total CPF Funding for Project",
             json_schema_extra={"column": "G"},
         )
     )
-    Total_from_all_funding_sources__c: condecimal(max_digits=13, decimal_places=2) = (
+    Total_from_all_funding_sources__c: CustomDecimal_13Digits = (
         Field(
             ...,
             serialization_alias="Total From all Funding Sources",
@@ -627,16 +627,14 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Laptops (Actual)",
         json_schema_extra={"column": "CC"},
     )
-    Laptops_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = (
+    Laptops_Expenditures_Planned__c: CustomDecimal_13Digits = (
         Field(
             ...,
             serialization_alias="Laptops Expenditure (Planned)",
             json_schema_extra={"column": "CD"},
         )
     )
-    Laptops_Expenditures_Actual__c: Optional[
-        condecimal(max_digits=13, decimal_places=2)
-    ] = Field(
+    Laptops_Expenditures_Actual__c: Optional[CustomDecimal_13Digits] = Field(
         default=None,
         serialization_alias="Laptops Expenditure (Actual)",
         json_schema_extra={"column": "CE"},
@@ -649,14 +647,12 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Tablets (Actual)",
         json_schema_extra={"column": "CG"},
     )
-    Tablet_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = Field(
+    Tablet_Expenditures_Planned__c: CustomDecimal_13Digits = Field(
         ...,
         serialization_alias="Tablets Expenditure (Planned)",
         json_schema_extra={"column": "CH"},
     )
-    Tablets_Expenditures_Actual__c: Optional[
-        condecimal(max_digits=13, decimal_places=2)
-    ] = Field(
+    Tablets_Expenditures_Actual__c: Optional[CustomDecimal_13Digits] = Field(
         default=None,
         serialization_alias="Tablets Expenditure (Actual)",
         json_schema_extra={"column": "CI"},
@@ -671,15 +667,13 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Desktop Computers (Actual)",
         json_schema_extra={"column": "CK"},
     )
-    Desktop_Computers_Expenditures_Planned__c: condecimal(
-        max_digits=13, decimal_places=2
-    ) = Field(
+    Desktop_Computers_Expenditures_Planned__c: CustomDecimal_13Digits = Field(
         ...,
         serialization_alias="Desktop Computers Expenditure (Planned)",
         json_schema_extra={"column": "CL"},
     )
     Desktop_Computers_Expenditures_Actual__c: Optional[
-        condecimal(max_digits=13, decimal_places=2)
+        CustomDecimal_13Digits
     ] = Field(
         default=None,
         serialization_alias="Desktop Computers Expenditure (Actual)",
@@ -695,7 +689,7 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Public WiFi (Actual)",
         json_schema_extra={"column": "CO"},
     )
-    Public_WiFi_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = (
+    Public_WiFi_Expenditures_Planned__c: CustomDecimal_13Digits = (
         Field(
             ...,
             serialization_alias="Public Wifi Expenditures (Planned)",
@@ -703,7 +697,7 @@ class Project1BRow(BaseProjectRow, AddressFields):
         )
     )
     Public_WiFi_Expenditures_Actual__c: Optional[
-        condecimal(max_digits=13, decimal_places=2)
+        CustomDecimal_13Digits
     ] = Field(
         default=None,
         serialization_alias="Public Wifi Expenditures (Actual)",
