@@ -246,7 +246,7 @@ class BaseProjectRow(BaseModel):
             "treasury_report_col_1C": "J",
         },
     )
-    Current_Period_Obligation__c: condecimal(max_digits=12, decimal_places=2) = Field(
+    Current_Period_Obligation__c: CustomDecimal_12Digits = Field(
         ...,
         serialization_alias="Current Period Obligation",
 
@@ -257,7 +257,7 @@ class BaseProjectRow(BaseModel):
             "treasury_report_col_1C": "K",
         },
     )
-    Current_Period_Expenditure__c: condecimal(max_digits=12, decimal_places=2) = Field(
+    Current_Period_Expenditure__c: CustomDecimal_12Digits = Field(
         ...,
         serialization_alias="Current Period Expenditure",
         json_schema_extra={
@@ -267,7 +267,7 @@ class BaseProjectRow(BaseModel):
             "treasury_report_col_1C": "L",
         },
     )
-    Cumulative_Obligation__c: condecimal(max_digits=12, decimal_places=2) = Field(
+    Cumulative_Obligation__c: CustomDecimal_12Digits = Field(
         ...,
         serialization_alias="Cumulative Obligation",
         json_schema_extra={
@@ -277,7 +277,7 @@ class BaseProjectRow(BaseModel):
             "treasury_report_col_1C": "M",
         },
     )
-    Cumulative_Expenditure__c: condecimal(max_digits=12, decimal_places=2) = Field(
+    Cumulative_Expenditure__c: CustomDecimal_12Digits = Field(
         ...,
         serialization_alias="Cumulative Expenditure",
         json_schema_extra={
@@ -421,9 +421,7 @@ class BaseProjectRow(BaseModel):
             "treasury_report_col_1C": "AG",
         },
     )
-    Amount_of_Matching_Funds__c: Optional[
-        condecimal(max_digits=12, decimal_places=2)
-    ] = Field(
+    Amount_of_Matching_Funds__c: Optional[CustomDecimal_12Digits] = Field(
         default=None,
         serialization_alias="Amount of Matching Funds",
         json_schema_extra={
