@@ -7,7 +7,6 @@ from pydantic import (
     ConfigDict,
     Field,
     ValidationInfo,
-    condecimal,
     conint,
     constr,
     field_serializer,
@@ -15,6 +14,11 @@ from pydantic import (
 )
 
 from src.schemas.project_types import NAME_BY_PROJECT
+from src.schemas.custom_types import (
+    CustomDecimal_7Digits,
+    CustomDecimal_12Digits,
+    CustomDecimal_13Digits,
+)
 
 
 class StateAbbreviation(str, Enum):
@@ -137,14 +141,14 @@ class BaseProjectRow(BaseModel):
         serialization_alias="Capital Asset Owenership Type",
         json_schema_extra={"column": "F"},
     )
-    Total_CPF_Funding_for_Project__c: condecimal(max_digits=13, decimal_places=2) = (
+    Total_CPF_Funding_for_Project__c: CustomDecimal_13Digits = (
         Field(
             ...,
             serialization_alias="Total CPF Funding for Project",
             json_schema_extra={"column": "G"},
         )
     )
-    Total_from_all_funding_sources__c: condecimal(max_digits=13, decimal_places=2) = (
+    Total_from_all_funding_sources__c: CustomDecimal_13Digits = (
         Field(
             ...,
             serialization_alias="Total From all Funding Sources",
@@ -157,22 +161,22 @@ class BaseProjectRow(BaseModel):
         max_length=3000,
         json_schema_extra={"column": "I"},
     )
-    Current_Period_Obligation__c: condecimal(max_digits=12, decimal_places=2) = Field(
+    Current_Period_Obligation__c: CustomDecimal_12Digits = Field(
         ...,
         serialization_alias="Current Period Obligation",
         json_schema_extra={"column": "J"},
     )
-    Current_Period_Expenditure__c: condecimal(max_digits=12, decimal_places=2) = Field(
+    Current_Period_Expenditure__c: CustomDecimal_12Digits = Field(
         ...,
         serialization_alias="Current Period Expenditure",
         json_schema_extra={"column": "K"},
     )
-    Cumulative_Obligation__c: condecimal(max_digits=12, decimal_places=2) = Field(
+    Cumulative_Obligation__c: CustomDecimal_12Digits = Field(
         ...,
         serialization_alias="Cumulative Obligation",
         json_schema_extra={"column": "L"},
     )
-    Cumulative_Expenditure__c: condecimal(max_digits=12, decimal_places=2) = Field(
+    Cumulative_Expenditure__c: CustomDecimal_12Digits = Field(
         ...,
         serialization_alias="Cumulative Expenditure",
         json_schema_extra={"column": "M"},
@@ -240,9 +244,7 @@ class BaseProjectRow(BaseModel):
         max_length=50,
         json_schema_extra={"column": "Z"},
     )
-    Amount_of_Matching_Funds__c: Optional[
-        condecimal(max_digits=12, decimal_places=2)
-    ] = Field(
+    Amount_of_Matching_Funds__c: Optional[CustomDecimal_12Digits] = Field(
         default=None,
         serialization_alias="Amount of Matching Funds",
         json_schema_extra={"column": "AA"},
@@ -623,16 +625,14 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Laptops (Actual)",
         json_schema_extra={"column": "CC"},
     )
-    Laptops_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = (
+    Laptops_Expenditures_Planned__c: CustomDecimal_13Digits = (
         Field(
             ...,
             serialization_alias="Laptops Expenditure (Planned)",
             json_schema_extra={"column": "CD"},
         )
     )
-    Laptops_Expenditures_Actual__c: Optional[
-        condecimal(max_digits=13, decimal_places=2)
-    ] = Field(
+    Laptops_Expenditures_Actual__c: Optional[CustomDecimal_13Digits] = Field(
         default=None,
         serialization_alias="Laptops Expenditure (Actual)",
         json_schema_extra={"column": "CE"},
@@ -645,14 +645,12 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Tablets (Actual)",
         json_schema_extra={"column": "CG"},
     )
-    Tablet_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = Field(
+    Tablet_Expenditures_Planned__c: CustomDecimal_13Digits = Field(
         ...,
         serialization_alias="Tablets Expenditure (Planned)",
         json_schema_extra={"column": "CH"},
     )
-    Tablets_Expenditures_Actual__c: Optional[
-        condecimal(max_digits=13, decimal_places=2)
-    ] = Field(
+    Tablets_Expenditures_Actual__c: Optional[CustomDecimal_13Digits] = Field(
         default=None,
         serialization_alias="Tablets Expenditure (Actual)",
         json_schema_extra={"column": "CI"},
@@ -667,15 +665,13 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Desktop Computers (Actual)",
         json_schema_extra={"column": "CK"},
     )
-    Desktop_Computers_Expenditures_Planned__c: condecimal(
-        max_digits=13, decimal_places=2
-    ) = Field(
+    Desktop_Computers_Expenditures_Planned__c: CustomDecimal_13Digits = Field(
         ...,
         serialization_alias="Desktop Computers Expenditure (Planned)",
         json_schema_extra={"column": "CL"},
     )
     Desktop_Computers_Expenditures_Actual__c: Optional[
-        condecimal(max_digits=13, decimal_places=2)
+        CustomDecimal_13Digits
     ] = Field(
         default=None,
         serialization_alias="Desktop Computers Expenditure (Actual)",
@@ -691,7 +687,7 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Public WiFi (Actual)",
         json_schema_extra={"column": "CO"},
     )
-    Public_WiFi_Expenditures_Planned__c: condecimal(max_digits=13, decimal_places=2) = (
+    Public_WiFi_Expenditures_Planned__c: CustomDecimal_13Digits = (
         Field(
             ...,
             serialization_alias="Public Wifi Expenditures (Planned)",
@@ -699,7 +695,7 @@ class Project1BRow(BaseProjectRow, AddressFields):
         )
     )
     Public_WiFi_Expenditures_Actual__c: Optional[
-        condecimal(max_digits=13, decimal_places=2)
+        CustomDecimal_13Digits
     ] = Field(
         default=None,
         serialization_alias="Public Wifi Expenditures (Actual)",
@@ -715,14 +711,12 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Other Devices (Actual)",
         json_schema_extra={"column": "CS"},
     )
-    Other_Expenditures_Planned__c: condecimal(max_digits=7, decimal_places=2) = Field(
+    Other_Expenditures_Planned__c: CustomDecimal_7Digits = Field(
         ...,
         serialization_alias="Other Expenditures (Planned)",
         json_schema_extra={"column": "CT"},
     )
-    Other_Expenditures_Actual__c: Optional[
-        condecimal(max_digits=7, decimal_places=2)
-    ] = Field(
+    Other_Expenditures_Actual__c: Optional[CustomDecimal_7Digits] = Field(
         default=None,
         serialization_alias="Other Expenditures (Actual)",
         json_schema_extra={"column": "CU"},
