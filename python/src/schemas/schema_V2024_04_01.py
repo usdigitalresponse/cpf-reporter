@@ -15,6 +15,12 @@ from pydantic import (
 )
 
 from src.schemas.project_types import NAME_BY_PROJECT
+from src.schemas.custom_types import (
+    CustomDecimal_7Digits,
+    CustomDecimal_12Digits,
+    CustomDecimal_13Digits,
+    CustomDecimal_15Digits,
+)
 
 
 class StateAbbreviation(str, Enum):
@@ -157,22 +163,22 @@ class BaseProjectRow(BaseModel):
         max_length=3000,
         json_schema_extra={"column": "I"},
     )
-    Current_Period_Obligation__c: condecimal(max_digits=12, decimal_places=2) = Field(
+    Current_Period_Obligation__c: CustomDecimal_12Digits = Field(
         ...,
         serialization_alias="Current Period Obligation",
         json_schema_extra={"column": "J"},
     )
-    Current_Period_Expenditure__c: condecimal(max_digits=12, decimal_places=2) = Field(
+    Current_Period_Expenditure__c: CustomDecimal_12Digits = Field(
         ...,
         serialization_alias="Current Period Expenditure",
         json_schema_extra={"column": "K"},
     )
-    Cumulative_Obligation__c: condecimal(max_digits=12, decimal_places=2) = Field(
+    Cumulative_Obligation__c: CustomDecimal_12Digits = Field(
         ...,
         serialization_alias="Cumulative Obligation",
         json_schema_extra={"column": "L"},
     )
-    Cumulative_Expenditure__c: condecimal(max_digits=12, decimal_places=2) = Field(
+    Cumulative_Expenditure__c: CustomDecimal_12Digits = Field(
         ...,
         serialization_alias="Cumulative Expenditure",
         json_schema_extra={"column": "M"},
@@ -240,9 +246,7 @@ class BaseProjectRow(BaseModel):
         max_length=50,
         json_schema_extra={"column": "Z"},
     )
-    Amount_of_Matching_Funds__c: Optional[
-        condecimal(max_digits=12, decimal_places=2)
-    ] = Field(
+    Amount_of_Matching_Funds__c: Optional[CustomDecimal_12Digits] = Field(
         default=None,
         serialization_alias="Amount of Matching Funds",
         json_schema_extra={"column": "AA"},
