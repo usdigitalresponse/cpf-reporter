@@ -34,6 +34,7 @@ from src.schemas.custom_types import (
     CustomStr_MIN1_MAX80,
 )
 
+
 class StateAbbreviation(str, Enum):
     AL = "AL"
     AK = "AK"
@@ -152,17 +153,15 @@ class BaseProjectRow(BaseModel):
             "treasury_report_col_1C": None,
         },
     )
-    Project_Name__c: CustomStr_MIN1_MAX100 = (
-        Field(
-            ...,
-            serialization_alias="Project Name",
-            json_schema_extra={
-                "column": "C",
-                "treasury_report_col_1A": "B",
-                "treasury_report_col_1B": "B",
-                "treasury_report_col_1C": "B",
-            },
-        )
+    Project_Name__c: CustomStr_MIN1_MAX100 = Field(
+        ...,
+        serialization_alias="Project Name",
+        json_schema_extra={
+            "column": "C",
+            "treasury_report_col_1A": "B",
+            "treasury_report_col_1B": "B",
+            "treasury_report_col_1C": "B",
+        },
     )
     Identification_Number__c: CustomStr_MIN1_MAX20 = Field(
         ...,
@@ -174,29 +173,25 @@ class BaseProjectRow(BaseModel):
             "treasury_report_col_1C": "C",
         },
     )
-    Subrecipient_UEI__c: CustomStr_MIN12_MAX12 = (
-        Field(
-            ...,
-            serialization_alias="Subrecipient UEI",
-            json_schema_extra={
-                "column": "E",
-                "treasury_report_col_1A": "D",
-                "treasury_report_col_1B": "D",
-                "treasury_report_col_1C": "D",
-            },
-        )
+    Subrecipient_UEI__c: CustomStr_MIN12_MAX12 = Field(
+        ...,
+        serialization_alias="Subrecipient UEI",
+        json_schema_extra={
+            "column": "E",
+            "treasury_report_col_1A": "D",
+            "treasury_report_col_1B": "D",
+            "treasury_report_col_1C": "D",
+        },
     )
-    Subrecipient_TIN__c: CustomStr_MIN9_MAX9 = (
-        Field(
-            ...,
-            serialization_alias="Subrecipient TIN",
-            json_schema_extra={
-                "column": "F",
-                "treasury_report_col_1A": "E",
-                "treasury_report_col_1B": "E",
-                "treasury_report_col_1C": "E",
-            },
-        )
+    Subrecipient_TIN__c: CustomStr_MIN9_MAX9 = Field(
+        ...,
+        serialization_alias="Subrecipient TIN",
+        json_schema_extra={
+            "column": "F",
+            "treasury_report_col_1A": "E",
+            "treasury_report_col_1B": "E",
+            "treasury_report_col_1C": "E",
+        },
     )
     Project_Description__c: CustomStr_MIN1_MAX3000 = Field(
         ...,
@@ -218,29 +213,25 @@ class BaseProjectRow(BaseModel):
             "treasury_report_col_1C": "G",
         },
     )
-    Total_CPF_Funding_for_Project__c: CustomDecimal_13Digits = (
-        Field(
-            ...,
-            serialization_alias="Total CPF Funding for Project",
-            json_schema_extra={
-                "column": "I",
-                "treasury_report_col_1A": "H",
-                "treasury_report_col_1B": "H",
-                "treasury_report_col_1C": "H",
-            },
-        )
+    Total_CPF_Funding_for_Project__c: CustomDecimal_13Digits = Field(
+        ...,
+        serialization_alias="Total CPF Funding for Project",
+        json_schema_extra={
+            "column": "I",
+            "treasury_report_col_1A": "H",
+            "treasury_report_col_1B": "H",
+            "treasury_report_col_1C": "H",
+        },
     )
-    Total_from_all_funding_sources__c: CustomDecimal_13Digits = (
-        Field(
-            ...,
-            serialization_alias="Total From all Funding Sources",
-            json_schema_extra={
-                "column": "J",
-                "treasury_report_col_1A": "I",
-                "treasury_report_col_1B": "I",
-                "treasury_report_col_1C": "I",
-            },
-        )
+    Total_from_all_funding_sources__c: CustomDecimal_13Digits = Field(
+        ...,
+        serialization_alias="Total From all Funding Sources",
+        json_schema_extra={
+            "column": "J",
+            "treasury_report_col_1A": "I",
+            "treasury_report_col_1B": "I",
+            "treasury_report_col_1C": "I",
+        },
     )
     Narrative_Description__c: Optional[str] = Field(
         default=None,
@@ -256,7 +247,6 @@ class BaseProjectRow(BaseModel):
     Current_Period_Obligation__c: CustomDecimal_12Digits = Field(
         ...,
         serialization_alias="Current Period Obligation",
-
         json_schema_extra={
             "column": "L",
             "treasury_report_col_1A": "K",
@@ -294,17 +284,15 @@ class BaseProjectRow(BaseModel):
             "treasury_report_col_1C": "N",
         },
     )
-    Cost_Overview__c: CustomStr_MIN1_MAX3000 = (
-        Field(
-            ...,
-            serialization_alias="Cost Overview",
-            json_schema_extra={
-                "column": "P",
-                "treasury_report_col_1A": "O",
-                "treasury_report_col_1B": "U",
-                "treasury_report_col_1C": "U",
-            },
-        )
+    Cost_Overview__c: CustomStr_MIN1_MAX3000 = Field(
+        ...,
+        serialization_alias="Cost Overview",
+        json_schema_extra={
+            "column": "P",
+            "treasury_report_col_1A": "O",
+            "treasury_report_col_1B": "U",
+            "treasury_report_col_1C": "U",
+        },
     )
     Project_Status__c: ProjectStatusType = Field(
         ...,
@@ -725,12 +713,10 @@ class Project1ARow(BaseProjectRow):
         serialization_alias="E) 100/20 Mbps to 100/100 Mbps (Planned)",
         json_schema_extra={"column": "BF", "treasury_report_col_1A": "BF"},
     )
-    X100_20_Mbps_to_100_100_Mbps_Actual__c: Optional[CustomInt_GE0_LELARGE] = (
-        Field(
-            default=None,
-            serialization_alias="E) 100/20 Mbps to 100/100 Mbps (Actual)",
-            json_schema_extra={"column": "BG", "treasury_report_col_1A": "BG"},
-        )
+    X100_20_Mbps_to_100_100_Mbps_Actual__c: Optional[CustomInt_GE0_LELARGE] = Field(
+        default=None,
+        serialization_alias="E) 100/20 Mbps to 100/100 Mbps (Actual)",
+        json_schema_extra={"column": "BG", "treasury_report_col_1A": "BG"},
     )
     Explanation_of_Discrepancy__c: Optional[str] = Field(
         default=None,
@@ -817,16 +803,14 @@ class Project1ARow(BaseProjectRow):
 
 
 class AddressFields(BaseModel):
-    Street_1_Planned__c: CustomStr_MIN1_MAX40 = (
-        Field(
-            ...,
-            serialization_alias="Street 1 (Planned)",
-            json_schema_extra={
-                "column": "BS",
-                "treasury_report_col_1B": "AY",
-                "treasury_report_col_1C": "AY",
-            },
-        )
+    Street_1_Planned__c: CustomStr_MIN1_MAX40 = Field(
+        ...,
+        serialization_alias="Street 1 (Planned)",
+        json_schema_extra={
+            "column": "BS",
+            "treasury_report_col_1B": "AY",
+            "treasury_report_col_1C": "AY",
+        },
     )
     Street_2_Planned__c: Optional[str] = Field(
         default=None,
@@ -904,16 +888,14 @@ class AddressFields(BaseModel):
             "treasury_report_col_1C": "BF",
         },
     )
-    Zip_Code_Planned__c: CustomStr_MIN1_MAX5 = (
-        Field(
-            ...,
-            serialization_alias="Zip Code (Planned)",
-            json_schema_extra={
-                "column": "CB",
-                "treasury_report_col_1B": "BG",
-                "treasury_report_col_1C": "BG",
-            },
-        )
+    Zip_Code_Planned__c: CustomStr_MIN1_MAX5 = Field(
+        ...,
+        serialization_alias="Zip Code (Planned)",
+        json_schema_extra={
+            "column": "CB",
+            "treasury_report_col_1B": "BG",
+            "treasury_report_col_1C": "BG",
+        },
     )
     Zip_Code_Actual__c: Optional[str] = Field(
         default=None,
@@ -949,12 +931,10 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Laptops (Actual)",
         json_schema_extra={"column": "CE", "treasury_report_col_1B": "BK"},
     )
-    Laptops_Expenditures_Planned__c: CustomDecimal_13Digits = (
-        Field(
-            ...,
-            serialization_alias="Laptops Expenditure (Planned)",
-            json_schema_extra={"column": "CF", "treasury_report_col_1B": "BL"},
-        )
+    Laptops_Expenditures_Planned__c: CustomDecimal_13Digits = Field(
+        ...,
+        serialization_alias="Laptops Expenditure (Planned)",
+        json_schema_extra={"column": "CF", "treasury_report_col_1B": "BL"},
     )
     Laptops_Expenditures_Actual__c: Optional[CustomDecimal_13Digits] = Field(
         default=None,
@@ -996,9 +976,7 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Desktop Computers Expenditure (Planned)",
         json_schema_extra={"column": "CN", "treasury_report_col_1B": "BT"},
     )
-    Desktop_Computers_Expenditures_Actual__c: Optional[
-        CustomDecimal_13Digits
-    ] = Field(
+    Desktop_Computers_Expenditures_Actual__c: Optional[CustomDecimal_13Digits] = Field(
         default=None,
         serialization_alias="Desktop Computers Expenditure (Actual)",
         json_schema_extra={"column": "CO", "treasury_report_col_1B": "BU"},
@@ -1013,16 +991,12 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Public WiFi (Actual)",
         json_schema_extra={"column": "CQ", "treasury_report_col_1B": "BW"},
     )
-    Public_WiFi_Expenditures_Planned__c: CustomDecimal_13Digits = (
-        Field(
-            ...,
-            serialization_alias="Public Wifi Expenditures (Planned)",
-            json_schema_extra={"column": "CR", "treasury_report_col_1B": "BX"},
-        )
+    Public_WiFi_Expenditures_Planned__c: CustomDecimal_13Digits = Field(
+        ...,
+        serialization_alias="Public Wifi Expenditures (Planned)",
+        json_schema_extra={"column": "CR", "treasury_report_col_1B": "BX"},
     )
-    Public_WiFi_Expenditures_Actual__c: Optional[
-        CustomDecimal_13Digits
-    ] = Field(
+    Public_WiFi_Expenditures_Actual__c: Optional[CustomDecimal_13Digits] = Field(
         default=None,
         serialization_alias="Public Wifi Expenditures (Actual)",
         json_schema_extra={"column": "CS", "treasury_report_col_1B": "BY"},
@@ -1277,9 +1251,7 @@ class SubrecipientRow(BaseModel):
         serialization_alias="Subrecipient Name",
         json_schema_extra={"column": "C", "output_column": "B"},
     )
-    Recipient_Profile_ID__c: Optional[
-        CustomStr_MIN1_MAX100
-    ] = Field(
+    Recipient_Profile_ID__c: Optional[CustomStr_MIN1_MAX100] = Field(
         default=None,
         serialization_alias="Recipient ID",
         json_schema_extra={"column": "D", "output_column": "C"},
@@ -1299,19 +1271,15 @@ class SubrecipientRow(BaseModel):
         serialization_alias="POC Name",
         json_schema_extra={"column": "G", "output_column": "F"},
     )
-    POC_Phone_Number__c: CustomStr_MIN1_MAX10 = (
-        Field(
-            ...,
-            serialization_alias="POC Phone Number",
-            json_schema_extra={"column": "H", "output_column": "G"},
-        )
+    POC_Phone_Number__c: CustomStr_MIN1_MAX10 = Field(
+        ...,
+        serialization_alias="POC Phone Number",
+        json_schema_extra={"column": "H", "output_column": "G"},
     )
-    POC_Email_Address__c: CustomStr_MIN1_MAX80 = (
-        Field(
-            ...,
-            serialization_alias="POC Email Address",
-            json_schema_extra={"column": "I", "output_column": "H"},
-        )
+    POC_Email_Address__c: CustomStr_MIN1_MAX80 = Field(
+        ...,
+        serialization_alias="POC Email Address",
+        json_schema_extra={"column": "I", "output_column": "H"},
     )
     Zip__c: CustomStr_MIN1_MAX5 = Field(
         ...,

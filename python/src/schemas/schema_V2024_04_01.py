@@ -33,6 +33,7 @@ from src.schemas.custom_types import (
     CustomStr_MIN1_MAX80,
 )
 
+
 class StateAbbreviation(str, Enum):
     AL = "AL"
     AK = "AK"
@@ -128,10 +129,8 @@ class BaseProjectRow(BaseModel):
         serialization_alias="Row Number",
         json_schema_extra={"column": "NONE"},
     )
-    Project_Name__c: CustomStr_MIN1_MAX100 = (
-        Field(
-            ..., serialization_alias="Project Name", json_schema_extra={"column": "C"}
-        )
+    Project_Name__c: CustomStr_MIN1_MAX100 = Field(
+        ..., serialization_alias="Project Name", json_schema_extra={"column": "C"}
     )
     Identification_Number__c: CustomStr_MIN1_MAX20 = Field(
         ...,
@@ -149,19 +148,15 @@ class BaseProjectRow(BaseModel):
         serialization_alias="Capital Asset Owenership Type",
         json_schema_extra={"column": "F"},
     )
-    Total_CPF_Funding_for_Project__c: CustomDecimal_13Digits = (
-        Field(
-            ...,
-            serialization_alias="Total CPF Funding for Project",
-            json_schema_extra={"column": "G"},
-        )
+    Total_CPF_Funding_for_Project__c: CustomDecimal_13Digits = Field(
+        ...,
+        serialization_alias="Total CPF Funding for Project",
+        json_schema_extra={"column": "G"},
     )
-    Total_from_all_funding_sources__c: CustomDecimal_13Digits = (
-        Field(
-            ...,
-            serialization_alias="Total From all Funding Sources",
-            json_schema_extra={"column": "H"},
-        )
+    Total_from_all_funding_sources__c: CustomDecimal_13Digits = Field(
+        ...,
+        serialization_alias="Total From all Funding Sources",
+        json_schema_extra={"column": "H"},
     )
     Narrative_Description__c: Optional[str] = Field(
         default=None,
@@ -189,10 +184,8 @@ class BaseProjectRow(BaseModel):
         serialization_alias="Cumulative Expenditure",
         json_schema_extra={"column": "M"},
     )
-    Cost_Overview__c: CustomStr_MIN1_MAX3000 = (
-        Field(
-            ..., serialization_alias="Cost Overview", json_schema_extra={"column": "N"}
-        )
+    Cost_Overview__c: CustomStr_MIN1_MAX3000 = Field(
+        ..., serialization_alias="Cost Overview", json_schema_extra={"column": "N"}
     )
     Project_Status__c: ProjectStatusType = Field(
         ..., serialization_alias="Project Status", json_schema_extra={"column": "O"}
@@ -464,12 +457,10 @@ class Project1ARow(BaseProjectRow):
         serialization_alias="E) 100/20 Mbps to 100/100 Mbps (Planned)",
         json_schema_extra={"column": "BD"},
     )
-    X100_20_Mbps_to_100_100_Mbps_Actual__c: Optional[CustomInt_GE0_LELARGE] = (
-        Field(
-            default=None,
-            serialization_alias="E) 100/20 Mbps to 100/100 Mbps (Actual)",
-            json_schema_extra={"column": "BE"},
-        )
+    X100_20_Mbps_to_100_100_Mbps_Actual__c: Optional[CustomInt_GE0_LELARGE] = Field(
+        default=None,
+        serialization_alias="E) 100/20 Mbps to 100/100 Mbps (Actual)",
+        json_schema_extra={"column": "BE"},
     )
     Explanation_of_Discrepancy__c: Optional[str] = Field(
         default=None,
@@ -551,12 +542,10 @@ class Project1ARow(BaseProjectRow):
 
 
 class AddressFields(BaseModel):
-    Street_1_Planned__c: CustomStr_MIN1_MAX40 = (
-        Field(
-            ...,
-            serialization_alias="Street 1 (Planned)",
-            json_schema_extra={"column": "BQ"},
-        )
+    Street_1_Planned__c: CustomStr_MIN1_MAX40 = Field(
+        ...,
+        serialization_alias="Street 1 (Planned)",
+        json_schema_extra={"column": "BQ"},
     )
     Street_2_Planned__c: Optional[str] = Field(
         default=None,
@@ -598,12 +587,10 @@ class AddressFields(BaseModel):
         serialization_alias="State (Actual)",
         json_schema_extra={"column": "BY"},
     )
-    Zip_Code_Planned__c: CustomStr_MIN1_MAX5 = (
-        Field(
-            ...,
-            serialization_alias="Zip Code (Planned)",
-            json_schema_extra={"column": "BZ"},
-        )
+    Zip_Code_Planned__c: CustomStr_MIN1_MAX5 = Field(
+        ...,
+        serialization_alias="Zip Code (Planned)",
+        json_schema_extra={"column": "BZ"},
     )
     Zip_Code_Actual__c: Optional[str] = Field(
         default=None,
@@ -633,12 +620,10 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Laptops (Actual)",
         json_schema_extra={"column": "CC"},
     )
-    Laptops_Expenditures_Planned__c: CustomDecimal_13Digits = (
-        Field(
-            ...,
-            serialization_alias="Laptops Expenditure (Planned)",
-            json_schema_extra={"column": "CD"},
-        )
+    Laptops_Expenditures_Planned__c: CustomDecimal_13Digits = Field(
+        ...,
+        serialization_alias="Laptops Expenditure (Planned)",
+        json_schema_extra={"column": "CD"},
     )
     Laptops_Expenditures_Actual__c: Optional[CustomDecimal_13Digits] = Field(
         default=None,
@@ -678,9 +663,7 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Desktop Computers Expenditure (Planned)",
         json_schema_extra={"column": "CL"},
     )
-    Desktop_Computers_Expenditures_Actual__c: Optional[
-        CustomDecimal_13Digits
-    ] = Field(
+    Desktop_Computers_Expenditures_Actual__c: Optional[CustomDecimal_13Digits] = Field(
         default=None,
         serialization_alias="Desktop Computers Expenditure (Actual)",
         json_schema_extra={"column": "CM"},
@@ -695,16 +678,12 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Public WiFi (Actual)",
         json_schema_extra={"column": "CO"},
     )
-    Public_WiFi_Expenditures_Planned__c: CustomDecimal_13Digits = (
-        Field(
-            ...,
-            serialization_alias="Public Wifi Expenditures (Planned)",
-            json_schema_extra={"column": "CP"},
-        )
+    Public_WiFi_Expenditures_Planned__c: CustomDecimal_13Digits = Field(
+        ...,
+        serialization_alias="Public Wifi Expenditures (Planned)",
+        json_schema_extra={"column": "CP"},
     )
-    Public_WiFi_Expenditures_Actual__c: Optional[
-        CustomDecimal_13Digits
-    ] = Field(
+    Public_WiFi_Expenditures_Actual__c: Optional[CustomDecimal_13Digits] = Field(
         default=None,
         serialization_alias="Public Wifi Expenditures (Actual)",
         json_schema_extra={"column": "CQ"},
@@ -906,19 +885,15 @@ class SubrecipientRow(BaseModel):
     POC_Name__c: CustomStr_MIN1_MAX100 = Field(
         ..., serialization_alias="POC Name", json_schema_extra={"column": "F"}
     )
-    POC_Phone_Number__c: CustomStr_MIN1_MAX10 = (
-        Field(
-            ...,
-            serialization_alias="POC Phone Number",
-            json_schema_extra={"column": "G"},
-        )
+    POC_Phone_Number__c: CustomStr_MIN1_MAX10 = Field(
+        ...,
+        serialization_alias="POC Phone Number",
+        json_schema_extra={"column": "G"},
     )
-    POC_Email_Address__c: CustomStr_MIN1_MAX80 = (
-        Field(
-            ...,
-            serialization_alias="POC Email Address",
-            json_schema_extra={"column": "H"},
-        )
+    POC_Email_Address__c: CustomStr_MIN1_MAX80 = Field(
+        ...,
+        serialization_alias="POC Email Address",
+        json_schema_extra={"column": "H"},
     )
     Zip__c: CustomStr_MIN1_MAX5 = Field(
         ..., serialization_alias="Zip5", json_schema_extra={"column": "I"}
