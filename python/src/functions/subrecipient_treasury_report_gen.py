@@ -7,6 +7,7 @@ from typing import Any, Dict
 import boto3
 import structlog
 from aws_lambda_typing.context import Context
+from botocore.exceptions import ClientError
 from mypy_boto3_s3.client import S3Client
 from openpyxl import Workbook, load_workbook
 from pydantic import BaseModel
@@ -93,12 +94,22 @@ def process_event(
         with structlog.contextvars.bound_contextvars(
             subrecipients_filename=recent_subrecipients_file.name
         ):
-            download_s3_object(
-                s3_client,
-                os.environ["REPORTING_DATA_BUCKET_NAME"],
-                f"treasuryreports/{organization_id}/{reporting_period_id}/subrecipients",
-                recent_subrecipients_file,
-            )
+            try:
+                download_s3_object(
+                    client=s3_client,
+                    bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+                    key=f"treasuryreports/{organization_id}/{reporting_period_id}/subrecipients",
+                    destination=recent_subrecipients_file,
+                )
+            except ClientError as e:
+                error = e.response.get("Error") or {}
+                if error.get("Code") == "404":
+                    logger.info(
+                        f"No subrecipients for organization {organization_id} and reporting period {reporting_period_id}"
+                    )
+                    return
+                else:
+                    raise
 
         recent_subrecipients_file.seek(0)
 

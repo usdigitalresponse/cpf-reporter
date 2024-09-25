@@ -1,6 +1,6 @@
 import csv
 from tempfile import _TemporaryFileWrapper
-from typing import IO, Optional, Union
+from typing import Optional
 
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
@@ -19,8 +19,8 @@ def escape_for_csv(text: Optional[str]):
 
 
 def convert_xlsx_to_csv(
-    csv_file: Union[IO[bytes], _TemporaryFileWrapper],
-    file: Union[IO[bytes], Workbook],
+    csv_file: "_TemporaryFileWrapper[str]",
+    file: Workbook,
     num_rows: int,
 ):
     """

@@ -1,8 +1,9 @@
-from botocore.exceptions import ClientError
-from mypy_boto3_s3.client import S3Client
+import tempfile
 from typing import IO, Optional, Union
 from urllib.parse import unquote_plus
-import tempfile
+
+from botocore.exceptions import ClientError
+from mypy_boto3_s3.client import S3Client
 
 from src.lib.logging import get_logger
 
@@ -67,11 +68,11 @@ def get_presigned_url(
     logger = get_logger()
     try:
         response = s3_client.head_object(
-            bucket = bucket,
-            key = key,
+            Bucket=bucket,
+            Key=key,
         )
-    except ClientError as e:
-        logger.error(e)
+    except ClientError:
+        logger.exception(f"Unable to retrieve head object for key: {key}")
         return None
 
     try:
@@ -83,8 +84,8 @@ def get_presigned_url(
             },
             ExpiresIn=expiration_time
         )
-    except ClientError as e:
-        logger.error(e)
+    except ClientError:
+        logger.exception(f"Unable to retrieve presigned URL for key: {key}")
         return None
     
     return response

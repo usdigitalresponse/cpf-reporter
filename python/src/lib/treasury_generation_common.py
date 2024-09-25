@@ -2,6 +2,7 @@ import os
 from enum import Enum
 from typing import IO
 
+from botocore.exceptions import ClientError
 from mypy_boto3_s3.client import S3Client
 from pydantic import BaseModel
 
@@ -41,7 +42,7 @@ def get_output_template(
     project: str,
     destination: IO[bytes],
 ):
-    """Downloads an output template from S3.
+    """Downloads an empty output template from S3.
 
     Args:
         output_template_id: ID of the output template to download
@@ -58,6 +59,11 @@ def get_output_template(
             key=f"treasuryreports/output-templates/{output_template_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.xlsx",
             destination=destination,
         )
-    except:
+    except ClientError as e:
+        error = e.response.get("Error") or {}
+        if error.get("Code") == "404":
+            logger.exception(
+                f"Cannot find any output template with ID: {output_template_id} and project: {project}"
+            )
         logger.exception("failed to download output template from S3")
         raise
