@@ -713,14 +713,12 @@ class Project1BRow(BaseProjectRow, AddressFields):
         serialization_alias="Other Devices (Actual)",
         json_schema_extra={"column": "CS"},
     )
-    Other_Expenditures_Planned__c: condecimal(max_digits=7, decimal_places=2) = Field(
+    Other_Expenditures_Planned__c: CustomDecimal_7Digits = Field(
         ...,
         serialization_alias="Other Expenditures (Planned)",
         json_schema_extra={"column": "CT"},
     )
-    Other_Expenditures_Actual__c: Optional[
-        condecimal(max_digits=7, decimal_places=2)
-    ] = Field(
+    Other_Expenditures_Actual__c: Optional[CustomDecimal_7Digits] = Field(
         default=None,
         serialization_alias="Other Expenditures (Actual)",
         json_schema_extra={"column": "CU"},
