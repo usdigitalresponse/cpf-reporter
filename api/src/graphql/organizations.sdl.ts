@@ -7,6 +7,7 @@ export const schema = gql`
     subrecipients: [Subrecipient]!
     projects: [Project]!
     preferences: JSON
+    reportingPeriod: ReportingPeriod
     reportingPeriodCertifications: [ReportingPeriodCertification]!
   }
 

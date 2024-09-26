@@ -9,15 +9,24 @@ import type {
 import { getTreasurySignedUrl, startStepFunctionExecution } from 'src/lib/aws'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
+import { reportingPeriod } from 'src/services/reportingPeriods'
 
 export const organizations: QueryResolvers['organizations'] = () => {
   return db.organization.findMany()
 }
 
-export const organization: QueryResolvers['organization'] = ({ id }) => {
-  return db.organization.findUnique({
+export const organization: QueryResolvers['organization'] = async ({ id }) => {
+  const org = await db.organization.findUnique({
     where: { id },
   })
+
+  if (org && org.preferences?.current_reporting_period_id) {
+    org.reportingPeriod = await reportingPeriod({
+      id: org.preferences.current_reporting_period_id,
+    })
+  }
+
+  return org
 }
 
 export const organizationOfCurrentUser: QueryResolvers['organizationOfCurrentUser'] =
