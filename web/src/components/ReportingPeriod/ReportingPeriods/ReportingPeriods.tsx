@@ -1,109 +1,147 @@
-import type {
-  DeleteReportingPeriodMutationVariables,
-  FindReportingPeriods,
-} from 'types/graphql'
+import { useState, useMemo, useCallback } from 'react'
 
-import { Link, routes } from '@redwoodjs/router'
+import Button from 'react-bootstrap/Button'
+import Modal from 'react-bootstrap/Modal'
+import { useAuth } from 'web/src/auth'
+
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
-import { QUERY } from 'src/components/ReportingPeriod/ReportingPeriodsCell'
-import { timeTag, truncate } from 'src/lib/formatters'
+import { QUERY } from 'src/components/ReportingPeriod/ReportingPeriodsCell/ReportingPeriodsCell'
+import TableBuilder from 'src/components/TableBuilder/TableBuilder'
+import { formatDateString } from 'src/utils'
 
-const DELETE_REPORTING_PERIOD_MUTATION = gql`
-  mutation DeleteReportingPeriodMutation($id: Int!) {
-    deleteReportingPeriod(id: $id) {
+import { columnDefs } from './columns'
+
+const CERTIFY_REPORTING_PERIOD_MUTATION = gql`
+  mutation CertifyReportingPeriodAndOpenNextPeriod($id: Int!) {
+    certifyReportingPeriodAndOpenNextPeriod(reportingPeriodId: $id) {
       id
     }
   }
 `
 
-const ReportingPeriodsList = ({ reportingPeriods }: FindReportingPeriods) => {
-  const [deleteReportingPeriod] = useMutation(
-    DELETE_REPORTING_PERIOD_MUTATION,
+const ReportingPeriodsList = ({
+  reportingPeriods,
+  organizationOfCurrentUser,
+}) => {
+  const { hasRole } = useAuth()
+  const isUSDRAdmin = hasRole('USDR_ADMIN')
+
+  const [showCertificationModal, setShowCertificationModal] = useState(false)
+
+  const currentReportingPeriod = useMemo(
+    () =>
+      reportingPeriods.find(
+        (period) =>
+          period.id ===
+          organizationOfCurrentUser.preferences.current_reporting_period_id
+      ),
+    [reportingPeriods, organizationOfCurrentUser]
+  )
+
+  const [certifyReportingPeriod] = useMutation(
+    CERTIFY_REPORTING_PERIOD_MUTATION,
     {
       onCompleted: () => {
-        toast.success('ReportingPeriod deleted')
+        toast.success('Reporting period certified')
+        setShowCertificationModal(false)
       },
       onError: (error) => {
-        toast.error(error.message)
+        console.error(error)
+        toast.error('Unable to certify the current reporting period.')
       },
-      // This refetches the query on the list page. Read more about other ways to
-      // update the cache over here:
-      // https://www.apollographql.com/docs/react/data/mutations/#making-all-other-cache-updates
       refetchQueries: [{ query: QUERY }],
-      awaitRefetchQueries: true,
     }
   )
 
-  const onDeleteClick = (id: DeleteReportingPeriodMutationVariables['id']) => {
-    if (
-      confirm('Are you sure you want to delete reportingPeriod ' + id + '?')
-    ) {
-      deleteReportingPeriod({ variables: { id } })
+  const handleCertify = useCallback(() => {
+    if (currentReportingPeriod?.id) {
+      certifyReportingPeriod({ variables: { id: currentReportingPeriod.id } })
     }
-  }
+  }, [currentReportingPeriod, certifyReportingPeriod])
+
+  const canEdit = useCallback(
+    (reportingPeriod) => {
+      return (
+        isUSDRAdmin &&
+        (reportingPeriod.id === currentReportingPeriod?.id ||
+          new Date(reportingPeriod.startDate) >
+            new Date(currentReportingPeriod?.endDate))
+      )
+    },
+    [isUSDRAdmin, currentReportingPeriod]
+  )
+
+  const certificationDisplay = useCallback(
+    (reportingPeriod) => {
+      if (reportingPeriod.id === currentReportingPeriod?.id) {
+        return (
+          <Button
+            onClick={() => setShowCertificationModal(true)}
+            variant="primary"
+            size="sm"
+          >
+            Certify Reporting Period
+          </Button>
+        )
+      }
+
+      const certification = reportingPeriod.certificationForOrganization
+      if (certification) {
+        return `${formatDateString(certification.createdAt)} by ${
+          certification.certifiedBy.email
+        }`
+      }
+
+      return ''
+    },
+    [currentReportingPeriod, setShowCertificationModal]
+  )
+
+  const columns = useMemo(
+    () =>
+      columnDefs({
+        certificationDisplay,
+        canEdit,
+        isUSDRAdmin,
+      }),
+    [certificationDisplay, canEdit, isUSDRAdmin]
+  )
 
   return (
-    <div className="rw-segment rw-table-wrapper-responsive">
-      <table className="rw-table">
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Name</th>
-            <th>Start date</th>
-            <th>End date</th>
-            <th>Input template id</th>
-            <th>Output template id</th>
-            <th>Created at</th>
-            <th>Updated at</th>
-            <th>&nbsp;</th>
-          </tr>
-        </thead>
-        <tbody>
-          {reportingPeriods.map((reportingPeriod) => (
-            <tr key={reportingPeriod.id}>
-              <td>{truncate(reportingPeriod.id)}</td>
-              <td>{truncate(reportingPeriod.name)}</td>
-              <td>{timeTag(reportingPeriod.startDate)}</td>
-              <td>{timeTag(reportingPeriod.endDate)}</td>
-              <td>{truncate(reportingPeriod.inputTemplateId)}</td>
-              <td>{truncate(reportingPeriod.outputTemplateId)}</td>
-              <td>{timeTag(reportingPeriod.createdAt)}</td>
-              <td>{timeTag(reportingPeriod.updatedAt)}</td>
-              <td>
-                <nav className="rw-table-actions">
-                  <Link
-                    to={routes.reportingPeriod({ id: reportingPeriod.id })}
-                    title={
-                      'Show reportingPeriod ' + reportingPeriod.id + ' detail'
-                    }
-                    className="rw-button rw-button-small"
-                  >
-                    Show
-                  </Link>
-                  <Link
-                    to={routes.editReportingPeriod({ id: reportingPeriod.id })}
-                    title={'Edit reportingPeriod ' + reportingPeriod.id}
-                    className="rw-button rw-button-small rw-button-blue"
-                  >
-                    Edit
-                  </Link>
-                  <button
-                    type="button"
-                    title={'Delete reportingPeriod ' + reportingPeriod.id}
-                    className="rw-button rw-button-small rw-button-red"
-                    onClick={() => onDeleteClick(reportingPeriod.id)}
-                  >
-                    Delete
-                  </button>
-                </nav>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <>
+      <Modal
+        show={showCertificationModal}
+        onHide={() => setShowCertificationModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Certify Reporting Period</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Certify the{' '}
+          <span className="fw-bold">{currentReportingPeriod?.name}</span>{' '}
+          period?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleCertify}>
+            Certify
+          </Button>
+          <Button
+            variant="outline-secondary"
+            onClick={() => setShowCertificationModal(false)}
+          >
+            Cancel
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <TableBuilder
+        data={reportingPeriods}
+        columns={columns}
+        filterableInputs={['name']}
+      />
+    </>
   )
 }
 

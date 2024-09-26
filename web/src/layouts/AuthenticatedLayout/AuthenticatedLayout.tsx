@@ -2,6 +2,7 @@ import Button from 'react-bootstrap/Button'
 import { useAuth } from 'web/src/auth'
 
 import { Link, routes } from '@redwoodjs/router'
+import { Toaster } from '@redwoodjs/web/toast'
 
 import Navigation from 'src/components/Navigation/Navigation'
 
@@ -14,6 +15,7 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
 
   return (
     <div className="container-fluid" style={{ width: '90%' }}>
+      <Toaster />
       <nav className="row navbar navbar-light bg-light d-flex justify-content-between">
         <div className="col">
           <Link to={routes.uploads()} className="navbar-brand">
