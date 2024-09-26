@@ -7,7 +7,7 @@ import { useAuth } from 'web/src/auth'
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
 
-import { QUERY } from 'src/components/ReportingPeriodsCell'
+import { QUERY } from 'src/components/ReportingPeriod/ReportingPeriodsCell/ReportingPeriodsCell'
 import TableBuilder from 'src/components/TableBuilder/TableBuilder'
 import { formatDateString } from 'src/utils'
 

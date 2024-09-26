@@ -3,7 +3,7 @@ import { useAuth } from 'web/src/auth'
 
 import { Link, routes } from '@redwoodjs/router'
 
-import ReportingPeriodsCell from 'src/components/ReportingPeriodsCell'
+import ReportingPeriodsCell from 'src/components/ReportingPeriod/ReportingPeriodsCell/ReportingPeriodsCell'
 
 const ReportingPeriodsPage = () => {
   const { hasRole } = useAuth()
