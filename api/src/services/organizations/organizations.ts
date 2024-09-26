@@ -20,7 +20,7 @@ export const organization: QueryResolvers['organization'] = async ({ id }) => {
     where: { id },
   })
 
-  if (org.preferences?.current_reporting_period_id) {
+  if (org && org.preferences?.current_reporting_period_id) {
     org.reportingPeriod = await reportingPeriod({
       id: org.preferences.current_reporting_period_id,
     })
