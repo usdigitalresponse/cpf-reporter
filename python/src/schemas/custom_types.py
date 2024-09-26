@@ -1,7 +1,7 @@
-from typing_extensions import Annotated
-from pydantic import BaseModel, Field, PlainSerializer
 from decimal import Decimal
 
+from pydantic import Field, PlainSerializer
+from typing_extensions import Annotated
 
 CustomDecimal_16Digits = Annotated[
     Decimal, Field(
