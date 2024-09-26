@@ -48,7 +48,8 @@ const ReportingPeriodsList = ({
         setShowCertificationModal(false)
       },
       onError: (error) => {
-        toast.error('Could not certify reporting period')
+        console.error(error)
+        toast.error('Unable to certify the current reporting period.')
       },
       refetchQueries: [{ query: QUERY }],
     }
