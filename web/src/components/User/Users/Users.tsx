@@ -30,8 +30,8 @@ const UsersList = ({ usersByOrganization, updateUser, usersUpdating }) => {
             ? user.name
             : user.name + ' (Deactivated)'
           const deactivateTitle = user.isActive
-            ? 'Deactivate user ' + user.id
-            : 'Reactivate user ' + user.id
+            ? 'Deactivate user ' + user.name
+            : 'Reactivate user ' + user.name
           const deactivateLabel = user.isActive ? 'Deactivate' : 'Reactivate'
 
           // Actions
@@ -48,11 +48,11 @@ const UsersList = ({ usersByOrganization, updateUser, usersUpdating }) => {
               <td>{truncate(user.agency?.name)}</td>
               <td>{timeTag(user.createdAt)}</td>
               <td>
-                <div className="d-grid gap-2 d-xl-block">
+                <div className="d-grid gap-2 d-xxl-block">
                   {hasEditAccess && (
                     <Link
                       to={routes.editUser({ id: user.id })}
-                      className="btn btn-secondary btn-sm me-xl-2"
+                      className="btn btn-secondary btn-sm me-xxl-2"
                       title={'Edit user ' + user.id}
                     >
                       Edit
