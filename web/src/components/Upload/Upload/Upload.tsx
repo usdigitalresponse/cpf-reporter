@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useAuth } from 'web/src/auth'
 
@@ -40,6 +40,7 @@ const Upload = ({ upload, queryResult }) => {
     upload.latestValidation?.results?.errors !== null &&
     Array.isArray(upload.latestValidation?.results?.errors) &&
     upload.latestValidation?.results?.errors.length > 0
+  const [savingUpload, setSavingUpload] = useState(false)
 
   useEffect(() => {
     const pollingTimeout = 120 * 1000
@@ -77,18 +78,21 @@ const Upload = ({ upload, queryResult }) => {
   }
 
   const [createValidation] = useMutation(CREATE_VALIDATION_MUTATION, {
-    onCompleted: () => {
+    onCompleted: async () => {
       toast.success('Upload invalidated')
-      refetch()
+      await refetch()
+      setSavingUpload(false)
     },
     onError: (error) => {
       toast.error(error.message)
+      setSavingUpload(false)
     },
   })
 
   const handleValidate = () => {}
 
   const handleForceInvalidate = async () => {
+    setSavingUpload(true)
     const invalidateResult = [
       {
         message: `Manually invalidated by User: ${currentUser.name}`,
@@ -158,6 +162,7 @@ const Upload = ({ upload, queryResult }) => {
                   handleValidate={handleValidate}
                   handleForceInvalidate={handleForceInvalidate}
                   handleFileDownload={handleFileDownload}
+                  savingUpload={savingUpload}
                 />
               </>
             )}

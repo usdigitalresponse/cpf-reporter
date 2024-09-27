@@ -23,12 +23,14 @@ interface UploadValidationButtonGroupProps {
   handleFileDownload: () => void
   handleForceInvalidate: () => void
   handleValidate: () => void
+  savingUpload: boolean
 }
 
 const UploadValidationButtonGroup = ({
   latestValidation,
   handleFileDownload,
   handleForceInvalidate,
+  savingUpload,
 }: UploadValidationButtonGroupProps) => {
   /*
     If the upload has been validated, renders "Invalidate" and "Re-validate" buttons
@@ -44,6 +46,7 @@ const UploadValidationButtonGroup = ({
             variant="outline-primary"
             size="sm"
             onClick={handleForceInvalidate}
+            disabled={savingUpload}
           >
             Invalidate
           </Button>
