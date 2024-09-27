@@ -55,6 +55,10 @@ export const columnDefs = [
     cell: (info) => info.getValue() ?? 'Not set',
     header: 'EC Code',
   }),
+  columnHelper.accessor('reportingPeriod.name', {
+    cell: (info) => info.getValue(),
+    header: 'Reporting Period',
+  }),
   columnHelper.accessor('uploadedBy.email', {
     cell: (info) => info.getValue(),
     header: 'Uploaded By',

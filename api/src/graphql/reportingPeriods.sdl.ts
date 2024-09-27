@@ -15,10 +15,12 @@ export const schema = gql`
     validationRulesId: Int
     validationRules: ValidationRules
     certifications: [ReportingPeriodCertification]!
+    certificationForOrganization: ReportingPeriodCertification
   }
 
   type Query {
     reportingPeriods: [ReportingPeriod!]! @requireAuth
+    reportingPeriodsWithCertification: [ReportingPeriod]! @requireAuth
     reportingPeriod(id: Int!): ReportingPeriod @requireAuth
   }
 
@@ -41,6 +43,9 @@ export const schema = gql`
   type Mutation {
     createReportingPeriod(input: CreateReportingPeriodInput!): ReportingPeriod!
       @requireAuth
+    certifyReportingPeriodAndOpenNextPeriod(
+      reportingPeriodId: Int!
+    ): ReportingPeriod @requireAuth(roles: ["USDR_ADMIN", "ORGANIZATION_ADMIN"])
     updateReportingPeriod(
       id: Int!
       input: UpdateReportingPeriodInput!

@@ -24,7 +24,7 @@ import { CreateUploadInput, Upload } from 'types/graphql'
 
 const REPORTING_DATA_BUCKET_NAME = `${process.env.REPORTING_DATA_BUCKET_NAME}`
 
-function getS3Client() {
+export function getS3Client() {
   let s3: S3Client
   if (process.env.LOCALSTACK_HOSTNAME) {
     /*

@@ -36,7 +36,7 @@ describe('ReportingPeriodsCell', () => {
 
   it('renders Success successfully', async () => {
     expect(() => {
-      render(<Success reportingPeriods={standard().reportingPeriods} />)
+      render(<Success {...standard()} />)
     }).not.toThrow()
   })
 })

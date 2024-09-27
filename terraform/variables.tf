@@ -315,3 +315,14 @@ variable "postgres_ca_cert_identifier" {
   description = "Certificate Authority identifier for RDS Aurora Postgres cluster instances."
   type        = string
 }
+
+// email
+variable "notifications_email_address" {
+  description = "SES domain from which email notifications should be sent."
+  type        = string
+  validation {
+    condition     = length(split("@", var.notifications_email_address)) == 2
+    error_message = "Email address must contain exactly one @ sign."
+  }
+}
+

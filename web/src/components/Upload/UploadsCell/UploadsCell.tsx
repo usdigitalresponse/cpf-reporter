@@ -22,6 +22,10 @@ export const QUERY = gql`
         id
         code
       }
+      reportingPeriod {
+        id
+        name
+      }
       latestValidation {
         id
         createdAt
