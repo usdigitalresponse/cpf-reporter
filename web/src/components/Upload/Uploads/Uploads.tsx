@@ -1,5 +1,3 @@
-import React from 'react'
-
 import type { FindUploads } from 'types/graphql'
 
 import TableBuilder from 'src/components/TableBuilder/TableBuilder'
@@ -12,6 +10,7 @@ const UploadsList = ({ uploads }: FindUploads) => {
     'expenditureCategory_code',
     'uploadedBy_email',
     'filename',
+    'reportingPeriod_name',
   ]
 
   return (
