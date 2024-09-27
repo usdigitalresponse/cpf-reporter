@@ -26,6 +26,7 @@ export const QUERY = gql`
         id
         createdAt
         passed
+        isManual
         results
       }
       createdAt

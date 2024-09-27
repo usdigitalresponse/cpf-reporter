@@ -1,11 +1,16 @@
 import { useEffect } from 'react'
 
+import { useAuth } from 'web/src/auth'
+
 import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
 
 import { timeTag } from 'src/lib/formatters'
 
 import UploadValidationButtonGroup from '../UploadValidationButtonGroup/UploadValidationButtonGroup'
-import UploadValidationResultsTable from '../UploadValidationResultsTable/UploadValidationResultsTable'
+import UploadValidationResultsTable, {
+  Severity,
+} from '../UploadValidationResultsTable/UploadValidationResultsTable'
 import UploadValidationStatus from '../UploadValidationStatus/UploadValidationStatus'
 
 const DOWNLOAD_UPLOAD_FILE = gql`
@@ -13,8 +18,24 @@ const DOWNLOAD_UPLOAD_FILE = gql`
     downloadUploadFile(id: $id)
   }
 `
+
+const CREATE_VALIDATION_MUTATION = gql`
+  mutation CreateUploadValidationMutation(
+    $input: CreateUploadValidationInput!
+  ) {
+    createUploadValidation(input: $input) {
+      initiatedById
+      passed
+      isManual
+      results
+      uploadId
+    }
+  }
+`
+
 const Upload = ({ upload, queryResult }) => {
-  const { startPolling, stopPolling } = queryResult
+  const { currentUser } = useAuth()
+  const { startPolling, stopPolling, refetch } = queryResult
   const hasErrors =
     upload.latestValidation?.results?.errors !== null &&
     Array.isArray(upload.latestValidation?.results?.errors) &&
@@ -55,8 +76,41 @@ const Upload = ({ upload, queryResult }) => {
     downloadUploadFile({ variables: { id: upload.id } })
   }
 
+  const [createValidation] = useMutation(CREATE_VALIDATION_MUTATION, {
+    onCompleted: () => {
+      toast.success('Upload invalidated')
+      refetch()
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+
   const handleValidate = () => {}
-  const handleForceInvalidate = () => {}
+
+  const handleForceInvalidate = async () => {
+    const invalidateResult = [
+      {
+        message: `Manually invalidated by User: ${currentUser.name}`,
+        tab: 'N/A',
+        row: 'N/A',
+        col: 'N/A',
+        severity: Severity.Error,
+      },
+    ]
+
+    const inputManual = {
+      initiatedById: currentUser.id,
+      passed: false,
+      isManual: true,
+      results: {
+        errors: invalidateResult,
+      },
+      uploadId: upload.id,
+    }
+
+    await createValidation({ variables: { input: inputManual } })
+  }
 
   return (
     <>

@@ -136,11 +136,12 @@ model Upload {
 }
 
 model UploadValidation {
-  id                  Int            @id @default(autoincrement())
+  id                  Int           @id @default(autoincrement())
   uploadId            Int
-  upload              Upload         @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  upload              Upload        @relation(fields: [uploadId], references: [id], onDelete: Cascade)
   results             Json?         @db.JsonB
   passed              Boolean
+  isManual            Boolean       @default(false)   
   initiatedById       Int
   initiatedBy         User          @relation(fields: [initiatedById], references: [id])
   createdAt           DateTime      @default(now()) @db.Timestamptz(6)
