@@ -255,6 +255,7 @@ def process_event(payload: ProjectLambdaPayload, logger: structlog.stdlib.BoundL
                 file=json_file,
             )
 
+
 def download_output_file(
     s3_client: S3Client,
     output_file: IO[bytes],
@@ -298,6 +299,7 @@ def download_output_file(
         )
         highest_row_num = OUTPUT_STARTING_ROW - 1
     return highest_row_num
+
 
 def get_existing_output_metadata(
     s3_client,
@@ -447,7 +449,7 @@ def insert_project_row(
         if prop_meta[f"treasury_report_col_{project_use_code}"]:
             row_with_output_cols[
                 prop_meta[f"treasury_report_col_{project_use_code}"]
-            ] = row_dict[prop] if row_dict[prop] else ""
+            ] = str(row_dict[prop]) if row_dict[prop] else ""
 
     for col in row_with_output_cols.keys():
         if sheet:
