@@ -98,7 +98,7 @@ def process_event(
                 download_s3_object(
                     client=s3_client,
                     bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
-                    key=f"treasuryreports/{organization_id}/{reporting_period_id}/subrecipients",
+                    key=f"treasuryreports/{organization_id}/{reporting_period_id}/subrecipients.json",
                     destination=recent_subrecipients_file,
                 )
             except ClientError as e:
@@ -224,7 +224,7 @@ def upload_workbook(
     Handles upload of workbook to S3, both in xlsx and csv formats
     """
 
-    with tempfile.NamedTemporaryFile("w") as new_xlsx_file:
+    with tempfile.NamedTemporaryFile("rb+") as new_xlsx_file:
         workbook.save(new_xlsx_file.name)
         upload_generated_file_to_s3(
             s3client,
@@ -237,7 +237,7 @@ def upload_workbook(
             new_xlsx_file,
         )
 
-    with tempfile.NamedTemporaryFile("w") as new_csv_file:
+    with tempfile.NamedTemporaryFile("r+") as new_csv_file:
         convert_xlsx_to_csv(
             new_csv_file,
             workbook,
