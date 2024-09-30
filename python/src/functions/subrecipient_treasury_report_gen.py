@@ -237,7 +237,9 @@ def upload_workbook(
             new_xlsx_file,
         )
 
-    with tempfile.NamedTemporaryFile("r+") as new_csv_file:
+    with tempfile.NamedTemporaryFile(
+        mode="wt", encoding="utf-8", delete_on_close=False
+    ) as new_csv_file:
         convert_xlsx_to_csv(
             new_csv_file,
             workbook,
@@ -245,13 +247,16 @@ def upload_workbook(
                 workbook[WORKSHEET_NAME], FIRST_BLANK_ROW_NUM, FIRST_DATA_COLUMN
             ),
         )
-        upload_generated_file_to_s3(
-            s3client,
-            os.environ["REPORTING_DATA_BUCKET_NAME"],
-            get_generated_output_file_key(
-                file_type=OutputFileType.CSV,
-                project="Subrecipient",
-                organization=organization,
-            ),
-            new_csv_file,
-        )
+        new_csv_file.close()
+
+        with open(new_csv_file.name, mode="rb") as binary_csv_file:
+            upload_generated_file_to_s3(
+                s3client,
+                os.environ["REPORTING_DATA_BUCKET_NAME"],
+                get_generated_output_file_key(
+                    file_type=OutputFileType.CSV,
+                    project="Subrecipient",
+                    organization=organization,
+                ),
+                binary_csv_file,
+            )
