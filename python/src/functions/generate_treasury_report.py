@@ -230,7 +230,7 @@ def process_event(payload: ProjectLambdaPayload, logger: structlog.stdlib.BoundL
             )
         # Output CSV file for treasury
         with tempfile.NamedTemporaryFile(
-            mode="r+t", encoding="utf-8", delete_on_close=False
+            mode="wt", encoding="utf-8", delete_on_close=False
         ) as csv_file:
             convert_xlsx_to_csv(csv_file, output_workbook, highest_row_num)
             csv_file.close()
@@ -247,7 +247,7 @@ def process_event(payload: ProjectLambdaPayload, logger: structlog.stdlib.BoundL
                 )
         # Store project_id_agency_id to row number in a json file
         with tempfile.NamedTemporaryFile(
-            "r+t", encoding="utf-8", delete_on_close=False
+            "wt", encoding="utf-8", delete_on_close=False
         ) as json_file:
             json.dump(project_agency_id_to_row_map, fp=json_file)
             json_file.close()

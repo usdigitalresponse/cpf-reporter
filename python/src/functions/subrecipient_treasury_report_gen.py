@@ -238,7 +238,7 @@ def upload_workbook(
         )
 
     with tempfile.NamedTemporaryFile(
-        mode="r+t", encoding="utf-8", delete_on_close=False
+        mode="wt", encoding="utf-8", delete_on_close=False
     ) as new_csv_file:
         convert_xlsx_to_csv(
             new_csv_file,
