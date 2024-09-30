@@ -94,7 +94,7 @@ def create_archive(
             zipf.close()
             file.flush()
             logger.info(f"Created archive file: {file.name}")
-            upload_key = "report.zip"
+            upload_key = f"{target_key}report.zip"
             # upload the zip file to the target key
 
             s3_client.upload_file(file.name, S3_BUCKET, upload_key)
