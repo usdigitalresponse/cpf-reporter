@@ -95,7 +95,7 @@ const Upload = ({ upload, queryResult }) => {
     setSavingUpload(true)
     const invalidateResult = [
       {
-        message: `Manually invalidated by User: ${currentUser.name}`,
+        message: `Manually invalidated by User: ${currentUser.name} (${currentUser.email})`,
         tab: 'N/A',
         row: 'N/A',
         col: 'N/A',
