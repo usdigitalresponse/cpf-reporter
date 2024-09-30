@@ -229,31 +229,39 @@ def process_event(payload: ProjectLambdaPayload, logger: structlog.stdlib.BoundL
                 file=new_output_file,
             )
         # Output CSV file for treasury
-        with tempfile.NamedTemporaryFile("r+") as csv_file:
+        with tempfile.NamedTemporaryFile(
+            mode="r+t", encoding="utf-8", delete_on_close=False
+        ) as csv_file:
             convert_xlsx_to_csv(csv_file, output_workbook, highest_row_num)
-            upload_generated_file_to_s3(
-                client=s3_client,
-                bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
-                key=get_generated_output_file_key(
-                    file_type=OutputFileType.CSV,
-                    project=project_use_code,
-                    organization=organization,
-                ),
-                file=csv_file,
-            )
+            csv_file.close()
+            with open(csv_file.name, mode="rb") as binary_csv_file:
+                upload_generated_file_to_s3(
+                    client=s3_client,
+                    bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+                    key=get_generated_output_file_key(
+                        file_type=OutputFileType.CSV,
+                        project=project_use_code,
+                        organization=organization,
+                    ),
+                    file=binary_csv_file,
+                )
         # Store project_id_agency_id to row number in a json file
-        with tempfile.NamedTemporaryFile("r+") as json_file:
+        with tempfile.NamedTemporaryFile(
+            "r+t", encoding="utf-8", delete_on_close=False
+        ) as json_file:
             json.dump(project_agency_id_to_row_map, fp=json_file)
-            upload_generated_file_to_s3(
-                client=s3_client,
-                bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
-                key=get_generated_output_file_key(
-                    file_type=OutputFileType.JSON,
-                    project=project_use_code,
-                    organization=organization,
-                ),
-                file=json_file,
-            )
+            json_file.close()
+            with open(json_file.name, mode="rb") as binary_json_file:
+                upload_generated_file_to_s3(
+                    client=s3_client,
+                    bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+                    key=get_generated_output_file_key(
+                        file_type=OutputFileType.JSON,
+                        project=project_use_code,
+                        organization=organization,
+                    ),
+                    file=binary_json_file,
+                )
 
 
 def download_output_file(
