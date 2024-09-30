@@ -5,6 +5,7 @@ export const schema = gql`
     upload: Upload!
     results: JSON
     passed: Boolean!
+    isManual: Boolean!
     initiatedById: Int!
     initiatedBy: User!
     createdAt: DateTime!
@@ -22,6 +23,7 @@ export const schema = gql`
     uploadId: Int!
     results: JSON
     passed: Boolean!
+    isManual: Boolean
     initiatedById: Int!
   }
 
@@ -29,6 +31,7 @@ export const schema = gql`
     uploadId: Int
     results: JSON
     passed: Boolean
+    isManual: Boolean
     initiatedById: Int
   }
 

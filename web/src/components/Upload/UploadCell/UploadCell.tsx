@@ -25,6 +25,7 @@ export const QUERY = gql`
       latestValidation {
         id
         passed
+        isManual
         results
         createdAt
         initiatedBy {

@@ -1,13 +1,13 @@
-import { ROLES } from 'api/src/lib/constants'
 import Button from 'react-bootstrap/Button'
-import { useAuth } from 'web/src/auth'
+
+import { Severity } from 'src/components/Upload/UploadValidationResultsTable/UploadValidationResultsTable'
 
 interface ValidationError {
   message: string
   tab?: string
   row?: string
   col?: string
-  severity: 'warn' | 'err' | 'info'
+  severity: Severity
 }
 
 interface ValidationResult {
@@ -15,20 +15,23 @@ interface ValidationResult {
 }
 
 interface UploadValidationButtonGroupProps {
-  latestValidation?: { passed: boolean; results: ValidationResult | null }
+  latestValidation?: {
+    passed: boolean
+    isManual: boolean
+    results: ValidationResult | null
+  }
   handleFileDownload: () => void
   handleForceInvalidate: () => void
   handleValidate: () => void
+  savingUpload: boolean
 }
 
 const UploadValidationButtonGroup = ({
   latestValidation,
   handleFileDownload,
   handleForceInvalidate,
-  handleValidate,
+  savingUpload,
 }: UploadValidationButtonGroupProps) => {
-  const { hasRole } = useAuth()
-
   /*
     If the upload has been validated, renders "Invalidate" and "Re-validate" buttons
     If the upload has been invalidated, renders the "Validate" button
@@ -43,13 +46,14 @@ const UploadValidationButtonGroup = ({
             variant="outline-primary"
             size="sm"
             onClick={handleForceInvalidate}
+            disabled={savingUpload}
           >
             Invalidate
           </Button>
         )}{' '}
-        <Button variant="primary" size="sm" onClick={handleValidate}>
-          {passed ? 'Re-Validate' : 'Validate'}
-        </Button>
+        {/* <Button variant="primary" size="sm" onClick={handleValidate}>
+          {passed || manuallyInvalidated ? 'Re-Validate' : 'Validate'}
+        </Button> */}
       </>
     )
   }
@@ -60,10 +64,7 @@ const UploadValidationButtonGroup = ({
         <Button variant="primary" size="sm" onClick={handleFileDownload}>
           Download file
         </Button>{' '}
-        {/* TODO: Remove USDR_ADMIN check when ready || 2024-05-13 Milestone */}
-        {hasRole(ROLES.USDR_ADMIN) &&
-          latestValidation?.results &&
-          renderValidationButtons()}
+        {latestValidation?.results && renderValidationButtons()}
       </div>
     </li>
   )
