@@ -46,8 +46,8 @@ module "lambda_function-subrecipientTreasuryReportGen" {
       ]
       resources = [
         # These are temporary files shared across services containing subrecipient data.
-        # Path: /{organization_id}/{reporting_period_id}/subrecipients
-        "${module.reporting_data_bucket.bucket_arn}/*/*/subrecipients",
+        # Path: treasuryreports/{organization_id}/{reporting_period_id}/subrecipients.json
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/subrecipients.json",
       ]
     }
     AllowDownloadTreasuryOutputTemplates = {

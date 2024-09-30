@@ -223,7 +223,7 @@ export const processRecord = async (
       }
 
       try {
-        const subrecipientKey = `treasuryreports/${organizationId}/${reportingPeriod.id}/subrecipients`
+        const subrecipientKey = `treasuryreports/${organizationId}/${reportingPeriod.id}/subrecipients.json`
         const { startDate, endDate } = reportingPeriod
         const subrecipientsWithUploads = await db.subrecipient.findMany({
           where: { createdAt: { lte: endDate, gte: startDate } },
