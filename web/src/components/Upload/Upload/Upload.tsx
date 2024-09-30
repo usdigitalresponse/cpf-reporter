@@ -1,11 +1,16 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+
+import { useAuth } from 'web/src/auth'
 
 import { useMutation } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
 
 import { timeTag } from 'src/lib/formatters'
 
 import UploadValidationButtonGroup from '../UploadValidationButtonGroup/UploadValidationButtonGroup'
-import UploadValidationResultsTable from '../UploadValidationResultsTable/UploadValidationResultsTable'
+import UploadValidationResultsTable, {
+  Severity,
+} from '../UploadValidationResultsTable/UploadValidationResultsTable'
 import UploadValidationStatus from '../UploadValidationStatus/UploadValidationStatus'
 
 const DOWNLOAD_UPLOAD_FILE = gql`
@@ -13,12 +18,29 @@ const DOWNLOAD_UPLOAD_FILE = gql`
     downloadUploadFile(id: $id)
   }
 `
+
+const CREATE_VALIDATION_MUTATION = gql`
+  mutation CreateUploadValidationMutation(
+    $input: CreateUploadValidationInput!
+  ) {
+    createUploadValidation(input: $input) {
+      initiatedById
+      passed
+      isManual
+      results
+      uploadId
+    }
+  }
+`
+
 const Upload = ({ upload, queryResult }) => {
-  const { startPolling, stopPolling } = queryResult
+  const { currentUser } = useAuth()
+  const { startPolling, stopPolling, refetch } = queryResult
   const hasErrors =
     upload.latestValidation?.results?.errors !== null &&
     Array.isArray(upload.latestValidation?.results?.errors) &&
     upload.latestValidation?.results?.errors.length > 0
+  const [savingUpload, setSavingUpload] = useState(false)
 
   useEffect(() => {
     const pollingTimeout = 120 * 1000
@@ -55,8 +77,44 @@ const Upload = ({ upload, queryResult }) => {
     downloadUploadFile({ variables: { id: upload.id } })
   }
 
+  const [createValidation] = useMutation(CREATE_VALIDATION_MUTATION, {
+    onCompleted: async () => {
+      toast.success('Upload invalidated')
+      await refetch()
+      setSavingUpload(false)
+    },
+    onError: (error) => {
+      toast.error(error.message)
+      setSavingUpload(false)
+    },
+  })
+
   const handleValidate = () => {}
-  const handleForceInvalidate = () => {}
+
+  const handleForceInvalidate = async () => {
+    setSavingUpload(true)
+    const invalidateResult = [
+      {
+        message: `Manually invalidated by User: ${currentUser.name} (${currentUser.email})`,
+        tab: 'N/A',
+        row: 'N/A',
+        col: 'N/A',
+        severity: Severity.Error,
+      },
+    ]
+
+    const inputManual = {
+      initiatedById: currentUser.id,
+      passed: false,
+      isManual: true,
+      results: {
+        errors: invalidateResult,
+      },
+      uploadId: upload.id,
+    }
+
+    await createValidation({ variables: { input: inputManual } })
+  }
 
   return (
     <>
@@ -104,6 +162,7 @@ const Upload = ({ upload, queryResult }) => {
                   handleValidate={handleValidate}
                   handleForceInvalidate={handleForceInvalidate}
                   handleFileDownload={handleFileDownload}
+                  savingUpload={savingUpload}
                 />
               </>
             )}

@@ -1,6 +1,6 @@
 import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Prisma, Version } from '@prisma/client'
-import { S3Handler, S3ObjectCreatedNotificationEvent } from 'aws-lambda'
+import { S3ObjectCreatedNotificationEvent } from 'aws-lambda'
 
 import { getS3Client, sendPutObjectToS3Bucket } from 'src/lib/aws'
 import { db, getPrismaClient } from 'src/lib/db'
@@ -53,7 +53,7 @@ type UploadValidationS3Client = {
   send: (command: GetObjectCommand | DeleteObjectCommand) => Promise<any>
 }
 
-export const handler: S3Handler = async (
+export const handler = async (
   event: S3ObjectCreatedNotificationEvent
 ): Promise<Response> => {
   const s3 = getS3Client()
@@ -223,7 +223,7 @@ export const processRecord = async (
       }
 
       try {
-        const subrecipientKey = `treasuryreports/${organizationId}/${reportingPeriod.id}/subrecipients`
+        const subrecipientKey = `treasuryreports/${organizationId}/${reportingPeriod.id}/subrecipients.json`
         const { startDate, endDate } = reportingPeriod
         const subrecipientsWithUploads = await db.subrecipient.findMany({
           where: { createdAt: { lte: endDate, gte: startDate } },

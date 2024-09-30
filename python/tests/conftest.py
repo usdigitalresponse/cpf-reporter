@@ -338,6 +338,7 @@ def sample_subrecipients_generation_event():
         "outputTemplateId": 78,
     }
 
+
 @pytest.fixture
 def sample_subrecipients_lambda_payload():
     return SubrecipientLambdaPayload(

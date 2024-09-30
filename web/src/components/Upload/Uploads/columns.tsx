@@ -1,4 +1,5 @@
 import { createColumnHelper } from '@tanstack/react-table'
+import type { Upload } from 'types/graphql'
 
 import { Link, routes } from '@redwoodjs/router'
 
@@ -22,20 +23,20 @@ function valueAsLink(cell): JSX.Element {
 
 function validationDisplay(row) {
   const { latestValidation } = row
+  const { results, passed, isManual, createdAt } = latestValidation
 
-  if (!latestValidation || latestValidation.results === null) {
+  if (!latestValidation || results === null) {
     return 'Not set'
   }
 
-  const { passed, createdAt } = latestValidation
   const formattedDate = formatDateString(createdAt)
 
   if (!passed) {
-    return (
-      <span className="text-danger">
-        Did not pass validation on {formattedDate}
-      </span>
-    )
+    const invalidText = isManual
+      ? `Invalidated on ${formattedDate}`
+      : `Did not pass validation on ${formattedDate}`
+
+    return <span className="text-danger">{invalidText}</span>
   }
 
   return formattedDate
@@ -50,9 +51,13 @@ export const columnDefs = [
     cell: (info) => info.getValue(),
     header: 'Agency',
   }),
-  columnHelper.accessor('expenditureCategory.code', {
+  columnHelper.accessor((row: Upload) => row.expenditureCategory?.code, {
     cell: (info) => info.getValue() ?? 'Not set',
     header: 'EC Code',
+  }),
+  columnHelper.accessor('reportingPeriod.name', {
+    cell: (info) => info.getValue(),
+    header: 'Reporting Period',
   }),
   columnHelper.accessor('uploadedBy.email', {
     cell: (info) => info.getValue(),

@@ -373,4 +373,9 @@ export const User: UserRelationResolvers = {
   uploaded: (_obj, { root }) => {
     return db.user.findUnique({ where: { id: root?.id } }).uploaded()
   },
+  certifiedReportingPeriods: (_obj, { root }) => {
+    return db.user
+      .findUnique({ where: { id: root?.id } })
+      .certifiedReportingPeriods()
+  },
 }

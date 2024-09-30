@@ -7,6 +7,7 @@ from typing import Any, Dict
 import boto3
 import structlog
 from aws_lambda_typing.context import Context
+from botocore.exceptions import ClientError
 from mypy_boto3_s3.client import S3Client
 from openpyxl import Workbook, load_workbook
 from pydantic import BaseModel
@@ -93,12 +94,22 @@ def process_event(
         with structlog.contextvars.bound_contextvars(
             subrecipients_filename=recent_subrecipients_file.name
         ):
-            download_s3_object(
-                s3_client,
-                os.environ["REPORTING_DATA_BUCKET_NAME"],
-                f"treasuryreports/{organization_id}/{reporting_period_id}/subrecipients",
-                recent_subrecipients_file,
-            )
+            try:
+                download_s3_object(
+                    client=s3_client,
+                    bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+                    key=f"treasuryreports/{organization_id}/{reporting_period_id}/subrecipients.json",
+                    destination=recent_subrecipients_file,
+                )
+            except ClientError as e:
+                error = e.response.get("Error") or {}
+                if error.get("Code") == "404":
+                    logger.info(
+                        f"No subrecipients for organization {organization_id} and reporting period {reporting_period_id}"
+                    )
+                    return
+                else:
+                    raise
 
         recent_subrecipients_file.seek(0)
 
@@ -213,7 +224,7 @@ def upload_workbook(
     Handles upload of workbook to S3, both in xlsx and csv formats
     """
 
-    with tempfile.NamedTemporaryFile("w") as new_xlsx_file:
+    with tempfile.NamedTemporaryFile("rb+") as new_xlsx_file:
         workbook.save(new_xlsx_file.name)
         upload_generated_file_to_s3(
             s3client,
@@ -226,7 +237,9 @@ def upload_workbook(
             new_xlsx_file,
         )
 
-    with tempfile.NamedTemporaryFile("w") as new_csv_file:
+    with tempfile.NamedTemporaryFile(
+        mode="wt", encoding="utf-8", delete_on_close=False
+    ) as new_csv_file:
         convert_xlsx_to_csv(
             new_csv_file,
             workbook,
@@ -234,13 +247,16 @@ def upload_workbook(
                 workbook[WORKSHEET_NAME], FIRST_BLANK_ROW_NUM, FIRST_DATA_COLUMN
             ),
         )
-        upload_generated_file_to_s3(
-            s3client,
-            os.environ["REPORTING_DATA_BUCKET_NAME"],
-            get_generated_output_file_key(
-                file_type=OutputFileType.CSV,
-                project="Subrecipient",
-                organization=organization,
-            ),
-            new_csv_file,
-        )
+        new_csv_file.close()
+
+        with open(new_csv_file.name, mode="rb") as binary_csv_file:
+            upload_generated_file_to_s3(
+                s3client,
+                os.environ["REPORTING_DATA_BUCKET_NAME"],
+                get_generated_output_file_key(
+                    file_type=OutputFileType.CSV,
+                    project="Subrecipient",
+                    organization=organization,
+                ),
+                binary_csv_file,
+            )

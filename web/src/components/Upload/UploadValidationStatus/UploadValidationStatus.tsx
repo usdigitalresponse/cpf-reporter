@@ -7,7 +7,15 @@ const UploadValidationStatus = ({ latestValidation }) => {
   }
 
   const getValidationStatus = () => {
-    if (latestValidation?.results === null) {
+    const {
+      passed,
+      isManual,
+      createdAt,
+      results,
+      initiatedBy: { name },
+    } = latestValidation
+
+    if (results === null) {
       return (
         <span className="text-warning fst-italic">
           Validation in progress...
@@ -15,14 +23,29 @@ const UploadValidationStatus = ({ latestValidation }) => {
       )
     }
 
-    const { passed, createdAt, initiatedBy } = latestValidation
-    const statusText = passed ? 'Validated' : 'Did not pass validation'
-    const statusClass = passed ? 'text-success' : 'text-danger'
+    const valueClassName = !passed ? 'text-danger' : 'text-success'
+    const time = timeTag(createdAt)
+
+    let statusOutcome
+    if (isManual) {
+      statusOutcome = 'Invalidated'
+    } else {
+      statusOutcome = passed ? 'Validated' : 'Did not pass validation'
+    }
+
+    const statusText = (
+      <>
+        {statusOutcome}
+        {' on '}
+        {time}
+        {' by '}
+        {name}
+      </>
+    )
 
     return (
-      <span className={statusClass}>
-        {getValidationIcon(passed)} {statusText} on {timeTag(createdAt)} by{' '}
-        {initiatedBy?.name}
+      <span className={valueClassName}>
+        {getValidationIcon(passed)} {statusText}
       </span>
     )
   }

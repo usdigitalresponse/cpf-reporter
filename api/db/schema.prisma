@@ -22,27 +22,29 @@ model Agency {
 }
 
 model Organization {
-  id                Int                 @id @default(autoincrement())
-  agencies          Agency[]
-  name              String
-  subrecipients     Subrecipient[]
-  projects          Project[]
-  preferences       Json?
+  id                            Int                            @id @default(autoincrement())
+  agencies                      Agency[]
+  name                          String
+  subrecipients                 Subrecipient[]
+  projects                      Project[]
+  preferences                   Json?
+  reportingPeriodCertifications ReportingPeriodCertification[]
 }
 
 model User {
-  id             Int                 @id @default(autoincrement())
-  email          String              @unique
-  name           String
-  agencyId       Int
-  createdAt      DateTime            @default(now()) @db.Timestamptz(6)
-  updatedAt      DateTime            @default(now()) @db.Timestamptz(6) @updatedAt
-  role           Role
-  isActive       Boolean             @default(true)
-  passageId      String?
-  agency         Agency              @relation(fields: [agencyId], references: [id])
-  uploaded       Upload[]
-  initiated      UploadValidation[]
+  id                        Int                            @id @default(autoincrement())
+  email                     String                         @unique
+  name                      String
+  agencyId                  Int
+  createdAt                 DateTime                       @default(now()) @db.Timestamptz(6)
+  updatedAt                 DateTime                       @default(now()) @updatedAt @db.Timestamptz(6)
+  role                      Role
+  isActive                  Boolean                        @default(true)
+  passageId                 String?
+  agency                    Agency                         @relation(fields: [agencyId], references: [id])
+  uploaded                  Upload[]
+  initiated                 UploadValidation[]
+  certifiedReportingPeriods ReportingPeriodCertification[]
 
   @@index(fields: [passageId])
 }
@@ -90,6 +92,21 @@ model ReportingPeriod {
   updatedAt         DateTime       @default(now()) @db.Timestamptz(6) @updatedAt
   uploads           Upload[]
   projects          Project[]
+  certifications    ReportingPeriodCertification[]
+}
+
+model ReportingPeriodCertification {
+  id                 Int             @id @default(autoincrement())
+  organizationId     Int
+  organization       Organization    @relation(fields: [organizationId], references: [id])
+  reportingPeriodId  Int
+  reportingPeriod    ReportingPeriod @relation(fields: [reportingPeriodId], references: [id])
+  certifiedById      Int
+  certifiedBy        User            @relation(fields: [certifiedById], references: [id])
+  createdAt          DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime        @default(now()) @db.Timestamptz(6) @updatedAt
+
+  @@unique([organizationId, reportingPeriodId])
 }
 
 model ExpenditureCategory {
@@ -119,11 +136,12 @@ model Upload {
 }
 
 model UploadValidation {
-  id                  Int            @id @default(autoincrement())
+  id                  Int           @id @default(autoincrement())
   uploadId            Int
-  upload              Upload         @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  upload              Upload        @relation(fields: [uploadId], references: [id], onDelete: Cascade)
   results             Json?         @db.JsonB
   passed              Boolean
+  isManual            Boolean       @default(false)   
   initiatedById       Int
   initiatedBy         User          @relation(fields: [initiatedById], references: [id])
   createdAt           DateTime      @default(now()) @db.Timestamptz(6)

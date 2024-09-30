@@ -7,6 +7,7 @@ from typing import IO, Dict, List, Set, Union
 import boto3
 import structlog
 from aws_lambda_typing.context import Context
+from botocore.exceptions import ClientError
 from mypy_boto3_s3.client import S3Client
 from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
@@ -87,13 +88,13 @@ def handle(event: ProjectLambdaPayload, context: Context):
     try:
         process_event(payload, logger)
     except Exception:
-        logger.exception("Exception processing Subrecipient file generation event")
+        logger.exception("Exception processing Project file generation event")
         return {"statusCode": 500, "body": "Internal Server Error"}
 
     return {"statusCode": 200, "body": "Success"}
 
 
-def process_event(payload: ProjectLambdaPayload, logger):
+def process_event(payload: ProjectLambdaPayload, logger: structlog.stdlib.BoundLogger):
     """
     This function is structured as followed:
     1) Load the metadata
@@ -137,6 +138,7 @@ def process_event(payload: ProjectLambdaPayload, logger):
         s3_client=s3_client,
         organization=organization,
         project_use_code=project_use_code,
+        logger=logger,
     )
 
     ### 2) Download the existing output XLSX file. If it doesn't exist, download
@@ -149,9 +151,10 @@ def process_event(payload: ProjectLambdaPayload, logger):
             project_agency_id_to_row_map=project_agency_id_to_row_map,
             output_file=output_file,
             output_template_id=payload.outputTemplateId,
+            logger=logger,
         )
 
-        output_workbook = load_workbook(filename=output_file, read_only=True)
+        output_workbook = load_workbook(filename=output_file, read_only=False)
         output_sheet = output_workbook["Baseline"]
 
         ### 3) Open files in the uploadsToRemove parameter.
@@ -160,6 +163,7 @@ def process_event(payload: ProjectLambdaPayload, logger):
             s3_client=s3_client,
             uploads_by_agency_id=payload.uploadsToRemove,
             ProjectRowSchema=ProjectRowSchema,
+            logger=logger,
         )
 
         # Delete rows corresponding to project_agency_ids_to_remove in the existing output file
@@ -181,13 +185,20 @@ def process_event(payload: ProjectLambdaPayload, logger):
 
                 # TODO: Add a verification to ensure that the objectKey here is formatted correctly.
                 # Path must be: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm
-
-                download_s3_object(
-                    s3_client,
-                    os.environ["REPORTING_DATA_BUCKET_NAME"],
-                    file_info.objectKey,
-                    file,
-                )
+                try:
+                    download_s3_object(
+                        s3_client,
+                        os.environ["REPORTING_DATA_BUCKET_NAME"],
+                        file_info.objectKey,
+                        file,
+                    )
+                except ClientError as e:
+                    error = e.response.get("Error") or {}
+                    if error.get("Code") == "404":
+                        logger.exception(
+                            f"Expected to find an upload with key: {file_info.objectKey}"
+                        )
+                    raise
                 # Load workbook
                 wb = load_workbook(filename=file, read_only=True)
                 # Get and combine project rows
@@ -205,7 +216,7 @@ def process_event(payload: ProjectLambdaPayload, logger):
 
         ### 5) Save data
         # Output XLSX file
-        with tempfile.NamedTemporaryFile("w") as new_output_file:
+        with tempfile.NamedTemporaryFile("rb+") as new_output_file:
             output_workbook.save(new_output_file.name)
             upload_generated_file_to_s3(
                 client=s3_client,
@@ -218,31 +229,40 @@ def process_event(payload: ProjectLambdaPayload, logger):
                 file=new_output_file,
             )
         # Output CSV file for treasury
-        with tempfile.NamedTemporaryFile("w") as csv_file:
+        with tempfile.NamedTemporaryFile(
+            mode="wt", encoding="utf-8", delete_on_close=False
+        ) as csv_file:
             convert_xlsx_to_csv(csv_file, output_workbook, highest_row_num)
-            upload_generated_file_to_s3(
-                client=s3_client,
-                bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
-                key=get_generated_output_file_key(
-                    file_type=OutputFileType.CSV,
-                    project=project_use_code,
-                    organization=organization,
-                ),
-                file=csv_file,
-            )
+            csv_file.close()
+            with open(csv_file.name, mode="rb") as binary_csv_file:
+                upload_generated_file_to_s3(
+                    client=s3_client,
+                    bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+                    key=get_generated_output_file_key(
+                        file_type=OutputFileType.CSV,
+                        project=project_use_code,
+                        organization=organization,
+                    ),
+                    file=binary_csv_file,
+                )
         # Store project_id_agency_id to row number in a json file
-        with tempfile.NamedTemporaryFile("w") as json_file:
+        with tempfile.NamedTemporaryFile(
+            "wt", encoding="utf-8", delete_on_close=False
+        ) as json_file:
             json.dump(project_agency_id_to_row_map, fp=json_file)
-            upload_generated_file_to_s3(
-                client=s3_client,
-                bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
-                key=get_generated_output_file_key(
-                    file_type=OutputFileType.JSON,
-                    project=project_use_code,
-                    organization=organization,
-                ),
-                file=json_file,
-            )
+            json_file.close()
+            with open(json_file.name, mode="rb") as binary_json_file:
+                upload_generated_file_to_s3(
+                    client=s3_client,
+                    bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+                    key=get_generated_output_file_key(
+                        file_type=OutputFileType.JSON,
+                        project=project_use_code,
+                        organization=organization,
+                    ),
+                    file=binary_json_file,
+                )
+
 
 def download_output_file(
     s3_client: S3Client,
@@ -251,22 +271,29 @@ def download_output_file(
     organization: OrganizationObj,
     project_use_code: str,
     output_template_id: int,
+    logger: structlog.stdlib.BoundLogger,
 ) -> int:
     highest_row_num = None
     if project_agency_id_to_row_map:
         """
         Output file already exists, download it
         """
-        download_s3_object(
-            client=s3_client,
-            bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
-            key=get_generated_output_file_key(
-                file_type=OutputFileType.XLSX,
-                project=project_use_code,
-                organization=organization,
-            ),
-            destination=output_file,
-        )
+        try:
+            download_s3_object(
+                client=s3_client,
+                bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+                key=get_generated_output_file_key(
+                    file_type=OutputFileType.XLSX,
+                    project=project_use_code,
+                    organization=organization,
+                ),
+                destination=output_file,
+            )
+        except ClientError as e:
+            error = e.response.get("Error") or {}
+            if error.get("Code") == "404":
+                logger.exception("Expected to find an existing treasury output report")
+                raise
         highest_row_num = max(project_agency_id_to_row_map.values())
     else:
         """
@@ -281,10 +308,12 @@ def download_output_file(
         highest_row_num = OUTPUT_STARTING_ROW - 1
     return highest_row_num
 
+
 def get_existing_output_metadata(
     s3_client,
     organization: OrganizationObj,
     project_use_code: str,
+    logger: structlog.stdlib.BoundLogger,
 ) -> Dict[str, int]:
     existing_project_agency_id_to_row_number = {}
     with tempfile.NamedTemporaryFile() as existing_file:
@@ -299,8 +328,16 @@ def get_existing_output_metadata(
                 ),
                 existing_file,
             )
-        except Exception:
-            existing_file = None
+        except ClientError as e:
+            error = e.response.get("Error") or {}
+            if error.get("Code") == "404":
+                logger.info(
+                    "There is no existing metadata file for this treasury report"
+                )
+                existing_file = None
+            else:
+                raise
+
         if existing_file:
             existing_project_agency_id_to_row_number = json.load(existing_file)
 
@@ -333,6 +370,7 @@ def get_outdated_projects_to_remove(
     s3_client,
     uploads_by_agency_id: Dict[AgencyId, UploadObj],
     ProjectRowSchema: Union[Project1ARow, Project1BRow, Project1CRow],
+    logger: structlog.stdlib.BoundLogger,
 ):
     """
     Open the files in the outdated_file_info_list and get the projects to
@@ -342,12 +380,20 @@ def get_outdated_projects_to_remove(
     for agency_id, file_info in uploads_by_agency_id.items():
         with tempfile.NamedTemporaryFile() as file:
             # Download projects from S3
-            download_s3_object(
-                s3_client,
-                os.environ["REPORTING_DATA_BUCKET_NAME"],
-                file_info.objectKey,
-                file,
-            )
+            try:
+                download_s3_object(
+                    client=s3_client,
+                    bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+                    key=file_info.objectKey,
+                    destination=file,
+                )
+            except ClientError as e:
+                error = e.response.get("Error") or {}
+                if error.get("Code") == "404":
+                    logger.exception(
+                        f"Expected to find an upload with key: {file_info.objectKey}"
+                    )
+                raise
             # Load workbook
             outdated_wb = load_workbook(filename=file, read_only=True)
             project_agency_ids_to_remove = project_agency_ids_to_remove.union(
@@ -402,8 +448,7 @@ def insert_project_row(
     sheet is Optional only for tests
     """
     row_schema = row.model_json_schema()["properties"]
-    row_dict = dict(row)
-
+    row_dict = row.dict()
     row_with_output_cols = {}
     for prop in row_dict.keys():
         prop_meta = row_schema.get(prop)
@@ -412,7 +457,7 @@ def insert_project_row(
         if prop_meta[f"treasury_report_col_{project_use_code}"]:
             row_with_output_cols[
                 prop_meta[f"treasury_report_col_{project_use_code}"]
-            ] = row_dict[prop]
+            ] = str(row_dict[prop]) if row_dict[prop] else ""
 
     for col in row_with_output_cols.keys():
         if sheet:

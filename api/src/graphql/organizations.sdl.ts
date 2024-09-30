@@ -7,11 +7,14 @@ export const schema = gql`
     subrecipients: [Subrecipient]!
     projects: [Project]!
     preferences: JSON
+    reportingPeriod: ReportingPeriod
+    reportingPeriodCertifications: [ReportingPeriodCertification]!
   }
 
   type Query {
     organizations: [Organization!]! @requireAuth
     organization(id: Int!): Organization @requireAuth
+    organizationOfCurrentUser: Organization @requireAuth
   }
 
   input CreateOrganizationInput {

@@ -16,6 +16,7 @@ export const schema = gql`
     role: RoleEnum!
     isActive: Boolean!
     uploaded: [Upload]!
+    certifiedReportingPeriods: [ReportingPeriodCertification]!
   }
 
   type Query {

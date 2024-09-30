@@ -9,16 +9,33 @@ import type {
 import { getTreasurySignedUrl, startStepFunctionExecution } from 'src/lib/aws'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
+import { reportingPeriod } from 'src/services/reportingPeriods'
 
 export const organizations: QueryResolvers['organizations'] = () => {
   return db.organization.findMany()
 }
 
-export const organization: QueryResolvers['organization'] = ({ id }) => {
-  return db.organization.findUnique({
+export const organization: QueryResolvers['organization'] = async ({ id }) => {
+  const org = await db.organization.findUnique({
     where: { id },
   })
+
+  if (org && org.preferences?.current_reporting_period_id) {
+    org.reportingPeriod = await reportingPeriod({
+      id: org.preferences.current_reporting_period_id,
+    })
+  }
+
+  return org
 }
+
+export const organizationOfCurrentUser: QueryResolvers['organizationOfCurrentUser'] =
+  async () => {
+    const organizationId = context.currentUser.agency.organizationId
+    return db.organization.findUnique({
+      where: { id: organizationId },
+    })
+  }
 
 export const createOrganization: MutationResolvers['createOrganization'] = ({
   input,
@@ -225,5 +242,10 @@ export const Organization: OrganizationRelationResolvers = {
   },
   projects: (_obj, { root }) => {
     return db.organization.findUnique({ where: { id: root?.id } }).projects()
+  },
+  reportingPeriodCertifications: (_obj, { root }) => {
+    return db.organization
+      .findUnique({ where: { id: root?.id } })
+      .reportingPeriodCertifications()
   },
 }
