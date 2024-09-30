@@ -66,6 +66,7 @@ export const createUpload: MutationResolvers['createUpload'] = async ({
       uploadId: upload.id,
       initiatedById: upload.uploadedById,
       passed: false,
+      isManual: false,
       results: null,
     },
   })
