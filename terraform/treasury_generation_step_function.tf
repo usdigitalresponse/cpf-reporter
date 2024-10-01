@@ -147,7 +147,7 @@ module "treasury_generation_step_function" {
         "Type" : "Task",
         "Resource" : "arn:aws:states:::lambda:invoke",
         "Parameters" : {
-          "FunctionName" : lambda_function-email-presigned-url.lambda_function_arn,
+          "FunctionName" : module.lambda_function-email-presigned-url.lambda_function_arn,
           "Payload.$" : "$$.Execution.Input.email"
         },
         "Retry" : [
