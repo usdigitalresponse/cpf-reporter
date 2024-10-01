@@ -24,6 +24,7 @@ import {
   SubrecipientLambdaPayload,
   ProjectLambdaPayload,
   CreateArchiveLambdaPayload,
+  EmailLambdaPayload,
 } from './uploads'
 import type { StandardScenario } from './uploads.scenarios'
 
@@ -336,6 +337,20 @@ describe('treasury report', () => {
           },
         },
       }
+      const emailPayload: EmailLambdaPayload = {
+        email: {
+          organization: {
+            id: mockOrganization.id,
+            preferences: {
+              current_reporting_period_id: mockReportingPeriod.id,
+            },
+          },
+          user: {
+            email: mockUser.email,
+            id: mockUser.id,
+          },
+        },
+      }
 
       const input = JSON.stringify({
         '1A': {},
@@ -343,9 +358,11 @@ describe('treasury report', () => {
         '1C': {},
         Subrecipient: {},
         zip: {},
+        email: {},
         ...projectPayload,
         ...subrecipientPayload,
         ...zipPayload,
+        ...emailPayload,
       })
       const result = await sendTreasuryReport()
 
