@@ -2,7 +2,7 @@ import json
 import os
 import tempfile
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import boto3
 import structlog
@@ -88,7 +88,49 @@ def process_event(
     reporting_period_id = payload.organization.preferences.current_reporting_period_id
     output_template_id = payload.outputTemplateId
 
-    s3_client: S3Client = boto3.client("s3")
+    s3_client: S3Client = boto3.client(service_name="s3")
+
+    recent_subrecipients = get_recent_subrecipients(
+        s3_client, organization_id, reporting_period_id, logger
+    )
+    if not recent_subrecipients or no_subrecipients_in_file(recent_subrecipients):
+        logger.warning(
+            f"Subrecipients file for organization {organization_id} and reporting period {reporting_period_id} does not have any subrecipients listed"
+        )
+        return
+
+    workbook = get_output_workbook(s3_client, output_template_id)
+    write_subrecipients_to_workbook(
+        recent_subrecipients=recent_subrecipients,
+        workbook=workbook,
+        logger=logger,
+    )
+    upload_workbook(workbook, s3_client, payload.organization)
+
+    return {
+        "statusCode": 200,
+        "Payload": {
+            "organization_id": organization_id,
+            "reporting_period_id": reporting_period_id,
+        },
+    }
+
+
+def get_output_workbook(s3_client: S3Client, output_template_id: int) -> Workbook:
+    with tempfile.NamedTemporaryFile() as output_file:
+        get_output_template(s3_client, output_template_id, "Subrecipient", output_file)
+        workbook = load_workbook(filename=output_file)
+
+    return workbook
+
+
+def get_recent_subrecipients(
+    s3_client,
+    organization_id,
+    reporting_period_id,
+    logger: structlog.stdlib.BoundLogger,
+) -> Optional[dict]:
+    recent_subrecipients = {}
 
     with tempfile.NamedTemporaryFile() as recent_subrecipients_file:
         with structlog.contextvars.bound_contextvars(
@@ -111,48 +153,19 @@ def process_event(
                 else:
                     raise
 
-        recent_subrecipients_file.seek(0)
+            recent_subrecipients_file.seek(0)
 
-    recent_subrecipients = ...
-    try:
-        recent_subrecipients = json.load(recent_subrecipients_file)
-    except json.JSONDecodeError:
-        logger.exception(
-            f"Subrecipients file for organization {organization_id} and reporting period {reporting_period_id} does not contain valid JSON"
-        )
-        return
+            try:
+                recent_subrecipients = json.load(recent_subrecipients_file)
+            except json.JSONDecodeError:
+                logger.exception(
+                    f"Subrecipients file for organization {organization_id} and reporting period {reporting_period_id} does not contain valid JSON"
+                )
+                return
 
-    if no_subrecipients_in_file(recent_subrecipients=recent_subrecipients):
-        logger.warning(
-            f"Subrecipients file for organization {organization_id} and reporting period {reporting_period_id} does not have any subrecipients listed"
-        )
-        return
+    return recent_subrecipients
 
-    output_file = tempfile.NamedTemporaryFile()
-    get_output_template(s3_client, output_template_id, "Subrecipient", output_file)
-
-    workbook = load_workbook(filename=output_file)
-    write_subrecipients_to_workbook(
-        recent_subrecipients=recent_subrecipients,
-        workbook=workbook,
-        logger=logger,
-    )
-
-    upload_workbook(workbook, s3_client, payload.organization)
-
-    output_file.close()
-    recent_subrecipients_file.close()
-
-    return {
-        "statusCode": 200,
-        "Payload": {
-            "organization_id": organization_id,
-            "reporting_period_id": reporting_period_id,
-        }
-    }
-
-
-def no_subrecipients_in_file(recent_subrecipients):
+def no_subrecipients_in_file(recent_subrecipients: dict):
     """
     Helper method to determine if the recent_subrecipients JSON object in
     the recent subrecipients file downloaded from S3 has actual subrecipients in it or not
@@ -164,7 +177,11 @@ def no_subrecipients_in_file(recent_subrecipients):
     )
 
 
-def write_subrecipients_to_workbook(recent_subrecipients, workbook, logger):
+def write_subrecipients_to_workbook(
+    recent_subrecipients: dict,
+    workbook: Workbook,
+    logger: structlog.stdlib.BoundLogger,
+):
     """
     Given an output template, in the form of a `workbook` preloaded with openpyxl,
     go through a list of `recent_subrecipients` and write information for each of them into the workbook

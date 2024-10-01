@@ -316,7 +316,9 @@ def get_existing_output_metadata(
     logger: structlog.stdlib.BoundLogger,
 ) -> Dict[str, int]:
     existing_project_agency_id_to_row_number = {}
-    with tempfile.NamedTemporaryFile() as existing_file:
+    with tempfile.NamedTemporaryFile(
+        mode="wb", delete_on_close=False
+    ) as existing_file_binary:
         try:
             download_s3_object(
                 s3_client,
@@ -326,7 +328,7 @@ def get_existing_output_metadata(
                     project=project_use_code,
                     organization=organization,
                 ),
-                existing_file,
+                existing_file_binary,
             )
         except ClientError as e:
             error = e.response.get("Error") or {}
@@ -334,12 +336,14 @@ def get_existing_output_metadata(
                 logger.info(
                     "There is no existing metadata file for this treasury report"
                 )
-                existing_file = None
+                existing_file_binary = None
             else:
                 raise
 
-        if existing_file:
-            existing_project_agency_id_to_row_number = json.load(existing_file)
+        if existing_file_binary:
+            existing_file_binary.close()
+            with open(existing_file_binary.name, mode="rt") as existing_file_json:
+                existing_project_agency_id_to_row_number = json.load(existing_file_json)
 
     return existing_project_agency_id_to_row_number
 
