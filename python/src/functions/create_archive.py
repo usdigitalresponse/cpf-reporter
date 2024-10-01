@@ -97,5 +97,10 @@ def create_archive(
             upload_key = f"{target_key}report.zip"
             # upload the zip file to the target key
 
-            s3_client.upload_file(file.name, S3_BUCKET, upload_key)
+            s3_client.upload_file(
+                file.name,
+                S3_BUCKET,
+                upload_key,
+                ExtraArgs={"ServerSideEncryption": "AES256"},
+            )
             logger.info(f"Uploaded archive file to {upload_key}")

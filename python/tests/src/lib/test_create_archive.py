@@ -30,7 +30,10 @@ def test_create_archive_creates_zip():
 
     # Assert that the file was attempted to be created
     s3_client.upload_file.assert_called_with(
-        ANY, "test_bucket", "treasuryreports/1234/5678/report.zip"
+        ANY,
+        "test_bucket",
+        "treasuryreports/1234/5678/report.zip",
+        ExtraArgs={"ServerSideEncryption": "AES256"},
     )
 
 
