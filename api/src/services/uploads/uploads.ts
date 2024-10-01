@@ -191,6 +191,10 @@ type InfoForSubrecipient = {
 type InfoForArchive = {
   organization: OrganizationObj
 }
+type InfoForEmail = {
+  organization: OrganizationObj
+  user: UserObj
+}
 /*
 This type should be similar to the following python class:
 class ProjectLambdaPayload(BaseModel):
@@ -204,6 +208,7 @@ export type SubrecipientLambdaPayload = Record<
   InfoForSubrecipient
 >
 export type CreateArchiveLambdaPayload = Record<'zip', InfoForArchive>
+export type EmailLambdaPayload = Record<'email', InfoForEmail>
 
 export const getUploadsByExpenditureCategory = async (
   organization: Organization,
@@ -343,6 +348,27 @@ export const getCreateArchiveLambdaPayload = async (
   }
 }
 
+export const getEmailLambdaPayload = async (
+  organization: Organization,
+  user: CurrentUser
+): Promise<EmailLambdaPayload> => {
+  return {
+    email: {
+      organization: {
+        id: organization.id,
+        preferences: {
+          current_reporting_period_id:
+            organization.preferences['current_reporting_period_id'],
+        },
+      },
+      user: {
+        email: user.email,
+        id: user.id,
+      },
+    },
+  }
+}
+
 export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
   async () => {
     try {
@@ -363,15 +389,20 @@ export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
       const createArchiveLambdaPayload: CreateArchiveLambdaPayload =
         await getCreateArchiveLambdaPayload(organization)
 
+      const emailLambdaPayload: EmailLambdaPayload =
+        await getEmailLambdaPayload(organization, context.currentUser)
+
       const input = {
         '1A': {},
         '1B': {},
         '1C': {},
         Subrecipient: {},
         zip: {},
+        email: {},
         ...projectLambdaPayload,
         ...subrecipientLambdaPayload,
         ...createArchiveLambdaPayload,
+        ...emailLambdaPayload,
       }
 
       await startStepFunctionExecution(

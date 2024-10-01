@@ -123,10 +123,32 @@ module "treasury_generation_step_function" {
       },
       "CreateTreasuryZipfile" : {
         "Type" : "Task",
+        "Next" : "SendSuccessEmail",
         "Resource" : "arn:aws:states:::lambda:invoke",
         "Parameters" : {
           "FunctionName" : module.lambda_function-cpfCreateArchive.lambda_function_arn,
           "Payload.$" : "$$.Execution.Input.zip"
+        },
+        "Retry" : [
+          {
+            "ErrorEquals" : [
+              "Lambda.ServiceException",
+              "Lambda.AWSLambdaException",
+              "Lambda.SdkClientException",
+              "Lambda.TooManyRequestsException"
+            ],
+            "IntervalSeconds" : 1,
+            "MaxAttempts" : 3,
+            "BackoffRate" : 2
+          }
+        ],
+      }
+      "SendSuccessEmail" : {
+        "Type" : "Task",
+        "Resource" : "arn:aws:states:::lambda:invoke",
+        "Parameters" : {
+          "FunctionName" : module.lambda_function-email-presigned-url.lambda_function_arn,
+          "Payload.$" : "$$.Execution.Input.email"
         },
         "Retry" : [
           {
