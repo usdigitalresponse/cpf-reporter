@@ -11,7 +11,9 @@ services:
       - DEBUG=${DEBUG-}
       - DOCKER_HOST=unix:///var/run/docker.sock
       - AWS_DEFAULT_REGION=${AWS_REGION:-us-west-2}
+      - LS_LOG=debug
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - "../python/dist/:/tmp/dist/"
       - "./entrypoint/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh"

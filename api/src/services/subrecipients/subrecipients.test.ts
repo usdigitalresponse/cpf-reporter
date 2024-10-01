@@ -1,4 +1,7 @@
 import type { Subrecipient } from '@prisma/client'
+import type { GraphQLResolveInfo } from 'graphql'
+
+import type { RedwoodGraphQLContext } from '@redwoodjs/graphql-server'
 
 import {
   subrecipients,
@@ -6,6 +9,7 @@ import {
   createSubrecipient,
   updateSubrecipient,
   deleteSubrecipient,
+  Subrecipient as SubrecipientResolver,
 } from './subrecipients'
 import type { StandardScenario } from './subrecipients.scenarios'
 
@@ -17,6 +21,7 @@ import type { StandardScenario } from './subrecipients.scenarios'
 
 describe('subrecipients', () => {
   scenario('returns all subrecipients', async (scenario: StandardScenario) => {
+    mockCurrentUser(scenario.user.one)
     const result = await subrecipients()
 
     expect(result.length).toEqual(Object.keys(scenario.subrecipient).length)
@@ -36,8 +41,7 @@ describe('subrecipients', () => {
       input: {
         name: 'String',
         organizationId: scenario.subrecipient.two.organizationId,
-        startDate: '2023-12-09T14:50:18.092Z',
-        endDate: '2023-12-09T14:50:18.092Z',
+        ueiTinCombo: '10934985867',
       },
     })
 
@@ -45,8 +49,6 @@ describe('subrecipients', () => {
     expect(result.organizationId).toEqual(
       scenario.subrecipient.two.organizationId
     )
-    expect(result.startDate).toEqual(new Date('2023-12-09T00:00:00.000Z'))
-    expect(result.endDate).toEqual(new Date('2023-12-09T00:00:00.000Z'))
     expect(result.updatedAt).toBeDefined()
   })
 
@@ -64,10 +66,60 @@ describe('subrecipients', () => {
 
   scenario('deletes a subrecipient', async (scenario: StandardScenario) => {
     const original = (await deleteSubrecipient({
-      id: scenario.subrecipient.one.id,
+      id: scenario.subrecipient.two.id,
     })) as Subrecipient
     const result = await subrecipient({ id: original.id })
 
     expect(result).toEqual(null)
   })
+
+  scenario(
+    'returns all valid subrecipient uploads',
+    async (scenario: StandardScenario) => {
+      const result = await subrecipient({ id: scenario.subrecipient.one.id })
+      expect(result).toBeDefined()
+
+      const validUploads = await SubrecipientResolver.validSubrecipientUploads(
+        {},
+        {
+          root: result,
+          context: {} as RedwoodGraphQLContext,
+          info: {} as GraphQLResolveInfo,
+        }
+      )
+
+      expect(validUploads).toBeDefined()
+      expect(validUploads.length).toBe(1)
+      expect(validUploads[0].upload.filename).toBe('latest_validation_valid')
+      expect(validUploads[0].upload.validations[0].passed).toBe(true)
+    }
+  )
+
+  scenario(
+    'returns all invalid subrecipient uploads',
+    async (scenario: StandardScenario) => {
+      const result = await subrecipient({ id: scenario.subrecipient.one.id })
+      expect(result).toBeDefined()
+
+      const invalidUploads =
+        await SubrecipientResolver.invalidSubrecipientUploads(
+          {},
+          {
+            root: result,
+            context: {} as RedwoodGraphQLContext,
+            info: {} as GraphQLResolveInfo,
+          }
+        )
+
+      expect(invalidUploads).toBeDefined()
+      expect(invalidUploads.length).toBe(1)
+      expect(invalidUploads[0].upload.filename).toBe(
+        'latest_validation_invalid'
+      )
+      expect(invalidUploads[0].upload.validations[0].passed).toBe(false)
+      expect(invalidUploads[0].upload.validations[0].results).toEqual(
+        '{errors: { severity: err }}'
+      )
+    }
+  )
 })

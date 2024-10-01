@@ -2,15 +2,20 @@ export const schema = gql`
   type Subrecipient {
     id: Int!
     name: String!
+    ueiTinCombo: String!
     organizationId: Int!
     organization: Organization!
-    startDate: DateTime!
-    endDate: DateTime!
-    certifiedAt: DateTime
-    certifiedById: Int
-    certifiedBy: User
     createdAt: DateTime!
     updatedAt: DateTime!
+    status: SubrecipientStatus
+    subrecipientUploads: [SubrecipientUpload]
+    validSubrecipientUploads: [SubrecipientUpload!]
+    invalidSubrecipientUploads: [SubrecipientUpload!]
+  }
+
+  enum SubrecipientStatus {
+    ACTIVE
+    ARCHIVED
   }
 
   type Query {
@@ -21,19 +26,12 @@ export const schema = gql`
   input CreateSubrecipientInput {
     name: String!
     organizationId: Int!
-    startDate: DateTime!
-    endDate: DateTime!
-    certifiedAt: DateTime
-    certifiedById: Int
+    ueiTinCombo: String!
   }
 
   input UpdateSubrecipientInput {
     name: String
     organizationId: Int
-    startDate: DateTime
-    endDate: DateTime
-    certifiedAt: DateTime
-    certifiedById: Int
   }
 
   type Mutation {

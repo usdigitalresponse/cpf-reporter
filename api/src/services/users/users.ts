@@ -3,6 +3,8 @@ import type {
   MutationResolvers,
   UserRelationResolvers,
   Agency,
+  CreateUserInput,
+  UpdateUserInput,
 } from 'types/graphql'
 
 import {
@@ -16,7 +18,10 @@ import { AuthenticationError } from '@redwoodjs/graphql-server'
 import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
-import { createPassageUser } from 'src/services/passage/passage'
+import {
+  createPassageUser,
+  deletePassageUser,
+} from 'src/services/passage/passage'
 
 export const currentUserIsUSDRAdmin = (): boolean => {
   return context.currentUser?.roles?.includes(ROLES.USDR_ADMIN)
@@ -66,7 +71,7 @@ export const runPermissionsCreateOrUpdateValidations = async (input) => {
   const { currentUser } = context
 
   validateWithSync(() => {
-    if (!currentUser?.roles?.includes(ROLES.ORGANIZATION_ADMIN))
+    if (currentUser?.roles?.includes(ROLES.ORGANIZATION_STAFF))
       throw new AuthenticationError("You don't have permission to do that")
   })
 
@@ -186,8 +191,21 @@ export const createUser: MutationResolvers['createUser'] = async ({
   return validateUniqueness(
     'user',
     { email },
-    { message: 'This email is already in use' },
-    (db) => db.user.create({ data: input })
+    { message: 'This email is already in use', db: db },
+    async (db) => {
+      const userInput: CreateUserInput & { passageId?: string | null } = {
+        ...input,
+        passageId: null,
+      }
+
+      if (process.env.AUTH_PROVIDER === 'passage') {
+        logger.info(`Creating Passage user for ${userInput.email}`)
+        const passageUser = await createPassageUser(userInput.email)
+        userInput.passageId = passageUser.id
+      }
+
+      return db.user.create({ data: userInput })
+    }
   )
 }
 
@@ -199,13 +217,45 @@ export const updateUser: MutationResolvers['updateUser'] = async ({
   await runPermissionsCreateOrUpdateValidations(input)
   await runUpdateSpecificValidations(input, id)
 
+  const user = await db.user.findUnique({ where: { id } })
+  if (!user) {
+    throw new Error('User not found')
+  }
+
+  const updatedData: UpdateUserInput & { passageId?: string | null } = {
+    ...input,
+  }
+
+  if (process.env.AUTH_PROVIDER === 'passage') {
+    try {
+      if (!input.isActive && user.passageId) {
+        await deletePassageUser(user.passageId)
+        updatedData.passageId = null
+      } else if (input.isActive && !user.passageId) {
+        const passageUser = await createPassageUser(user.email)
+        updatedData.passageId = passageUser.id
+      }
+    } catch (e) {
+      throw new Error('Error updating Passage user')
+    }
+  }
+
   return db.user.update({
-    data: input,
+    data: updatedData,
     where: { id },
   })
 }
 
-export const deleteUser: MutationResolvers['deleteUser'] = ({ id }) => {
+export const deleteUser: MutationResolvers['deleteUser'] = async ({ id }) => {
+  const user = await db.user.findUnique({ where: { id } })
+  if (process.env.AUTH_PROVIDER == 'passage') {
+    try {
+      await deletePassageUser(user.passageId)
+    } catch (e) {
+      throw new Error('Error deleting Passage user')
+    }
+  }
+
   return db.user.delete({
     where: { id },
   })
@@ -322,5 +372,10 @@ export const User: UserRelationResolvers = {
   },
   uploaded: (_obj, { root }) => {
     return db.user.findUnique({ where: { id: root?.id } }).uploaded()
+  },
+  certifiedReportingPeriods: (_obj, { root }) => {
+    return db.user
+      .findUnique({ where: { id: root?.id } })
+      .certifiedReportingPeriods()
   },
 }

@@ -12,8 +12,11 @@ services:
       - node_modules:/home/node/app/node_modules
     ports:
       - "8910:8910"
+      - "5555:5555"
     depends_on:
       - db
+    networks:
+      - redwood
     environment:
       - DATABASE_URL=postgresql://redwood:redwood@db:5432/redwood
       - TEST_DATABASE_URL=postgresql://redwood:redwood@db:5432/redwood_test
@@ -33,6 +36,8 @@ services:
       - "5432:5432"
     volumes:
       - postgres:/var/lib/postgresql/data
+    networks:
+      - redwood
 
   localstack:
     container_name: "cpf-reporter-localstack-main"
@@ -97,6 +102,27 @@ services:
       - LOCALSTACK_HOSTNAME=localstack
     depends_on:
       - db
+
+  localstack:
+    container_name: "cpf-localstack_main"
+    image: localstack/localstack
+    ports:
+      - 4566:4566           # LocalStack Gateway
+      - 4510-4559:4510-4559  # external services port range
+    environment:
+      - DEBUG=${DEBUG-}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - AWS_DEFAULT_REGION=${AWS_REGION:-us-west-2}
+    networks:
+      - redwood
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./localstack/entrypoint/init-aws.sh:/etc/localstack/init/ready.d/init-aws.sh"
+
+networks:
+  redwood:
+    driver: bridge
 
 volumes:
   node_modules:

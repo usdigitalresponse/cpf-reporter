@@ -54,8 +54,8 @@ resource "aws_ssm_parameter" "ecs_console_secret_database_url" {
     module.postgres.cluster_port,
     module.postgres.cluster_database_name,
     join("&", [
-      "sslmode=verify-full",
-      "sslrootcert=${urlencode("/home/node/app/api/db/rds-combined-ca-bundle.pem")}",
+      "sslmode=require",
+      "sslcert=${urlencode("/home/node/app/api/db/rds-global-bundle.pem")}",
     ])
   )
 }
@@ -168,6 +168,19 @@ data "aws_iam_policy_document" "ecs_console_task" {
       "logs:PutLogEvents",
     ]
     resources = ["${aws_cloudwatch_log_group.ecs.arn}:log-stream:*"]
+  }
+  // add permissions to delete objects from s3 bucket
+  statement {
+    sid    = "DeleteS3Objects"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObject",
+      "s3:DeleteObjectVersion",
+    ]
+    resources = [
+      "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
+      "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm.json",
+    ]
   }
 }
 

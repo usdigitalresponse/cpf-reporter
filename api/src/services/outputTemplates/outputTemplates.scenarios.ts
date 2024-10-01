@@ -8,18 +8,14 @@ export const standard = defineScenario<Prisma.OutputTemplateCreateArgs>({
       data: {
         name: 'String',
         version: 'String',
-        effectiveDate: '2023-12-07T18:17:34.973Z',
-        rulesGeneratedAt: '2023-12-07T18:17:34.973Z',
-        updatedAt: '2023-12-07T18:17:34.973Z',
+        effectiveDate: '2024-08-19T20:09:50.500Z',
       },
     },
     two: {
       data: {
         name: 'String',
         version: 'String',
-        effectiveDate: '2023-12-07T18:17:34.973Z',
-        rulesGeneratedAt: '2023-12-07T18:17:34.973Z',
-        updatedAt: '2023-12-07T18:17:34.973Z',
+        effectiveDate: '2024-08-19T20:09:50.500Z',
       },
     },
   },

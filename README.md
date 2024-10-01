@@ -73,14 +73,18 @@ Build artifacts are uploaded to AWS S3 and served through a CloudFormation CDN d
 To use Docker for local development, run the following commands:
 - `docker compose -f ./docker-compose.dev.yml build` - to build the docker images
 - `docker compose -f ./docker-compose.dev.yml up` - to run the docker containers
-- `docker compose -f ./docker-compose.dev.yml run --rm -it console /bin/bash` - to go into the console container and INSIDE the container, run the following:
+- `docker compose -f ./docker-compose.dev.yml run --rm -it redwood /bin/bash` - to go into the redwood container and INSIDE the container, run the following:
   - `yarn rw prisma migrate dev` - migrates the local DB
-  - `yarn rw prisma db seed` - seeds the local DB
+  - `yarn rw prisma db seed` - seeds the local DB (seeds automatically during migration)
 - Now you should be able to open your browser to `localhost:8910` and hit the web server in the redwood container.
 
 To use Docker to run the pytest suite, run the following commands (after starting the docker containers via `up`):
 - `docker compose -f ./docker-compose.dev.yml run --rm -it python-console /bin/bash` - to go into the python container
   - `poetry run pytest` - to run the pytest suite
+
+To access the local `redwood` and `redwood_test` databases via [psql](https://www.postgresql.org/docs/current/app-psql.html):
+- Database used for local development `PGPASSWORD=redwood psql -h localhost -p 5432 -U redwood -d redwood`
+- Database used by test suites locally: `PGPASSWORD=redwood psql -h localhost -p 5432 -U redwood -d redwood_test`
 
 ## Development
 

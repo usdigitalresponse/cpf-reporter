@@ -15,12 +15,13 @@ export const QUERY = gql`
       name
       agencyId
       role
+      isActive
       createdAt
       updatedAt
     }
   }
 `
-const UPDATE_USER_MUTATION = gql`
+export const UPDATE_USER_MUTATION = gql`
   mutation UpdateUserMutation($id: Int!, $input: UpdateUserInput!) {
     updateUser(id: $id, input: $input) {
       id
@@ -28,6 +29,7 @@ const UPDATE_USER_MUTATION = gql`
       name
       agencyId
       role
+      isActive
       createdAt
       updatedAt
     }

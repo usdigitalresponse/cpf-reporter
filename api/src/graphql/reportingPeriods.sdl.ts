@@ -4,8 +4,6 @@ export const schema = gql`
     name: String!
     startDate: DateTime!
     endDate: DateTime!
-    organizationId: Int!
-    organization: Organization!
     inputTemplateId: Int!
     inputTemplate: InputTemplate!
     outputTemplateId: Int!
@@ -16,10 +14,13 @@ export const schema = gql`
     projects: [Project]!
     validationRulesId: Int
     validationRules: ValidationRules
+    certifications: [ReportingPeriodCertification]!
+    certificationForOrganization: ReportingPeriodCertification
   }
 
   type Query {
     reportingPeriods: [ReportingPeriod!]! @requireAuth
+    reportingPeriodsWithCertification: [ReportingPeriod]! @requireAuth
     reportingPeriod(id: Int!): ReportingPeriod @requireAuth
   }
 
@@ -27,7 +28,6 @@ export const schema = gql`
     name: String!
     startDate: DateTime!
     endDate: DateTime!
-    organizationId: Int!
     inputTemplateId: Int!
     outputTemplateId: Int!
   }
@@ -36,7 +36,6 @@ export const schema = gql`
     name: String
     startDate: DateTime
     endDate: DateTime
-    organizationId: Int
     inputTemplateId: Int
     outputTemplateId: Int
   }
@@ -44,6 +43,9 @@ export const schema = gql`
   type Mutation {
     createReportingPeriod(input: CreateReportingPeriodInput!): ReportingPeriod!
       @requireAuth
+    certifyReportingPeriodAndOpenNextPeriod(
+      reportingPeriodId: Int!
+    ): ReportingPeriod @requireAuth(roles: ["USDR_ADMIN", "ORGANIZATION_ADMIN"])
     updateReportingPeriod(
       id: Int!
       input: UpdateReportingPeriodInput!

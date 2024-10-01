@@ -69,6 +69,7 @@ export default async () => {
       },
     ]
 
+    let lastInputTemplateId: number
     await Promise.all(
       //
       // Change to match your data model and seeding needs
@@ -77,18 +78,42 @@ export default async () => {
         async (data: Prisma.InputTemplateCreateArgs['data']) => {
           const record = await db.inputTemplate.create({ data })
           console.log(record)
+          lastInputTemplateId = record.id
         }
       )
     )
 
+    let lastOutputTemplateId: number
     await Promise.all(
       outputTemplates.map(
         async (data: Prisma.OutputTemplateCreateArgs['data']) => {
           const record = await db.outputTemplate.create({ data })
           console.log(record)
+          lastOutputTemplateId = record.id
         }
       )
     )
+
+    const reportingPeriodData: Prisma.ReportingPeriodCreateArgs['data'] = {
+      name: 'First Reporting Period',
+      startDate: new Date(),
+      endDate: new Date(),
+      inputTemplateId: lastInputTemplateId,
+      outputTemplateId: lastOutputTemplateId,
+    }
+    const reportingPeriod = await db.reportingPeriod.create({
+      data: reportingPeriodData,
+    })
+    console.log(reportingPeriod)
+
+    await db.organization.update({
+      where: { id: organizationRecord.id },
+      data: {
+        preferences: {
+          current_reporting_period_id: reportingPeriod.id,
+        },
+      },
+    })
 
     const expendtitureCategoriesData = [
       {

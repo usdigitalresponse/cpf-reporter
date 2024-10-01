@@ -1,17 +1,13 @@
 // To access your database
 // Append api/* to import from api and web/* to import from web
 import { getPrismaClient } from 'api/src/lib/db'
-import {
-  getOrCreateOrganization
-} from 'api/src/services/organizations/organizations'
-import {
-  getOrCreateAgencies
-} from 'api/src/services/agencies/agencies'
-import { getOrCreateUsers } from 'api/src/services/users/users'
-import { getOrCreateReportingPeriod } from 'api/src/services/reportingPeriods/reportingPeriods'
-import { getOrCreateInputTemplate } from 'api/src/services/inputTemplates/inputTemplates'
-import { getOrCreateOutputTemplate } from 'api/src/services/outputTemplates/outputTemplates'
+import { getOrCreateAgencies } from 'api/src/services/agencies/agencies'
 import { createOrSkipInitialExpenditureCategories } from 'api/src/services/expenditureCategories/expenditureCategories'
+import { getOrCreateInputTemplate } from 'api/src/services/inputTemplates/inputTemplates'
+import { getOrCreateOrganization } from 'api/src/services/organizations/organizations'
+import { getOrCreateOutputTemplate } from 'api/src/services/outputTemplates/outputTemplates'
+import { getOrCreateReportingPeriod } from 'api/src/services/reportingPeriods/reportingPeriods'
+import { getOrCreateUsers } from 'api/src/services/users/users'
 
 export default async ({ args }) => {
   /*

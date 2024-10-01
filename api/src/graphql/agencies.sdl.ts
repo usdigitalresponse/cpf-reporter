@@ -11,6 +11,7 @@ export const schema = gql`
     agencies: [Agency!]! @requireAuth
     agency(id: Int!): Agency @requireAuth
     agenciesByOrganization(organizationId: Int!): [Agency!]! @requireAuth
+    agenciesAvailableForUpload: [Agency!]! @requireAuth
   }
 
   input CreateAgencyInput {
@@ -28,8 +29,10 @@ export const schema = gql`
   }
 
   type Mutation {
-    createAgency(input: CreateAgencyInput!): Agency! @requireAuth
-    updateAgency(id: Int!, input: UpdateAgencyInput!): Agency! @requireAuth
+    createAgency(input: CreateAgencyInput!): Agency!
+      @requireAuth(roles: ["USDR_ADMIN", "ORGANIZATION_ADMIN"])
+    updateAgency(id: Int!, input: UpdateAgencyInput!): Agency!
+      @requireAuth(roles: ["USDR_ADMIN", "ORGANIZATION_ADMIN"])
     deleteAgency(id: Int!): Agency! @requireAuth
   }
 `

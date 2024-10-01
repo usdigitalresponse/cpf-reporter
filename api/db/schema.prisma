@@ -22,28 +22,29 @@ model Agency {
 }
 
 model Organization {
-  id                Int                 @id @default(autoincrement())
-  agencies          Agency[]
-  name              String
-  reportingPeriods  ReportingPeriod[]
-  subrecipients     Subrecipient[]
-  projects          Project[]
-  preferences       Json?
+  id                            Int                            @id @default(autoincrement())
+  agencies                      Agency[]
+  name                          String
+  subrecipients                 Subrecipient[]
+  projects                      Project[]
+  preferences                   Json?
+  reportingPeriodCertifications ReportingPeriodCertification[]
 }
 
 model User {
-  id             Int                 @id @default(autoincrement())
-  email          String              @unique
-  name           String
-  agencyId       Int
-  createdAt      DateTime            @default(now()) @db.Timestamptz(6)
-  updatedAt      DateTime            @default(now()) @db.Timestamptz(6)
-  role           Role
-  isActive       Boolean             @default(true)
-  passageId      String?
-  agency         Agency              @relation(fields: [agencyId], references: [id])
-  uploaded       Upload[]
-  initiated      UploadValidation[]
+  id                        Int                            @id @default(autoincrement())
+  email                     String                         @unique
+  name                      String
+  agencyId                  Int
+  createdAt                 DateTime                       @default(now()) @db.Timestamptz(6)
+  updatedAt                 DateTime                       @default(now()) @updatedAt @db.Timestamptz(6)
+  role                      Role
+  isActive                  Boolean                        @default(true)
+  passageId                 String?
+  agency                    Agency                         @relation(fields: [agencyId], references: [id])
+  uploaded                  Upload[]
+  initiated                 UploadValidation[]
+  certifiedReportingPeriods ReportingPeriodCertification[]
 
   @@index(fields: [passageId])
 }
@@ -61,7 +62,7 @@ model InputTemplate {
   effectiveDate       DateTime           @db.Date
   rulesGeneratedAt    DateTime?          @db.Timestamptz(6)
   createdAt           DateTime           @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime           @default(now()) @db.Timestamptz(6) @updatedAt
   reportingPeriods    ReportingPeriod[]
 }
 
@@ -72,7 +73,7 @@ model OutputTemplate {
   effectiveDate      DateTime          @db.Date
   rulesGeneratedAt   DateTime?         @db.Timestamptz(6)
   createdAt          DateTime          @default(now()) @db.Timestamptz(6)
-  updatedAt          DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime          @default(now()) @db.Timestamptz(6) @updatedAt
   reportingPeriods   ReportingPeriod[]
 }
 
@@ -81,8 +82,6 @@ model ReportingPeriod {
   name              String
   startDate         DateTime       @db.Date
   endDate           DateTime       @db.Date
-  organizationId    Int?
-  organization      Organization?   @relation(fields: [organizationId], references: [id])
   inputTemplateId   Int
   inputTemplate     InputTemplate  @relation(fields: [inputTemplateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   outputTemplateId  Int
@@ -90,9 +89,24 @@ model ReportingPeriod {
   validationRulesId Int?
   validationRules   ValidationRules? @relation(fields: [validationRulesId], references: [id])
   createdAt         DateTime       @default(now()) @db.Timestamptz(6)
-  updatedAt         DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime       @default(now()) @db.Timestamptz(6) @updatedAt
   uploads           Upload[]
   projects          Project[]
+  certifications    ReportingPeriodCertification[]
+}
+
+model ReportingPeriodCertification {
+  id                 Int             @id @default(autoincrement())
+  organizationId     Int
+  organization       Organization    @relation(fields: [organizationId], references: [id])
+  reportingPeriodId  Int
+  reportingPeriod    ReportingPeriod @relation(fields: [reportingPeriodId], references: [id])
+  certifiedById      Int
+  certifiedBy        User            @relation(fields: [certifiedById], references: [id])
+  createdAt          DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime        @default(now()) @db.Timestamptz(6) @updatedAt
+
+  @@unique([organizationId, reportingPeriodId])
 }
 
 model ExpenditureCategory {
@@ -100,7 +114,7 @@ model ExpenditureCategory {
   name      String
   code      String
   createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6) @updatedAt
   Uploads   Upload[]
 }
 
@@ -116,34 +130,55 @@ model Upload {
   expenditureCategoryId Int?
   expenditureCategory   ExpenditureCategory? @relation(fields: [expenditureCategoryId], references: [id])
   createdAt             DateTime             @default(now()) @db.Timestamptz(6)
-  updatedAt             DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime             @default(now()) @db.Timestamptz(6) @updatedAt
   validations           UploadValidation[]
+  subrecipientUploads   SubrecipientUpload[]
 }
 
 model UploadValidation {
-  id                  Int            @id @default(autoincrement())
+  id                  Int           @id @default(autoincrement())
   uploadId            Int
-  upload              Upload         @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  upload              Upload        @relation(fields: [uploadId], references: [id], onDelete: Cascade)
   results             Json?         @db.JsonB
   passed              Boolean
+  isManual            Boolean       @default(false)   
   initiatedById       Int
   initiatedBy         User          @relation(fields: [initiatedById], references: [id])
   createdAt           DateTime      @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime      @default(now()) @db.Timestamptz(6) @updatedAt
   validationRulesId   Int?
   validationRules     ValidationRules? @relation(fields: [validationRulesId], references:[id])
 }
 
 model Subrecipient {
-  id                  Int          @id @default(autoincrement())
+  id                  Int                 @id @default(autoincrement())
   name String
+  ueiTinCombo         String              @unique
+  status              SubrecipientStatus  @default(ACTIVE)
   organizationId      Int
-  organization        Organization @relation(fields: [organizationId], references: [id])
-  startDate           DateTime     @db.Date
-  endDate             DateTime     @db.Date
-  certifiedAt         DateTime?    @db.Timestamptz(6)
-  createdAt           DateTime     @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime     @default(now()) @db.Timestamptz(6)
+  organization        Organization        @relation(fields: [organizationId], references: [id])
+  createdAt           DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime            @default(now()) @db.Timestamptz(6) @updatedAt
+  subrecipientUploads SubrecipientUpload[]
+}
+
+enum SubrecipientStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+model SubrecipientUpload {
+  id                  Int               @id @default(autoincrement())
+  subrecipientId      Int                 
+  subrecipient        Subrecipient      @relation(fields: [subrecipientId], references: [id])
+  uploadId            Int
+  upload              Upload            @relation(fields: [uploadId], references: [id])
+  rawSubrecipient     Json
+  createdAt           DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime          @default(now()) @db.Timestamptz(6) @updatedAt
+  version             Version
+
+  @@unique([subrecipientId, uploadId])
 }
 
 model Project {
@@ -159,20 +194,21 @@ model Project {
   originationPeriodId Int
   originationPeriod   ReportingPeriod @relation(fields: [originationPeriodId], references: [id])
   createdAt           DateTime        @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime        @default(now()) @db.Timestamptz(6) @updatedAt
 }
 
 enum Version {
   V2023_12_12
   V2024_01_07
   V2024_04_01
+  V2024_05_24
 }
 
 model ValidationRules {
   id                  Int               @id @default(autoincrement())
   versionId           Version
   createdAt           DateTime        @default(now()) @db.Timestamptz(6)
-  updatedAt           DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime        @default(now()) @db.Timestamptz(6) @updatedAt
   validations         UploadValidation[]
   reportingPeriods    ReportingPeriod[]
 }

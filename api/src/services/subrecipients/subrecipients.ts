@@ -7,7 +7,13 @@ import type {
 import { db } from 'src/lib/db'
 
 export const subrecipients: QueryResolvers['subrecipients'] = () => {
-  return db.subrecipient.findMany()
+  const currentUser = context.currentUser
+
+  return db.subrecipient.findMany({
+    where: {
+      organizationId: currentUser.agency.organizationId,
+    },
+  })
 }
 
 export const subrecipient: QueryResolvers['subrecipient'] = ({ id }) => {
@@ -48,9 +54,58 @@ export const Subrecipient: SubrecipientRelationResolvers = {
       .findUnique({ where: { id: root?.id } })
       .organization()
   },
-  originationUpload: (_obj, { root }) => {
+  subrecipientUploads: (_obj, { root }) => {
     return db.subrecipient
       .findUnique({ where: { id: root?.id } })
-      .originationUpload()
+      .subrecipientUploads()
+  },
+  validSubrecipientUploads: async (_obj, { root }) => {
+    const uploads = await db.subrecipientUpload.findMany({
+      where: {
+        subrecipientId: root?.id,
+      },
+      orderBy: { updatedAt: 'desc' },
+      include: {
+        upload: {
+          include: {
+            validations: {
+              orderBy: { createdAt: 'desc' },
+              take: 1,
+            },
+          },
+        },
+      },
+    })
+
+    return uploads.filter(
+      (upload) =>
+        upload.upload.validations.length > 0 &&
+        upload.upload.validations[0].passed
+    )
+  },
+  invalidSubrecipientUploads: async (_obj, { root }) => {
+    const subrecipientUploads = await db.subrecipientUpload.findMany({
+      where: {
+        subrecipientId: root?.id,
+      },
+      orderBy: { updatedAt: 'desc' },
+      include: {
+        upload: {
+          include: {
+            validations: {
+              orderBy: { createdAt: 'desc' },
+              take: 1,
+            },
+          },
+        },
+      },
+    })
+
+    return subrecipientUploads.filter(
+      (upload) =>
+        upload.upload.validations.length > 0 &&
+        upload.upload.validations[0].results !== null &&
+        !upload.upload.validations[0].passed
+    )
   },
 }

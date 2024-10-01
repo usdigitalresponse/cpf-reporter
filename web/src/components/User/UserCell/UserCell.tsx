@@ -12,6 +12,7 @@ export const QUERY = gql`
       name
       agencyId
       role
+      isActive
       createdAt
       updatedAt
     }

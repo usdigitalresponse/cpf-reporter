@@ -47,7 +47,6 @@ export const standard = defineScenario<
                     updatedAt: '2023-12-08T21:03:20.706Z',
                   },
                 },
-                organization: { create: { name: 'String' } },
               },
             },
             expenditureCategory: {

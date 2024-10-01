@@ -7,6 +7,7 @@ import {
   updateReportingPeriod,
   deleteReportingPeriod,
   getOrCreateReportingPeriod,
+  certifyReportingPeriodAndOpenNextPeriod,
 } from './reportingPeriods'
 import type { StandardScenario } from './reportingPeriods.scenarios'
 
@@ -76,7 +77,6 @@ describe('reportingPeriods', () => {
         name: 'String',
         startDate: '2023-12-07T18:38:12.341Z',
         endDate: '2023-12-07T18:38:12.341Z',
-        organizationId: scenario.reportingPeriod.two.organizationId,
         inputTemplateId: scenario.reportingPeriod.two.inputTemplateId,
         outputTemplateId: scenario.reportingPeriod.two.outputTemplateId,
       },
@@ -114,4 +114,47 @@ describe('reportingPeriods', () => {
 
     expect(result).toEqual(null)
   })
+
+  scenario(
+    'certifies a reporting period and sets the next reporting period as current',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser(scenario.user.one)
+      const result = await certifyReportingPeriodAndOpenNextPeriod({
+        reportingPeriodId: scenario.reportingPeriod.one.id,
+      })
+
+      expect(result.id).toEqual(scenario.reportingPeriod.two.id)
+      expect(result.startDate.getTime()).toBeGreaterThan(
+        scenario.reportingPeriod.one.endDate.getTime()
+      )
+    }
+  )
+
+  scenario(
+    'prevents certifying when no next period exists',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser(scenario.user.one)
+      await expect(
+        certifyReportingPeriodAndOpenNextPeriod({
+          reportingPeriodId: scenario.reportingPeriod.two.id,
+        })
+      ).rejects.toThrow('No next reporting period found')
+    }
+  )
+
+  scenario(
+    'prevents certifying the same reporting period twice',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser(scenario.user.one)
+      await certifyReportingPeriodAndOpenNextPeriod({
+        reportingPeriodId: scenario.reportingPeriod.one.id,
+      })
+
+      await expect(
+        certifyReportingPeriodAndOpenNextPeriod({
+          reportingPeriodId: scenario.reportingPeriod.one.id,
+        })
+      ).rejects.toThrow()
+    }
+  )
 })

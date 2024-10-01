@@ -157,6 +157,11 @@ __pycache__/
 # Python test and coverage output
 python/.coverage
 python/htmlcov/
+python/_tmp_test.zip
 
 # Python build artifacts
 python/dist/
+
+# Generated Type files
+web/types/graphql.d.ts
+api/types/graphql.d.ts

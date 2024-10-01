@@ -24,6 +24,7 @@ postgres_prevent_destroy           = true
 postgres_snapshot_before_destroy   = true
 postgres_apply_changes_immediately = true
 postgres_query_logging_enabled     = true
+postgres_ca_cert_identifier        = "rds-ca-rsa2048-g1"
 
 // General Lambda options
 lambda_log_level  = "debug"
@@ -41,3 +42,6 @@ passage_app_id = "OjNe5PvwdKm6rmcFc1WfPIBa"
 
 // API
 api_domain_name = "api.staging.cpf.usdr.dev"
+
+// Email for treasury notifications
+notifications_email_address = "grants-notifications@staging.cpf.usdr.dev"

@@ -4,10 +4,22 @@ export const schema = gql`
     name: String!
     version: String!
     effectiveDate: DateTime!
-    rulesGeneratedAt: DateTime!
+    rulesGeneratedAt: DateTime
     createdAt: DateTime!
     updatedAt: DateTime!
     reportingPeriods: [ReportingPeriod]!
+  }
+
+  type SignedUrls {
+    CPF1A: String
+    CPF1B: String
+    CPF1C: String
+    CPFSubrecipient: String
+  }
+
+  type OutputTemplateWithSignedUrl {
+    outputTemplate: OutputTemplate!
+    signedUrls: SignedUrls!
   }
 
   type Query {
@@ -15,11 +27,19 @@ export const schema = gql`
     outputTemplate(id: Int!): OutputTemplate @requireAuth
   }
 
+  input FileNames {
+    CPF1A: String
+    CPF1B: String
+    CPF1C: String
+    CPFSubrecipient: String
+  }
+
   input CreateOutputTemplateInput {
     name: String!
     version: String!
     effectiveDate: DateTime!
-    rulesGeneratedAt: DateTime!
+    rulesGeneratedAt: DateTime
+    filenames: FileNames!
   }
 
   input UpdateOutputTemplateInput {
@@ -30,8 +50,9 @@ export const schema = gql`
   }
 
   type Mutation {
-    createOutputTemplate(input: CreateOutputTemplateInput!): OutputTemplate!
-      @requireAuth
+    createOutputTemplate(
+      input: CreateOutputTemplateInput!
+    ): OutputTemplateWithSignedUrl! @requireAuth
     updateOutputTemplate(
       id: Int!
       input: UpdateOutputTemplateInput!

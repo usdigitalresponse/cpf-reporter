@@ -3,20 +3,39 @@ import type {
   QueryResolvers,
   MutationResolvers,
   OrganizationRelationResolvers,
+  Agency,
 } from 'types/graphql'
 
+import { getTreasurySignedUrl, startStepFunctionExecution } from 'src/lib/aws'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
+import { reportingPeriod } from 'src/services/reportingPeriods'
 
 export const organizations: QueryResolvers['organizations'] = () => {
   return db.organization.findMany()
 }
 
-export const organization: QueryResolvers['organization'] = ({ id }) => {
-  return db.organization.findUnique({
+export const organization: QueryResolvers['organization'] = async ({ id }) => {
+  const org = await db.organization.findUnique({
     where: { id },
   })
+
+  if (org && org.preferences?.current_reporting_period_id) {
+    org.reportingPeriod = await reportingPeriod({
+      id: org.preferences.current_reporting_period_id,
+    })
+  }
+
+  return org
 }
+
+export const organizationOfCurrentUser: QueryResolvers['organizationOfCurrentUser'] =
+  async () => {
+    const organizationId = context.currentUser.agency.organizationId
+    return db.organization.findUnique({
+      where: { id: organizationId },
+    })
+  }
 
 export const createOrganization: MutationResolvers['createOrganization'] = ({
   input,
@@ -74,6 +93,65 @@ export const getOrCreateOrganization = async (orgName, reportingPeriodName) => {
   }
 }
 
+export const downloadTreasuryFile: MutationResolvers['downloadTreasuryFile'] =
+  async ({ input }) => {
+    const { fileType } = input
+    const { organizationId } = context.currentUser.agency
+
+    // get the organization
+    const organization = await db.organization.findUnique({
+      where: { id: organizationId },
+    })
+
+    if (!organization) {
+      throw new Error(`Organization with id ${organizationId} not found`)
+    }
+
+    // Retrieve the signed URL for the treasury file
+    logger.info(`Downloading treasury file for ${fileType}`)
+    const url = await getTreasurySignedUrl(
+      fileType,
+      organization.id,
+      organization.preferences['current_reporting_period_id']
+    )
+
+    // Return the file link
+    return { fileLink: url }
+  }
+
+export const kickOffTreasuryReportGeneration: MutationResolvers['kickOffTreasuryReportGeneration'] =
+  async ({ input }) => {
+    let { organizationId } = input
+    const { payload } = input
+
+    if (!organizationId) {
+      logger.info('Using current user agency to determine organization')
+      organizationId = (context.currentUser.agency as Agency).organizationId
+    }
+    // Get the organization
+    const organization = await db.organization.findUnique({
+      where: { id: organizationId },
+    })
+
+    if (!organization) {
+      throw new Error(`Organization with id ${organizationId} not found`)
+    }
+
+    // kick off the step function for treasury report generation
+    logger.info(
+      `Kicking off treasury report generation for ${organization.name}`
+    )
+    const response = await startStepFunctionExecution(
+      process.env.TREASURY_STEP_FUNCTION_ARN,
+      `manual-treasury-report-generation-${Date.now()}`,
+      payload,
+      `${organizationId}-${Date.now()}`
+    )
+
+    // Return the step function execution response
+    return { response: JSON.stringify(response) }
+  }
+
 export const createOrganizationAgencyAdmin: MutationResolvers['createOrganizationAgencyAdmin'] =
   async ({ input }) => {
     const {
@@ -120,6 +198,9 @@ export const updateOrganization: MutationResolvers['updateOrganization'] = ({
   id,
   input,
 }) => {
+  if (input.preferences && typeof input.preferences === 'string') {
+    input.preferences = JSON.parse(input.preferences)
+  }
   return db.organization.update({
     data: input,
     where: { id },
@@ -161,5 +242,10 @@ export const Organization: OrganizationRelationResolvers = {
   },
   projects: (_obj, { root }) => {
     return db.organization.findUnique({ where: { id: root?.id } }).projects()
+  },
+  reportingPeriodCertifications: (_obj, { root }) => {
+    return db.organization
+      .findUnique({ where: { id: root?.id } })
+      .reportingPeriodCertifications()
   },
 }

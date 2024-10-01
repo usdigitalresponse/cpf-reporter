@@ -4,15 +4,17 @@ export const schema = gql`
     agencies: [Agency]!
     users: [User]!
     name: String!
-    reportingPeriods: [ReportingPeriod]!
     subrecipients: [Subrecipient]!
     projects: [Project]!
     preferences: JSON
+    reportingPeriod: ReportingPeriod
+    reportingPeriodCertifications: [ReportingPeriodCertification]!
   }
 
   type Query {
     organizations: [Organization!]! @requireAuth
     organization(id: Int!): Organization @requireAuth
+    organizationOfCurrentUser: Organization @requireAuth
   }
 
   input CreateOrganizationInput {
@@ -21,6 +23,24 @@ export const schema = gql`
 
   input UpdateOrganizationInput {
     name: String
+    preferences: JSON
+  }
+
+  input NewTreasuryGenerationInput {
+    organizationId: Int
+    payload: JSON!
+  }
+
+  type TreasuryReportGenerationPayload {
+    response: String
+  }
+
+  input DownloadTreasuryFileInput {
+    fileType: String!
+  }
+
+  type TreasuryFilePayload {
+    fileLink: String
   }
 
   type Mutation {
@@ -34,6 +54,12 @@ export const schema = gql`
     createOrganizationAgencyAdmin(
       input: CreateOrgAgencyAdminInput!
     ): CreateOrgAgencyAdminPayload @requireAuth
+    kickOffTreasuryReportGeneration(
+      input: NewTreasuryGenerationInput!
+    ): TreasuryReportGenerationPayload @requireAuth
+    downloadTreasuryFile(
+      input: DownloadTreasuryFileInput!
+    ): TreasuryFilePayload @requireAuth
   }
 
   input CreateOrgAgencyAdminInput {

@@ -288,6 +288,8 @@ module "lambda_function-graphql" {
       resources = [
         # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm
         "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
+        # Path: "treasuryreports/output-templates/{output_template_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.xlsx"
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/output-templates/*/*.xlsx",
       ]
     }
     AllowDownloadXLSMFiles = {
@@ -299,6 +301,40 @@ module "lambda_function-graphql" {
       resources = [
         # Path: uploads/{organization_id}/{agency_id}/{reporting_period_id}/{upload_id}/{filename}.xlsm
         "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.xlsm",
+      ]
+    }
+    AllowDownloadTreasuryFiles = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:HeadObject",
+      ]
+      resources = [
+        # Path: treasuryreports/{organization_id}/{reporting_period_id}/{filename}.csv
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.csv",
+        # Path: treasuryreports/{organization_id}/{reporting_period_id}/{filename}.zip
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.zip",
+      ]
+    }
+    AllowDownloadTreasuryOutputTemplates = {
+      effect = "Allow"
+      actions = [
+        "s3:GetObject",
+        "s3:HeadObject",
+      ]
+      resources = [
+        # Path: "treasuryreports/output-templates/{output_template_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.xlsx"
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/output-templates/*/*.xlsx",
+      ]
+    }
+
+    AllowStepFunctionInvocation = {
+      effect = "Allow"
+      actions = [
+        "states:StartExecution"
+      ]
+      resources = [
+        module.treasury_generation_step_function.state_machine_arn
       ]
     }
   }
@@ -327,7 +363,8 @@ module "lambda_function-graphql" {
       module.postgres.cluster_port,
       module.postgres.cluster_database_name,
       join("&", [
-        "sslmode=verify",
+        "sslmode=require",
+        "sslcert=${urlencode("/var/task/rds-global-bundle.pem")}",
         "connection_limit=1", // Can be tuned for parallel query performance: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections#serverless-environments-faas
       ])
     )
@@ -336,6 +373,8 @@ module "lambda_function-graphql" {
     DD_LAMBDA_HANDLER                  = "graphql.handler"
     PASSAGE_API_KEY_SECRET_ARN         = data.aws_ssm_parameter.passage_api_key_secret_arn.value
     AUTH_PROVIDER                      = "passage"
+    TREASURY_STEP_FUNCTION_ARN         = module.treasury_generation_step_function.state_machine_arn
+    PASSAGE_APP_ID                     = var.passage_app_id
   })
 
   // Triggers
@@ -399,6 +438,17 @@ module "lambda_function-processValidationJson" {
         "${module.reporting_data_bucket.bucket_arn}/uploads/*/*/*/*/*.json",
       ]
     }
+    AllowUploadSubrecipientsFile = {
+      effect = "Allow"
+      actions = [
+        "s3:PutObject",
+      ]
+      resources = [
+        # These are temporary files shared across services containing subrecipient data.
+        # Path: treasuryreports/{organization_id}/{reporting_period_id}/subrecipients.json
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/subrecipients.json",
+      ]
+    }
   }
 
   // Artifacts
@@ -424,7 +474,8 @@ module "lambda_function-processValidationJson" {
       module.postgres.cluster_port,
       module.postgres.cluster_database_name,
       join("&", [
-        "sslmode=verify",
+        "sslmode=require",
+        "sslcert=${urlencode("/var/task/rds-global-bundle.pem")}",
         "connection_limit=1", // Can be tuned for parallel query performance: https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections#serverless-environments-faas
       ])
     )
