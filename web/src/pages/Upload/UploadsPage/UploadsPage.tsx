@@ -49,7 +49,7 @@ const UploadsPage = () => {
           Upload Workbook
         </Button>
         {/* TODO: Remove USDR_ADMIN check when ready || 2024-05-13 Milestone */}
-        {hasRole(ROLES.USDR_ADMIN) && (
+        {(hasRole(ROLES.USDR_ADMIN) || hasRole(ROLES.ORGANIZATION_ADMIN)) && (
           <Button
             size="sm"
             variant=""
