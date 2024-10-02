@@ -1,20 +1,16 @@
 import os
+from typing import Optional, Tuple
 
 import boto3
 import chevron
 import structlog
 from aws_lambda_typing.context import Context
 from pydantic import BaseModel
-from typing import Optional, Tuple
 
+from src.lib.email import send_email
 from src.lib.logging import get_logger, reset_contextvars
 from src.lib.s3_helper import get_presigned_url
-from src.lib.treasury_generation_common import (
-    OrganizationObj,
-    UserObj,
-)
-from src.lib.email import send_email
-
+from src.lib.treasury_generation_common import OrganizationObj, UserObj
 
 treasury_email_html = """
 Your treasury report can be downloaded <a href={url}>here</a>.
@@ -116,14 +112,14 @@ def process_event(
     organization = payload.organization
     
     presigned_url = get_presigned_url(
-        s3_client = s3_client,
-        bucket = os.getenv("REPORTING_DATA_BUCKET_NAME"),
-        key = f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip",
-        expiration_time = 60 * 60,  # 1 hour
+        s3_client=s3_client,
+        bucket=os.getenv("REPORTING_DATA_BUCKET_NAME", default=""),
+        key=f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip",
+        expiration_time=60 * 60,  # 1 hour
     )
     if presigned_url is None:
         raise Exception('Failed to generate signed-URL or file not found')
-    
+
     email_html, email_text, subject = generate_email(
         user = user,
         presigned_url = presigned_url,
@@ -133,10 +129,10 @@ def process_event(
         return False
 
     send_email(
-        dest_email = user.email,
-        email_html = email_html,
-        email_text = email_text,
-        subject = subject,
-        logger = logger,
+        dest_email=user.email,
+        email_html=email_html,
+        email_text=email_text or "",
+        subject=subject or "",
+        logger=logger,
     )
     return True
