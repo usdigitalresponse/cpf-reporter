@@ -432,8 +432,9 @@ module "lambda_function-email-presigned-url" {
   timeout       = 60 # 1 minute, in seconds
   memory_size   = 512
   environment_variables = merge(local.lambda_default_environment_variables, {
-    DD_LAMBDA_HANDLER = "src.functions.generate_presigned_url_and_send_email"
-    DD_LOGS_INJECTION = "true"
+    DD_LAMBDA_HANDLER   = "src.functions.generate_presigned_url_and_send_email"
+    DD_LOGS_INJECTION   = "true"
+    NOTIFICATIONS_EMAIL = var.notifications_email_address
   })
 
   // Triggers
