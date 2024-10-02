@@ -170,7 +170,7 @@ module "treasury_generation_step_function" {
 
   service_integrations = {
     lambda = {
-      lambda = [module.lambda_function-treasuryProjectFileGeneration.lambda_function_arn, module.lambda_function-subrecipientTreasuryReportGen.lambda_function_arn, module.lambda_function-cpfCreateArchive.lambda_function_arn]
+      lambda = [module.lambda_function-treasuryProjectFileGeneration.lambda_function_arn, module.lambda_function-subrecipientTreasuryReportGen.lambda_function_arn, module.lambda_function-cpfCreateArchive.lambda_function_arn, module.lambda_function-email-presigned-url.lambda_function_arn]
     }
   }
 
