@@ -13,12 +13,11 @@ from src.lib.s3_helper import get_presigned_url
 from src.lib.treasury_generation_common import OrganizationObj, UserObj
 
 treasury_email_html = """
-Your treasury report can be downloaded <a href={url}>here</a>.
+<p><a href={url}><b>Click here</b></a> to download your file<br>Or, paste this link into your browser:<br><b>{url}</b><br><br>This link will remain active for 1 hour.</p>
 """
 
 treasury_email_text = """
-Hello,
-Your treasury report can be downloaded here: {url}.
+Click on this link {url} to download your file or, paste the link into your browser. This link will remain active for 1 hour.
 """
 
 class SendTreasuryEmailLambdaPayload(BaseModel):
@@ -65,29 +64,33 @@ def generate_email(
 ) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     try:
         with open("src/static/email_templates/formatted_body.html") as g:
-            email_body = chevron.render(g, {
-                "body_title": 'Hello,',
-                "body_detail": treasury_email_html.format(
-                    url = presigned_url
-                ),
-            })
-            with open("src/static/email_templates/base.html") as f:
-                email_html = chevron.render(f, {
-                    "tool_name": "CPF",
-                    "title": "CPF Treasury Report",
-                    "preheader": False,
-                    "webview_available": False,
-                    "base_url_safe": "",
-                    "usdr_logo_url": 'https://grants.usdigitalresponse.org/usdr_logo_transparent.png',
-                    "presigned_url": presigned_url,
-                    "notifications_url_safe": False,
-                    "email_body": email_body,
+            email_body = chevron.render(
+                g,
+                {
+                    "body_title": "Your Treasury report is ready for download",
+                    "body_detail": treasury_email_html.format(url=presigned_url),
                 },
-                partials_dict = {
-                    "email_body": email_body,
-                })
+            )
+            with open("src/static/email_templates/base.html") as f:
+                email_html = chevron.render(
+                    f,
+                    {
+                        "tool_name": "CPF Reporter Tool",
+                        "title": "Your Treasury report is ready for download",
+                        "preheader": False,
+                        "webview_available": False,
+                        "base_url_safe": "",
+                        "usdr_logo_url": "https://grants.usdigitalresponse.org/usdr_logo_transparent.png",
+                        "presigned_url": presigned_url,
+                        "notifications_url_safe": False,
+                        "email_body": email_body,
+                    },
+                    partials_dict={
+                        "email_body": email_body,
+                    },
+                )
                 email_text = treasury_email_text.format(url=presigned_url)
-                subject = "USDR CPF Treasury Report"
+                subject = "CPF: Your Treasury report is ready for download"
                 return email_html, email_text, subject
     except Exception as e:
         logger.error(f"Failed to generate treasury email: {e}")
