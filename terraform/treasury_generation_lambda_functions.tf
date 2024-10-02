@@ -425,14 +425,14 @@ module "lambda_function-email-presigned-url" {
   }
 
   // Runtime
-  handler       = var.datadog_enabled ? local.datadog_lambda_py_handler : "src.functions.generate_presigned_url_and_send_email"
+  handler       = var.datadog_enabled ? local.datadog_lambda_py_handler : "src.functions.generate_presigned_url_and_send_email.handle"
   runtime       = var.lambda_py_runtime
   architectures = [var.lambda_arch]
   layers        = local.lambda_py_layer_arns
   timeout       = 60 # 1 minute, in seconds
   memory_size   = 512
   environment_variables = merge(local.lambda_default_environment_variables, {
-    DD_LAMBDA_HANDLER   = "src.functions.generate_presigned_url_and_send_email"
+    DD_LAMBDA_HANDLER   = "src.functions.generate_presigned_url_and_send_email.handle"
     DD_LOGS_INJECTION   = "true"
     NOTIFICATIONS_EMAIL = var.notifications_email_address
   })
