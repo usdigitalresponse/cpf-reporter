@@ -113,7 +113,7 @@ def process_event(
     
     presigned_url = get_presigned_url(
         s3_client=s3_client,
-        bucket=os.getenv("REPORTING_DATA_BUCKET_NAME", default=""),
+        bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
         key=f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip",
         expiration_time=60 * 60,  # 1 hour
     )
