@@ -272,6 +272,18 @@ describeScenario<StandardScenario>(
   }
 )
 
+describe('getValidUploadsInCurrentPeriod', () => {
+  scenario(
+    'returns only uploads that have passed latest validation in the given reporting period',
+    async (scenario: StandardScenario) => {
+      console.log(
+        'TODO: Add tests for getValidUploadsInCurrentPeriod function',
+        scenario
+      )
+    }
+  )
+})
+
 describe('treasury report', () => {
   beforeEach(() => {
     jest.resetAllMocks()
