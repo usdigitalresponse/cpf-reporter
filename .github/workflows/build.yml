@@ -442,7 +442,7 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --immutable --immutable-cache --check-cache
       - name: Build the api side
         run: yarn rw build api
         env:
@@ -603,7 +603,7 @@ jobs:
           cache: yarn
           cache-dependency-path: yarn.lock
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --immutable --immutable-cache --check-cache
       - name: Write env vars for build
         run: cat <<< "$DOTENV_FOR_BUILD" >> .env
         env:
