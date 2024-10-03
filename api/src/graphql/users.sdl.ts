@@ -15,6 +15,7 @@ export const schema = gql`
     agency: Agency!
     role: RoleEnum!
     isActive: Boolean!
+    passageId: String
     uploaded: [Upload]!
     certifiedReportingPeriods: [ReportingPeriodCertification]!
   }
