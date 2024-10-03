@@ -34,7 +34,7 @@ jobs:
     name: Prepare for QA
     runs-on: ubuntu-latest
     steps:
-      - uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
         with:
           disable-sudo: truex
           egress-policy: audit
@@ -76,7 +76,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
         with:
           disable-sudo: true
           egress-policy: audit
@@ -119,7 +119,7 @@ jobs:
     outputs:
       coverage-markdown-report: ${{ steps.coverage-markdown.outputs.markdownReport }}
     steps:
-      - uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
         with:
           disable-sudo: true
           egress-policy: audit
@@ -157,7 +157,7 @@ jobs:
     outputs:
       coverage-markdown-report: ${{ steps.coverage-markdown.outputs.stdout }}
     steps:
-      - uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
         with:
           disable-sudo: true
           egress-policy: audit
@@ -186,7 +186,7 @@ jobs:
     needs:
       - prepare-qa
     steps:
-      - uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
         with:
           disable-sudo: true
           egress-policy: audit
@@ -217,7 +217,7 @@ jobs:
     name: Lint python
     runs-on: ubuntu-latest
     steps:
-      - uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
         with:
           disable-sudo: true
           egress-policy: audit
@@ -234,7 +234,7 @@ jobs:
     name: Lint terraform
     runs-on: ubuntu-latest
     steps:
-      - uses: step-security/harden-runner@91182cccc01eb5e619899d80e4e971d6181294a7 # v2.10.1
+      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
         with:
           disable-sudo: true
           egress-policy: audit
