@@ -50,7 +50,7 @@ jobs:
           cache: yarn
           cache-dependency-path: yarn.lock
       - name: Install dependencies
-        run: yarn install --immutable --immutable-cache --check-cache
+        run: yarn install --immutable
         env:
           CI: 1
 
@@ -91,7 +91,7 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
       - name: Install dependencies
-        run: yarn install --immutable --immutable-cache --check-cache
+        run: yarn install --immutable
         env:
           CI: 1
       - name: Prepare test execution environment
@@ -134,7 +134,7 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
       - name: Install dependencies
-        run: yarn install --immutable --immutable-cache --check-cache
+        run: yarn install --immutable
         env:
           CI: 1
       - name: Run unit tests with coverage
@@ -201,7 +201,7 @@ jobs:
           node-version-file: .nvmrc
           cache: yarn
       - name: Install dependencies
-        run: yarn install --immutable --immutable-cache --check-cache
+        run: yarn install --immutable
         env:
           CI: 1
       - name: Run linter for api side
