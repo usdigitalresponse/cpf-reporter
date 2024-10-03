@@ -8,6 +8,10 @@ const columnHelper = createColumnHelper()
 
 export const columnDefs = ({ certificationDisplay, canEdit, isUSDRAdmin }) => {
   const columns = [
+    columnHelper.accessor('id', {
+      header: 'ID',
+      enableSorting: true,
+    }),
     columnHelper.accessor('name', {
       header: 'Name',
       enableSorting: false,
@@ -31,6 +35,7 @@ export const columnDefs = ({ certificationDisplay, canEdit, isUSDRAdmin }) => {
   if (isUSDRAdmin) {
     columns.push(
       columnHelper.accessor('id', {
+        id: 'actions',
         cell: (info) =>
           canEdit(info.row.original) ? (
             <Link
