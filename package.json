@@ -22,9 +22,9 @@
   "prisma": {
     "seed": "yarn rw exec seed"
   },
-  "dependencies": {
-    "fsevents": "^2.3.3"
-  },
   "packageManager": "yarn@3.7.0",
-  "version": "3.7.0"
+  "version": "3.7.0",
+  "optionalDependencies": {
+    "fsevents": "^2.3.3"
+  }
 }
