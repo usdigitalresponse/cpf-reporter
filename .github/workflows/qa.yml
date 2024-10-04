@@ -110,6 +110,12 @@ jobs:
         with:
           textReportPath: 'coverage/coverage.txt'
           srcBasePath: 'api/src'
+      - name: Publish coverage markdown report to step summary
+        run: |
+          echo '## API-side test coverage' >> $GITHUB_STEP_SUMMARY
+          printf "%s" "$COVERAGE_REPORT" >> $GITHUB_STEP_SUMMARY
+        env:
+          COVERAGE_REPORT: ${{ steps.coverage-markdown.outputs.markdownReport }}
 
   test-client:
     name: Test client-side code
@@ -147,6 +153,12 @@ jobs:
         with:
           textReportPath: 'coverage/coverage.txt'
           srcBasePath: 'web/src'
+      - name: Publish coverage markdown report to step summary
+        run: |
+          echo '## Web-side test coverage' >> $GITHUB_STEP_SUMMARY
+          printf "%s" "$COVERAGE_REPORT" >> $GITHUB_STEP_SUMMARY
+        env:
+          COVERAGE_REPORT: ${{ steps.coverage-markdown.outputs.markdownReport }}
 
   test-python:
     name: Test python code
@@ -179,6 +191,12 @@ jobs:
       - name: Generate coverage markdown report
         id: coverage-markdown
         run: poetry run coverage report --format markdown
+      - name: Publish coverage markdown report to step summary
+        run: |
+          echo '## Python test coverage' >> $GITHUB_STEP_SUMMARY
+          printf "%s" "$COVERAGE_REPORT" >> $GITHUB_STEP_SUMMARY
+        env:
+          COVERAGE_REPORT: ${{ steps.coverage-markdown.outputs.stdout }}
 
   eslint:
     name: Lint JavaScript
