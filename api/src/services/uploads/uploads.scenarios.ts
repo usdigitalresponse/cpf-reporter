@@ -292,7 +292,6 @@ export const uploadCheck = defineScenario<
   },
   agency: {
     one: (scenario) => {
-      console.log(scenario)
       return {
         data: {
           name: 'Agency1',

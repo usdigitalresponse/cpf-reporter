@@ -99,21 +99,19 @@ export const runPermissionsCreateOrUpdateValidations = async (input) => {
 /**
  * Validations specific to updating a user
  */
-export const runUpdateSpecificValidations = async (input, id) => {
+export const runUpdateSpecificValidations = async (input, userId) => {
   // If not USDR admin, changes to agencyId are only allowed if the new agency ID is in the same organization
   // as the user's current agency (e.g., you can't swap a user between organizations)
   await validateWith(async () => {
     if (!currentUserIsUSDRAdmin()) {
-      const currentAgency = (
-        await db.user.findUniqueOrThrow({
-          where: { id },
-          select: {
-            agency: {
-              select: { id: true, organizationId: true },
-            },
+      const { agency: currentAgency } = await db.user.findUniqueOrThrow({
+        where: { id: userId },
+        select: {
+          agency: {
+            select: { id: true, organizationId: true },
           },
-        })
-      ).agency
+        },
+      })
 
       if (input.agencyId === currentAgency.id) {
         return
