@@ -101,10 +101,7 @@ jobs:
         with:
           key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
           path: node_modules
-      # - name: Install dependencies
-      #   run: yarn install --immutable
-      #   env:
-      #     CI: 1
+          fail-on-cache-miss: true
       - name: Prepare test execution environment
         run: |
           cat >> .env << ENDOFDOTENV
@@ -156,10 +153,7 @@ jobs:
         with:
           key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
           path: node_modules
-      # - name: Install dependencies
-      #   run: yarn install --immutable
-      #   env:
-      #     CI: 1
+          fail-on-cache-miss: true
       - name: Run unit tests with coverage
         run: yarn rw test web --no-watch --collect-coverage
         env:
@@ -241,10 +235,7 @@ jobs:
         with:
           key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
           path: node_modules
-      # - name: Install dependencies
-      #   run: yarn install --immutable
-      #   env:
-      #     CI: 1
+          fail-on-cache-miss: true
       - name: Run linter for api side
         run: yarn eslint api/src
       - name: Run linter for web side
