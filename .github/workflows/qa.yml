@@ -120,8 +120,16 @@ jobs:
           srcBasePath: 'api/src'
       - name: Publish coverage markdown report to step summary
         run: |
-          echo '## API-side test coverage' >> $GITHUB_STEP_SUMMARY
-          printf "%s" "$COVERAGE_REPORT" >> $GITHUB_STEP_SUMMARY
+          cat >> $GITHUB_STEP_SUMMARY << 'ENDOFREPORT'
+          ## API-side test coverage
+
+          <details>
+          <summary>Coverage report</summary>
+
+          ${{ env.COVERAGE_REPORT }}
+
+          </details>
+          ENDOFREPORT
         env:
           COVERAGE_REPORT: ${{ steps.coverage-markdown.outputs.markdownReport }}
 
@@ -166,8 +174,16 @@ jobs:
           srcBasePath: 'web/src'
       - name: Publish coverage markdown report to step summary
         run: |
-          echo '## Web-side test coverage' >> $GITHUB_STEP_SUMMARY
-          printf "%s" "$COVERAGE_REPORT" >> $GITHUB_STEP_SUMMARY
+          cat >> $GITHUB_STEP_SUMMARY << 'ENDOFREPORT'
+          ## Web-side test coverage
+
+          <details>
+          <summary>Coverage report</summary>
+
+          ${{ env.COVERAGE_REPORT }}
+
+          </details>
+          ENDOFREPORT
         env:
           COVERAGE_REPORT: ${{ steps.coverage-markdown.outputs.markdownReport }}
 
@@ -204,8 +220,16 @@ jobs:
         run: poetry run coverage report --format markdown
       - name: Publish coverage markdown report to step summary
         run: |
-          echo '## Python test coverage' >> $GITHUB_STEP_SUMMARY
-          printf "%s" "$COVERAGE_REPORT" >> $GITHUB_STEP_SUMMARY
+          cat >> $GITHUB_STEP_SUMMARY << 'ENDOFREPORT'
+          ## Python test coverage
+
+          <details>
+          <summary>Coverage report</summary>
+
+          ${{ env.COVERAGE_REPORT }}
+
+          </details>
+          ENDOFREPORT
         env:
           COVERAGE_REPORT: ${{ steps.coverage-markdown.outputs.stdout }}
 
