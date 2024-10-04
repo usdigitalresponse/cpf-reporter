@@ -73,6 +73,8 @@ jobs:
           cat >> $REPORT_FILE << 'ENDOFREPORT'
           ## QA Summary
 
+          *Pusher: @${{ env.GH_ACTOR }}, Action: `${{ env.GH_ACTION }}`, Workflow: [`${{ env.GH_WORKFLOW }}`](${{ env.WORKFLOW_RUN_SUMMARY_URL }})*
+
           _[See our documentation for tips on how to resolve failing QA checks.](${{ env.GH_SERVER}}/${{ env.GH_REPO }}/blob/main/docs/resolving-qa-failures.md)_
 
           | QA Check        | Result  |
@@ -107,8 +109,6 @@ jobs:
           ${{ env.PYTHON_COVERAGE_REPORT }}
 
           </details>
-
-          *Pusher: @${{ env.GH_ACTOR }}, Action: `${{ env.GH_ACTION }}`, Workflow: [`${{ env.GH_WORKFLOW }}`](${{ env.GH_SERVER}}/${{ env.GH_REPO }}/actions/runs/${{ env.GH_RUN_ID }})*
           ENDOFREPORT
         env:
           API_TEST_OUTCOME: ${{ inputs.api-test-outcome }}
