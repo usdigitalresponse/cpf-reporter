@@ -8,6 +8,7 @@ const config = {
     'html',
     ['text', { file: 'coverage.txt', path: './' }],
   ],
+  collectCoverageFrom: ['!**/*.sdl.ts'],
   setupFilesAfterEnv: ['<rootDir>/api/setup-jest.ts'],
 }
 
