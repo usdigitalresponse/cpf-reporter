@@ -90,10 +90,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: yarn
-      - name: Install dependencies
-        run: yarn install --immutable
-        env:
-          CI: 1
+      # - name: Install dependencies
+      #   run: yarn install --immutable
+      #   env:
+      #     CI: 1
       - name: Prepare test execution environment
         run: |
           cat >> .env << ENDOFDOTENV
@@ -110,6 +110,12 @@ jobs:
         with:
           textReportPath: 'coverage/coverage.txt'
           srcBasePath: 'api/src'
+      - name: Publish coverage markdown report to step summary
+        run: |
+          echo '## API-side test coverage' >> $GITHUB_STEP_SUMMARY
+          printf "%s" "$COVERAGE_REPORT" >> $GITHUB_STEP_SUMMARY
+        env:
+          COVERAGE_REPORT: ${{ steps.coverage-markdown.outputs.markdownReport }}
 
   test-client:
     name: Test client-side code
@@ -133,10 +139,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: yarn
-      - name: Install dependencies
-        run: yarn install --immutable
-        env:
-          CI: 1
+      # - name: Install dependencies
+      #   run: yarn install --immutable
+      #   env:
+      #     CI: 1
       - name: Run unit tests with coverage
         run: yarn rw test web --no-watch --collect-coverage
         env:
@@ -147,6 +153,12 @@ jobs:
         with:
           textReportPath: 'coverage/coverage.txt'
           srcBasePath: 'web/src'
+      - name: Publish coverage markdown report to step summary
+        run: |
+          echo '## Web-side test coverage' >> $GITHUB_STEP_SUMMARY
+          printf "%s" "$COVERAGE_REPORT" >> $GITHUB_STEP_SUMMARY
+        env:
+          COVERAGE_REPORT: ${{ steps.coverage-markdown.outputs.markdownReport }}
 
   test-python:
     name: Test python code
@@ -179,6 +191,12 @@ jobs:
       - name: Generate coverage markdown report
         id: coverage-markdown
         run: poetry run coverage report --format markdown
+      - name: Publish coverage markdown report to step summary
+        run: |
+          echo '## Python test coverage' >> $GITHUB_STEP_SUMMARY
+          printf "%s" "$COVERAGE_REPORT" >> $GITHUB_STEP_SUMMARY
+        env:
+          COVERAGE_REPORT: ${{ steps.coverage-markdown.outputs.stdout }}
 
   eslint:
     name: Lint JavaScript
@@ -200,10 +218,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: yarn
-      - name: Install dependencies
-        run: yarn install --immutable
-        env:
-          CI: 1
+      # - name: Install dependencies
+      #   run: yarn install --immutable
+      #   env:
+      #     CI: 1
       - name: Run linter for api side
         run: yarn eslint api/src
       - name: Run linter for web side

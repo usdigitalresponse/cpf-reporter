@@ -56,12 +56,24 @@ jobs:
         with:
           disable-sudo: true
           egress-policy: audit
+      - name: Create URL to workflow run
+        id: workflow-run-summary-url
+        run: |
+          RUN_URL="$GH_SERVER/$GH_REPO/actions/runs/$GH_RUN_ID"
+          echo "url=$RUN_URL" >> $GITHUB_OUTPUT
+          echo "attempt-url=$RUN_URL/attempts/${{ github.run_attempt }}" >> $GITHUB_OUTPUT
+        env:
+          GH_SERVER: ${{ github.server_url }}
+          GH_REPO: ${{ github.repository }}
+          GH_RUN_ID: ${{ github.run_id }}
       - name: Write the report markdown file
         run: |
           REPORT_FILE=$(mktemp -t summary.md.XXXXX)
           echo "REPORT_FILE=$REPORT_FILE" >> $GITHUB_ENV
           cat >> $REPORT_FILE << 'ENDOFREPORT'
           ## QA Summary
+
+          *Pusher: @${{ env.GH_ACTOR }}, Action: `${{ env.GH_ACTION }}`, Workflow: [`${{ env.GH_WORKFLOW }}`](${{ env.WORKFLOW_RUN_SUMMARY_URL }})*
 
           _[See our documentation for tips on how to resolve failing QA checks.](${{ env.GH_SERVER}}/${{ env.GH_REPO }}/blob/main/docs/resolving-qa-failures.md)_
 
@@ -75,6 +87,8 @@ jobs:
           | 🧹 TFLint    | ${{ (env.TFLINT_OUTCOME == 'success' && '✅') || (env.TFLINT_OUTCOME == 'skipped' && '➖') || '❌' }} |
 
           ### Test Coverage
+
+          _View the [workflow summary](${{ env.WORKFLOW_RUN_SUMMARY_ATTEMPT_URL }}) for individual coverage reports if this comment is truncated._
 
           <details>
           <summary>Coverage report for <code>api</code> suite</summary>
@@ -95,8 +109,6 @@ jobs:
           ${{ env.PYTHON_COVERAGE_REPORT }}
 
           </details>
-
-          *Pusher: @${{ env.GH_ACTOR }}, Action: `${{ env.GH_ACTION }}`, Workflow: [`${{ env.GH_WORKFLOW }}`](${{ env.GH_SERVER}}/${{ env.GH_REPO }}/actions/runs/${{ env.GH_RUN_ID }})*
           ENDOFREPORT
         env:
           API_TEST_OUTCOME: ${{ inputs.api-test-outcome }}
@@ -108,6 +120,8 @@ jobs:
           ESLINT_OUTCOME: ${{ inputs.eslint-outcome }}
           RUFF_OUTCOME: ${{ inputs.ruff-outcome }}
           TFLINT_OUTCOME: ${{ inputs.tflint-outcome }}
+          WORKFLOW_RUN_SUMMARY_URL: ${{ steps.workflow-run-summary-url.outputs.url }}
+          WORKFLOW_RUN_SUMMARY_ATTEMPT_URL: ${{ steps.workflow-run-summary-url.outputs.attempt-url }}
           GH_ACTOR: ${{ github.actor }}
           GH_ACTION: ${{ github.event_name }}
           GH_WORKFLOW: ${{ github.workflow }}
