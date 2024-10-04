@@ -90,10 +90,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: yarn
-      - name: Install dependencies
-        run: yarn install --immutable
-        env:
-          CI: 1
+      # - name: Install dependencies
+      #   run: yarn install --immutable
+      #   env:
+      #     CI: 1
       - name: Prepare test execution environment
         run: |
           cat >> .env << ENDOFDOTENV
@@ -139,10 +139,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: yarn
-      - name: Install dependencies
-        run: yarn install --immutable
-        env:
-          CI: 1
+      # - name: Install dependencies
+      #   run: yarn install --immutable
+      #   env:
+      #     CI: 1
       - name: Run unit tests with coverage
         run: yarn rw test web --no-watch --collect-coverage
         env:
@@ -218,10 +218,10 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: yarn
-      - name: Install dependencies
-        run: yarn install --immutable
-        env:
-          CI: 1
+      # - name: Install dependencies
+      #   run: yarn install --immutable
+      #   env:
+      #     CI: 1
       - name: Run linter for api side
         run: yarn eslint api/src
       - name: Run linter for web side
