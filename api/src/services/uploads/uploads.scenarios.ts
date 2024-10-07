@@ -10,6 +10,8 @@ import type {
 
 import type { ScenarioData } from '@redwoodjs/testing/api'
 
+import { Severity } from 'src/functions/processValidationJson/processValidationJson'
+
 export const standard = defineScenario<
   | Prisma.OrganizationCreateArgs
   | Prisma.AgencyCreateArgs
@@ -154,13 +156,13 @@ export const standard = defineScenario<
           create: [
             {
               passed: true,
-              results: '{error:false}',
+              results: { errors: [] },
               createdAt: '2024-01-26T15:11:27.000Z',
               initiatedById: scenario.user.one.id,
             },
             {
               passed: true,
-              results: '{error:false}',
+              results: { errors: [] },
               createdAt: '2024-01-27T10:32:00.000Z',
               initiatedById: scenario.user.one.id,
             },
@@ -181,13 +183,13 @@ export const standard = defineScenario<
           create: [
             {
               passed: true,
-              results: '{error:false}',
+              results: { errors: [] },
               initiatedById: scenario.user.two.id,
               createdAt: '2024-01-29T18:13:25.000Z',
             },
             {
               passed: true,
-              results: '{error:false}',
+              results: { errors: [] },
               initiatedById: scenario.user.two.id,
               createdAt: '2024-01-29T17:10:22.000Z',
             },
@@ -208,7 +210,7 @@ export const standard = defineScenario<
           create: [
             {
               passed: true,
-              results: '{error:false}',
+              results: { errors: [] },
               initiatedById: scenario.user.two.id,
               createdAt: '2024-01-29T18:13:25.000Z',
             },
@@ -228,10 +230,57 @@ export const standard = defineScenario<
         validations: {
           create: [
             {
+              passed: false,
+              isManual: true,
+              results: {
+                errors: [
+                  {
+                    message: `Manually invalidated by User...`,
+                    tab: 'N/A',
+                    row: 'N/A',
+                    col: 'N/A',
+                    severity: Severity.Error,
+                  },
+                ],
+              },
+              initiatedById: scenario.user.two.id,
+              createdAt: '2024-01-30T18:13:25.000Z',
+            },
+            {
               passed: true,
-              results: '{error:false}',
+              results: { errors: [] },
               initiatedById: scenario.user.two.id,
               createdAt: '2024-01-29T18:13:25.000Z',
+            },
+          ],
+        },
+        createdAt: '2024-01-21T18:10:17.000Z',
+        updatedAt: '2024-01-21T18:10:17.000Z',
+      },
+    }),
+    five: (scenario) => ({
+      data: {
+        filename: 'InvalidUpload.xls',
+        uploadedById: scenario.user.four.id,
+        agencyId: scenario.agency.two.id,
+        reportingPeriodId: scenario.reportingPeriod.one.id,
+        expenditureCategoryId: scenario.expenditureCategory.two.id,
+        validations: {
+          create: [
+            {
+              passed: false,
+              results: {
+                errors: [
+                  {
+                    message: `Value is required for Project__c`,
+                    tab: 'Project',
+                    row: 13,
+                    col: 'G',
+                    severity: Severity.Error,
+                  },
+                ],
+              },
+              initiatedById: scenario.user.two.id,
             },
           ],
         },
@@ -442,13 +491,17 @@ export const uploadCheck = defineScenario<
           create: [
             {
               passed: true,
-              results: '{error:false}',
+              results: {
+                errors: [],
+              },
               createdAt: '2024-01-26T15:11:27.000Z',
               initiatedById: scenario.user.one.id,
             },
             {
               passed: true,
-              results: '{error:false}',
+              results: {
+                errors: [],
+              },
               createdAt: '2024-01-27T10:32:00.000Z',
               initiatedById: scenario.user.one.id,
             },
@@ -469,13 +522,17 @@ export const uploadCheck = defineScenario<
           create: [
             {
               passed: true,
-              results: '{error:false}',
+              results: {
+                errors: [],
+              },
               createdAt: '2024-01-26T15:11:27.000Z',
               initiatedById: scenario.user.one.id,
             },
             {
               passed: true,
-              results: '{error:false}',
+              results: {
+                errors: [],
+              },
               createdAt: '2024-01-27T10:32:00.000Z',
               initiatedById: scenario.user.one.id,
             },

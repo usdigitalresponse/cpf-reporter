@@ -6,7 +6,7 @@ import { getS3Client, sendPutObjectToS3Bucket } from 'src/lib/aws'
 import { db, getPrismaClient } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 
-enum Severity {
+export enum Severity {
   Error = 'ERR',
   Warning = 'WARN',
   Info = 'INFO',

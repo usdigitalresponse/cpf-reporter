@@ -297,14 +297,12 @@ export const getValidUploadsInCurrentPeriod = async (
   })
 
   /* Step 2: Filter out uploads whose latest validation is not passed */
-  const validUploadsInPeriod = uploadsInPeriod
-    .filter((upload) => {
-      const latestValidation = upload.validations.reduce((latest, current) =>
-        current.createdAt > latest.createdAt ? current : latest
-      )
-      return latestValidation.passed
-    })
-    .map((upload) => upload)
+  const validUploadsInPeriod = uploadsInPeriod.filter((upload) => {
+    const latestValidation = upload.validations.reduce((latest, current) =>
+      current.createdAt > latest.createdAt ? current : latest
+    )
+    return latestValidation.passed
+  })
 
   return validUploadsInPeriod
 }
