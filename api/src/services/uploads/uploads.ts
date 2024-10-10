@@ -7,6 +7,8 @@ import type {
 } from 'types/graphql'
 import { v4 as uuidv4 } from 'uuid'
 
+import { RedwoodError } from '@redwoodjs/api'
+
 import { CurrentUser } from 'src/lib/auth'
 import { hasRole } from 'src/lib/auth'
 import {
@@ -411,6 +413,6 @@ export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
       return true
     } catch (error) {
       logger.error(error, 'Error sending Treasury Report')
-      return false
+      throw new RedwoodError(error.message)
     }
   }
