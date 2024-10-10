@@ -480,9 +480,8 @@ describe('treasury report', () => {
       .fn()
       .mockRejectedValue(new Error('Database error'))
 
-    const result = await sendTreasuryReport()
+    await expect(sendTreasuryReport()).rejects.toThrow('Database error')
 
-    expect(result).toBe(false)
     expect(logger.error).toHaveBeenCalledWith(
       expect.any(Error),
       'Error sending Treasury Report'
