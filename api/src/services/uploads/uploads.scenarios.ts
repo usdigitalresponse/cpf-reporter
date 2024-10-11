@@ -419,8 +419,8 @@ export const uploadCheck = defineScenario<
     },
     two: {
       data: {
-        name: '2A',
-        code: '2A',
+        name: '1B',
+        code: '1B',
         updatedAt: '2024-01-26T15:11:27.000Z',
       },
     },

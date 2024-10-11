@@ -263,8 +263,10 @@ describeScenario<StandardScenario>(
         scenario.organization.one,
         scenario.reportingPeriod.one
       )
-      expect(Object.keys(result).length).toEqual(1)
-      expect(Object.keys(result)).toEqual(['1A'])
+      expect(Object.keys(result).length).toEqual(3)
+      expect(Object.keys(result['1A'].uploadsToAdd).length).toEqual(1)
+      expect(Object.keys(result['1B'].uploadsToAdd).length).toEqual(0)
+      expect(Object.keys(result['1C'].uploadsToAdd).length).toEqual(0)
     })
 
     it('returns two uploads of different categories', async () => {
@@ -273,8 +275,10 @@ describeScenario<StandardScenario>(
         scenario.organization.two,
         scenario.reportingPeriod.one
       )
-      expect(Object.keys(result).length).toEqual(2)
-      expect(Object.keys(result).sort()).toEqual(['2A', '1A'].sort())
+      expect(Object.keys(result).length).toEqual(3)
+      expect(Object.keys(result['1A'].uploadsToAdd).length).toEqual(1)
+      expect(Object.keys(result['1B'].uploadsToAdd).length).toEqual(1)
+      expect(Object.keys(result['1C'].uploadsToAdd).length).toEqual(0)
     })
   }
 )
