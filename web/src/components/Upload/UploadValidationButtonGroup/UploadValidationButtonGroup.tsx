@@ -1,4 +1,6 @@
+import { ROLES } from 'api/src/lib/constants'
 import Button from 'react-bootstrap/Button'
+import { useAuth } from 'web/src/auth'
 
 import { Severity } from 'src/components/Upload/UploadValidationResultsTable/UploadValidationResultsTable'
 
@@ -32,6 +34,7 @@ const UploadValidationButtonGroup = ({
   handleForceInvalidate,
   savingUpload,
 }: UploadValidationButtonGroupProps) => {
+  const { hasRole } = useAuth()
   /*
     If the upload has been validated, renders "Invalidate" and "Re-validate" buttons
     If the upload has been invalidated, renders the "Validate" button
@@ -41,7 +44,7 @@ const UploadValidationButtonGroup = ({
 
     return (
       <>
-        {passed && (
+        {passed && hasRole(ROLES.USDR_ADMIN) && (
           <Button
             variant="outline-primary"
             size="sm"

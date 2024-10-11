@@ -7,6 +7,8 @@ import type {
 } from 'types/graphql'
 import { v4 as uuidv4 } from 'uuid'
 
+import { RedwoodError } from '@redwoodjs/api'
+
 import { CurrentUser } from 'src/lib/auth'
 import { hasRole } from 'src/lib/auth'
 import {
@@ -297,14 +299,12 @@ export const getValidUploadsInCurrentPeriod = async (
   })
 
   /* Step 2: Filter out uploads whose latest validation is not passed */
-  const validUploadsInPeriod = uploadsInPeriod
-    .filter((upload) => {
-      const latestValidation = upload.validations.reduce((latest, current) =>
-        current.createdAt > latest.createdAt ? current : latest
-      )
-      return latestValidation.passed
-    })
-    .map((upload) => upload)
+  const validUploadsInPeriod = uploadsInPeriod.filter((upload) => {
+    const latestValidation = upload.validations.reduce((latest, current) =>
+      current.createdAt > latest.createdAt ? current : latest
+    )
+    return latestValidation.passed
+  })
 
   return validUploadsInPeriod
 }
@@ -413,6 +413,6 @@ export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
       return true
     } catch (error) {
       logger.error(error, 'Error sending Treasury Report')
-      return false
+      throw new RedwoodError(error.message)
     }
   }

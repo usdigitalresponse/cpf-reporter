@@ -1,5 +1,3 @@
-import type { User } from '@prisma/client'
-
 import { EmailValidationError } from '@redwoodjs/api'
 
 import { ROLES } from 'src/lib/constants'
@@ -172,7 +170,7 @@ describe('user queries', () => {
         id: scenario.user.one.id,
         email: scenario.user.one.email,
         roles: ['USDR_ORGANIZATION_STAFF'],
-        agency: {},
+        agency: scenario.agency.three,
       })
       const result = await usersByOrganization({
         organizationId: scenario.organization.one.id,
@@ -246,9 +244,9 @@ describe('user writes', () => {
         email: scenario.user.one.email,
         roles: ['USDR_ADMIN'],
       })
-      const original = (await deleteUser({
+      const original = await deleteUser({
         id: scenario.user.one.id,
-      })) as User
+      })
       const result = await user({ id: original.id })
 
       expect(result).toEqual(null)
@@ -363,30 +361,27 @@ describe('user writes', () => {
 
 describe('general write validations', () => {
   scenario('general validations, fails on invalid email', async () => {
-    expect(
-      async () =>
-        await runGeneralCreateOrUpdateValidations({
-          email: 'iamnotarealemail',
-        })
+    await expect(
+      runGeneralCreateOrUpdateValidations({
+        email: 'iamnotarealemail',
+      })
     ).rejects.toThrow(EmailValidationError)
   })
 
   scenario('general validations, fails on missing name', async () => {
-    expect(
-      async () =>
-        await runGeneralCreateOrUpdateValidations({
-          email: 'iamreal@gmail.com',
-        })
+    await expect(
+      runGeneralCreateOrUpdateValidations({
+        email: 'iamreal@gmail.com',
+      })
     ).rejects.toThrow('Please provide a name')
   })
 
   scenario('general validations, fails on missing role', async () => {
-    expect(
-      async () =>
-        await runGeneralCreateOrUpdateValidations({
-          email: 'iamreal@gmail.com',
-          name: 'FDR',
-        })
+    await expect(
+      runGeneralCreateOrUpdateValidations({
+        email: 'iamreal@gmail.com',
+        name: 'FDR',
+      })
     ).rejects.toThrow('Please provide a role')
   })
 
@@ -398,9 +393,10 @@ describe('general write validations', () => {
         email: scenario.user.one.email,
         roles: ['USDR_ADMIN'],
       })
-      expect(
-        async () => await runPermissionsCreateOrUpdateValidations({})
-      ).not.toThrowError()
+
+      await expect(
+        runPermissionsCreateOrUpdateValidations({})
+      ).resolves.not.toThrow()
     }
   )
 
@@ -412,33 +408,32 @@ describe('general write validations', () => {
         email: scenario.user.one.email,
         roles: ['ORGANIZATION_STAFF'],
       })
-      expect(
-        async () => await runPermissionsCreateOrUpdateValidations({})
-      ).rejects.toThrow("You don't have permission to do that")
+
+      await expect(runPermissionsCreateOrUpdateValidations({})).rejects.toThrow(
+        "You don't have permission to do that"
+      )
     }
   )
 
   scenario('general validations, fails on bad role', async () => {
-    expect(
-      async () =>
-        await runGeneralCreateOrUpdateValidations({
-          email: 'iamreal@gmail.com',
-          name: 'FDR',
-          role: 'FAKE_ROLE',
-        })
+    await expect(
+      runGeneralCreateOrUpdateValidations({
+        email: 'iamreal@gmail.com',
+        name: 'FDR',
+        role: 'FAKE_ROLE',
+      })
     ).rejects.toThrow('Please select a recognized role')
   })
 
   scenario('general validations, fails on bad agency id', async () => {
-    expect(
-      async () =>
-        await runGeneralCreateOrUpdateValidations({
-          email: 'iamreal@gmail.com',
-          name: 'FDR',
-          role: 'ORGANIZATION_STAFF',
-          agencyId: 4598,
-        })
-    ).rejects.toThrowError('No Agency found')
+    await expect(
+      runGeneralCreateOrUpdateValidations({
+        email: 'iamreal@gmail.com',
+        name: 'FDR',
+        role: 'ORGANIZATION_STAFF',
+        agencyId: 4598,
+      })
+    ).rejects.toThrow('No Agency found')
   })
 })
 
@@ -451,11 +446,10 @@ describe('permissions write validations', () => {
         email: scenario.user.one.email,
         roles: ['ORGANIZATION_ADMIN'],
       })
-      expect(
-        async () =>
-          await runPermissionsCreateOrUpdateValidations({
-            role: ROLES.USDR_ADMIN,
-          })
+      await expect(
+        runPermissionsCreateOrUpdateValidations({
+          role: ROLES.USDR_ADMIN,
+        })
       ).rejects.toThrow("You don't have permission to update that role")
     }
   )
@@ -469,12 +463,11 @@ describe('permissions write validations', () => {
         roles: ['ORGANIZATION_ADMIN'],
         agency: scenario.agency.one,
       })
-      expect(
-        async () =>
-          await runPermissionsCreateOrUpdateValidations({
-            role: ROLES.ORGANIZATION_STAFF,
-            agencyId: scenario.agency.three.id,
-          })
+      await expect(
+        runPermissionsCreateOrUpdateValidations({
+          role: ROLES.ORGANIZATION_STAFF,
+          agencyId: scenario.agency.three.id,
+        })
       ).rejects.toThrow("You don't have permission to do that")
     }
   )
@@ -487,12 +480,11 @@ describe('permissions write validations', () => {
         email: scenario.user.two.email,
         roles: ['ORGANIZATION_ADMIN'],
       })
-      expect(
-        async () =>
-          await runPermissionsCreateOrUpdateValidations({
-            role: ROLES.ORGANIZATION_STAFF,
-            agencyId: scenario.agency.one.id,
-          })
+      await expect(
+        runPermissionsCreateOrUpdateValidations({
+          role: ROLES.ORGANIZATION_STAFF,
+          agencyId: scenario.agency.one.id,
+        })
       ).rejects.toThrow("You don't have permission to do that")
     }
   )
@@ -508,15 +500,14 @@ describe('update specific validations', () => {
         roles: ['USDR_ADMIN'],
       })
       await expect(
-        async () =>
-          await runUpdateSpecificValidations(
-            {
-              role: ROLES.ORGANIZATION_STAFF,
-              agencyId: scenario.agency.one.id,
-            },
-            scenario.user.one.id
-          )
-      ).not.toThrowError()
+        runUpdateSpecificValidations(
+          {
+            role: ROLES.ORGANIZATION_STAFF,
+            agencyId: scenario.agency.one.id,
+          },
+          scenario.user.one.id
+        )
+      ).resolves.not.toThrow()
     }
   )
 
@@ -529,15 +520,14 @@ describe('update specific validations', () => {
         roles: ['ORGANIZATION_ADMIN'],
       })
       await expect(
-        async () =>
-          await runUpdateSpecificValidations(
-            {
-              role: ROLES.ORGANIZATION_STAFF,
-              agencyId: scenario.agency.one.id,
-            },
-            scenario.user.three.id
-          )
-      ).not.toThrowError()
+        runUpdateSpecificValidations(
+          {
+            role: ROLES.ORGANIZATION_STAFF,
+            agencyId: scenario.agency.one.id,
+          },
+          scenario.user.three.id
+        )
+      ).resolves.not.toThrow()
     }
   )
 
@@ -550,14 +540,13 @@ describe('update specific validations', () => {
         roles: ['ORGANIZATION_ADMIN'],
       })
       await expect(
-        async () =>
-          await runUpdateSpecificValidations(
-            {
-              role: ROLES.ORGANIZATION_STAFF,
-              agencyId: scenario.agency.one.id,
-            },
-            scenario.user.four.id
-          )
+        runUpdateSpecificValidations(
+          {
+            role: ROLES.ORGANIZATION_STAFF,
+            agencyId: scenario.agency.one.id,
+          },
+          scenario.user.four.id
+        )
       ).rejects.toThrow('agencyId is invalid or unavailable to this user')
     }
   )

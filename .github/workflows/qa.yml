@@ -34,7 +34,7 @@ jobs:
     name: Prepare for QA
     runs-on: ubuntu-latest
     steps:
-      - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
         with:
           disable-sudo: true
           egress-policy: audit
@@ -44,13 +44,18 @@ jobs:
           show-progress: 'false'
           persist-credentials: 'false'
       - name: Setup Node
-        uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
+        uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4.0.4
         with:
           node-version-file: .nvmrc
           cache: yarn
           cache-dependency-path: yarn.lock
+      - name: Cache node_modules
+        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        with:
+          key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          path: node_modules
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
         env:
           CI: 1
 
@@ -76,7 +81,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
         with:
           disable-sudo: true
           egress-policy: audit
@@ -86,14 +91,17 @@ jobs:
           show-progress: 'false'
           persist-credentials: 'false'
       - name: Setup Node
-        uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
+        uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4.0.4
         with:
           node-version-file: .nvmrc
           cache: yarn
-      - name: Install dependencies
-        run: yarn install
-        env:
-          CI: 1
+      - name: Restore node_modules
+        id: restore-node-modules
+        uses: actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        with:
+          key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          path: node_modules
+          fail-on-cache-miss: true
       - name: Prepare test execution environment
         run: |
           cat >> .env << ENDOFDOTENV
@@ -110,6 +118,20 @@ jobs:
         with:
           textReportPath: 'coverage/coverage.txt'
           srcBasePath: 'api/src'
+      - name: Publish coverage markdown report to step summary
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'ENDOFREPORT'
+          ## API-side test coverage
+
+          <details>
+          <summary>Coverage report</summary>
+
+          ${{ env.COVERAGE_REPORT }}
+
+          </details>
+          ENDOFREPORT
+        env:
+          COVERAGE_REPORT: ${{ steps.coverage-markdown.outputs.markdownReport }}
 
   test-client:
     name: Test client-side code
@@ -119,7 +141,7 @@ jobs:
     outputs:
       coverage-markdown-report: ${{ steps.coverage-markdown.outputs.markdownReport }}
     steps:
-      - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
         with:
           disable-sudo: true
           egress-policy: audit
@@ -129,14 +151,17 @@ jobs:
           show-progress: 'false'
           persist-credentials: 'false'
       - name: Setup Node
-        uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
+        uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4.0.4
         with:
           node-version-file: .nvmrc
           cache: yarn
-      - name: Install dependencies
-        run: yarn install
-        env:
-          CI: 1
+      - name: Restore node_modules
+        id: restore-node-modules
+        uses: actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        with:
+          key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          path: node_modules
+          fail-on-cache-miss: true
       - name: Run unit tests with coverage
         run: yarn rw test web --no-watch --collect-coverage
         env:
@@ -147,6 +172,20 @@ jobs:
         with:
           textReportPath: 'coverage/coverage.txt'
           srcBasePath: 'web/src'
+      - name: Publish coverage markdown report to step summary
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'ENDOFREPORT'
+          ## Web-side test coverage
+
+          <details>
+          <summary>Coverage report</summary>
+
+          ${{ env.COVERAGE_REPORT }}
+
+          </details>
+          ENDOFREPORT
+        env:
+          COVERAGE_REPORT: ${{ steps.coverage-markdown.outputs.markdownReport }}
 
   test-python:
     name: Test python code
@@ -157,7 +196,7 @@ jobs:
     outputs:
       coverage-markdown-report: ${{ steps.coverage-markdown.outputs.stdout }}
     steps:
-      - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
         with:
           disable-sudo: true
           egress-policy: audit
@@ -179,6 +218,20 @@ jobs:
       - name: Generate coverage markdown report
         id: coverage-markdown
         run: poetry run coverage report --format markdown
+      - name: Publish coverage markdown report to step summary
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'ENDOFREPORT'
+          ## Python test coverage
+
+          <details>
+          <summary>Coverage report</summary>
+
+          ${{ env.COVERAGE_REPORT }}
+
+          </details>
+          ENDOFREPORT
+        env:
+          COVERAGE_REPORT: ${{ steps.coverage-markdown.outputs.stdout }}
 
   eslint:
     name: Lint JavaScript
@@ -186,7 +239,7 @@ jobs:
     needs:
       - prepare-qa
     steps:
-      - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
         with:
           disable-sudo: true
           egress-policy: audit
@@ -196,14 +249,17 @@ jobs:
           show-progress: 'false'
           persist-credentials: 'false'
       - name: Setup Node
-        uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
+        uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6 # v4.0.4
         with:
           node-version-file: .nvmrc
           cache: yarn
-      - name: Install dependencies
-        run: yarn install
-        env:
-          CI: 1
+      - name: Restore node_modules
+        id: restore-node-modules
+        uses: actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        with:
+          key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
+          path: node_modules
+          fail-on-cache-miss: true
       - name: Run linter for api side
         run: yarn eslint api/src
       - name: Run linter for web side
@@ -217,7 +273,7 @@ jobs:
     name: Lint python
     runs-on: ubuntu-latest
     steps:
-      - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
         with:
           disable-sudo: true
           egress-policy: audit
@@ -234,7 +290,7 @@ jobs:
     name: Lint terraform
     runs-on: ubuntu-latest
     steps:
-      - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
         with:
           disable-sudo: true
           egress-policy: audit

@@ -1,4 +1,4 @@
-import type { Upload } from '@prisma/client'
+import { Upload } from '@prisma/client'
 
 import {
   deleteUploadFile,
@@ -10,6 +10,7 @@ import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 
 import { updateOrganization } from '../organizations/organizations'
+import { createUploadValidation } from '../uploadValidations/uploadValidations'
 
 import {
   uploads,
@@ -20,6 +21,7 @@ import {
   downloadUploadFile,
   Upload as UploadRelationResolver,
   getUploadsByExpenditureCategory,
+  getValidUploadsInCurrentPeriod,
   sendTreasuryReport,
   SubrecipientLambdaPayload,
   ProjectLambdaPayload,
@@ -102,18 +104,23 @@ describe('uploads', () => {
     'returns all uploads in their agency for organization staff',
     async (scenario: StandardScenario) => {
       mockCurrentUser(scenario.user.three)
-      const result = await uploads()
+      const result: Upload[] = await uploads()
+
       const uploadsBelongToOrg = await uploadsBelongToOrganization(
         result,
         scenario.organization.two.id
       )
-      const uploadsBelongToAgency = result.every(async (upload) => {
-        return upload.agencyId === scenario.user.three.agencyId
-      })
-
-      expect(result.length).toEqual(2)
-      expect(uploadsBelongToAgency).toEqual(true)
       expect(uploadsBelongToOrg).toBe(true)
+
+      const uploadsBelongToAgency = result.every(
+        (upload) => upload.agencyId === scenario.user.three.agencyId
+      )
+      expect(uploadsBelongToAgency).toEqual(true)
+
+      const expectedUploads = Object.values(scenario.upload).filter(
+        (upload) => upload.agencyId === scenario.user.three.agencyId
+      )
+      expect(result.length).toEqual(expectedUploads.length)
     }
   )
 
@@ -271,6 +278,98 @@ describeScenario<StandardScenario>(
     })
   }
 )
+describe('getValidUploadsInCurrentPeriod', () => {
+  scenario(
+    'When an upload was first validated and subsequently invalidated then it should be ignored.',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser(scenario.user.three)
+      const uploads = await getValidUploadsInCurrentPeriod(
+        scenario.organization.two,
+        scenario.reportingPeriod.one
+      )
+
+      expect(uploads).toHaveLength(1)
+      expect(uploads.map((upload) => upload.id)).not.toContain(
+        scenario.upload.four.id
+      )
+    }
+  )
+
+  scenario(
+    'When an upload was first invalid and subsequently became valid then it should be included.',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser(scenario.user.three)
+      await createUploadValidation({
+        input: {
+          uploadId: scenario.upload.four.id,
+          passed: true,
+          results: { errors: [] },
+          initiatedById: scenario.user.three.id,
+        },
+      })
+
+      const uploads = await getValidUploadsInCurrentPeriod(
+        scenario.organization.two,
+        scenario.reportingPeriod.one
+      )
+
+      expect(uploads).toHaveLength(2)
+      expect(uploads.map((upload) => upload.id)).toContain(
+        scenario.upload.four.id
+      )
+    }
+  )
+
+  scenario(
+    'When an upload has multiple valid UploadValidation records it should be included.',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser(scenario.user.three)
+
+      // Find one with multiple passed validations
+      const upload = scenario.upload.one
+
+      const uploads = await getValidUploadsInCurrentPeriod(
+        scenario.organization.one,
+        upload.reportingPeriodId
+      )
+
+      expect(uploads.map((upload) => upload.id)).toContain(upload.id)
+    }
+  )
+
+  scenario(
+    'When an upload only has a single valid UploadValidation record it should be included.',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser(scenario.user.three)
+
+      // Find one with single valid validation
+      const upload = scenario.upload.three
+
+      const uploads = await getValidUploadsInCurrentPeriod(
+        scenario.organization.two,
+        upload.reportingPeriodId
+      )
+
+      expect(uploads.map((upload) => upload.id)).toContain(upload.id)
+    }
+  )
+  scenario(
+    'When an upload only has a single invalid UploadValidation record it should be ignored.',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser(scenario.user.three)
+
+      // Find one with single invalid validation
+      const upload = scenario.upload.five
+
+      const uploads = await getValidUploadsInCurrentPeriod(
+        scenario.organization.two,
+        upload.reportingPeriodId
+      )
+
+      expect(uploads.map((upload) => upload.id)).not.toContain(upload.id)
+    }
+  )
+})
 
 describe('getValidUploadsInCurrentPeriod', () => {
   scenario(
@@ -393,9 +492,8 @@ describe('treasury report', () => {
       .fn()
       .mockRejectedValue(new Error('Database error'))
 
-    const result = await sendTreasuryReport()
+    await expect(sendTreasuryReport()).rejects.toThrow('Database error')
 
-    expect(result).toBe(false)
     expect(logger.error).toHaveBeenCalledWith(
       expect.any(Error),
       'Error sending Treasury Report'
