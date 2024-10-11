@@ -2,7 +2,8 @@ import { ROLES } from 'api/src/lib/constants'
 import { Button, ButtonGroup } from 'react-bootstrap'
 import { useAuth } from 'web/src/auth'
 
-import { useMutation, MetaTags } from '@redwoodjs/web'
+import { useMutation, Metadata } from '@redwoodjs/web'
+import { toast } from '@redwoodjs/web/toast'
 
 import UploadsCell from 'src/components/Upload/UploadsCell'
 
@@ -16,10 +17,10 @@ const UploadsPage = () => {
   const { hasRole } = useAuth()
   const [sendTreasuryReport] = useMutation(SEND_TREASURY_REPORT, {
     onCompleted: () => {
-      console.log('Treasury Report sent by email')
+      toast.success('Treasury Report has been sent')
     },
     onError: (error) => {
-      console.error('Error sending Treasury Report by email', error)
+      toast.error('Error sending Treasury Report by email: ' + error.message)
     },
   })
 
@@ -29,7 +30,7 @@ const UploadsPage = () => {
 
   return (
     <>
-      <MetaTags title="Uploads Page" description="Uploads page" />
+      <Metadata title="Uploads Page" description="Uploads page" />
 
       <h2>Uploads</h2>
 
