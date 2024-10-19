@@ -5,11 +5,11 @@ import pytest
 from moto import mock_aws
 
 from src.functions.generate_presigned_url_and_send_email import (
-    SendTreasuryEmailLambdaPayload,
     generate_email,
     handle,
 )
 from src.lib.logging import get_logger
+from src.lib.treasury_email_common import SendTreasuryEmailLambdaPayload
 from src.lib.treasury_generation_common import OrganizationObj, PreferencesObj, UserObj
 
 

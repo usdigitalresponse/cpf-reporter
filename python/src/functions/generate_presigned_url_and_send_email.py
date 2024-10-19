@@ -1,16 +1,18 @@
 import os
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import boto3
 import structlog
 from aws_lambda_typing.context import Context
-from pydantic import BaseModel
 
+from src.lib import treasury_email_common
 from src.lib.email import send_email
-from src.lib.logging import get_logger, reset_contextvars
 from src.lib.s3_helper import get_presigned_url
-from src.lib.treasury_email_common import generate_email_html_given_body
-from src.lib.treasury_generation_common import OrganizationObj, UserObj
+from src.lib.treasury_email_common import (
+    SendTreasuryEmailLambdaPayload,
+    generate_email_html_given_body,
+)
+from src.lib.treasury_generation_common import UserObj
 
 treasury_email_html = """
 Your treasury report can be downloaded <a href={url}>here</a>.
@@ -22,41 +24,8 @@ Your treasury report can be downloaded here: {url}.
 """
 
 
-class SendTreasuryEmailLambdaPayload(BaseModel):
-    organization: OrganizationObj
-    user: UserObj
-
-
-@reset_contextvars
-def handle(event: SendTreasuryEmailLambdaPayload, context: Context):
-    """Lambda handler for emailing Treasury reports
-
-    Given a user and organization object- send an email to the user that
-    contains a pre-signed URL to the following S3 object if it exists:
-    treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip
-    If the object does not exist then raise an exception.
-
-    Args:
-        event: S3 Lambda event of type `s3:ObjectCreated:*`
-        context: Lambda context
-    """
-    structlog.contextvars.bind_contextvars(lambda_event={"step_function": event})
-    logger = get_logger()
-    logger.info("received new invocation event from step function")
-
-    try:
-        payload = SendTreasuryEmailLambdaPayload.model_validate(event)
-    except Exception:
-        logger.exception("Exception parsing Send Treasury Email event payload")
-        return {"statusCode": 400, "body": "Bad Request"}
-
-    try:
-        process_event(payload, logger)
-    except Exception:
-        logger.exception("Exception processing sending treasury report email")
-        return {"statusCode": 500, "body": "Internal Server Error"}
-
-    return {"statusCode": 200, "body": "Success"}
+def handle(event: SendTreasuryEmailLambdaPayload, context: Context) -> dict[str, Any]:
+    return treasury_email_common.handle(event, context, process_event)
 
 
 def generate_email(
