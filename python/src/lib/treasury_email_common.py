@@ -6,8 +6,7 @@ from aws_lambda_typing.context import Context
 from pydantic import BaseModel
 from structlog import BoundLogger
 
-from src.lib.logging import reset_contextvars, get_logger
-
+from src.lib.logging import get_logger, reset_contextvars
 from src.lib.treasury_generation_common import OrganizationObj, UserObj
 
 
@@ -45,18 +44,16 @@ def generate_email_html_given_body(title: str, body_html: str) -> str:
 
 
 @reset_contextvars
-def handle(event: SendTreasuryEmailLambdaPayload, context: Context,
-           process_event: Callable[[SendTreasuryEmailLambdaPayload, BoundLogger], bool]) -> dict[str, Any]:
-    """Lambda handler for emailing Treasury reports
+def handle(
+    event: SendTreasuryEmailLambdaPayload,
+    context: Context,
+    process_event: Callable[[SendTreasuryEmailLambdaPayload, BoundLogger], bool],
+) -> dict[str, Any]:
+    """Call process_event on SendTreasureEmailLambdaPayload after some validation.
 
-    Given a user and organization object- send an email to the user that
-    contains a pre-signed URL to the following S3 object if it exists:
-    treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip
-    If the object does not exist then raise an exception.
-
-    Args:
-        event: S3 Lambda event of type `s3:ObjectCreated:*`
-        context: Lambda context
+    event: S3 Lambda event of type `s3:ObjectCreated:*`
+    context: Lambda context
+    process_event: function that does the work with the payload
     """
     structlog.contextvars.bind_contextvars(lambda_event={"step_function": event})
     logger = get_logger()

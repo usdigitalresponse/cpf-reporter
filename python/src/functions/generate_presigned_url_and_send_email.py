@@ -14,32 +14,37 @@ from src.lib.treasury_email_common import (
 )
 from src.lib.treasury_generation_common import UserObj
 
-treasury_email_html = """
+EMAIL_SUBJECT = "USDR CPF Treasury Report"
+EMAIL_HTML = """
 Your treasury report can be downloaded <a href={url}>here</a>.
 """
-
-treasury_email_text = """
+EMAIL_TEXT = """
 Hello,
 Your treasury report can be downloaded here: {url}.
 """
 
 
 def handle(event: SendTreasuryEmailLambdaPayload, context: Context) -> dict[str, Any]:
+    """Lambda handler for emailing Treasury reports
+
+    Given a user and organization object, send an email to the user that
+    contains a pre-signed URL to the following S3 object if it exists:
+    treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip
+    If the object does not exist then raise an exception.
+    """
     return treasury_email_common.handle(event, context, process_event)
 
 
 def generate_email(
-    user: UserObj,
+    user: UserObj | None,
     logger: structlog.stdlib.BoundLogger,
-    presigned_url: str = "",
+    presigned_url: str,
 ) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     try:
         email_html = generate_email_html_given_body(
-            "CPF Treasury Report", treasury_email_html.format(url=presigned_url)
+            "CPF Treasury Report", EMAIL_HTML.format(url=presigned_url)
         )
-        email_text = treasury_email_text.format(url=presigned_url)
-        subject = "USDR CPF Treasury Report"
-        return email_html, email_text, subject
+        return email_html, EMAIL_TEXT.format(url=presigned_url), EMAIL_SUBJECT
     except Exception as e:
         logger.error(f"Failed to generate treasury email: {e}")
     return None, None, None
@@ -71,19 +76,15 @@ def process_event(
     if presigned_url is None:
         raise Exception("Failed to generate signed-URL or file not found")
 
-    email_html, email_text, subject = generate_email(
-        user=user,
-        presigned_url=presigned_url,
-        logger=logger,
-    )
+    email_html, email_text, subject = generate_email(user, logger, presigned_url)
     if not email_html:
         return False
 
     send_email(
-        dest_email=user.email,
-        email_html=email_html,
-        email_text=email_text or "",
-        subject=subject or "",
-        logger=logger,
+        user.email,
+        email_html,
+        email_text or "",
+        subject or "",
+        logger,
     )
     return True
