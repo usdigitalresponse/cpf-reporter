@@ -7,8 +7,8 @@ from src.functions.generate_presigned_url_and_send_email import (
 )
 from src.lib.logging import get_logger
 from tests.test_utils import (
+    long_string_compare,
     set_up_mock_email_environment,
-    string_compare,
 )
 
 
@@ -30,7 +30,7 @@ def test_generate_email():
     # What the heck, just test the whole thing to be sure
     with open("tests/data/treasury_success_email.html") as the_file:
         result_email = the_file.read()
-        string_compare(result_email, email_html)
+        long_string_compare(result_email, email_html)
 
 
 def test_email_success_handler(s3_bucket_and_s3):
