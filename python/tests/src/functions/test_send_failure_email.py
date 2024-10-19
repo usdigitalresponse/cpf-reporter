@@ -1,16 +1,10 @@
-import os
-
-import boto3
-
 from src.functions import send_failure_email
 from src.functions.send_failure_email import (
     generate_email,
     handle,
 )
 from src.lib.logging import get_logger
-from src.lib.treasury_email_common import SendTreasuryEmailLambdaPayload
-from src.lib.treasury_generation_common import OrganizationObj, PreferencesObj, UserObj
-from tests.test_utils import string_compare, s3_bucket_and_s3
+from tests.test_utils import set_up_mock_email_environment
 
 
 def test_generate_email():
@@ -21,9 +15,7 @@ def test_generate_email():
 
     assert subject == send_failure_email.EMAIL_SUBJECT
 
-    assert (
-        email_text == send_failure_email.EMAIL_TEXT
-    )
+    assert email_text == send_failure_email.EMAIL_TEXT
 
     assert "We were not able to generate your treasury report." in email_html
 
@@ -34,31 +26,6 @@ def test_generate_email():
 
 
 def test_email_failure_handler(s3_bucket_and_s3):
-    event = SendTreasuryEmailLambdaPayload(
-        organization=OrganizationObj(
-            id=1, preferences=PreferencesObj(current_reporting_period_id=0)
-        ),
-        user=UserObj(id=0, email="foo@example.com"),
-    )
-
-    # Set up required environment
-    environ = os.environ.copy()
-    try:
-        # Set up email
-        client = boto3.client("ses")
-        notifs_email = "notifs@example.com"
-        client.verify_email_identity(EmailAddress=notifs_email)
-
-        os.environ.update(
-            {
-                "NOTIFICATIONS_EMAIL": notifs_email,
-            }
-        )
-
-        # Call handler.
+    with set_up_mock_email_environment() as (event, environ):
         result = handle(event, None)
-    finally:
-        os.environ.clear()
-        os.environ.update(environ)
-
-    assert result == {"body": "Success", "statusCode": 200}
+        assert result == {"body": "Success", "statusCode": 200}
