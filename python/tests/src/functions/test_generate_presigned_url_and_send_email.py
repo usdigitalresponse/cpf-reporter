@@ -29,11 +29,10 @@ def test_generate_email():
         )
 
     assert subject == EMAIL_SUBJECT
-
     assert presigned_url in email_text
     assert email_text == EMAIL_TEXT.format(url=presigned_url)
-
     assert presigned_url in email_html
+
     # What the heck, just test the whole thing to be sure
     with open("tests/data/treasury_success_email.html") as the_file:
         result_email = the_file.read()

@@ -12,9 +12,7 @@ def test_generate_email():
     email_html, email_text, subject = generate_email(email_data(None), get_logger())
 
     assert subject == send_failure_email.EMAIL_SUBJECT
-
     assert email_text == send_failure_email.EMAIL_TEXT
-
     assert "We were not able to generate your treasury report." in email_html
 
     # TODO: What the heck, just test the whole thing to be sure
