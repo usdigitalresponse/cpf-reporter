@@ -37,14 +37,7 @@ class PresignedException(Exception):
     """Exception generating presigned URL"""
 
 
-def email_data(payload: SendTreasuryEmailLambdaPayload) -> EmailData:
-    """Generate data for email.
-
-    1) Check to see if the s3 object exists:
-    treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip
-    2) If it does not, raise an exception and quit
-    3) Generate a pre-signed URL with an expiration date of 1 hour
-    """
+def _get_presigned_url(payload: SendTreasuryEmailLambdaPayload) -> str:
     s3_client = boto3.client("s3")
 
     # user = payload.user
@@ -58,7 +51,19 @@ def email_data(payload: SendTreasuryEmailLambdaPayload) -> EmailData:
     )
     if presigned_url is None:
         raise PresignedException("Failed to generate signed-URL or file not found")
+    return presigned_url
 
+
+def email_data(payload: SendTreasuryEmailLambdaPayload) -> EmailData:
+    """Generate data for email.
+
+    1) Check to see if the s3 object exists:
+    treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip
+    2) If it does not, raise an exception and quit
+    3) Generate a pre-signed URL with an expiration date of 1 hour
+    """
+
+    presigned_url = _get_presigned_url(payload)
     return EmailData(
         EMAIL_TITLE,
         EMAIL_SUBJECT,

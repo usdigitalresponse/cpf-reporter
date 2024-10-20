@@ -1,13 +1,13 @@
 import os
+from unittest.mock import patch
 
 from src.functions.generate_presigned_url_and_send_email import (
     handle,
-    EMAIL_TITLE,
     EMAIL_SUBJECT,
-    EMAIL_HTML,
     EMAIL_TEXT,
+    email_data,
 )
-from src.lib.treasury_email_common import generate_email, EmailData
+from src.lib.treasury_email_common import generate_email
 from src.lib.logging import get_logger
 from tests.test_utils import (
     long_string_compare,
@@ -16,18 +16,17 @@ from tests.test_utils import (
 
 
 def test_generate_email():
-    logger = get_logger()
     presigned_url = "https://example.com"
 
-    email_html, email_text, subject = generate_email(
-        EmailData(
-            EMAIL_TITLE,
-            EMAIL_SUBJECT,
-            EMAIL_HTML.format(url=presigned_url),
-            EMAIL_TEXT.format(url=presigned_url),
-        ),
-        logger,
-    )
+    with patch(
+        "src.functions.generate_presigned_url_and_send_email._get_presigned_url"
+    ) as get_presigned:
+        get_presigned.side_effect = lambda payload: presigned_url
+
+        email_html, email_text, subject = generate_email(
+            email_data(None),
+            get_logger(),
+        )
 
     assert subject == EMAIL_SUBJECT
 

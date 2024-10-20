@@ -9,8 +9,7 @@ from tests.test_utils import set_up_mock_email_environment
 
 
 def test_generate_email():
-    logger = get_logger()
-    email_html, email_text, subject = generate_email(email_data(None), logger)
+    email_html, email_text, subject = generate_email(email_data(None), get_logger())
 
     assert subject == send_failure_email.EMAIL_SUBJECT
 
