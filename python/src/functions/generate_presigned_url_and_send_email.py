@@ -15,6 +15,7 @@ from src.lib.treasury_email_common import (
 from src.lib.treasury_generation_common import UserObj
 
 EMAIL_SUBJECT = "USDR CPF Treasury Report"
+EMAIL_TITLE = "CPF Treasury Report"
 EMAIL_HTML = """
 Your treasury report can be downloaded <a href={url}>here</a>.
 """
@@ -42,7 +43,7 @@ def generate_email(
 ) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     try:
         email_html = generate_email_html_given_body(
-            "CPF Treasury Report", EMAIL_HTML.format(url=presigned_url)
+            EMAIL_TITLE, EMAIL_HTML.format(url=presigned_url)
         )
         return email_html, EMAIL_TEXT.format(url=presigned_url), EMAIL_SUBJECT
     except Exception as e:

@@ -12,6 +12,7 @@ from src.lib.treasury_email_common import (
 from src.lib.treasury_generation_common import UserObj
 
 EMAIL_SUBJECT = "USDR CPF Treasury Report Failure"
+EMAIL_TITLE = "CPF Treasury Report"
 EMAIL_TEXT = """
 We were not able to generate your treasury report.
 We are looking into it.
@@ -31,7 +32,7 @@ def generate_email(
 ) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     try:
         email_html = generate_email_html_given_body(
-            EMAIL_SUBJECT, EMAIL_HTML
+            EMAIL_TITLE, EMAIL_HTML
         )
         return email_html, EMAIL_TEXT, EMAIL_SUBJECT
     except Exception as e:
