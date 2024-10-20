@@ -1,17 +1,16 @@
 from src.functions import send_failure_email
 from src.functions.send_failure_email import (
-    generate_email,
     handle,
+    email_data,
 )
 from src.lib.logging import get_logger
+from src.lib.treasury_email_common import generate_email
 from tests.test_utils import set_up_mock_email_environment
 
 
 def test_generate_email():
-    # user isn't used
-    user = None
     logger = get_logger()
-    email_html, email_text, subject = generate_email(user, logger)
+    email_html, email_text, subject = generate_email(email_data(None), logger)
 
     assert subject == send_failure_email.EMAIL_SUBJECT
 

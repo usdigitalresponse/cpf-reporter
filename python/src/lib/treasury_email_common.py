@@ -1,11 +1,12 @@
-from typing import Any, Callable
+from dataclasses import dataclass
+from typing import Any, Callable, Tuple, Optional
 
 import chevron
 import structlog
 from aws_lambda_typing.context import Context
 from pydantic import BaseModel
-from structlog import BoundLogger
 
+from src.lib.email import send_email
 from src.lib.logging import get_logger, reset_contextvars
 from src.lib.treasury_generation_common import OrganizationObj, UserObj
 
@@ -13,6 +14,14 @@ from src.lib.treasury_generation_common import OrganizationObj, UserObj
 class SendTreasuryEmailLambdaPayload(BaseModel):
     organization: OrganizationObj
     user: UserObj
+
+
+@dataclass(frozen=True)
+class EmailData:
+    title: str
+    subject: str
+    html: str
+    text: str
 
 
 def generate_email_html_given_body(title: str, body_html: str) -> str:
@@ -47,7 +56,7 @@ def generate_email_html_given_body(title: str, body_html: str) -> str:
 def handle(
     event: SendTreasuryEmailLambdaPayload,
     context: Context,
-    process_event: Callable[[SendTreasuryEmailLambdaPayload, BoundLogger], bool],
+    email_data: Callable[[SendTreasuryEmailLambdaPayload], EmailData],
 ) -> dict[str, Any]:
     """Call process_event on SendTreasureEmailLambdaPayload after some validation.
 
@@ -66,9 +75,48 @@ def handle(
         return {"statusCode": 400, "body": "Bad Request"}
 
     try:
-        process_event(payload, logger)
+        process_event(payload, email_data, logger)
     except Exception:
         logger.exception("Exception processing sending treasury report email")
         return {"statusCode": 500, "body": "Internal Server Error"}
 
     return {"statusCode": 200, "body": "Success"}
+
+
+def generate_email(
+    data: EmailData,
+    logger: structlog.stdlib.BoundLogger,
+) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+    try:
+        email_html = generate_email_html_given_body(data.title, data.html)
+        return email_html, data.text, data.subject
+    except Exception as e:
+        logger.error(f"Failed to generate treasury email: {e}")
+    return None, None, None
+
+
+def process_event(
+    payload: SendTreasuryEmailLambdaPayload,
+    email_data: Callable[[SendTreasuryEmailLambdaPayload], EmailData],
+    logger: structlog.stdlib.BoundLogger,
+):
+    """
+    This function is structured as followed:
+    - Generate data for email
+    - Generate an email
+    - Send email to the user
+    """
+
+    data = email_data(payload)
+    email_html, email_text, subject = generate_email(data, logger)
+    if not email_html:
+        return False
+
+    send_email(
+        payload.user.email,
+        email_html,
+        email_text or "",
+        subject or "",
+        logger,
+    )
+    return True

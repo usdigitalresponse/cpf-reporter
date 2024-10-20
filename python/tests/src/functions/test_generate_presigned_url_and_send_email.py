@@ -1,10 +1,13 @@
 import os
 
-from src.functions import generate_presigned_url_and_send_email
 from src.functions.generate_presigned_url_and_send_email import (
-    generate_email,
     handle,
+    EMAIL_TITLE,
+    EMAIL_SUBJECT,
+    EMAIL_HTML,
+    EMAIL_TEXT,
 )
+from src.lib.treasury_email_common import generate_email, EmailData
 from src.lib.logging import get_logger
 from tests.test_utils import (
     long_string_compare,
@@ -13,18 +16,23 @@ from tests.test_utils import (
 
 
 def test_generate_email():
-    # user isn't used
-    user = None
     logger = get_logger()
     presigned_url = "https://example.com"
-    email_html, email_text, subject = generate_email(user, logger, presigned_url)
 
-    assert subject == generate_presigned_url_and_send_email.EMAIL_SUBJECT
+    email_html, email_text, subject = generate_email(
+        EmailData(
+            EMAIL_TITLE,
+            EMAIL_SUBJECT,
+            EMAIL_HTML.format(url=presigned_url),
+            EMAIL_TEXT.format(url=presigned_url),
+        ),
+        logger,
+    )
+
+    assert subject == EMAIL_SUBJECT
 
     assert presigned_url in email_text
-    assert email_text == generate_presigned_url_and_send_email.EMAIL_TEXT.format(
-        url=presigned_url
-    )
+    assert email_text == EMAIL_TEXT.format(url=presigned_url)
 
     assert presigned_url in email_html
     # What the heck, just test the whole thing to be sure
