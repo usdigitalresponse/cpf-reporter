@@ -166,7 +166,7 @@ describe('uploads', () => {
     expect(deleteUploadFile).not.toHaveBeenCalled()
   })
 
-  describe('Uploads resolver', () => {
+  describe('Uploads resolvers', () => {
     scenario(
       'latest validations: returns the latest validation for an upload when there are multiple validations',
       async (scenario: StandardScenario) => {
@@ -502,9 +502,8 @@ describe('treasury report', () => {
       .fn()
       .mockRejectedValue(new Error('Database error'))
 
-    const result = await sendTreasuryReport()
+    await expect(sendTreasuryReport()).rejects.toThrow('Database error')
 
-    expect(result).toBe(false)
     expect(logger.error).toHaveBeenCalledWith(
       expect.any(Error),
       'Error sending Treasury Report'
