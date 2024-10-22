@@ -50,11 +50,6 @@ export const standardSeriesUploads =
         createdAt: '2024-10-21T23:56:49.310Z',
         __typename: 'UploadValidation',
       },
-      expenditureCategory: null,
-      reportingPeriod: {
-        name: 'First Reporting Period',
-        __typename: 'ReportingPeriod',
-      },
     },
     {
       id: 2,
@@ -69,11 +64,6 @@ export const standardSeriesUploads =
         },
         createdAt: '2024-10-22T00:03:57.027Z',
         __typename: 'UploadValidation',
-      },
-      expenditureCategory: null,
-      reportingPeriod: {
-        name: 'First Reporting Period',
-        __typename: 'ReportingPeriod',
       },
     },
   ]

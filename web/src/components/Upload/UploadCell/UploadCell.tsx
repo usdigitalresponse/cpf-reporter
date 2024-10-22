@@ -35,12 +35,6 @@ export const QUERY = gql`
       seriesUploads {
         id
         createdAt
-        expenditureCategory {
-          code
-        }
-        reportingPeriod {
-          name
-        }
         latestValidation {
           id
           passed
