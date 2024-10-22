@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react'
 
 import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal'
+import type { FindReportingPeriodsWithCertification } from 'types/graphql'
 import { useAuth } from 'web/src/auth'
 
 import { useMutation } from '@redwoodjs/web'
@@ -136,7 +137,9 @@ const ReportingPeriodsList = ({
           </Button>
         </Modal.Footer>
       </Modal>
-      <TableBuilder
+      <TableBuilder<
+        FindReportingPeriodsWithCertification['reportingPeriodsWithCertification']
+      >
         data={reportingPeriods}
         columns={columns}
         filterableInputs={['name']}

@@ -1,10 +1,11 @@
 import { createColumnHelper, ColumnDef } from '@tanstack/react-table'
-import { ParsedSubrecipient, Subrecipient } from 'types/graphql'
+import { ParsedSubrecipient, FindSubrecipients } from 'types/graphql'
 
 import SubrecipientTableUploadLinksDisplay from 'src/components/Subrecipient/SubrecipientTableUploadLinksDisplay/SubrecipientTableUploadLinksDisplay'
 import { formatDateString, formatPhoneNumber } from 'src/utils'
 
-const columnHelper = createColumnHelper<Subrecipient>()
+const columnHelper =
+  createColumnHelper<FindSubrecipients['subrecipients'][number]>()
 
 function formatDetails(
   parsedSubrecipient: ParsedSubrecipient | null | undefined
@@ -46,7 +47,9 @@ const getUEI = (ueiTinCombo: string) => ueiTinCombo.split('_')[0]
 
 const getTIN = (ueiTinCombo: string) => ueiTinCombo.split('_')[1]
 
-export const columnDefs: ColumnDef<Subrecipient>[] = [
+export const columnDefs: ColumnDef<
+  FindSubrecipients['subrecipients'][number]
+>[] = [
   columnHelper.accessor((row) => getUEI(row.ueiTinCombo), {
     id: 'uei',
     cell: (info) => info.getValue() ?? '',

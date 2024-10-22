@@ -7,6 +7,7 @@ import { toast } from '@redwoodjs/web/toast'
 
 import { timeTag } from 'src/lib/formatters'
 
+import UploadSeriesTable from '../UploadSeriesTable/UploadSeriesTable'
 import UploadValidationButtonGroup from '../UploadValidationButtonGroup/UploadValidationButtonGroup'
 import UploadValidationResultsTable, {
   Severity,
@@ -125,7 +126,7 @@ const Upload = ({ upload, queryResult }) => {
       )}
 
       <h3>Upload {upload.id} details</h3>
-      <div className="row">
+      <div className="row mb-4">
         <div className="col">
           <ul className="list-group">
             <li className="list-group-item">
@@ -169,6 +170,8 @@ const Upload = ({ upload, queryResult }) => {
           </ul>
         </div>
       </div>
+
+      <UploadSeriesTable upload={upload} seriesUploads={upload.seriesUploads} />
     </>
   )
 }

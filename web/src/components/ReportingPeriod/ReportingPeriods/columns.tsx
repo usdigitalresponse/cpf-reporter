@@ -1,10 +1,14 @@
 import { createColumnHelper } from '@tanstack/react-table'
+import type { FindReportingPeriodsWithCertification } from 'types/graphql'
 
 import { Link, routes } from '@redwoodjs/router'
 
 import { formatDateString } from 'src/utils'
 
-const columnHelper = createColumnHelper()
+const columnHelper =
+  createColumnHelper<
+    FindReportingPeriodsWithCertification['reportingPeriodsWithCertification']
+  >()
 
 export const columnDefs = ({ certificationDisplay, canEdit, isUSDRAdmin }) => {
   const columns = [

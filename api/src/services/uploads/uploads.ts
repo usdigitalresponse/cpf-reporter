@@ -3,6 +3,7 @@ import type { Organization, ReportingPeriod } from '@prisma/client'
 import type {
   QueryResolvers,
   MutationResolvers,
+  ResolversTypes,
   UploadRelationResolvers,
 } from 'types/graphql'
 import { v4 as uuidv4 } from 'uuid'
@@ -127,6 +128,7 @@ export const downloadUploadFile: MutationResolvers['downloadUploadFile'] =
     return signedUrl
   }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const Upload: UploadRelationResolvers = {
   uploadedBy: (_obj, { root }) => {
     return db.upload.findUnique({ where: { id: root?.id } }).uploadedBy()
@@ -153,6 +155,23 @@ export const Upload: UploadRelationResolvers = {
       },
     })
     return latestValidation
+  },
+  seriesUploads: async (
+    _obj,
+    { root }
+  ): Promise<ResolversTypes['Upload'][]> => {
+    return db.upload.findMany({
+      where: {
+        AND: {
+          agencyId: root?.agencyId,
+          expenditureCategoryId: root?.expenditureCategoryId,
+          reportingPeriodId: root?.reportingPeriodId,
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
   },
 }
 type UploadsWithValidationsAndExpenditureCategory = Prisma.UploadGetPayload<{

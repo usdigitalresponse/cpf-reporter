@@ -6,6 +6,7 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
   ColumnFiltersState,
+  ColumnDef,
 } from '@tanstack/react-table'
 import { Button } from 'react-bootstrap'
 import Table from 'react-bootstrap/Table'
@@ -18,11 +19,21 @@ import TableRow from './TableRow'
   and sorting functionality.
   For documentation, visit: https://tanstack.com/table/v8/docs/guide/introduction
 */
-function TableBuilder({ data, columns, filterableInputs = [] }) {
+interface TableBuilderProps<T> {
+  data: T[]
+  columns: ColumnDef<T>[]
+  filterableInputs?: string[]
+}
+
+function TableBuilder<T extends object>({
+  data,
+  columns,
+  filterableInputs = [],
+}: TableBuilderProps<T>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [sorting, setSorting] = useState([])
 
-  const table = useReactTable({
+  const table = useReactTable<T>({
     data,
     columns: columns,
     state: {
@@ -41,7 +52,7 @@ function TableBuilder({ data, columns, filterableInputs = [] }) {
   }
 
   return (
-    <div className="p-2">
+    <div className="pt-2">
       <Table striped borderless>
         <thead>
           {!!filterableInputs.length && (
