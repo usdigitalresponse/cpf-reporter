@@ -103,25 +103,14 @@ def process_event(
 ):
     """
     This function is structured as followed:
-    1) Check to see if the s3 object exists:
-        treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip
-    2) If it does not, raise an exception and quit
-    3) Generate a pre-signed URL with an expiration date of 1 hour
-    4) Generate an email
-    5) Send email to the user
+    1) Create link to treasury report
+    2) Generate an email
+    3) Send email to the user
     """
-    s3_client = boto3.client("s3")
     user = payload.user
     organization = payload.organization
     
-    presigned_url = get_presigned_url(
-        s3_client=s3_client,
-        bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
-        key=f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip",
-        expiration_time=60 * 60,  # 1 hour
-    )
-    if presigned_url is None:
-        raise Exception('Failed to generate signed-URL or file not found')
+    presigned_url = f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip"
 
     email_html, email_text, subject = generate_email(
         user = user,

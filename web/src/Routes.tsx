@@ -23,6 +23,10 @@ const Routes = () => {
         <Route path="/uploads/{id:Int}/edit" page={UploadEditUploadPage} name="editUpload" />
         <Route path="/uploads/{id:Int}" page={UploadUploadPage} name="upload" />
         <Route path="/upload-template/{id:Int}" page={UploadTemplatePage} name="uploadTemplate" />
+        {/* Treasury Report */}
+        <PrivateSet unauthenticated="forbidden" roles={['USDR_ADMIN', 'ORGANIZATION_ADMIN']}>
+          <Route path="/treasuryreports/{organizationId:Int}/{currentReportingPeriodId:Int}/report.zip" page={TreasuryReportPage} name="downloadTreasuryReport" />
+        </PrivateSet>
         {/* Agencies */}
         <PrivateSet unauthenticated="forbidden" roles={['USDR_ADMIN', 'ORGANIZATION_ADMIN']}>
           <Route path="/agencies/{id:Int}/edit" page={AgencyEditAgencyPage} name="editAgency" />

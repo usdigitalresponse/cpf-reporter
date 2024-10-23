@@ -172,6 +172,20 @@ export async function getSignedUrl(upload: Upload): Promise<string> {
     expiresIn: 60,
   })
 }
+
+export async function getSignedUrlForZippedTreasuryReport(
+  organization_id: number,
+  current_reporting_period_id: number,
+): Promise<string> {
+  const key = `treasuryreports/${organization_id}/${current_reporting_period_id}/report.zip`
+  
+  const s3 = getS3Client()
+  const baseParams = { Bucket: REPORTING_DATA_BUCKET_NAME, Key: key }
+  return awsGetSignedUrl(s3, new GetObjectCommand(baseParams), {
+    expiresIn: 60,
+  })
+}
+
 const OUTPUT_TEMPLATE = {
   '1A': 'CPF1ABroadbandInfrastructureTemplate',
   '1B': 'CPF1BDigitalConnectivityTechTemplate',
