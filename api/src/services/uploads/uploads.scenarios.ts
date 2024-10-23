@@ -410,17 +410,24 @@ export const uploadCheck = defineScenario<
     }),
   },
   expenditureCategory: {
-    one: {
+    oneA: {
       data: {
         name: '1A',
         code: '1A',
         updatedAt: '2024-01-26T15:11:27.000Z',
       },
     },
-    two: {
+    oneB: {
       data: {
         name: '1B',
         code: '1B',
+        updatedAt: '2024-01-26T15:11:27.000Z',
+      },
+    },
+    oneC: {
+      data: {
+        name: '1C',
+        code: '1C',
         updatedAt: '2024-01-26T15:11:27.000Z',
       },
     },
@@ -432,7 +439,7 @@ export const uploadCheck = defineScenario<
         uploadedById: scenario.user.one.id,
         agencyId: scenario.agency.one.id,
         reportingPeriodId: scenario.reportingPeriod.one.id,
-        expenditureCategoryId: scenario.expenditureCategory.one.id,
+        expenditureCategoryId: scenario.expenditureCategory.oneA.id,
         validations: {
           create: [
             {
@@ -459,7 +466,7 @@ export const uploadCheck = defineScenario<
         uploadedById: scenario.user.two.id,
         agencyId: scenario.agency.one.id,
         reportingPeriodId: scenario.reportingPeriod.one.id,
-        expenditureCategoryId: scenario.expenditureCategory.one.id,
+        expenditureCategoryId: scenario.expenditureCategory.oneA.id,
         validations: {
           create: [
             {
@@ -486,7 +493,7 @@ export const uploadCheck = defineScenario<
         uploadedById: scenario.user.three.id,
         agencyId: scenario.agency.two.id,
         reportingPeriodId: scenario.reportingPeriod.one.id,
-        expenditureCategoryId: scenario.expenditureCategory.one.id,
+        expenditureCategoryId: scenario.expenditureCategory.oneA.id,
         validations: {
           create: [
             {
@@ -517,7 +524,7 @@ export const uploadCheck = defineScenario<
         uploadedById: scenario.user.four.id,
         agencyId: scenario.agency.two.id,
         reportingPeriodId: scenario.reportingPeriod.one.id,
-        expenditureCategoryId: scenario.expenditureCategory.two.id,
+        expenditureCategoryId: scenario.expenditureCategory.oneB.id,
         validations: {
           create: [
             {

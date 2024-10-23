@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client'
 import type { Organization, ReportingPeriod } from '@prisma/client'
+import cloneDeep from 'lodash/cloneDeep'
 import type {
   QueryResolvers,
   MutationResolvers,
@@ -237,9 +238,9 @@ export const getUploadsByExpenditureCategory = async (
   }
 
   const uploadsByEC: ProjectLambdaPayload = {
-    '1A': { ...commonData, ProjectType: '1A' },
-    '1B': { ...commonData, ProjectType: '1B' },
-    '1C': { ...commonData, ProjectType: '1C' },
+    '1A': { ...cloneDeep(commonData), ProjectType: '1A' },
+    '1B': { ...cloneDeep(commonData), ProjectType: '1B' },
+    '1C': { ...cloneDeep(commonData), ProjectType: '1C' },
   }
 
   // Get the most recent upload for each expenditure category and agency and set the S3 Object key
