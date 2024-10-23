@@ -38,7 +38,7 @@ const Routes = () => {
           <Route path="/users" page={UserUsersPage} name="users" />
         </PrivateSet>
         {/* Subrecipients */}
-        <PrivateSet unauthenticated="forbidden" roles="USDR_ADMIN">
+        <PrivateSet unauthenticated="forbidden" roles={['USDR_ADMIN', 'ORGANIZATION_ADMIN']}>
           <Route path="/subrecipients" page={SubrecipientSubrecipientsPage} name="subrecipients" />
         </PrivateSet>
         {/* Reporting Periods */}

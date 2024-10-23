@@ -56,6 +56,8 @@ jobs:
           cat >> $REPORT_FILE << 'ENDOFREPORT'
           ## Terraform Summary
 
+          *Pusher: @${{ env.GH_ACTOR }}, Action: `${{ env.GH_ACTION }}`, Workflow: [`${{ env.GH_WORKFLOW }}`](${{ env.GH_SERVER}}/${{ env.GH_REPO }}/actions/runs/${{ env.GH_RUN_ID }})*
+
           | Step                         | Result  |
           |:-----------------------------|:-------:|
           | 🖌  Terraform Format & Style | ${{ (env.TF_FMT_OUTCOME == 'success' && '✅') || (env.TF_FMT_OUTCOME == 'skipped' && '➖') || '❌'  }} |
@@ -82,8 +84,6 @@ jobs:
           ${{ env.TF_PLAN_SUMMARY }}
 
           </details>
-
-          *Pusher: @${{ env.GH_ACTOR }}, Action: `${{ env.GH_ACTION }}`, Workflow: [`${{ env.GH_WORKFLOW }}`](${{ env.GH_SERVER}}/${{ env.GH_REPO }}/actions/runs/${{ env.GH_RUN_ID }})*
           ENDOFREPORT
         env:
           TF_FMT_OUTCOME: ${{ inputs.tf-fmt-outcome }}

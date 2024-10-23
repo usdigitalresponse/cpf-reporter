@@ -79,7 +79,7 @@ jobs:
       group: ${{ inputs.concurrency-group }}
       cancel-in-progress: false
     steps:
-      - uses: step-security/harden-runner@1b05615854632b887b69ae1be8cbefe72d3ae423 # v2.6.0
+      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
         with:
           disable-sudo: true
           egress-policy: block
@@ -93,7 +93,7 @@ jobs:
             registry.terraform.io:443
             releases.hashicorp.com:443
       - name: Download Terraform artifacts
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: ${{ inputs.tf-plan-artifacts-key }}
           path: ${{ github.workspace }}/terraform
@@ -106,17 +106,17 @@ jobs:
         with:
           terraform_version: ${{ steps.get_tf_version.outputs.TF_VERSION }}
       - name: Download api functions artifacts
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: ${{ inputs.api-functions-artifacts-key }}
           path: ${{ inputs.api-functions-artifacts-path }}
       - name: Download python functions artifacts
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: ${{ inputs.python-functions-artifacts-key }}
           path: ${{ inputs.python-functions-artifacts-path }}
       - name: Download website artifacts
-        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:
           name: ${{ inputs.web-artifacts-key }}
           path: ${{ inputs.web-artifacts-path }}

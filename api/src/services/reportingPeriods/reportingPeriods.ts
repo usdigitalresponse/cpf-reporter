@@ -117,43 +117,44 @@ export const certifyReportingPeriodAndOpenNextPeriod = async ({
   }
 
   try {
-    const newReportingPeriod = await db.$transaction(async (prisma) => {
-      const currentReportingPeriod = await db.reportingPeriod.findUnique({
-        where: { id: reportingPeriodId },
-      })
-      if (!currentReportingPeriod) {
-        throw new Error(
-          `Reporting period with id ${reportingPeriodId} not found`
-        )
-      }
-
-      // Find the next reporting period
-      const nextReportingPeriod = await db.reportingPeriod.findFirst({
-        where: { startDate: { gt: currentReportingPeriod.startDate } },
-        orderBy: { startDate: 'asc' },
-      })
-      if (!nextReportingPeriod) {
-        throw new Error('No next reporting period found')
-      }
-
-      await prisma.reportingPeriodCertification.create({
-        data: {
-          reportingPeriodId,
-          organizationId,
-          certifiedById: currentUser.id,
-        },
-      })
-
-      const preferences = {
-        current_reporting_period_id: nextReportingPeriod.id,
-      }
-      await db.organization.update({
-        data: { preferences },
-        where: { id: organizationId },
-      })
-
-      return nextReportingPeriod
+    const currentReportingPeriod = await reportingPeriod({
+      id: reportingPeriodId,
     })
+    if (!currentReportingPeriod) {
+      throw new Error(`Reporting period with id ${reportingPeriodId} not found`)
+    }
+
+    const nextReportingPeriod = await db.reportingPeriod.findFirst({
+      where: { startDate: { gt: currentReportingPeriod.startDate } },
+      orderBy: { startDate: 'asc' },
+    })
+    if (!nextReportingPeriod) {
+      throw new Error('No next reporting period found')
+    }
+
+    const newReportingPeriod = await db.$transaction(
+      async (prisma) => {
+        await prisma.reportingPeriodCertification.create({
+          data: {
+            reportingPeriodId,
+            organizationId,
+            certifiedById: currentUser.id,
+          },
+        })
+
+        await prisma.organization.update({
+          where: { id: organizationId },
+          data: {
+            preferences: {
+              current_reporting_period_id: nextReportingPeriod.id,
+            },
+          },
+        })
+
+        return nextReportingPeriod
+      },
+      { timeout: 10000 }
+    )
 
     return newReportingPeriod
   } catch (err) {

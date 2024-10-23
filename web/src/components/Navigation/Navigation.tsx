@@ -32,7 +32,7 @@ const Navigation = () => {
             </NavLink>
           </Nav.Item>
         )}
-        {hasRole(ROLES.USDR_ADMIN) && (
+        {canViewAdminTabs && (
           <Nav.Item>
             <NavLink
               to={routes.subrecipients()}
