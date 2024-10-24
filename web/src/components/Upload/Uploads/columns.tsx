@@ -1,13 +1,13 @@
 import { createColumnHelper } from '@tanstack/react-table'
-import type { Upload } from 'types/graphql'
+import type { FindUploads } from 'types/graphql'
 
 import { Link, routes } from '@redwoodjs/router'
 
 import { formatDateString } from 'src/utils'
 
-const columnHelper = createColumnHelper()
+const columnHelper = createColumnHelper<FindUploads['uploads'][number]>()
 
-function valueAsLink(cell): JSX.Element {
+export function valueAsLink(cell): JSX.Element {
   const value = cell.getValue()
 
   return (
@@ -21,7 +21,7 @@ function valueAsLink(cell): JSX.Element {
   )
 }
 
-function validationDisplay(row) {
+export function validationDisplay(row) {
   const { latestValidation } = row
   const { results, passed, isManual, createdAt } = latestValidation
 
@@ -51,7 +51,7 @@ export const columnDefs = [
     cell: (info) => info.getValue(),
     header: 'Agency',
   }),
-  columnHelper.accessor((row: Upload) => row.expenditureCategory?.code, {
+  columnHelper.accessor((row) => row.expenditureCategory?.code, {
     cell: (info) => info.getValue() ?? 'Not set',
     header: 'EC Code',
   }),

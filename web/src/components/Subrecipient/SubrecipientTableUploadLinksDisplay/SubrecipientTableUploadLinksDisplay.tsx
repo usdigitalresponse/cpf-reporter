@@ -1,14 +1,14 @@
-import { Subrecipient } from 'types/graphql'
+import { FindSubrecipients } from 'types/graphql'
 
 import { Link, routes } from '@redwoodjs/router'
 
 type SubrecipientUpload =
-  | Subrecipient['validSubrecipientUploads'][number]
-  | Subrecipient['invalidSubrecipientUploads'][number]
+  | FindSubrecipients['subrecipients'][number]['validSubrecipientUploads'][number]
+  | FindSubrecipients['subrecipients'][number]['invalidSubrecipientUploads'][number]
 
 interface SubrecipientTableUploadLinksDisplayProps {
-  validSubrecipientUploads: Subrecipient['validSubrecipientUploads']
-  invalidSubrecipientUploads: Subrecipient['invalidSubrecipientUploads']
+  validSubrecipientUploads: FindSubrecipients['subrecipients'][number]['validSubrecipientUploads']
+  invalidSubrecipientUploads: FindSubrecipients['subrecipients'][number]['invalidSubrecipientUploads']
 }
 
 const SubrecipientTableUploadLinksDisplay = ({
