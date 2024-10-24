@@ -327,6 +327,17 @@ module "lambda_function-graphql" {
         "${module.reporting_data_bucket.bucket_arn}/treasuryreports/output-templates/*/*.xlsx",
       ]
     }
+    AllowUploadSubrecipientsFile = {
+      effect = "Allow"
+      actions = [
+        "s3:PutObject",
+      ]
+      resources = [
+        # These are temporary files shared across services containing subrecipient data.
+        # Path: treasuryreports/{organization_id}/{reporting_period_id}/subrecipients.json
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/subrecipients.json",
+      ]
+    }
 
     AllowStepFunctionInvocation = {
       effect = "Allow"

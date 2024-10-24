@@ -18,39 +18,6 @@ export const standard = defineScenario<
   | Prisma.SubrecipientCreateArgs
   | Prisma.SubrecipientUploadCreateArgs
 >({
-  organization: {
-    one: {
-      data: {
-        name: 'USDR',
-        preferences: {},
-      },
-    },
-  },
-  agency: {
-    one: (scenario) => ({
-      data: {
-        name: 'Agency1',
-        organizationId: scenario.organization.one.id,
-        code: 'A1',
-      },
-      include: {
-        organization: true,
-      },
-    }),
-  },
-  user: {
-    one: (scenario) => ({
-      data: {
-        email: 'uniqueemail1@test.com',
-        name: 'String',
-        role: 'USDR_ADMIN',
-        agencyId: scenario.agency.one.id,
-      },
-      include: {
-        agency: true,
-      },
-    }),
-  },
   reportingPeriod: {
     one: () => ({
       data: {
@@ -73,6 +40,89 @@ export const standard = defineScenario<
         },
       },
     }),
+    q3: () => ({
+      data: {
+        name: 'Q3 2024 [July 1 - September 30]',
+        startDate: '2024-07-01T00:00:00.000Z',
+        endDate: '2024-09-30T00:00:00.000Z',
+        inputTemplate: {
+          create: {
+            name: 'Q3 - input',
+            version: '2024_q3',
+            effectiveDate: '2024-01-26T15:11:27.688Z',
+          },
+        },
+        outputTemplate: {
+          create: {
+            name: 'Q3 - output',
+            version: '2024_q3',
+            effectiveDate: '2024-01-26T15:11:27.688Z',
+          },
+        },
+      },
+    }),
+  },
+  organization: {
+    one: {
+      data: {
+        name: 'USDR',
+        preferences: {},
+      },
+    },
+    two: (scenario) => ({
+      data: {
+        name: 'Q3 Testing Org',
+        preferences: {
+          current_reporting_period_id: scenario.reportingPeriod.q3.id,
+        },
+      },
+    }),
+  },
+  agency: {
+    one: (scenario) => ({
+      data: {
+        name: 'Agency1',
+        organizationId: scenario.organization.one.id,
+        code: 'A1',
+      },
+      include: {
+        organization: true,
+      },
+    }),
+    two: (scenario) => ({
+      data: {
+        name: 'Q3Agency',
+        organizationId: scenario.organization.two.id,
+        code: 'AQ3',
+      },
+      include: {
+        organization: true,
+      },
+    }),
+  },
+  user: {
+    one: (scenario) => ({
+      data: {
+        email: 'uniqueemail1@test.com',
+        name: 'String',
+        role: 'USDR_ADMIN',
+        agencyId: scenario.agency.one.id,
+      },
+      include: {
+        agency: true,
+      },
+    }),
+    two: (scenario) => ({
+      data: {
+        email: 'q3@test.com',
+        name: 'Q3 User',
+        role: 'USDR_ADMIN',
+        agencyId: scenario.agency.two.id,
+      },
+      include: {
+        agency: true,
+      },
+    }),
   },
   subrecipient: {
     one: (scenario) => ({
@@ -87,6 +137,30 @@ export const standard = defineScenario<
         name: 'String',
         organization: { connect: { id: scenario.organization.one.id } },
         ueiTinCombo: '12485_920485',
+      },
+    }),
+    q3_createdOctober: (scenario) => ({
+      data: {
+        name: 'October Subrecipient',
+        organization: { connect: { id: scenario.organization.two.id } },
+        ueiTinCombo: '17290_172900',
+        createdAt: '2024-10-15T00:00:00.000Z',
+      },
+    }),
+    q3_createdNovember: (scenario) => ({
+      data: {
+        name: 'November Subrecipient',
+        organization: { connect: { id: scenario.organization.two.id } },
+        ueiTinCombo: '17291_172911',
+        createdAt: '2024-11-26T00:00:00.000Z',
+      },
+    }),
+    q3_createdSeptember: (scenario) => ({
+      data: {
+        name: 'September Subrecipient',
+        organization: { connect: { id: scenario.organization.two.id } },
+        ueiTinCombo: '17292_172922',
+        createdAt: '2024-09-26T00:00:00.000Z',
       },
     }),
   },

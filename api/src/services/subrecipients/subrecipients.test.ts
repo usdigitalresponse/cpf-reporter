@@ -3,6 +3,8 @@ import type { GraphQLResolveInfo } from 'graphql'
 
 import type { RedwoodGraphQLContext } from '@redwoodjs/graphql-server'
 
+import { sendPutObjectToS3Bucket } from 'src/lib/aws'
+
 import {
   subrecipients,
   subrecipient,
@@ -10,6 +12,7 @@ import {
   updateSubrecipient,
   deleteSubrecipient,
   Subrecipient as SubrecipientResolver,
+  uploadSubrecipients,
 } from './subrecipients'
 import type { StandardScenario } from './subrecipients.scenarios'
 
@@ -18,13 +21,16 @@ import type { StandardScenario } from './subrecipients.scenarios'
 //           Please refer to the RedwoodJS Testing Docs:
 //       https://redwoodjs.com/docs/testing#testing-services
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
-
+jest.mock('src/lib/aws', () => ({
+  ...jest.requireActual('src/lib/aws'),
+  sendPutObjectToS3Bucket: jest.fn(),
+}))
 describe('subrecipients', () => {
   scenario('returns all subrecipients', async (scenario: StandardScenario) => {
     mockCurrentUser(scenario.user.one)
     const result = await subrecipients()
 
-    expect(result.length).toEqual(Object.keys(scenario.subrecipient).length)
+    expect(result.length).toEqual(2)
   })
 
   scenario(
@@ -120,6 +126,23 @@ describe('subrecipients', () => {
       expect(invalidUploads[0].upload.validations[0].results).toEqual(
         '{errors: { severity: err }}'
       )
+    }
+  )
+
+  scenario(
+    'uploads all valid newly created subrecipients',
+    async (scenario: StandardScenario) => {
+      // uploadSubrecipients
+      const result = await uploadSubrecipients({
+        input: {
+          organizationId: scenario.organization.two.id,
+          reportingPeriodId: scenario.reportingPeriod.q3.id,
+        },
+      })
+      expect(sendPutObjectToS3Bucket).toHaveBeenCalled()
+      expect(result.message).toEqual('Subrecipients uploaded successfully')
+      expect(result.success).toBe(true)
+      expect(result.countSubrecipients).toBe(1)
     }
   )
 })

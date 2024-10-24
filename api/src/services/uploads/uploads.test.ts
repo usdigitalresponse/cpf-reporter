@@ -263,8 +263,10 @@ describeScenario<StandardScenario>(
         scenario.organization.one,
         scenario.reportingPeriod.one
       )
-      expect(Object.keys(result).length).toEqual(1)
-      expect(Object.keys(result)).toEqual(['1A'])
+      expect(Object.keys(result).length).toEqual(3)
+      expect(Object.keys(result['1A'].uploadsToAdd).length).toEqual(1)
+      expect(Object.keys(result['1B'].uploadsToAdd).length).toEqual(0)
+      expect(Object.keys(result['1C'].uploadsToAdd).length).toEqual(0)
     })
 
     it('returns two uploads of different categories', async () => {
@@ -273,8 +275,10 @@ describeScenario<StandardScenario>(
         scenario.organization.two,
         scenario.reportingPeriod.one
       )
-      expect(Object.keys(result).length).toEqual(2)
-      expect(Object.keys(result).sort()).toEqual(['2A', '1A'].sort())
+      expect(Object.keys(result).length).toEqual(3)
+      expect(Object.keys(result['1A'].uploadsToAdd).length).toEqual(1)
+      expect(Object.keys(result['1B'].uploadsToAdd).length).toEqual(1)
+      expect(Object.keys(result['1C'].uploadsToAdd).length).toEqual(0)
     })
   }
 )
@@ -399,7 +403,6 @@ describe('treasury report', () => {
             id: mockUser.id,
           },
           outputTemplateId: mockReportingPeriod.outputTemplateId,
-          ProjectType: '1A',
           uploadsToAdd: {
             [mockUpload.agencyId]: {
               objectKey: `uploads/${mockOrganization.id}/${mockUpload.agencyId}/${mockReportingPeriod.id}/${mockUpload.id}/${mockUpload.filename}`,
@@ -408,6 +411,39 @@ describe('treasury report', () => {
             },
           },
           uploadsToRemove: {},
+          ProjectType: '1A',
+        },
+        '1B': {
+          organization: {
+            id: mockOrganization.id,
+            preferences: {
+              current_reporting_period_id: mockReportingPeriod.id,
+            },
+          },
+          user: {
+            email: mockUser.email,
+            id: mockUser.id,
+          },
+          outputTemplateId: mockReportingPeriod.outputTemplateId,
+          uploadsToAdd: {},
+          uploadsToRemove: {},
+          ProjectType: '1B',
+        },
+        '1C': {
+          organization: {
+            id: mockOrganization.id,
+            preferences: {
+              current_reporting_period_id: mockReportingPeriod.id,
+            },
+          },
+          user: {
+            email: mockUser.email,
+            id: mockUser.id,
+          },
+          outputTemplateId: mockReportingPeriod.outputTemplateId,
+          uploadsToAdd: {},
+          uploadsToRemove: {},
+          ProjectType: '1C',
         },
       }
       const subrecipientPayload: SubrecipientLambdaPayload = {
@@ -480,9 +516,8 @@ describe('treasury report', () => {
       .fn()
       .mockRejectedValue(new Error('Database error'))
 
-    const result = await sendTreasuryReport()
+    await expect(sendTreasuryReport()).rejects.toThrow('Database error')
 
-    expect(result).toBe(false)
     expect(logger.error).toHaveBeenCalledWith(
       expect.any(Error),
       'Error sending Treasury Report'

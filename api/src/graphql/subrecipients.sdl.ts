@@ -34,6 +34,16 @@ export const schema = gql`
     organizationId: Int
   }
 
+  input UploadSubrecipientsInput {
+    organizationId: Int!
+  }
+
+  type UploadSubrecipientsOutput {
+    success: Boolean!
+    message: String
+    countSubrecipients: Int!
+  }
+
   type Mutation {
     createSubrecipient(input: CreateSubrecipientInput!): Subrecipient!
       @requireAuth
@@ -42,5 +52,8 @@ export const schema = gql`
       input: UpdateSubrecipientInput!
     ): Subrecipient! @requireAuth
     deleteSubrecipient(id: Int!): Subrecipient! @requireAuth
+    uploadSubrecipients(
+      input: UploadSubrecipientsInput!
+    ): UploadSubrecipientsOutput! @requireAuth
   }
 `
