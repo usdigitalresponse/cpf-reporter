@@ -10,6 +10,7 @@ import {
   updateSubrecipient,
   deleteSubrecipient,
   Subrecipient as SubrecipientResolver,
+  uploadSubrecipients,
 } from './subrecipients'
 import type { StandardScenario } from './subrecipients.scenarios'
 
@@ -24,7 +25,7 @@ describe('subrecipients', () => {
     mockCurrentUser(scenario.user.one)
     const result = await subrecipients()
 
-    expect(result.length).toEqual(Object.keys(scenario.subrecipient).length)
+    expect(result.length).toEqual(2)
   })
 
   scenario(
@@ -120,6 +121,22 @@ describe('subrecipients', () => {
       expect(invalidUploads[0].upload.validations[0].results).toEqual(
         '{errors: { severity: err }}'
       )
+    }
+  )
+
+  scenario(
+    'uploads all valid newly created subrecipients',
+    async (scenario: StandardScenario) => {
+      // uploadSubrecipients
+      const result = await uploadSubrecipients({
+        input: {
+          organizationId: scenario.organization.two.id,
+          reportingPeriodId: scenario.reportingPeriod.q3.id,
+        },
+      })
+      expect(result.message).toEqual('Subrecipients uploaded successfully')
+      expect(result.success).toBe(true)
+      expect(result.countSubrecipients).toBe(1)
     }
   )
 })
