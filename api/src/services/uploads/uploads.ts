@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client'
 import type { Organization, ReportingPeriod } from '@prisma/client'
+import cloneDeep from 'lodash/cloneDeep'
 import type {
   QueryResolvers,
   MutationResolvers,
@@ -238,7 +239,28 @@ export const getUploadsByExpenditureCategory = async (
   const validUploadsInPeriod: UploadsWithValidationsAndExpenditureCategory[] =
     await getValidUploadsInCurrentPeriod(organization, reportingPeriod)
 
-  const uploadsByEC: ProjectLambdaPayload = {}
+  const commonData = {
+    organization: {
+      id: organization.id,
+      preferences: {
+        current_reporting_period_id:
+          organization.preferences['current_reporting_period_id'],
+      },
+    },
+    user: {
+      email: context.currentUser.email,
+      id: context.currentUser.id,
+    },
+    outputTemplateId: reportingPeriod.outputTemplateId,
+    uploadsToAdd: {},
+    uploadsToRemove: {},
+  }
+
+  const uploadsByEC: ProjectLambdaPayload = {
+    '1A': { ...cloneDeep(commonData), ProjectType: '1A' },
+    '1B': { ...cloneDeep(commonData), ProjectType: '1B' },
+    '1C': { ...cloneDeep(commonData), ProjectType: '1C' },
+  }
 
   // Get the most recent upload for each expenditure category and agency and set the S3 Object key
   for (const upload of validUploadsInPeriod) {
@@ -246,34 +268,6 @@ export const getUploadsByExpenditureCategory = async (
       objectKey: await getS3UploadFileKey(organization.id, upload),
       createdAt: upload.createdAt,
       filename: upload.filename,
-    }
-
-    if (!uploadsByEC[upload.expenditureCategory.code]) {
-      // The EC code was never added. This is the time to initialize it.
-      uploadsByEC[upload.expenditureCategory.code] = {
-        organization: {
-          id: organization.id,
-          preferences: {
-            current_reporting_period_id:
-              organization.preferences['current_reporting_period_id'],
-          },
-        },
-        user: {
-          email: context.currentUser.email,
-          id: context.currentUser.id,
-        },
-        outputTemplateId: reportingPeriod.outputTemplateId,
-        ProjectType: upload.expenditureCategory.code,
-        uploadsToAdd: {},
-        uploadsToRemove: {},
-      }
-
-      // Set the upload to add for this agency
-      uploadsByEC[upload.expenditureCategory.code].uploadsToAdd[
-        upload.agencyId
-      ] = uploadPayload
-
-      continue
     }
 
     if (
