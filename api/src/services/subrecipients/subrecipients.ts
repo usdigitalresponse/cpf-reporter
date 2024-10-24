@@ -52,27 +52,19 @@ export const deleteSubrecipient: MutationResolvers['deleteSubrecipient'] = ({
 
 export const uploadSubrecipients: MutationResolvers['uploadSubrecipients'] =
   async ({ input }) => {
-    const { organizationId, reportingPeriodId } = input
+    const { organizationId } = input
     const organization = await db.organization.findUnique({
       where: { id: organizationId },
     })
     const reportingPeriod = await db.reportingPeriod.findFirst({
-      where: { id: reportingPeriodId },
+      where: { id: organization.preferences?.current_reporting_period_id },
     })
     if (!organization || !reportingPeriod) {
       throw new Error('Organization or reporting period not found')
     }
-    if (
-      organization.preferences?.current_reporting_period_id !==
-      reportingPeriod.id
-    ) {
-      throw new Error(
-        'Reporting period does not match current reporting period'
-      )
-    }
 
     try {
-      const subrecipientKey = `treasuryreports/${organizationId}/${reportingPeriodId}/subrecipients.json`
+      const subrecipientKey = `treasuryreports/${organization.id}/${reportingPeriod.id}/subrecipients.json`
 
       const startDate = new Date(
         reportingPeriod.endDate.getFullYear(),
@@ -86,7 +78,10 @@ export const uploadSubrecipients: MutationResolvers['uploadSubrecipients'] =
       )
 
       const subrecipientsWithUploads = await db.subrecipient.findMany({
-        where: { createdAt: { lte: endDate, gte: startDate }, organizationId },
+        where: {
+          createdAt: { lte: endDate, gte: startDate },
+          organizationId: organization.id,
+        },
         include: { subrecipientUploads: true },
       })
       const subrecipients = {
