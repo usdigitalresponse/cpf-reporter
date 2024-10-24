@@ -3,6 +3,8 @@ import type { GraphQLResolveInfo } from 'graphql'
 
 import type { RedwoodGraphQLContext } from '@redwoodjs/graphql-server'
 
+import { sendPutObjectToS3Bucket } from 'src/lib/aws'
+
 import {
   subrecipients,
   subrecipient,
@@ -19,7 +21,10 @@ import type { StandardScenario } from './subrecipients.scenarios'
 //           Please refer to the RedwoodJS Testing Docs:
 //       https://redwoodjs.com/docs/testing#testing-services
 // https://redwoodjs.com/docs/testing#jest-expect-type-considerations
-
+jest.mock('src/lib/aws', () => ({
+  ...jest.requireActual('src/lib/aws'),
+  sendPutObjectToS3Bucket: jest.fn(),
+}))
 describe('subrecipients', () => {
   scenario('returns all subrecipients', async (scenario: StandardScenario) => {
     mockCurrentUser(scenario.user.one)
@@ -134,6 +139,7 @@ describe('subrecipients', () => {
           reportingPeriodId: scenario.reportingPeriod.q3.id,
         },
       })
+      expect(sendPutObjectToS3Bucket).toHaveBeenCalled()
       expect(result.message).toEqual('Subrecipients uploaded successfully')
       expect(result.success).toBe(true)
       expect(result.countSubrecipients).toBe(1)

@@ -47,15 +47,15 @@ export const standard = defineScenario<
         endDate: '2024-09-30T00:00:00.000Z',
         inputTemplate: {
           create: {
-            name: 'String',
-            version: 'String',
+            name: 'Q3 - input',
+            version: '2024_q3',
             effectiveDate: '2024-01-26T15:11:27.688Z',
           },
         },
         outputTemplate: {
           create: {
-            name: 'String',
-            version: 'String',
+            name: 'Q3 - output',
+            version: '2024_q3',
             effectiveDate: '2024-01-26T15:11:27.688Z',
           },
         },
