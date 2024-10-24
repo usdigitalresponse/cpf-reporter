@@ -1,4 +1,5 @@
 import Button from 'react-bootstrap/Button'
+import { useAuth } from 'web/src/auth'
 
 import { useMutation } from '@redwoodjs/web'
 import { toast } from '@redwoodjs/web/toast'
@@ -11,7 +12,18 @@ const DOWNLOAD_TREASURY_FILE = gql`
   }
 `
 
+const UPLOAD_SUBRECIPIENTS = gql`
+  mutation UploadSubrecipients($input: UploadSubrecipientsInput!) {
+    uploadSubrecipients(input: $input) {
+      success
+      message
+      countSubrecipients
+    }
+  }
+`
+
 const DownloadTreasuryFiles = () => {
+  const { currentUser } = useAuth()
   const [downloadTreasuryFile] = useMutation(DOWNLOAD_TREASURY_FILE, {
     onCompleted: ({ downloadTreasuryFile }) => {
       const { fileLink } = downloadTreasuryFile
@@ -21,9 +33,35 @@ const DownloadTreasuryFiles = () => {
       toast.error(error.message)
     },
   })
+
   const onClick = (event) => {
     downloadTreasuryFile({
       variables: { input: { fileType: event.target.getAttribute('name') } },
+    })
+  }
+
+  const [uploadSubrecipients] = useMutation(UPLOAD_SUBRECIPIENTS, {
+    onCompleted: ({ uploadSubrecipients }) => {
+      const { success, message, countSubrecipients } = uploadSubrecipients
+      if (success) {
+        toast.success(
+          `${message} - ${countSubrecipients} subrecipients uploaded`
+        )
+      } else {
+        toast.error(message)
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+  const onSubrecipientClick = () => {
+    uploadSubrecipients({
+      variables: {
+        input: {
+          organizationId: currentUser.agency.organizationId,
+        },
+      },
     })
   }
 
@@ -41,6 +79,13 @@ const DownloadTreasuryFiles = () => {
         </Button>
         <Button name="Subrecipient" onClick={onClick} className="rw-button">
           Download Subrecipient file
+        </Button>
+        <Button
+          name="Subrecipient"
+          onClick={onSubrecipientClick}
+          className="rw-button"
+        >
+          Upload new Subrecipient file
         </Button>
       </div>
     </div>
