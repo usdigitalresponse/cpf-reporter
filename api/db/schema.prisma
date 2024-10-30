@@ -141,7 +141,7 @@ model UploadValidation {
   upload              Upload        @relation(fields: [uploadId], references: [id], onDelete: Cascade)
   results             Json?         @db.JsonB
   passed              Boolean
-  isManual            Boolean       @default(false)   
+  isManual            Boolean       @default(false)
   initiatedById       Int
   initiatedBy         User          @relation(fields: [initiatedById], references: [id])
   createdAt           DateTime      @default(now()) @db.Timestamptz(6)
@@ -169,7 +169,7 @@ enum SubrecipientStatus {
 
 model SubrecipientUpload {
   id                  Int               @id @default(autoincrement())
-  subrecipientId      Int                 
+  subrecipientId      Int
   subrecipient        Subrecipient      @relation(fields: [subrecipientId], references: [id])
   uploadId            Int
   upload              Upload            @relation(fields: [uploadId], references: [id])

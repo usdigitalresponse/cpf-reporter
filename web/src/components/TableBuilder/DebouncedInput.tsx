@@ -1,5 +1,5 @@
 /*
-  This component provides a debounced input field, 
+  This component provides a debounced input field,
   delaying the onChange event until a specified timeout
   to optimize performance in scenarios like filtering table data.
 */

@@ -1,6 +1,6 @@
 /**
  * colors-semantic-tokens.scss
- * 
+ *
  * Semantic token definition for USDR style guide.
  *
  * Please refer to USDR style guide definition in Figma:
@@ -26,7 +26,7 @@ $positive-content: $raw-white;
 $positive-accent: $raw-green-100;
 $positive-accentContent: $raw-gray-700;
 
-// NEGATIVE 
+// NEGATIVE
 $negative-default: $raw-red-600;
 $negative-hover: $raw-red-700;
 $negative-active: $raw-red-800;
@@ -50,7 +50,7 @@ $info-content: $raw-white;
 $info-accent: $raw-blue-100;
 $info-accentContent: $raw-gray-700;
 
-// SURFACE 
+// SURFACE
 $surface-foreground: $raw-white;
 $surface-background: $raw-white;
 $surface-accent: $raw-gray-50;
@@ -61,7 +61,7 @@ $surface-overlay: $raw-black-alpha-600;
 $border: $raw-gray-300;
 $border-hover: $raw-gray-400;
 
-// ICON 
+// ICON
 $icon-default: $raw-gray-600;
 
 // INTERACTIVE

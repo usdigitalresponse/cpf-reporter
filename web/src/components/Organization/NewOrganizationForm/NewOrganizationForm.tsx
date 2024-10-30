@@ -18,8 +18,8 @@ interface NewOrganizationFormProps {
   loading: boolean
 }
 
-/* 
-  This form creates a new organization, assigns a new agency to that organization, 
+/*
+  This form creates a new organization, assigns a new agency to that organization,
   and assigns a new admin user to both the organization and the agency.
 */
 const NewOrganizationForm = (props: NewOrganizationFormProps) => {

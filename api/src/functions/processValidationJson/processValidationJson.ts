@@ -61,14 +61,14 @@ export const handler = async (
     /*
     This allows us to easily test this function during local development by making a GET request as follows:
     http://localhost:8911/processValidationJson?Records[0][s3][bucket][name]=cpf-reporter&Records[0][s3][object][key]=/uploads/1/2/3/14/test.json
-    {  
-      "Records":[  
-          {  
+    {
+      "Records":[
+          {
             "s3":{
-                "bucket":{  
+                "bucket":{
                   "name":"cpf-reporter"
                 },
-                "object":{  
+                "object":{
                   "key":"/uploads/1/2/3/4/test.json"
                 }
             }
