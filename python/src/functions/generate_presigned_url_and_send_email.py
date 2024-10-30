@@ -1,7 +1,5 @@
-import os
 from typing import Optional, Tuple
 
-import boto3
 import chevron
 import structlog
 from aws_lambda_typing.context import Context
@@ -9,7 +7,6 @@ from pydantic import BaseModel
 
 from src.lib.email import send_email
 from src.lib.logging import get_logger, reset_contextvars
-from src.lib.s3_helper import get_presigned_url
 from src.lib.treasury_generation_common import OrganizationObj, UserObj
 
 treasury_email_html = """
@@ -19,6 +16,7 @@ treasury_email_html = """
 treasury_email_text = """
 Click on this link {url} to download your file or, paste the link into your browser. This link will remain active for 1 hour.
 """
+
 
 class SendTreasuryEmailLambdaPayload(BaseModel):
     organization: OrganizationObj
@@ -33,7 +31,7 @@ def handle(event: SendTreasuryEmailLambdaPayload, context: Context):
     contains a pre-signed URL to the following S3 object if it exists:
     treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip
     If the object does not exist then raise an exception.
-    
+
     Args:
         event: S3 Lambda event of type `s3:ObjectCreated:*`
         context: Lambda context
@@ -58,9 +56,9 @@ def handle(event: SendTreasuryEmailLambdaPayload, context: Context):
 
 
 def generate_email(
-        user: UserObj,
-        logger: structlog.stdlib.BoundLogger,
-        presigned_url: str = "",
+    user: UserObj,
+    logger: structlog.stdlib.BoundLogger,
+    presigned_url: str = "",
 ) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     try:
         with open("src/static/email_templates/formatted_body.html") as g:
@@ -98,8 +96,8 @@ def generate_email(
 
 
 def process_event(
-        payload: SendTreasuryEmailLambdaPayload,
-        logger: structlog.stdlib.BoundLogger,
+    payload: SendTreasuryEmailLambdaPayload,
+    logger: structlog.stdlib.BoundLogger,
 ):
     """
     This function is structured as followed:
@@ -109,13 +107,13 @@ def process_event(
     """
     user = payload.user
     organization = payload.organization
-    
+
     presigned_url = f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip"
 
     email_html, email_text, subject = generate_email(
-        user = user,
-        presigned_url = presigned_url,
-        logger = logger,
+        user=user,
+        presigned_url=presigned_url,
+        logger=logger,
     )
     if not email_html:
         return False

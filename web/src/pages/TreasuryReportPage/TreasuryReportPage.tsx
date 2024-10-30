@@ -1,15 +1,19 @@
-import { useAuth } from "src/auth"
-import TreasuryReportCell from "src/components/TreasuryReportCell/TreasuryReportCell"
+import { useAuth } from 'src/auth'
+import TreasuryReportCell from 'src/components/TreasuryReportCell/TreasuryReportCell'
+import ForbiddenPage from 'src/pages/ForbiddenPage/ForbiddenPage'
 
 type TreasuryReportPageProps = {
   organizationId: number
   currentReportingPeriodId: number
 }
 
-const TreasuryReportPage = ({ organizationId, currentReportingPeriodId }: TreasuryReportPageProps) => {
+const TreasuryReportPage = ({
+  organizationId,
+  currentReportingPeriodId,
+}: TreasuryReportPageProps) => {
   const { currentUser } = useAuth()
 
-  if ( currentUser.agency.organizationId === organizationId) {
+  if (currentUser.agency.organizationId === organizationId) {
     return (
       <TreasuryReportCell
         organizationId={organizationId}

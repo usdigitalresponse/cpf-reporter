@@ -6,7 +6,11 @@ import type {
   Agency,
 } from 'types/graphql'
 
-import { getSignedUrlForZippedTreasuryReport, getTreasurySignedUrl, startStepFunctionExecution } from 'src/lib/aws'
+import {
+  getSignedUrlForZippedTreasuryReport,
+  getTreasurySignedUrl,
+  startStepFunctionExecution,
+} from 'src/lib/aws'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
 import { reportingPeriod } from 'src/services/reportingPeriods'
@@ -93,16 +97,21 @@ export const getOrCreateOrganization = async (orgName, reportingPeriodName) => {
   }
 }
 
-export const downloadZippedTreasuryFile: QueryResolvers['downloadZippedTreasuryFile'] = 
-  async ({ organizationId, currentReportingPeriodId}) => {
+export const downloadZippedTreasuryFile: QueryResolvers['downloadZippedTreasuryFile'] =
+  async ({ organizationId, currentReportingPeriodId }) => {
     const { organizationId: userOrganizationId } = context.currentUser.agency
 
     if (userOrganizationId !== organizationId) {
       throw new Error(`You do not have access to download this treasury report`)
     }
 
-    logger.info(`Downloading zipped treasury file for ${organizationId}: ${currentReportingPeriodId}`)
-    const url  = await getSignedUrlForZippedTreasuryReport(organizationId, currentReportingPeriodId)
+    logger.info(
+      `Downloading zipped treasury file for ${organizationId}: ${currentReportingPeriodId}`
+    )
+    const url = await getSignedUrlForZippedTreasuryReport(
+      organizationId,
+      currentReportingPeriodId
+    )
     return { fileLink: url }
   }
 

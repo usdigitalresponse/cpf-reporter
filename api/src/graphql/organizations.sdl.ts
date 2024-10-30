@@ -15,7 +15,10 @@ export const schema = gql`
     organizations: [Organization!]! @requireAuth
     organization(id: Int!): Organization @requireAuth
     organizationOfCurrentUser: Organization @requireAuth
-    downloadZippedTreasuryFile(organizationId: Int!, currentReportingPeriodId: Int!): TreasuryFilePayload @requireAuth
+    downloadZippedTreasuryFile(
+      organizationId: Int!
+      currentReportingPeriodId: Int!
+    ): TreasuryFilePayload @requireAuth
   }
 
   input CreateOrganizationInput {
