@@ -13,29 +13,12 @@ import Table from 'react-bootstrap/Table'
 import TableHeader from './TableHeader'
 import TableRow from './TableRow'
 
-interface TableBuilderProps {
-  data: any[]
-  columns: any[]
-  filterableInputs?: string[]
-  globalFilter?: {
-    label: string
-    checked: boolean
-    onChange: () => void
-    loading?: boolean
-  }
-}
-
 /*
   This component uses TanStack Table to add filtering
   and sorting functionality.
   For documentation, visit: https://tanstack.com/table/v8/docs/introduction
 */
-function TableBuilder({
-  data,
-  columns,
-  filterableInputs = [],
-  globalFilter,
-}: TableBuilderProps) {
+function TableBuilder({ data, columns, filterableInputs = [], globalFilter }) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [sorting, setSorting] = useState([])
 
