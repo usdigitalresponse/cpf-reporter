@@ -1,9 +1,11 @@
 import zipfile
 from typing import BinaryIO
 
+import boto3
 import openpyxl
 import pytest
 from aws_lambda_typing.context import Context
+from moto import mock_aws
 
 from src.functions.subrecipient_treasury_report_gen import SubrecipientLambdaPayload
 from src.lib.output_template_comparator import CPFFileArchive
@@ -390,3 +392,16 @@ def sample_subrecipient_uploads_with_dates():
             {"id": 3, "updatedAt": "2023-06-30T12:00:00Z"},
         ]
     }
+
+
+@pytest.fixture
+def s3_bucket_and_s3():
+    """Fixture for mocking AWS in tests."""
+    with mock_aws():
+        # Set a default region, because some non-test code assumes one
+        boto3.setup_default_session(region_name="us-east-1")
+
+        s3 = boto3.client("s3", region_name="us-east-1")
+        bucket_name = "test-bucket"
+        s3.create_bucket(Bucket=bucket_name)
+        yield bucket_name, s3
