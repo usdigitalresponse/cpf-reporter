@@ -5,7 +5,6 @@ import { S3ObjectCreatedNotificationEvent } from 'aws-lambda'
 import { getS3Client, sendPutObjectToS3Bucket } from 'src/lib/aws'
 import { db, getPrismaClient } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
-import { subrecipient } from 'src/services/subrecipients'
 
 export enum Severity {
   Error = 'ERR',
