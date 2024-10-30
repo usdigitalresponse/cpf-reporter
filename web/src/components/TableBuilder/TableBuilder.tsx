@@ -70,6 +70,7 @@ function TableBuilder({ data, columns, filterableInputs = [], globalFilter }) {
                   {globalFilter && (
                     <Form.Check
                       type="checkbox"
+                      id="treasury-files-filter"
                       label={globalFilter.label}
                       checked={globalFilter.checked}
                       onChange={globalFilter.onChange}
