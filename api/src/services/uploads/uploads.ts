@@ -1,6 +1,5 @@
 import { Prisma } from '@prisma/client'
 import type { Organization, ReportingPeriod } from '@prisma/client'
-import { orderBy } from 'lodash'
 import cloneDeep from 'lodash/cloneDeep'
 import type {
   QueryResolvers,
