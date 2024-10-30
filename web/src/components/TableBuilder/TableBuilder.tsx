@@ -7,18 +7,35 @@ import {
   getFilteredRowModel,
   ColumnFiltersState,
 } from '@tanstack/react-table'
-import { Button } from 'react-bootstrap'
+import { Button, Form } from 'react-bootstrap'
 import Table from 'react-bootstrap/Table'
 
 import TableHeader from './TableHeader'
 import TableRow from './TableRow'
 
+interface TableBuilderProps {
+  data: any[]
+  columns: any[]
+  filterableInputs?: string[]
+  globalFilter?: {
+    label: string
+    checked: boolean
+    onChange: () => void
+    loading?: boolean
+  }
+}
+
 /*
   This component uses TanStack Table to add filtering
   and sorting functionality.
-  For documentation, visit: https://tanstack.com/table/v8/docs/guide/introduction
+  For documentation, visit: https://tanstack.com/table/v8/docs/introduction
 */
-function TableBuilder({ data, columns, filterableInputs = [] }) {
+function TableBuilder({
+  data,
+  columns,
+  filterableInputs = [],
+  globalFilter,
+}: TableBuilderProps) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [sorting, setSorting] = useState([])
 
@@ -36,25 +53,56 @@ function TableBuilder({ data, columns, filterableInputs = [] }) {
     getFilteredRowModel: getFilteredRowModel(),
   })
 
-  const resetColumnFilters = () => {
+  const resetFilters = () => {
     table.resetColumnFilters()
+    if (globalFilter) {
+      globalFilter.onChange()
+    }
+  }
+
+  const renderTableBody = () => {
+    const rows = table.getRowModel().rows
+
+    if (!rows.length) {
+      return (
+        <tr className="border">
+          <td colSpan={100} className="text-center py-4">
+            <span className="text-muted">No results found</span>
+          </td>
+        </tr>
+      )
+    }
+
+    return rows.map((row) => <TableRow row={row} key={row.id} />)
   }
 
   return (
     <div className="p-2">
       <Table striped borderless>
         <thead>
-          {!!filterableInputs.length && (
+          {(!!filterableInputs.length || globalFilter) && (
             <tr className="border">
-              <th className="text-end" colSpan={100}>
-                <Button
-                  className="btn btn-secondary"
-                  size="sm"
-                  onClick={resetColumnFilters}
-                >
-                  Reset filters
-                </Button>
-              </th>
+              <td colSpan={100} className="text-end pe-2">
+                <div className="d-inline-flex align-items-center gap-3">
+                  {globalFilter && (
+                    <Form.Check
+                      type="checkbox"
+                      label={globalFilter.label}
+                      checked={globalFilter.checked}
+                      onChange={globalFilter.onChange}
+                      disabled={globalFilter.loading}
+                      className="mb-0"
+                    />
+                  )}
+                  <Button
+                    className="btn btn-secondary"
+                    size="sm"
+                    onClick={resetFilters}
+                  >
+                    Reset filters
+                  </Button>
+                </div>
+              </td>
             </tr>
           )}
           {table.getHeaderGroups().map((headerGroup) => (
@@ -65,11 +113,7 @@ function TableBuilder({ data, columns, filterableInputs = [] }) {
             />
           ))}
         </thead>
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow row={row} key={row.id} />
-          ))}
-        </tbody>
+        <tbody>{renderTableBody()}</tbody>
       </Table>
     </div>
   )
