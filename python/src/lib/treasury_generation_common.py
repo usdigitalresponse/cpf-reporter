@@ -24,6 +24,7 @@ class UserObj(BaseModel):
     id: int
     email: str
 
+
 class OutputFileType(Enum):
     XLSX = "xlsx"
     CSV = "csv"

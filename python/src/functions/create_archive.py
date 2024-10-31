@@ -49,7 +49,10 @@ def handle(event: dict[str, Any], _context: Context):
         create_archive(organization_id, reporting_period_id, boto3.client("s3"), logger)
     except Exception:
         logger.exception("Exception creating archive")
-        return {"statusCode": 500, "body": "Internal Server Error - unable to create archive"}
+        return {
+            "statusCode": 500,
+            "body": "Internal Server Error - unable to create archive",
+        }
 
     return {
         "statusCode": 200,

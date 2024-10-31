@@ -165,6 +165,7 @@ def get_recent_subrecipients(
 
     return recent_subrecipients
 
+
 def no_subrecipients_in_file(recent_subrecipients: dict):
     """
     Helper method to determine if the recent_subrecipients JSON object in
