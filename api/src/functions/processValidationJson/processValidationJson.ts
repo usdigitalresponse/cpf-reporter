@@ -198,61 +198,7 @@ export const processRecord = async (
 
     // If we passed validation, we will save the subrecipient info into our DB
     if (passed && result.subrecipients?.length) {
-      const organizationId = extractOrganizationIdFromKey(key)
-      result.subrecipients.forEach((subrecipient) =>
-        saveSubrecipientInfo(
-          subrecipient,
-          key,
-          uploadId,
-          result.versionString,
-          organizationId
-        )
-      )
-
-      let reportingPeriod
-      try {
-        reportingPeriod = (
-          await db.upload.findUnique({
-            where: { id: uploadId },
-            include: { reportingPeriod: true },
-          })
-        ).reportingPeriod
-      } catch (err) {
-        logger.error(`Could not find reporting period for upload ${uploadId}`)
-        throw new Error('Error determining reporting period for upload')
-      }
-
-      try {
-        const subrecipientKey = `treasuryreports/${organizationId}/${reportingPeriod.id}/subrecipients.json`
-        const startDate = new Date(
-          reportingPeriod.endDate.getFullYear(),
-          reportingPeriod.endDate.getMonth() + 1,
-          1
-        )
-        const endDate = new Date(
-          reportingPeriod.endDate.getFullYear(),
-          reportingPeriod.endDate.getMonth() + 2,
-          0
-        )
-        const subrecipientsWithUploads = await db.subrecipient.findMany({
-          where: {
-            createdAt: { lte: endDate, gte: startDate },
-            organizationId,
-          },
-          include: { subrecipientUploads: true },
-        })
-        const subrecipients = {
-          subrecipients: subrecipientsWithUploads,
-        }
-        await sendPutObjectToS3Bucket(
-          bucket,
-          subrecipientKey,
-          JSON.stringify(subrecipients)
-        )
-      } catch (err) {
-        logger.error(`Error saving subrecipients JSON file to S3: ${err}`)
-        throw new Error('Error saving subrecipient info to S3')
-      }
+      await handleSubrecipientUploads(result, key, uploadId, bucket)
     }
 
     // Delete the errors.json file from S3
@@ -270,6 +216,82 @@ export const processRecord = async (
   } else {
     logger.error('No body in getObjectResponse')
   }
+}
+
+async function handleSubrecipientUploads(result, key, uploadId, bucket) {
+  const organizationId = extractOrganizationIdFromKey(key)
+  for (const subrecipient of result.subrecipients) {
+    await saveSubrecipientInfo(
+      subrecipient,
+      key,
+      uploadId,
+      result.versionString,
+      organizationId
+    )
+  }
+
+  let reportingPeriod
+  try {
+    reportingPeriod = (
+      await db.upload.findUnique({
+        where: { id: uploadId },
+        include: { reportingPeriod: true },
+      })
+    ).reportingPeriod
+  } catch (err) {
+    logger.error(`Could not find reporting period for upload ${uploadId}`)
+    throw new Error('Error determining reporting period for upload')
+  }
+
+  try {
+    const subrecipientsWithUploads = await getNewlyCreatedSubrecipients(
+      reportingPeriod,
+      organizationId
+    )
+    const subrecipients = {
+      subrecipients: subrecipientsWithUploads,
+    }
+    const subrecipientKey = `treasuryreports/${organizationId}/${reportingPeriod.id}/subrecipients.json`
+    await sendPutObjectToS3Bucket(
+      bucket,
+      subrecipientKey,
+      JSON.stringify(subrecipients)
+    )
+    logger.info(
+      `Successfully saved subrecipients to S3: ${subrecipientsWithUploads.length}`
+    )
+  } catch (err) {
+    logger.error(`Error saving subrecipients JSON file to S3: ${err}`)
+    throw new Error('Error saving subrecipient info to S3')
+  }
+}
+
+async function getNewlyCreatedSubrecipients(reportingPeriod, organizationId) {
+  // Get all subrecipients for the current reporting period
+  // These subrecipients are considered for the report if they were created
+  // during the month following the end of the reporting period
+  // For example: if the reporting period ends on 2022-03-31,
+  // any subrecipients created between 2022-04-01 and 2022-04-30 are new
+
+  const startDate = new Date(
+    reportingPeriod.endDate.getFullYear(),
+    reportingPeriod.endDate.getMonth() + 1,
+    1
+  )
+  const endDate = new Date(
+    reportingPeriod.endDate.getFullYear(),
+    reportingPeriod.endDate.getMonth() + 2,
+    0
+  )
+  const subrecipientsWithUploads = await db.subrecipient.findMany({
+    where: {
+      createdAt: { lte: endDate, gte: startDate },
+      organizationId,
+    },
+    include: { subrecipientUploads: true },
+  })
+
+  return subrecipientsWithUploads
 }
 
 async function saveSubrecipientInfo(
