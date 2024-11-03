@@ -6,7 +6,7 @@ from pydantic import ValidationError
 from src.functions.create_archive import CreateArchiveLambdaPayload, create_archive
 
 
-def test_create_archive_creates_zip():
+def test_create_archive_creates_zip() -> None:
     org_id = 1234
     reporting_period_id = 5678
     s3_client = MagicMock()
@@ -37,7 +37,7 @@ def test_create_archive_creates_zip():
     )
 
 
-def test_create_archive_lambda_payload():
+def test_create_archive_lambda_payload() -> None:
     organizationObj = {
         "organization": {
             "id": 1234,
@@ -52,7 +52,7 @@ def test_create_archive_lambda_payload():
         )
 
 
-def test_create_archive_lambda_payload_failed():
+def test_create_archive_lambda_payload_failed() -> None:
     organizationObj = {
         # "id": "1234", Missing a required field
         "preferences": {"current_reporting_period_id": 5678},

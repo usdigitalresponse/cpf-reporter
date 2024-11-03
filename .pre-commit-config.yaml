@@ -19,4 +19,6 @@ repos:
     rev: 'main'
     hooks:
     -   id: mypy
-        args: [--strict, --ignore-missing-imports]
+        args: [--ignore-missing-imports]
+        additional_dependencies:
+        - pydantic

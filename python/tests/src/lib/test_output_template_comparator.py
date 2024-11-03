@@ -8,7 +8,7 @@ from src.lib.output_template_comparator import (
 )
 
 
-def test_compare_workbooks_same_values(cpf_file_archive: CPFFileArchive):
+def test_compare_workbooks_same_values(cpf_file_archive: CPFFileArchive) -> None:
     latest_archive = cpf_file_archive
     previous_archive = cpf_file_archive
     common_files, new_files, removed_files = compare_workbooks(
@@ -21,7 +21,7 @@ def test_compare_workbooks_same_values(cpf_file_archive: CPFFileArchive):
 
 def test_compare_workbooks_new_file_values(
     cpf_file_archive: CPFFileArchive, cpf_file_archive_two: CPFFileArchive
-):
+) -> None:
     common_files, new_files, removed_files = compare_workbooks(
         cpf_file_archive_two, cpf_file_archive
     )
@@ -30,7 +30,7 @@ def test_compare_workbooks_new_file_values(
     assert len(removed_files) == 0
 
 
-def test_compare_sheets_same_values(template_workbook: Workbook):
+def test_compare_sheets_same_values(template_workbook: Workbook) -> None:
     valid_project_sheet = template_workbook["Baseline"]
     added_columns, removed_columns, header_map = compare_sheet_columns(
         valid_project_sheet, valid_project_sheet
@@ -42,7 +42,7 @@ def test_compare_sheets_same_values(template_workbook: Workbook):
 
 def test_compare_sheets_different_values(
     template_workbook: Workbook, template_workbook_two: Workbook
-):
+) -> None:
     valid_project_sheet_1 = template_workbook["Baseline"]
     valid_project_sheet_2 = template_workbook_two["Baseline"]
     added_columns, removed_columns, header_map = compare_sheet_columns(
@@ -55,7 +55,7 @@ def test_compare_sheets_different_values(
 
 def test_compare_cells_same_values(
     template_workbook: Workbook, template_workbook_two: Workbook
-):
+) -> None:
     valid_project_sheet_1 = template_workbook["Baseline"]
     valid_project_sheet_2 = template_workbook_two["Baseline"]
     _, _, header_map = compare_sheet_columns(
@@ -67,7 +67,7 @@ def test_compare_cells_same_values(
     assert len(cell_value_differences) == 4
 
 
-def test_compare_cells_diff_values(template_workbook: Workbook):
+def test_compare_cells_diff_values(template_workbook: Workbook) -> None:
     valid_project_sheet = template_workbook["Baseline"]
     _, _, header_map = compare_sheet_columns(valid_project_sheet, valid_project_sheet)
     cell_value_differences = compare_cell_values(

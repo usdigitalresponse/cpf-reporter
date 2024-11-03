@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import boto3
 import chevron
@@ -28,7 +28,7 @@ class SendTreasuryEmailLambdaPayload(BaseModel):
 
 
 @reset_contextvars
-def handle(event: SendTreasuryEmailLambdaPayload, context: Context):
+def handle(event: SendTreasuryEmailLambdaPayload, context: Context) -> dict[str, Any]:
     """Lambda handler for emailing Treasury reports
 
     Given a user and organization object- send an email to the user that
@@ -102,7 +102,7 @@ def generate_email(
 def process_event(
     payload: SendTreasuryEmailLambdaPayload,
     logger: structlog.stdlib.BoundLogger,
-):
+) -> bool:
     """
     This function is structured as followed:
     1) Check to see if the s3 object exists:

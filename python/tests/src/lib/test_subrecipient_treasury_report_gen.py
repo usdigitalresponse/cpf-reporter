@@ -1,6 +1,7 @@
 import json
 from tempfile import NamedTemporaryFile
-from unittest.mock import ANY, MagicMock, call, patch
+from typing import Any, Dict, List
+from unittest.mock import ANY, MagicMock, Mock, call, patch
 
 import pytest
 from aws_lambda_typing.context import Context
@@ -9,6 +10,7 @@ from openpyxl import Workbook
 from src.functions.subrecipient_treasury_report_gen import (
     FIRST_BLANK_ROW_NUM,
     WORKSHEET_NAME,
+    SubrecipientLambdaPayload,
     get_most_recent_upload,
     handle,
     process_event,
@@ -21,8 +23,8 @@ from src.lib.treasury_generation_common import OrganizationObj
 class TestHandleNoEventOrNoContext:
     @patch("src.functions.subrecipient_treasury_report_gen.get_logger")
     def test_handle_no_event_provided(
-        self, mock_get_logger, valid_aws_typing_context: Context
-    ):
+        self, mock_get_logger: Mock, valid_aws_typing_context: Context
+    ) -> None:
         mock_logger = MagicMock()
         mock_get_logger.return_value = mock_logger
 
@@ -30,10 +32,10 @@ class TestHandleNoEventOrNoContext:
         mock_logger.exception.assert_called_once_with("Missing event or context")
 
     @patch("src.functions.subrecipient_treasury_report_gen.get_logger")
-    def test_handle_no_context_provided(self, mock_get_logger):
+    def test_handle_no_context_provided(self, mock_get_logger: Mock) -> None:
         mock_logger = MagicMock()
         mock_get_logger.return_value = mock_logger
-        event = {}
+        event: dict[str, str] = {}
         context = None
 
         handle(event, context)
@@ -44,8 +46,8 @@ class TestHandleNoEventOrNoContext:
 class TestHandleIncompleteEventInput:
     @patch("src.functions.subrecipient_treasury_report_gen.get_logger")
     def test_handle_no_organization_id(
-        self, mock_get_logger, valid_aws_typing_context: Context
-    ):
+        self, mock_get_logger: Mock, valid_aws_typing_context: Context
+    ) -> None:
         mock_logger = MagicMock()
         mock_get_logger.return_value = mock_logger
 
@@ -66,8 +68,8 @@ class TestHandleIncompleteEventInput:
 
     @patch("src.functions.subrecipient_treasury_report_gen.get_logger")
     def test_handle_no_preferences(
-        self, mock_get_logger, valid_aws_typing_context: Context
-    ):
+        self, mock_get_logger: Mock, valid_aws_typing_context: Context
+    ) -> None:
         mock_logger = MagicMock()
         mock_get_logger.return_value = mock_logger
 
@@ -79,8 +81,8 @@ class TestHandleIncompleteEventInput:
 
     @patch("src.functions.subrecipient_treasury_report_gen.get_logger")
     def test_handle_no_current_reporting_period_id(
-        self, mock_get_logger, valid_aws_typing_context: Context
-    ):
+        self, mock_get_logger: Mock, valid_aws_typing_context: Context
+    ) -> None:
         mock_logger = MagicMock()
         mock_get_logger.return_value = mock_logger
 
@@ -92,8 +94,8 @@ class TestHandleIncompleteEventInput:
 
     @patch("src.functions.subrecipient_treasury_report_gen.get_logger")
     def test_handle_no_output_template_id(
-        self, mock_get_logger, valid_aws_typing_context: Context
-    ):
+        self, mock_get_logger: Mock, valid_aws_typing_context: Context
+    ) -> None:
         mock_logger = MagicMock()
         mock_get_logger.return_value = mock_logger
 
@@ -117,12 +119,12 @@ class TestInvalidSubrecipientsFile:
     @patch("src.functions.subrecipient_treasury_report_gen.tempfile.NamedTemporaryFile")
     def test_invalid_subrecipients_file(
         self,
-        mock_tempfile,
-        mock_boto_client,
-        invalid_json_content,
-        sample_subrecipients_lambda_payload,
-        monkeypatch,
-    ):
+        mock_tempfile: Mock,
+        mock_boto_client: Mock,
+        invalid_json_content: str,
+        sample_subrecipients_lambda_payload: SubrecipientLambdaPayload,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         monkeypatch.setenv("REPORTING_DATA_BUCKET_NAME", "test-cpf-reporter")
         mock_s3_client = MagicMock()
         mock_boto_client.return_value = mock_s3_client
@@ -143,12 +145,12 @@ class TestInvalidSubrecipientsFile:
     @patch("src.functions.subrecipient_treasury_report_gen.tempfile.NamedTemporaryFile")
     def test_no_subrecipients_key(
         self,
-        mock_tempfile,
-        mock_boto_client,
-        no_subrecipients_key_json_content,
-        sample_subrecipients_lambda_payload,
-        monkeypatch,
-    ):
+        mock_tempfile: Mock,
+        mock_boto_client: Mock,
+        no_subrecipients_key_json_content: str,
+        sample_subrecipients_lambda_payload: SubrecipientLambdaPayload,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         monkeypatch.setenv("REPORTING_DATA_BUCKET_NAME", "test-cpf-reporter")
         mock_s3_client = MagicMock()
         mock_boto_client.return_value = mock_s3_client
@@ -169,12 +171,12 @@ class TestInvalidSubrecipientsFile:
     @patch("src.functions.subrecipient_treasury_report_gen.tempfile.NamedTemporaryFile")
     def test_no_subrecipients_list(
         self,
-        mock_tempfile,
-        mock_boto_client,
-        no_subrecipients_list_json_content,
-        sample_subrecipients_lambda_payload,
-        monkeypatch,
-    ):
+        mock_tempfile: Mock,
+        mock_boto_client: Mock,
+        no_subrecipients_list_json_content: str,
+        sample_subrecipients_lambda_payload: SubrecipientLambdaPayload,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         monkeypatch.setenv("REPORTING_DATA_BUCKET_NAME", "test-cpf-reporter")
         mock_s3_client = MagicMock()
         mock_boto_client.return_value = mock_s3_client
@@ -195,12 +197,12 @@ class TestInvalidSubrecipientsFile:
     @patch("src.functions.subrecipient_treasury_report_gen.tempfile.NamedTemporaryFile")
     def test_empty_subrecipients_list(
         self,
-        mock_tempfile,
-        mock_boto_client,
-        empty_subrecipients_list_json_content,
-        sample_subrecipients_lambda_payload,
-        monkeypatch,
-    ):
+        mock_tempfile: Mock,
+        mock_boto_client: Mock,
+        empty_subrecipients_list_json_content: str,
+        sample_subrecipients_lambda_payload: SubrecipientLambdaPayload,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         monkeypatch.setenv("REPORTING_DATA_BUCKET_NAME", "test-cpf-reporter")
         mock_s3_client = MagicMock()
         mock_boto_client.return_value = mock_s3_client
@@ -220,8 +222,10 @@ class TestInvalidSubrecipientsFile:
 
 class TestWriteSubrecipientsToWorkbook:
     def test_write_subrecipients_to_workbook_no_uploads(
-        self, subrecipients_no_uploads, empty_subrecipient_treasury_template
-    ):
+        self,
+        subrecipients_no_uploads: dict[str, list[dict[str, Any]]],
+        empty_subrecipient_treasury_template: Workbook,
+    ) -> None:
         mock_logger = MagicMock()
 
         write_subrecipients_to_workbook(
@@ -233,8 +237,10 @@ class TestWriteSubrecipientsToWorkbook:
         )
 
     def test_write_subrecipients_to_workbook_empty_output_file_valid_subrecipients(
-        self, valid_subrecipients_json_content, empty_subrecipient_treasury_template
-    ):
+        self,
+        valid_subrecipients_json_content: dict[str, list[dict[str, Any]]],
+        empty_subrecipient_treasury_template: Workbook,
+    ) -> None:
         mock_logger = MagicMock()
 
         write_subrecipients_to_workbook(
@@ -275,8 +281,11 @@ class TestUploadSubrecipientWorkbook:
     @patch("src.functions.subrecipient_treasury_report_gen.upload_generated_file_to_s3")
     @patch("src.functions.subrecipient_treasury_report_gen.convert_xlsx_to_csv")
     def test_upload_workbook(
-        self, mock_convert_xlsx_to_csv, mock_upload_generated_file_to_s3, monkeypatch
-    ):
+        self,
+        mock_convert_xlsx_to_csv: Mock,
+        mock_upload_generated_file_to_s3: Mock,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
         bucket_name = "test-cpf-reporter"
         monkeypatch.setenv("REPORTING_DATA_BUCKET_NAME", bucket_name)
         mock_s3_client = MagicMock()
@@ -306,18 +315,20 @@ class TestUploadSubrecipientWorkbook:
 
 
 class TestGetMostRecentUpload:
-    def test_get_most_recent_upload(self, sample_subrecipient_uploads_with_dates):
+    def test_get_most_recent_upload(
+        self, sample_subrecipient_uploads_with_dates: dict[str, list[dict[str, Any]]]
+    ) -> None:
         result = get_most_recent_upload(sample_subrecipient_uploads_with_dates)
         assert result["id"] == 2
 
-    def test_get_most_recent_upload_with_single_entry(self):
+    def test_get_most_recent_upload_with_single_entry(self) -> None:
         single_entry_subrecipient = {
             "subrecipientUploads": [{"id": 1, "updatedAt": "2023-07-01T12:00:00Z"}]
         }
         result = get_most_recent_upload(single_entry_subrecipient)
         assert result["id"] == 1
 
-    def test_get_most_recent_upload_with_empty_list(self):
-        empty_subrecipient = {"subrecipientUploads": []}
+    def test_get_most_recent_upload_with_empty_list(self) -> None:
+        empty_subrecipient: Dict[str, List[str]] = {"subrecipientUploads": []}
         with pytest.raises(IndexError):
             get_most_recent_upload(empty_subrecipient)
