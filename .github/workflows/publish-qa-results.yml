@@ -87,7 +87,7 @@ jobs:
           | 🐍 Python Tests | ${{ (env.PYTHON_TEST_OUTCOME == 'success' && '✅') || (env.PYTHON_TEST_OUTCOME == 'skipped' && '➖') || '❌' }} |
           | 📏 ESLint    | ${{ (env.ESLINT_OUTCOME == 'success' && '✅') || (env.ESLINT_OUTCOME == 'skipped' && '➖') || '❌' }} |
           | 🧼 Ruff      | ${{ (env.RUFF_OUTCOME == 'success' && '✅')  || (env.RUFF_OUTCOME == 'skipped' && '➖') || '❌' }} |
-          | 🧼 Ruff      | ${{ (env.RUFF_OUTCOME == 'success' && '✅')  || (env.RUFF_OUTCOME == 'skipped' && '➖') || '❌' }} |
+          | 🛁 mypy      | ${{ (env.MYPY_OUTCOME == 'success' && '✅')  || (env.MYPY_OUTCOME == 'skipped' && '➖') || '❌' }} |
           | 🧹 TFLint    | ${{ (env.TFLINT_OUTCOME == 'success' && '✅') || (env.TFLINT_OUTCOME == 'skipped' && '➖') || '❌' }} |
 
           ### Test Coverage
