@@ -60,8 +60,6 @@ jobs:
         run: yarn install --immutable
         env:
           CI: 1
-      - name: Where am I?
-        run: echo "Whattttttttt"
 
   test-api:
     name: Test api-side code
@@ -289,7 +287,6 @@ jobs:
       - uses: chartboost/ruff-action@e18ae971ccee1b2d7bbef113930f00c670b78da4 # v1
         with:
           src: python
-      - run: echo "Do edits impact the steps"
 
   mypy:
     name: Type-check python

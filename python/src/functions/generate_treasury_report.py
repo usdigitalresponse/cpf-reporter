@@ -383,7 +383,7 @@ def get_outdated_projects_to_remove(
     Open the files in the outdated_file_info_list and get the projects to
     remove.
     """
-    project_agency_ids_to_remove = set()
+    project_agency_ids_to_remove: Set[str] = set()
     for agency_id, file_info in uploads_by_agency_id.items():
         with tempfile.NamedTemporaryFile() as file:
             # Download projects from S3
