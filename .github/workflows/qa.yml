@@ -23,6 +23,8 @@ on:
         value: ${{ jobs.eslint.result }}
       ruff-outcome:
         value: ${{ jobs.ruff.result }}
+      mypy-outcome:
+        value: ${{ jobs.mypy.result }}
       tflint-outcome:
         value: ${{ jobs.tflint.result }}
 
