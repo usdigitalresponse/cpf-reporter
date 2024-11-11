@@ -60,6 +60,8 @@ jobs:
         run: yarn install --immutable
         env:
           CI: 1
+      - name: Where am I?
+        run: echo "Whattttttttt"
 
   test-api:
     name: Test api-side code
