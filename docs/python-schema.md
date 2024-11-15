@@ -1,7 +1,7 @@
 # Python Schema for Excel CPF Templates
 
 In order to validate user reporting templates, we define a schema in Python that matches the Excel template schema (tabs, columns, and field types).
-This schema is defined and validated using Pydantic, a Python library for data validation (docs [here](https://docs.pydantic.dev/latest/)). 
+This schema is defined and validated using Pydantic, a Python library for data validation (docs [here](https://docs.pydantic.dev/latest/)).
 
 ## Note on terminology
 For the purposes of this guide, we will use `file` to refer to code files, and `sheet` to refer to user-uploaded Excel reporting templates.
@@ -22,7 +22,7 @@ For example, in a `schema.py` file:
         ..., serialization_alias="Project Name", json_schema_extra={"column":"C"}
     )
 ```
-There should only be _one_ field per column per tab (e.g., the "Project" tab can only ever have a `Project_Name__c` field in column C). 
+There should only be _one_ field per column per tab (e.g., the "Project" tab can only ever have a `Project_Name__c` field in column C).
 
 ## Updating the schema
 

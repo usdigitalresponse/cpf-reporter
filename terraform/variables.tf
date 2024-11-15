@@ -325,4 +325,3 @@ variable "notifications_email_address" {
     error_message = "Email address must contain exactly one @ sign."
   }
 }
-

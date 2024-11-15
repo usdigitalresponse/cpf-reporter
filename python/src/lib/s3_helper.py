@@ -60,10 +60,10 @@ def upload_generated_file_to_s3(
 
 
 def get_presigned_url(
-        s3_client: S3Client,
-        bucket: str,
-        key: str,
-        expiration_time: int = 60 * 60,  #  1 hour
+    s3_client: S3Client,
+    bucket: str,
+    key: str,
+    expiration_time: int = 60 * 60,  #  1 hour
 ) -> Optional[str]:
     logger = get_logger()
     try:
@@ -76,16 +76,16 @@ def get_presigned_url(
         return None
 
     try:
-        response =  s3_client.generate_presigned_url(
+        response = s3_client.generate_presigned_url(
             "get_object",
             Params={
                 "Bucket": bucket,
                 "Key": key,
             },
-            ExpiresIn=expiration_time
+            ExpiresIn=expiration_time,
         )
     except ClientError:
         logger.exception(f"Unable to retrieve presigned URL for key: {key}")
         return None
-    
+
     return response
