@@ -2,7 +2,7 @@
 # Note: you will need to replace the GROUP variable with the log group name that you are interested in.
 export GROUP=/aws/lambda/localstack-lambda-project-1C
 for STREAM in $(awslocal logs describe-log-streams --log-group-name $GROUP  --query logStreams[*].logStreamName  --output text --order-by LastEventTime --descending) ;
-do  
+do
     echo awslocal logs delete-log-stream --log-group-name $GROUP  --log-stream-name $STREAM
     echo awslocal logs get-log-events --log-group-name $GROUP  --log-stream-name $STREAM --output table
 done
