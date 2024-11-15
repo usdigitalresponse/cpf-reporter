@@ -21,6 +21,7 @@ export const schema = gql`
   type Query {
     uploads: [Upload!]! @requireAuth
     upload(id: Int!): Upload @requireAuth
+    getValidUploadsInCurrentPeriod: [Upload!]! @requireAuth
   }
 
   input CreateUploadInput {
