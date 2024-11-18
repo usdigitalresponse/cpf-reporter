@@ -42,6 +42,7 @@ export const uploads: QueryResolvers['uploads'] = () => {
 
   return db.upload.findMany({
     where: whereInputs,
+    orderBy: { createdAt: 'desc' },
   })
 }
 
