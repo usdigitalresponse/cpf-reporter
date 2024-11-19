@@ -2,12 +2,12 @@ BEGIN;
 
 CREATE OR REPLACE FUNCTION populate_organization_preferences()
 RETURNS void AS $$
-DECLARE 
+DECLARE
     current_reporting_period_id INT;
-BEGIN 
+BEGIN
     -- Get one valid reporting period id --
-    SELECT id INTO current_reporting_period_id 
-    FROM "ReportingPeriod" 
+    SELECT id INTO current_reporting_period_id
+    FROM "ReportingPeriod"
     WHERE "outputTemplateId" IS NOT NULL AND "inputTemplateId" IS NOT NULL
     LIMIT 1;
 
