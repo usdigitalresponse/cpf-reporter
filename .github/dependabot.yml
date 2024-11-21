@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://json.schemastore.org/dependabot-2.0.json
+
+# Please see the documentation for all configuration options:
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  - package-ecosystem: npm
+    versioning-strategy: lockfile-only
+    directory: /
+    schedule:
+      interval: daily
+      time: "03:00"
+      timezone: America/New_York
+    commit-message:
+      prefix: 'Chore [deps:npm]'
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: daily
+      time: "03:00"
+      timezone: America/New_York
+    commit-message:
+      prefix: 'Chore [deps:github-actions]'
+  - package-ecosystem: terraform
+    directory: /terraform
+    schedule:
+      interval: daily
+      time: "03:00"
+      timezone: America/New_York
+    commit-message:
+      prefix: 'Chore [deps:terraform]'
