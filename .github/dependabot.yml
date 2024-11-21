@@ -7,7 +7,10 @@ version: 2
 updates:
   - package-ecosystem: npm
     versioning-strategy: lockfile-only
-    directory: /
+    directories:
+      - /
+      - /api
+      - /web
     schedule:
       interval: daily
       time: "03:00"
