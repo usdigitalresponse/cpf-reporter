@@ -23,9 +23,6 @@ import {
   getUploadsByExpenditureCategory,
   getValidUploadsInCurrentPeriod,
   sendTreasuryReport,
-  SubrecipientLambdaPayload,
-  ProjectLambdaPayload,
-  CreateArchiveLambdaPayload,
   EmailLambdaPayload,
 } from './uploads'
 import type { StandardScenario } from './uploads.scenarios'
@@ -42,7 +39,7 @@ jest.mock('src/lib/aws', () => ({
   deleteUploadFile: jest.fn(),
   s3UploadFilePutSignedUrl: jest.fn(),
   getSignedUrl: jest.fn(),
-  startStepFunctionExecution: jest.fn(),
+  sendSqsMessage: jest.fn(),
 }))
 jest.mock('uuid', () => ({
   v4: () => '00000000-0000-0000-0000-000000000000',
@@ -412,7 +409,7 @@ describe('treasury report', () => {
       expect(result).toBe(true)
       expect(sendSqsMessage).toHaveBeenCalledWith(
         'https://sqs.us-east-1.amazon.com/fake_aws_account_key/fake_queue',
-        emailPayload
+        input
       )
     }
   )
