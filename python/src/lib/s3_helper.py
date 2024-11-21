@@ -29,6 +29,31 @@ def download_s3_object(
         raise
 
 
+def delete_file_from_s3(client: S3Client, bucket: str, key: str) -> None:
+    """Deletes file from S3.
+
+    Args:
+        client: Client facilitating delete from S3
+        bucket: bucket file should be deleted from
+        key: S3 key for file
+    """
+    logger = get_logger()
+
+    logger = logger.bind(upload={"s3": {"bucket": bucket, "key": key}})
+    try:
+        client.delete_object(
+            Bucket=bucket,
+            Key=unquote_plus(key),
+        )
+    except:
+        logger.exception(
+            f"failed to delete file from S3, bucket {bucket} and key {key}"
+        )
+        raise
+
+    logger.info("successfully deleted file from s3")
+
+
 def upload_generated_file_to_s3(
     client: S3Client,
     bucket: str,
@@ -45,7 +70,7 @@ def upload_generated_file_to_s3(
     """
     logger = get_logger()
 
-    logger = logger.bind(upload={"s3": {"bucket": bucket, "key": key}})
+    logger = logger.bind(delete={"s3": {"bucket": bucket, "key": key}})
     try:
         file.seek(0)
         client.put_object(
