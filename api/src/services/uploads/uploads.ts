@@ -6,7 +6,6 @@ import type {
   MutationResolvers,
   UploadRelationResolvers,
 } from 'types/graphql'
-import { v4 as uuidv4 } from 'uuid'
 
 import { RedwoodError } from '@redwoodjs/api'
 
@@ -254,7 +253,7 @@ export const getUploadsByExpenditureCategory = async (
 
     if (
       !uploadsByEC[upload.expenditureCategory.code].uploadsToAdd[
-      upload.agencyId
+        upload.agencyId
       ]
     ) {
       // The agency was never added. This is the time to initialize it.
@@ -371,17 +370,11 @@ export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
         where: { id: context.currentUser.agency.organizationId },
       })
       const emailLambdaPayload: EmailLambdaPayload =
-        await getEmailLambdaPayload(
-          organization,
-          context.currentUser,
-        )
+        await getEmailLambdaPayload(organization, context.currentUser)
 
-      const input = emailLambdaPayload;
+      const input = emailLambdaPayload
 
-      await sendSqsMessage(
-        process.env.TREASURY_EMAIL_SQS_URL,
-        input
-      )
+      await sendSqsMessage(process.env.TREASURY_EMAIL_SQS_URL, input)
       return true
     } catch (error) {
       logger.error(error, 'Error sending Treasury Report')
