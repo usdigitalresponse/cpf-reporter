@@ -4,7 +4,7 @@ import {
   deleteUploadFile,
   s3UploadFilePutSignedUrl,
   getSignedUrl,
-  startStepFunctionExecution,
+  sendSqsMessage,
 } from 'src/lib/aws'
 import { db } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
@@ -379,6 +379,8 @@ describe('treasury report', () => {
   beforeEach(() => {
     jest.resetAllMocks()
     process.env.TREASURY_STEP_FUNCTION_ARN = 'test-arn'
+    process.env.TREASURY_EMAIL_SQS_URL =
+      'https://sqs.us-east-1.amazon.com/fake_aws_account_key/fake_queue'
   })
 
   scenario(
@@ -387,91 +389,8 @@ describe('treasury report', () => {
       mockCurrentUser(scenario.user.one)
       const mockOrganization = scenario.organization.one
       const mockReportingPeriod = scenario.reportingPeriod.one
-      const mockUpload = scenario.upload.two
       const mockUser = scenario.user.one
 
-      const projectPayload: ProjectLambdaPayload = {
-        '1A': {
-          organization: {
-            id: mockOrganization.id,
-            preferences: {
-              current_reporting_period_id: mockReportingPeriod.id,
-            },
-          },
-          user: {
-            email: mockUser.email,
-            id: mockUser.id,
-          },
-          outputTemplateId: mockReportingPeriod.outputTemplateId,
-          uploadsToAdd: {
-            [mockUpload.agencyId]: {
-              objectKey: `uploads/${mockOrganization.id}/${mockUpload.agencyId}/${mockReportingPeriod.id}/${mockUpload.id}/${mockUpload.filename}`,
-              createdAt: mockUpload.createdAt,
-              filename: mockUpload.filename,
-            },
-          },
-          uploadsToRemove: {},
-          ProjectType: '1A',
-        },
-        '1B': {
-          organization: {
-            id: mockOrganization.id,
-            preferences: {
-              current_reporting_period_id: mockReportingPeriod.id,
-            },
-          },
-          user: {
-            email: mockUser.email,
-            id: mockUser.id,
-          },
-          outputTemplateId: mockReportingPeriod.outputTemplateId,
-          uploadsToAdd: {},
-          uploadsToRemove: {},
-          ProjectType: '1B',
-        },
-        '1C': {
-          organization: {
-            id: mockOrganization.id,
-            preferences: {
-              current_reporting_period_id: mockReportingPeriod.id,
-            },
-          },
-          user: {
-            email: mockUser.email,
-            id: mockUser.id,
-          },
-          outputTemplateId: mockReportingPeriod.outputTemplateId,
-          uploadsToAdd: {},
-          uploadsToRemove: {},
-          ProjectType: '1C',
-        },
-      }
-      const subrecipientPayload: SubrecipientLambdaPayload = {
-        Subrecipient: {
-          organization: {
-            id: mockOrganization.id,
-            preferences: {
-              current_reporting_period_id: mockReportingPeriod.id,
-            },
-          },
-          user: {
-            email: mockUser.email,
-            id: mockUser.id,
-          },
-          outputTemplateId: mockReportingPeriod.outputTemplateId,
-        },
-      }
-
-      const zipPayload: CreateArchiveLambdaPayload = {
-        zip: {
-          organization: {
-            id: mockOrganization.id,
-            preferences: {
-              current_reporting_period_id: mockReportingPeriod.id,
-            },
-          },
-        },
-      }
       const emailPayload: EmailLambdaPayload = {
         email: {
           organization: {
@@ -487,25 +406,13 @@ describe('treasury report', () => {
         },
       }
 
-      const input = JSON.stringify({
-        '1A': {},
-        '1B': {},
-        '1C': {},
-        Subrecipient: {},
-        zip: {},
-        email: {},
-        ...projectPayload,
-        ...subrecipientPayload,
-        ...zipPayload,
-        ...emailPayload,
-      })
+      const input = emailPayload
       const result = await sendTreasuryReport()
 
       expect(result).toBe(true)
-      expect(startStepFunctionExecution).toHaveBeenCalledWith(
-        'test-arn',
-        `Force-kick-off-00000000-0000-0000-0000-000000000000`,
-        input
+      expect(sendSqsMessage).toHaveBeenCalledWith(
+        'https://sqs.us-east-1.amazon.com/fake_aws_account_key/fake_queue',
+        emailPayload
       )
     }
   )
