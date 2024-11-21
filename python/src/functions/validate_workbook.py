@@ -1,6 +1,6 @@
 import json
 import tempfile
-from typing import IO, List, Union, Dict
+from typing import IO, Dict, List, Union
 from urllib.parse import unquote_plus
 
 import boto3
@@ -10,14 +10,16 @@ from aws_lambda_typing.events import S3Event
 from mypy_boto3_s3.client import S3Client
 
 from src.lib.logging import get_logger, reset_contextvars
-from src.lib.workbook_validator import validate
 from src.lib.s3_helper import download_s3_object
+from src.lib.workbook_validator import Subrecipients, validate
 
-type ValidationResults = Dict[str, Union[List[Dict[str, str]], str, None]]
+type ValidationResults = Dict[
+    str, Union[List[Dict[str, str]], str, None, Subrecipients]
+]
 
 
 @reset_contextvars
-def handle(event: S3Event, context: Context):
+def handle(event: S3Event, context: Context) -> None:
     """Lambda handler for validating workbooks uploaded to S3
 
     Args:
@@ -79,8 +81,8 @@ def validate_workbook(file: IO[bytes]) -> ValidationResults:
 
 
 def save_validation_results(
-    client: S3Client, bucket, key: str, results: ValidationResults
-):
+    client: S3Client, bucket: str, key: str, results: ValidationResults
+) -> None:
     """Persists workbook validation results to S3.
 
     Args:

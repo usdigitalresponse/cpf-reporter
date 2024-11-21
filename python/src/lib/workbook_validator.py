@@ -1,3 +1,4 @@
+import typing
 from enum import Enum
 from typing import IO, Any, Dict, Iterable, List, Optional, Tuple, Type, Union
 
@@ -15,6 +16,7 @@ from src.schemas.schema_versions import (
     Project1BRow,
     Project1CRow,
     SubrecipientRow,
+    V2024_05_24_ProjectRows,
     Version,
     getCoverSheetRowClass,
     getSchemaByProject,
@@ -22,9 +24,6 @@ from src.schemas.schema_versions import (
     getSubrecipientRowClass,
     getVersionFromString,
 )
-
-type Errors = List[WorkbookError]
-type Subrecipients = List[SubrecipientRow]
 
 LOGIC_SHEET = "Logic"
 COVER_SHEET = "Cover"
@@ -69,15 +68,21 @@ class WorkbookError:
         self.severity = severity
 
 
-def map_values_to_headers(headers: Tuple, values: Iterable[Any]):
+type Errors = List[WorkbookError]
+type Subrecipients = List[SubrecipientRow]
+
+
+def map_values_to_headers(
+    headers: Tuple[str, ...], values: Iterable[Any]
+) -> Dict[str, Any]:
     return dict(zip(headers, values))
 
 
-def is_empty_row(row_values: Tuple):
+def is_empty_row(row_values: Tuple[Optional[Any], ...]) -> bool:
     return all(value in (None, "") for value in row_values)
 
 
-def get_headers(sheet: Worksheet, cell_range: str) -> tuple:
+def get_headers(sheet: Worksheet, cell_range: str) -> Tuple[Any, ...]:
     return tuple(header_cell.value for header_cell in sheet[cell_range][0])
 
 
@@ -92,15 +97,18 @@ def get_project_use_code(
     values, it raises an error.
     """
     metadata = getSchemaMetadata(version_string)
-    if not row_dict:
+    actual_dict: Dict[str, str]
+    if row_dict:
+        actual_dict = row_dict
+    else:
         cover_header = get_headers(cover_sheet, metadata["Cover"]["header_range"])
         cover_row = map(lambda cell: cell.value, cover_sheet[2])
-        row_dict = map_values_to_headers(cover_header, cover_row)
+        actual_dict = map_values_to_headers(cover_header, cover_row)
     version = getVersionFromString(version_string)
     codeKey = "Expenditure Category Group"
     if version != Version.V2024_05_24:
         codeKey = "Project Use Code"
-    code = row_dict[codeKey]
+    code = actual_dict[codeKey]
     return ProjectType.from_project_name(code)
 
 
@@ -224,6 +232,8 @@ def validate(workbook: IO[bytes]) -> Tuple[Errors, Optional[str], Subrecipients,
                 )
             ],
             "Unkown",
+            [],
+            "",
         )
 
     finally:
@@ -234,9 +244,9 @@ def validate_workbook(
     workbook: Workbook, return_data: bool = False
 ) -> Tuple[
     Errors,
-    Optional[str],
-    List[Union[Project1ARow, Project1BRow, Project1CRow]],
-    List[SubrecipientRow],
+    Optional[ProjectType],
+    Subrecipients,
+    str,
 ]:
     """Validates a given Excel workbook according to CPF validation rules.
 
@@ -289,8 +299,6 @@ def validate_workbook(
         errors += validate_projects_subrecipients(
             projects, subrecipients, version_string
         )
-
-    subrecipients = [subrecipient.model_dump() for subrecipient in subrecipients]
 
     return (errors, project_use_code, subrecipients, version_string)
 
@@ -372,13 +380,15 @@ def validate_cover_sheet(
         )
         return (errors, None, None)
 
-    project_schema = getSchemaByProject(version_string, project_use_code)
+    project_schema = getSchemaByProject(
+        getVersionFromString(version_string), project_use_code
+    )
     return (errors, project_schema, project_use_code)
 
 
 def validate_project_sheet(
     project_sheet: Worksheet,
-    project_schema: Type[Union[Project1ARow, Project1BRow, Project1CRow]],
+    project_schema: Union[Type[Project1ARow], Type[Project1BRow], Type[Project1CRow]],
     version_string: str,
 ) -> Tuple[Errors, List[Union[Project1ARow, Project1BRow, Project1CRow]]]:
     errors = []
@@ -409,8 +419,8 @@ def validate_project_sheet(
         errors += [
             WorkbookError(
                 message="Upload doesn’t include any project records.",
-                row=INITIAL_STARTING_ROW + 1,
-                col=0,
+                row=str(INITIAL_STARTING_ROW + 1),
+                col=str(0),
                 tab=PROJECT_SHEET,
                 field_name="",
                 severity=ErrorLevel.ERR.name,
@@ -457,6 +467,10 @@ def validate_projects_subrecipients(
     if getVersionFromString(version_string) != Version.active_version():
         return []
 
+    projects_v2024: List[V2024_05_24_ProjectRows] = typing.cast(
+        List[V2024_05_24_ProjectRows], projects
+    )
+
     errors = []
     subrecipients_by_uei_tin = {}
     for subrecipient in subrecipients:
@@ -464,23 +478,25 @@ def validate_projects_subrecipients(
             (subrecipient.EIN__c, subrecipient.Unique_Entity_Identifier__c)
         ] = subrecipient
 
-    for project in projects:
+    for project in projects_v2024:
         if (
             subrecipients_by_uei_tin.get(
                 (project.Subrecipient_TIN__c, project.Subrecipient_UEI__c)
             )
             is None
         ):
-            col_name_tin = project.__class__.model_fields[
-                "Subrecipient_TIN__c"
-            ].json_schema_extra["column"]
-            col_name_uei = project.__class__.model_fields[
-                "Subrecipient_UEI__c"
-            ].json_schema_extra["column"]
+            col_name_tin = typing.cast(
+                Dict[str, str],
+                project.__class__.model_fields["Subrecipient_TIN__c"].json_schema_extra,
+            )["column"]
+            col_name_uei = typing.cast(
+                Dict[str, str],
+                project.__class__.model_fields["Subrecipient_UEI__c"].json_schema_extra,
+            )["column"]
             errors.append(
                 WorkbookError(
                     message="You must submit a subrecipient record with the same UEI & TIN numbers entered for this project",
-                    row=project.row_num,
+                    row=str(project.row_num),
                     col=f"{col_name_uei}, {col_name_tin}",
                     tab="Project",
                     field_name="Subrecipient_TIN__c and Subrecipient_UEI__c",
@@ -499,7 +515,7 @@ if __name__ == "__main__":
 
     file_path = sys.argv[1]
     with open(file_path, "rb") as f:
-        errors, project_use_code = validate(f)
+        errors, project_use_code, subrecipients, version_str = validate(f)
         if errors:
             print("Errors found:")
             for error in errors:

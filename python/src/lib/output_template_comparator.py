@@ -5,9 +5,10 @@ import re
 import zipfile
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Dict, List, Set
+from typing import IO, Any, Dict, List, Set
 
 from openpyxl import load_workbook
+from openpyxl.worksheet.worksheet import Worksheet
 
 HEADER_ROW_INDEX = 4
 
@@ -16,22 +17,22 @@ HEADER_ROW_INDEX = 4
 class CPFDiffReport:
     new_sheets: Dict[str, List[str]] = field(default_factory=dict)
     removed_sheets: Dict[str, List[str]] = field(default_factory=dict)
-    row_count_changed: Dict[str, List[str]] = field(default_factory=dict)
-    column_count_changed: Dict[str, List[str]] = field(default_factory=dict)
+    row_count_changed: Dict[str, str] = field(default_factory=dict)
+    column_count_changed: Dict[str, str] = field(default_factory=dict)
     column_differences: Dict[str, List[str]] = field(default_factory=dict)
     cell_value_changed: Dict[str, List[str]] = field(default_factory=dict)
     new_files: List[str] = field(default_factory=list)
     removed_files: List[str] = field(default_factory=list)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.new_sheets = defaultdict(list)
         self.removed_sheets = defaultdict(list)
-        self.row_count_changed = defaultdict(list)
-        self.column_count_changed = defaultdict(list)
+        self.row_count_changed = defaultdict(lambda: "")
+        self.column_count_changed = defaultdict(lambda: "")
         self.column_differences = defaultdict(list)
         self.cell_value_changed = defaultdict(list)
 
-    def summary_report(self):
+    def summary_report(self) -> str:
         return f"""
         New files: {self._format_item(self.new_files)}
         Removed files: {self._format_item(self.removed_files)}
@@ -44,20 +45,20 @@ class CPFDiffReport:
         """
 
     @staticmethod
-    def _format_item(item: any):
+    def _format_item(item: Any) -> str:
         if isinstance(item, list):
             return "\n".join(item)
         elif isinstance(item, dict):
             return "\n".join([f"{k}: {v}" for k, v in item.items()])
         else:
-            return item
+            return str(item)
 
 
 class CPFFileArchive:
     """Class for working with a CPF file archive"""
 
     _zip_file: zipfile.ZipFile
-    _file_name_map: dict
+    _file_name_map: dict[str, str]
 
     def __init__(self, zip_file: zipfile.ZipFile):
         self._zip_file = zip_file
@@ -67,11 +68,11 @@ class CPFFileArchive:
         """Returns a dictionary of normalized file names"""
         return set(self._file_name_map.keys())
 
-    def file_by_name(self, name) -> zipfile.ZipExtFile:
+    def file_by_name(self, name: str) -> IO[bytes]:
         """Returns a file object by name"""
         return self._zip_file.open(self._file_name_map[name])
 
-    def _normalize_names(self):
+    def _normalize_names(self) -> None:
         """Normalizes file names"""
         suffix_regex = r"\s\(\d+\)"
         normalized_files = {}
@@ -83,7 +84,7 @@ class CPFFileArchive:
 
 def compare_workbooks(
     latest_archive: CPFFileArchive, previous_archive: CPFFileArchive
-) -> tuple:
+) -> tuple[set[str], set[str], set[str]]:
     latest_files = latest_archive.normalized_file_names()
     previous_files = previous_archive.normalized_file_names()
     new_files = latest_files - previous_files
@@ -92,7 +93,9 @@ def compare_workbooks(
     return common_files, new_files, removed_files
 
 
-def compare_sheet_columns(previous_sheet, latest_sheet):
+def compare_sheet_columns(
+    previous_sheet: Worksheet, latest_sheet: Worksheet
+) -> tuple[set[Any], set[Any], dict[Any, tuple[int, int]]]:
     previous_column_headers = [
         previous_sheet.cell(row=HEADER_ROW_INDEX, column=column).value
         for column in range(1, previous_sheet.max_column + 1)
@@ -116,7 +119,11 @@ def compare_sheet_columns(previous_sheet, latest_sheet):
     return added_columns, removed_columns, header_map
 
 
-def compare_cell_values(previous_sheet, latest_sheet, header_map):
+def compare_cell_values(
+    previous_sheet: Worksheet,
+    latest_sheet: Worksheet,
+    header_map: dict[str, tuple[int, int]],
+) -> list[str]:
     differences = []
     for row in range(HEADER_ROW_INDEX, latest_sheet.max_row + 1):
         for header, (previous_column, latest_column) in header_map.items():
@@ -131,7 +138,7 @@ def compare_cell_values(previous_sheet, latest_sheet, header_map):
 
 def compare(
     latest_zip_files: zipfile.ZipFile, previous_zip_files: zipfile.ZipFile
-) -> List[str]:
+) -> CPFDiffReport:
     # read the files from the zip files
     # compare the files
     # return the differences
@@ -203,7 +210,7 @@ def compare(
     return differences
 
 
-def load_files(zip_path) -> zipfile.ZipFile:
+def load_files(zip_path: str) -> zipfile.ZipFile:
     """Loads XLSX files from a zip file.
 
     Args:

@@ -8,7 +8,9 @@ from mypy_boto3_s3.client import S3Client
 from src.lib.logging import get_logger
 
 
-def download_s3_object(client: S3Client, bucket: str, key: str, destination: IO[bytes]):
+def download_s3_object(
+    client: S3Client, bucket: str, key: str, destination: IO[bytes]
+) -> None:
     """Downloads an S3 object to a local file.
 
     Args:
@@ -31,8 +33,8 @@ def upload_generated_file_to_s3(
     client: S3Client,
     bucket: str,
     key: str,
-    file: Union[IO[bytes], tempfile._TemporaryFileWrapper],
-):
+    file: Union[IO[bytes], "tempfile._TemporaryFileWrapper[str]"],
+) -> None:
     """Persists file to S3.
 
     Args:
@@ -67,7 +69,8 @@ def get_presigned_url(
 ) -> Optional[str]:
     logger = get_logger()
     try:
-        response = s3_client.head_object(
+        # Check file exists
+        _resp = s3_client.head_object(
             Bucket=bucket,
             Key=key,
         )
@@ -75,6 +78,7 @@ def get_presigned_url(
         logger.exception(f"Unable to retrieve head object for key: {key}")
         return None
 
+    response = None
     try:
         response = s3_client.generate_presigned_url(
             "get_object",
@@ -86,6 +90,5 @@ def get_presigned_url(
         )
     except ClientError:
         logger.exception(f"Unable to retrieve presigned URL for key: {key}")
-        return None
 
     return response

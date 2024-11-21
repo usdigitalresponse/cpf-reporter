@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Type, Union
+from typing import Any, List, Type, Union
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
@@ -30,24 +30,18 @@ in here.
 """
 
 
-class SubrecipientRow:
-    Type[Union[V2024_04_01_SubrecipientRow, V2024_05_24_SubrecipientRow]]
+type SubrecipientRow = Union[V2024_04_01_SubrecipientRow, V2024_05_24_SubrecipientRow]
 
 
-class CoverSheetRow:
-    Type[Union[V2024_04_01_CoverSheetRow, V2024_05_24_CoverSheetRow]]
+type CoverSheetRow = Union[V2024_04_01_CoverSheetRow, V2024_05_24_CoverSheetRow]
 
 
-class Project1ARow:
-    Type[Union[V2024_04_01_Project1ARow, V2024_05_24_Project1ARow]]
-
-
-class Project1BRow:
-    Type[Union[V2024_04_01_Project1BRow, V2024_05_24_Project1BRow]]
-
-
-class Project1CRow:
-    Type[Union[V2024_04_01_Project1CRow, V2024_05_24_Project1CRow]]
+Project1ARow = Union[V2024_04_01_Project1ARow, V2024_05_24_Project1ARow]
+Project1BRow = Union[V2024_04_01_Project1BRow, V2024_05_24_Project1BRow]
+Project1CRow = Union[V2024_04_01_Project1CRow, V2024_05_24_Project1CRow]
+V2024_05_24_ProjectRows = Union[
+    V2024_05_24_Project1ARow, V2024_05_24_Project1BRow, V2024_05_24_Project1CRow
+]
 
 
 class Version(Enum):
@@ -61,11 +55,11 @@ class Version(Enum):
         return cls.V2024_05_24
 
     @classmethod
-    def compatible_older_versions(cls):
+    def compatible_older_versions(cls) -> List["Version"]:
         return [cls.V2023_12_12, cls.V2024_01_07, cls.V2024_04_01]
 
     @classmethod
-    def compatible_newer_versions(cls):
+    def compatible_newer_versions(cls) -> List["Version"]:
         return []
 
 
@@ -74,7 +68,9 @@ class LogicSheetVersion(BaseModel):
 
     @field_validator("version")
     @classmethod
-    def validate_field(cls, version: Version, info: ValidationInfo, **kwargs):
+    def validate_field(
+        cls, version: Version, info: ValidationInfo, **kwargs: dict[str, Any]
+    ) -> Version:
         if version == Version.active_version():
             return version
         elif version in Version.compatible_older_versions():
@@ -97,15 +93,15 @@ def getVersionFromString(version_string: str) -> Version:
     # validate_logic_sheet
     version = None
     try:
-        version = Version._value2member_map_[version_string]
-    except KeyError:
+        version = Version(version_string)
+    except Exception:
         # Handle the edge case of a bad version with the latest schema
         # We should have already collected a user-facing error for this in validate_logic_sheet
         version = Version.active_version()
     return version
 
 
-def getSubrecipientRowClass(version_string: str) -> SubrecipientRow:
+def getSubrecipientRowClass(version_string: str) -> Type[SubrecipientRow]:
     version = getVersionFromString(version_string)
     match version:
         case Version.V2024_05_24:
@@ -114,7 +110,7 @@ def getSubrecipientRowClass(version_string: str) -> SubrecipientRow:
             return V2024_04_01_SubrecipientRow
 
 
-def getCoverSheetRowClass(version_string: str) -> CoverSheetRow:
+def getCoverSheetRowClass(version_string: str) -> Type[CoverSheetRow]:
     version = getVersionFromString(version_string)
     match version:
         case Version.V2024_05_24:
@@ -124,9 +120,8 @@ def getCoverSheetRowClass(version_string: str) -> CoverSheetRow:
 
 
 def getSchemaByProject(
-    version_string: Version, project_type: ProjectType
-) -> Union[Project1ARow, Project1BRow, Project1CRow]:
-    version = getVersionFromString(version_string)
+    version: Version, project_type: ProjectType
+) -> Union[Type[Project1ARow], Type[Project1BRow], Type[Project1CRow]]:
     match project_type:
         case ProjectType._1A:
             return getProject1ARow(version)
@@ -136,7 +131,7 @@ def getSchemaByProject(
             return getProject1CRow(version)
 
 
-def getProject1ARow(version: Version) -> Project1ARow:
+def getProject1ARow(version: Version) -> Type[Project1ARow]:
     match version:
         case Version.V2024_05_24:
             return V2024_05_24_Project1ARow
@@ -144,7 +139,7 @@ def getProject1ARow(version: Version) -> Project1ARow:
             return V2024_04_01_Project1ARow
 
 
-def getProject1BRow(version: Version) -> Project1BRow:
+def getProject1BRow(version: Version) -> Type[Project1BRow]:
     match version:
         case Version.V2024_05_24:
             return V2024_05_24_Project1BRow
@@ -152,7 +147,7 @@ def getProject1BRow(version: Version) -> Project1BRow:
             return V2024_04_01_Project1BRow
 
 
-def getProject1CRow(version: Version) -> Project1CRow:
+def getProject1CRow(version: Version) -> Type[Project1CRow]:
     match version:
         case Version.V2024_05_24:
             return V2024_05_24_Project1CRow
@@ -160,7 +155,7 @@ def getProject1CRow(version: Version) -> Project1CRow:
             return V2024_04_01_Project1CRow
 
 
-def getSchemaMetadata(version_string: str) -> dict:
+def getSchemaMetadata(version_string: str) -> dict[str, dict[str, Any]]:
     version = getVersionFromString(version_string)
     match version:
         case Version.V2024_05_24:

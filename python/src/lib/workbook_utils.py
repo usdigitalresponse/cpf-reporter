@@ -10,7 +10,7 @@ Util methods for dealing with the mechanics of parsing workbooks, primarily tran
 """
 
 
-def escape_for_csv(text: Optional[str]):
+def escape_for_csv(text: Optional[str]) -> Optional[str]:
     if not text:
         return text
     text = text.replace("\n", " -- ")
@@ -22,7 +22,7 @@ def convert_xlsx_to_csv(
     csv_file: "_TemporaryFileWrapper[str]",
     file: Workbook,
     num_rows: int,
-):
+) -> "_TemporaryFileWrapper[str]":
     """
     Convert xlsx file to csv.
     """
@@ -33,7 +33,12 @@ def convert_xlsx_to_csv(
     for eachrow in sheet.rows:
         if row_num > num_rows:
             break
-        csv_file_handle.writerow([escape_for_csv(cell.value) for cell in eachrow])
+        csv_file_handle.writerow(
+            [
+                escape_for_csv(str(cell.value) if cell.value else None)
+                for cell in eachrow
+            ]
+        )
         row_num = row_num + 1
 
     return csv_file
@@ -46,7 +51,7 @@ as well as a `start_row` of the row number to start looking for populated cells
 """
 
 
-def find_last_populated_row(worksheet: Worksheet, start_row: int, column: str):
+def find_last_populated_row(worksheet: Worksheet, start_row: int, column: str) -> int:
     last_populated_row = start_row
 
     for row in range(start_row, worksheet.max_row + 1):
