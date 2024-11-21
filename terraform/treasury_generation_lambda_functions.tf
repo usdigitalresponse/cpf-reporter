@@ -443,5 +443,20 @@ module "lambda_function-email-presigned-url" {
       principal  = "states.amazonaws.com"
       source_arn = module.treasury_generation_step_function.state_machine_arn
     }
+
   }
+}
+
+// SQS queue for email triggers
+resource "aws_sqs_queue" "email_queue" {
+  name = "${var.namespace}-treasury-email-queue"
+}
+
+
+// Event source from SQS
+resource "aws_lambda_event_source_mapping" "email_event" {
+  event_source_arn = aws_sqs_queue.email_queue.arn
+  enabled          = true
+  function_name    = module.lambda_function-email-presigned-url.lambda_function_arn
+  batch_size       = 1
 }

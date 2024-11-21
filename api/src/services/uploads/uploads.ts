@@ -16,7 +16,7 @@ import {
   s3UploadFilePutSignedUrl,
   getSignedUrl,
   getS3UploadFileKey,
-  startStepFunctionExecution,
+  sendSqsMessage,
 } from 'src/lib/aws'
 import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
@@ -254,7 +254,7 @@ export const getUploadsByExpenditureCategory = async (
 
     if (
       !uploadsByEC[upload.expenditureCategory.code].uploadsToAdd[
-        upload.agencyId
+      upload.agencyId
       ]
     ) {
       // The agency was never added. This is the time to initialize it.
@@ -370,40 +370,17 @@ export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
       const organization = await db.organization.findFirst({
         where: { id: context.currentUser.agency.organizationId },
       })
-      const reportingPeriod = await db.reportingPeriod.findFirst({
-        where: { id: organization.preferences['current_reporting_period_id'] },
-      })
-      const projectLambdaPayload: ProjectLambdaPayload =
-        await getUploadsByExpenditureCategory(organization, reportingPeriod)
-      const subrecipientLambdaPayload: SubrecipientLambdaPayload =
-        await getSubrecipientLambdaPayload(
+      const emailLambdaPayload: EmailLambdaPayload =
+        await getEmailLambdaPayload(
           organization,
           context.currentUser,
-          reportingPeriod
         )
-      const createArchiveLambdaPayload: CreateArchiveLambdaPayload =
-        await getCreateArchiveLambdaPayload(organization)
 
-      const emailLambdaPayload: EmailLambdaPayload =
-        await getEmailLambdaPayload(organization, context.currentUser)
+      const input = emailLambdaPayload;
 
-      const input = {
-        '1A': {},
-        '1B': {},
-        '1C': {},
-        Subrecipient: {},
-        zip: {},
-        email: {},
-        ...projectLambdaPayload,
-        ...subrecipientLambdaPayload,
-        ...createArchiveLambdaPayload,
-        ...emailLambdaPayload,
-      }
-
-      await startStepFunctionExecution(
-        process.env.TREASURY_STEP_FUNCTION_ARN,
-        `Force-kick-off-${uuidv4()}`,
-        JSON.stringify(input)
+      await sendSqsMessage(
+        process.env.TREASURY_EMAIL_SQS_URL,
+        input
       )
       return true
     } catch (error) {
