@@ -318,8 +318,9 @@ jobs:
         if: steps.changed-py-files.outputs.any_changed == 'true'
         env:
           CHANGED_PY_FILES: ${{ steps.changed-py-files.outputs.all_changed_files }}
-        run: mypy $CHANGED_PY_FILES --ignore-missing-imports
-
+        run: |
+          poetry install --no-interaction --no-ansi
+          poetry run mypy $CHANGED_PY_FILES --ignore-missing-imports
 
   tflint:
     name: Lint terraform
