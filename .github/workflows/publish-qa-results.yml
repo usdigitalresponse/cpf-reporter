@@ -27,6 +27,9 @@ on:
       ruff-outcome:
         type: string
         required: true
+      mypy-outcome:
+        type: string
+        required: true
       tflint-outcome:
         type: string
         required: true
@@ -84,6 +87,7 @@ jobs:
           | 🐍 Python Tests | ${{ (env.PYTHON_TEST_OUTCOME == 'success' && '✅') || (env.PYTHON_TEST_OUTCOME == 'skipped' && '➖') || '❌' }} |
           | 📏 ESLint    | ${{ (env.ESLINT_OUTCOME == 'success' && '✅') || (env.ESLINT_OUTCOME == 'skipped' && '➖') || '❌' }} |
           | 🧼 Ruff      | ${{ (env.RUFF_OUTCOME == 'success' && '✅')  || (env.RUFF_OUTCOME == 'skipped' && '➖') || '❌' }} |
+          | 🛁 mypy      | ${{ (env.MYPY_OUTCOME == 'success' && '✅')  || (env.MYPY_OUTCOME == 'skipped' && '➖') || '❌' }} |
           | 🧹 TFLint    | ${{ (env.TFLINT_OUTCOME == 'success' && '✅') || (env.TFLINT_OUTCOME == 'skipped' && '➖') || '❌' }} |
 
           ### Test Coverage
@@ -119,6 +123,7 @@ jobs:
           PYTHON_COVERAGE_REPORT: ${{ inputs.python-test-coverage-markdown-report }}
           ESLINT_OUTCOME: ${{ inputs.eslint-outcome }}
           RUFF_OUTCOME: ${{ inputs.ruff-outcome }}
+          MYPY_OUTCOME: ${{ inputs.mypy-outcome }}
           TFLINT_OUTCOME: ${{ inputs.tflint-outcome }}
           WORKFLOW_RUN_SUMMARY_URL: ${{ steps.workflow-run-summary-url.outputs.url }}
           WORKFLOW_RUN_SUMMARY_ATTEMPT_URL: ${{ steps.workflow-run-summary-url.outputs.attempt-url }}
