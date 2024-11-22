@@ -2,7 +2,7 @@ import json
 import os
 import tempfile
 import zipfile
-from typing import Any
+from typing import Any, Optional
 
 import boto3
 import structlog
@@ -68,7 +68,7 @@ def create_archive(
     org_id: int,
     reporting_period_id: int,
     s3_client: S3Client,
-    logger: structlog.stdlib.BoundLogger = None,
+    logger: Optional[structlog.stdlib.BoundLogger] = None,
 ) -> None:
     """Create a zip archive of CSV files in S3"""
 
