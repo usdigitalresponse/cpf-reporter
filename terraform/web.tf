@@ -39,7 +39,7 @@ module "cloudfront_to_origin_bucket_access_policy" {
 
 module "cdn_origin_bucket" {
   source  = "cloudposse/s3-bucket/aws"
-  version = "4.0.1"
+  version = "4.9.0"
   context = module.s3_label.context
   name    = "origin"
 
@@ -68,7 +68,7 @@ module "cdn_origin_bucket" {
 
 module "cdn_logs_bucket" {
   source  = "cloudposse/s3-bucket/aws"
-  version = "4.0.1"
+  version = "4.9.0"
   context = module.s3_label.context
   name    = "cdn-logs"
 
