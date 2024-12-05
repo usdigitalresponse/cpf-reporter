@@ -1,10 +1,18 @@
 import { GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
 import { Prisma, Version } from '@prisma/client'
 import { S3ObjectCreatedNotificationEvent } from 'aws-lambda'
+import cloneDeep from 'lodash/cloneDeep'
+import { v4 as uuidv4 } from 'uuid'
 
 import { getS3Client, sendPutObjectToS3Bucket } from 'src/lib/aws'
+import { startStepFunctionExecution } from 'src/lib/aws'
 import { db, getPrismaClient } from 'src/lib/db'
 import { logger } from 'src/lib/logger'
+import {
+  getSubrecipientLambdaPayload,
+  getCreateArchiveLambdaPayload,
+  getEmailLambdaPayload,
+} from 'src/services/uploads/uploads'
 
 export enum Severity {
   Error = 'ERR',
@@ -216,6 +224,81 @@ export const processRecord = async (
   } else {
     logger.error('No body in getObjectResponse')
   }
+
+  await handleUpdateTreasuryReport(bucket, key)
+}
+
+async function handleUpdateTreasuryReport(bucket: string, key: string) {
+  const organizationId = extractOrganizationIdFromKey(key)
+  const organization = await db.organization.findUnique({
+    where: { id: organizationId },
+  })
+  const reportingPeriod = await db.reportingPeriod.findUnique({
+    where: { id: organization.preferences['current_reporting_period_id'] },
+  })
+  // 1. delete the report.zip file from the S3 bucket
+
+  // 2. Get the series of uploads for the current reporting period, EC Code, and agency combination
+
+  // 3. Build the input for the TreasuryReport step function
+
+  // if file was valid then add the previous upload to "uploadsToRemove" and the new upload to "uploadsToAdd"
+  // if file became invalid then add the current upload to "uploadsToRemove" and the previous upload to "uploadsToAdd"
+  const commonData = {
+    organization: {
+      id: organization.id,
+      preferences: {
+        current_reporting_period_id:
+          organization.preferences['current_reporting_period_id'],
+      },
+    },
+    user: {
+      email: context.currentUser.email,
+      id: context.currentUser.id,
+    },
+    outputTemplateId: reportingPeriod.outputTemplateId,
+    uploadsToAdd: {},
+    uploadsToRemove: {},
+  }
+
+  const projectLambdaPayload: ProjectLambdaPayload = {
+    '1A': { ...cloneDeep(commonData), ProjectType: '1A' },
+    '1B': { ...cloneDeep(commonData), ProjectType: '1B' },
+    '1C': { ...cloneDeep(commonData), ProjectType: '1C' },
+  }
+
+  const subrecipientLambdaPayload: SubrecipientLambdaPayload =
+    await getSubrecipientLambdaPayload()
+  const createArchiveLambdaPayload: CreateArchiveLambdaPayload =
+    await getCreateArchiveLambdaPayload()
+  const emailLambdaPayload: EmailLambdaPayload = await getEmailLambdaPayload()
+
+  /*
+    const uploadPayload: UploadPayload = {
+      objectKey: await getS3UploadFileKey(organization.id, upload),
+      createdAt: upload.createdAt,
+      filename: upload.filename,
+    }
+  */
+  // 4. Start the TreasuryReport step function process
+  const input = {
+    '1A': {},
+    '1B': {},
+    '1C': {},
+    Subrecipient: {},
+    zip: {},
+    email: {},
+    ...projectLambdaPayload,
+    ...subrecipientLambdaPayload,
+    ...createArchiveLambdaPayload,
+    ...emailLambdaPayload,
+  }
+
+  await startStepFunctionExecution(
+    process.env.TREASURY_STEP_FUNCTION_ARN,
+    `Force-kick-off-${uuidv4()}`,
+    JSON.stringify(input)
+  )
 }
 
 async function handleSubrecipientUploads(result, key, uploadId, bucket) {
