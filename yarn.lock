@@ -6532,33 +6532,33 @@ __metadata:
   linkType: hard
 
 "@passageidentity/passage-elements@npm:^1.21.4":
-  version: 1.21.4
-  resolution: "@passageidentity/passage-elements@npm:1.21.4"
+  version: 1.23.1
+  resolution: "@passageidentity/passage-elements@npm:1.23.1"
   dependencies:
-    "@passageidentity/passage-js": 3.14.4
-    dayjs: ^1.11.0
+    "@passageidentity/passage-js": 3.14.6
+    dayjs: ^1.11.9
     gridstack: 5.0.0
-    intl-tel-input: ^17.0.13
+    intl-tel-input: ^24.3.4
     jwt-decode: ^3.1.2
     ua-parser-js: ^1.0.35
     vue: ^3.3.4
     vue-i18n: ^9.3
     vue-inline-svg: ^3.1.0
-  checksum: d32b9b9a804694c48586f04d3add7b0739936cc77d345ce95038a91a63527b56d1a8907000bbc9735de511a7c4e76eaf2463851e6073641de5a91e41aa2fd0dd
+  checksum: a0db0777dc0b1dd70155781819663878c89d70ae29422863377069585bd09e192f4b9e05a9284534f8dd94179daac9ffb8048d6856be6a6794f675df97de5330
   languageName: node
   linkType: hard
 
-"@passageidentity/passage-js@npm:3.14.4":
-  version: 3.14.4
-  resolution: "@passageidentity/passage-js@npm:3.14.4"
+"@passageidentity/passage-js@npm:3.14.6":
+  version: 3.14.6
+  resolution: "@passageidentity/passage-js@npm:3.14.6"
   dependencies:
-    "@passageidentity/webauthnutils": 1.1.6
+    "@passageidentity/webauthnutils": 1.2.0
     "@types/node": ^17.0.27
     async-mutex: ^0.4.1
     js-cookie: ^3.0.1
     jwt-decode: ^3.1.2
     serialize-error: ^11.0.0
-  checksum: ae9dc29b16bdb3b4134bbab68efec999a7f1c4b5ab1399522d255775963063a9379fdbefad06578afde8b737cfdbd19f1440caef2f11138ee8ffeaaa89285c87
+  checksum: 1ae9d431b15e5797b6e70b69359abe5de92ad23621fa0d413f5f08ab4197d039ef3ee7147fd02061bf8c35be65cd4c6492c59b1eefbe9ba73181f757bdb29945
   languageName: node
   linkType: hard
 
@@ -6572,12 +6572,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@passageidentity/webauthnutils@npm:1.1.6":
-  version: 1.1.6
-  resolution: "@passageidentity/webauthnutils@npm:1.1.6"
+"@passageidentity/webauthnutils@npm:1.2.0":
+  version: 1.2.0
+  resolution: "@passageidentity/webauthnutils@npm:1.2.0"
   dependencies:
     ua-parser-js: ^1.0.34
-  checksum: ce61beed94034a39051b3a7c77fa90f54557ad6cca7d835be3a6b254aba65ec31b350cd8f20380190fb76b13e377f720e251f6c7475d4ed023db2eb85e85cf38
+  checksum: 193871034394a8d7fe005c5a357b5215fe8cc1e8fd542b9f7a9fb11046ea17c69fd81c0af2d0fb8565752aa14bb7ba95774951625c47aa8395c7c6bd869068b6
   languageName: node
   linkType: hard
 
@@ -15370,7 +15370,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dayjs@npm:^1.11.0, dayjs@npm:^1.8.34":
+"dayjs@npm:^1.11.9":
+  version: 1.11.13
+  resolution: "dayjs@npm:1.11.13"
+  checksum: f388db88a6aa93956c1f6121644e783391c7b738b73dbc54485578736565c8931bdfba4bb94e9b1535c6e509c97d5deb918bbe1ae6b34358d994de735055cca9
+  languageName: node
+  linkType: hard
+
+"dayjs@npm:^1.8.34":
   version: 1.11.10
   resolution: "dayjs@npm:1.11.10"
   checksum: a6b5a3813b8884f5cd557e2e6b7fa569f4c5d0c97aca9558e38534af4f2d60daafd3ff8c2000fed3435cfcec9e805bcebd99f90130c6d1c5ef524084ced588c4
@@ -19529,10 +19536,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"intl-tel-input@npm:^17.0.13":
-  version: 17.0.21
-  resolution: "intl-tel-input@npm:17.0.21"
-  checksum: 834c4b72f6e8e9905544e1959ff5501e3f071d744be3f51187f5544953d829b988641ace5ddf23a417866205737af5d5197056aedcdc830caf424469ad5d521a
+"intl-tel-input@npm:^24.3.4":
+  version: 24.8.2
+  resolution: "intl-tel-input@npm:24.8.2"
+  checksum: 69b375cc7be65ae5e9dc7789418b64edd69a129a580a14cd53c43e5dbc4290d294bc9efb0b4414534b4cd98febcefe80178a2611a027b363c6b6677f353977f0
   languageName: node
   linkType: hard
 
