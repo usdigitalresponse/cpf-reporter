@@ -45,7 +45,7 @@ module "write_api_logs_policy" {
 
 module "api_gateway" {
   source  = "terraform-aws-modules/apigateway-v2/aws"
-  version = "2.2.2"
+  version = "5.2.1"
 
   name          = var.namespace
   description   = "API Gateway to CPF Reporter web services"
