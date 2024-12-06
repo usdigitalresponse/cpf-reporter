@@ -204,7 +204,7 @@ resource "aws_s3_object" "origin_dist_artifact" {
 
 module "cdn" {
   source              = "terraform-aws-modules/cloudfront/aws"
-  version             = "3.2.1"
+  version             = "3.4.1"
   create_distribution = true
 
   depends_on = [
