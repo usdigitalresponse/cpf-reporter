@@ -52,7 +52,7 @@ jobs:
           cache: yarn
           cache-dependency-path: yarn.lock
       - name: Cache node_modules
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
           key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
           path: node_modules
@@ -99,7 +99,7 @@ jobs:
           cache: yarn
       - name: Restore node_modules
         id: restore-node-modules
-        uses: actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        uses: actions/cache/restore@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
           key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
           path: node_modules
@@ -159,7 +159,7 @@ jobs:
           cache: yarn
       - name: Restore node_modules
         id: restore-node-modules
-        uses: actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        uses: actions/cache/restore@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
           key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
           path: node_modules
@@ -257,7 +257,7 @@ jobs:
           cache: yarn
       - name: Restore node_modules
         id: restore-node-modules
-        uses: actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+        uses: actions/cache/restore@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         with:
           key: node_modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
           path: node_modules
@@ -335,7 +335,7 @@ jobs:
           ref: ${{ inputs.ref }}
           show-progress: 'false'
           persist-credentials: 'false'
-      - uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+      - uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
         name: Cache plugin dir
         with:
           path: ~/.tflint.d/plugins
