@@ -1,5 +1,5 @@
 import os
-from typing import Any, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import boto3
 import chevron
@@ -28,7 +28,7 @@ class SendTreasuryEmailLambdaPayload(BaseModel):
 
 
 @reset_contextvars
-def handle(event: SendTreasuryEmailLambdaPayload, context: Context) -> dict[str, Any]:
+def handle(event: Dict[str, Any], context: Context) -> dict[str, Any]:
     """Lambda handler for emailing Treasury reports
 
     Given a user and organization object- send an email to the user that
@@ -37,7 +37,8 @@ def handle(event: SendTreasuryEmailLambdaPayload, context: Context) -> dict[str,
     If the object does not exist then raise an exception.
 
     Args:
-        event: S3 Lambda event of type `s3:ObjectCreated:*`
+        event: S3 Lambda event of type `s3:ObjectCreated:*` or a single SQS message
+            with a `Records` field
         context: Lambda context
     """
     structlog.contextvars.bind_contextvars(lambda_event={"step_function": event})
@@ -47,8 +48,11 @@ def handle(event: SendTreasuryEmailLambdaPayload, context: Context) -> dict[str,
     try:
         payload = SendTreasuryEmailLambdaPayload.model_validate(event)
     except Exception:
-        logger.exception("Exception parsing Send Treasury Email event payload")
-        return {"statusCode": 400, "body": "Bad Request"}
+        try:
+            payload = SendTreasuryEmailLambdaPayload.model_validate(event["Records"][0])
+        except Exception:
+            logger.exception("Exception parsing Send Treasury Email event payload")
+            return {"statusCode": 400, "body": "Bad Request"}
 
     try:
         process_event(payload, logger)
