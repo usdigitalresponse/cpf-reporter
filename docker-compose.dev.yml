@@ -17,6 +17,10 @@ services:
       - db
     networks:
       - redwood
+      - ls
+    dns:
+      # Set the DNS server to be the LocalStack container
+      - 10.0.2.20
     environment:
       - DATABASE_URL=postgresql://redwood:redwood@db:5432/redwood
       - TEST_DATABASE_URL=postgresql://redwood:redwood@db:5432/redwood_test
@@ -91,7 +95,10 @@ services:
       - DOCKER_HOST=unix:///var/run/docker.sock
       - AWS_DEFAULT_REGION=${AWS_REGION:-us-west-2}
     networks:
-      - redwood
+      redwood:
+      ls:
+        # Set the container IP address in the 10.0.2.0/24 subnet
+        ipv4_address: 10.0.2.20
     volumes:
       - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
@@ -100,6 +107,11 @@ services:
 networks:
   redwood:
     driver: bridge
+  ls:
+    ipam:
+      config:
+        # Specify the subnet range for IP address allocation
+        - subnet: 10.0.2.0/24
 
 volumes:
   node_modules:

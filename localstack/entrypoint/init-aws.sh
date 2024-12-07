@@ -13,3 +13,4 @@ for email in "${VALID_EMAILS[@]}"; do
 done
 
 awslocal s3api create-bucket --bucket cpf-reporter --region us-west-2 --create-bucket-configuration '{"LocationConstraint": "us-west-2"}'
+awslocal sqs create-queue --queue-name treasury-email-queue
