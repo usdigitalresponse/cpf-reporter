@@ -27,6 +27,9 @@ on:
       ruff-outcome:
         type: string
         required: true
+      mypy-outcome:
+        type: string
+        required: true
       tflint-outcome:
         type: string
         required: true
@@ -52,7 +55,7 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: step-security/harden-runner@446798f8213ac2e75931c1b0769676d927801858 # v2.10.0
+      - uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
         with:
           disable-sudo: true
           egress-policy: audit
@@ -84,6 +87,7 @@ jobs:
           | 🐍 Python Tests | ${{ (env.PYTHON_TEST_OUTCOME == 'success' && '✅') || (env.PYTHON_TEST_OUTCOME == 'skipped' && '➖') || '❌' }} |
           | 📏 ESLint    | ${{ (env.ESLINT_OUTCOME == 'success' && '✅') || (env.ESLINT_OUTCOME == 'skipped' && '➖') || '❌' }} |
           | 🧼 Ruff      | ${{ (env.RUFF_OUTCOME == 'success' && '✅')  || (env.RUFF_OUTCOME == 'skipped' && '➖') || '❌' }} |
+          | 🛁 mypy      | ${{ (env.MYPY_OUTCOME == 'success' && '✅')  || (env.MYPY_OUTCOME == 'skipped' && '➖') || '❌' }} |
           | 🧹 TFLint    | ${{ (env.TFLINT_OUTCOME == 'success' && '✅') || (env.TFLINT_OUTCOME == 'skipped' && '➖') || '❌' }} |
 
           ### Test Coverage
@@ -119,6 +123,7 @@ jobs:
           PYTHON_COVERAGE_REPORT: ${{ inputs.python-test-coverage-markdown-report }}
           ESLINT_OUTCOME: ${{ inputs.eslint-outcome }}
           RUFF_OUTCOME: ${{ inputs.ruff-outcome }}
+          MYPY_OUTCOME: ${{ inputs.mypy-outcome }}
           TFLINT_OUTCOME: ${{ inputs.tflint-outcome }}
           WORKFLOW_RUN_SUMMARY_URL: ${{ steps.workflow-run-summary-url.outputs.url }}
           WORKFLOW_RUN_SUMMARY_ATTEMPT_URL: ${{ steps.workflow-run-summary-url.outputs.attempt-url }}
@@ -141,7 +146,7 @@ jobs:
       - name: Find previous report comment
         id: find-comment
         if: inputs.write-comment
-        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2.4.0
+        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3.1.0
         with:
           issue-number: ${{ inputs.pr-number }}
           comment-author: 'github-actions[bot]'
