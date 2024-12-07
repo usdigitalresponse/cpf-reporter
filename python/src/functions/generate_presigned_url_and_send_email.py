@@ -46,9 +46,11 @@ def handle(event: Dict[str, Any], context: Context) -> dict[str, Any]:
     logger.info("received new invocation event from step function")
 
     try:
+        # Lambda payload
         payload = SendTreasuryEmailLambdaPayload.model_validate(event)
     except Exception:
         try:
+            # SQS event
             payload = SendTreasuryEmailLambdaPayload.model_validate(event["Records"][0])
         except Exception:
             logger.exception("Exception parsing Send Treasury Email event payload")
