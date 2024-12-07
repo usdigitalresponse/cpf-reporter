@@ -1,3 +1,4 @@
+import json
 import os
 from typing import Any, Dict, Optional, Tuple
 
@@ -51,7 +52,9 @@ def handle(event: Dict[str, Any], context: Context) -> dict[str, Any]:
     except Exception:
         try:
             # SQS event
-            payload = SendTreasuryEmailLambdaPayload.model_validate(event["Records"][0])
+            payload = SendTreasuryEmailLambdaPayload.model_validate(
+                json.loads(event["Records"][0]["body"])
+            )
         except Exception:
             logger.exception("Exception parsing Send Treasury Email event payload")
             return {"statusCode": 400, "body": "Bad Request"}
