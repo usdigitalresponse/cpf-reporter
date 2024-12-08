@@ -218,7 +218,7 @@ export type EmailLambdaPayload = Record<'email', InfoForEmail>
 export const getUploadsByExpenditureCategory = async (
   organization: Organization,
   reportingPeriod: ReportingPeriod,
-  regenerate: boolean = false
+  regenerate = false
 ): Promise<ProjectLambdaPayload> => {
   const validUploadsInPeriod: UploadsWithValidationsAndExpenditureCategory[] =
     await getValidUploadsInCurrentPeriod(organization, reportingPeriod)
@@ -406,7 +406,6 @@ export const generateTreasuryReport: MutationResolvers['generateTreasuryReport']
         ...createArchiveLambdaPayload,
         ...emailLambdaPayload,
       }
-
       await startStepFunctionExecution(
         process.env.TREASURY_STEP_FUNCTION_ARN,
         `Force-kick-off-${uuidv4()}`,

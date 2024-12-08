@@ -411,8 +411,8 @@ describe('treasury report', () => {
             },
           },
           uploadsToRemove: {},
-          ProjectType: '1A',
           forceRegenerate: true,
+          ProjectType: '1A',
         },
         '1B': {
           organization: {
@@ -428,8 +428,8 @@ describe('treasury report', () => {
           outputTemplateId: mockReportingPeriod.outputTemplateId,
           uploadsToAdd: {},
           uploadsToRemove: {},
-          ProjectType: '1B',
           forceRegenerate: true,
+          ProjectType: '1B',
         },
         '1C': {
           organization: {
@@ -445,8 +445,8 @@ describe('treasury report', () => {
           outputTemplateId: mockReportingPeriod.outputTemplateId,
           uploadsToAdd: {},
           uploadsToRemove: {},
-          ProjectType: '1C',
           forceRegenerate: true,
+          ProjectType: '1C',
         },
       }
       const subrecipientPayload: SubrecipientLambdaPayload = {
@@ -502,7 +502,7 @@ describe('treasury report', () => {
         ...zipPayload,
         ...emailPayload,
       })
-      const result = await generateTreasuryReport({regenerate: true})
+      const result = await generateTreasuryReport({ regenerate: true })
 
       expect(result).toBe(true)
       expect(startStepFunctionExecution).toHaveBeenCalledWith(
@@ -543,8 +543,8 @@ describe('treasury report', () => {
             },
           },
           uploadsToRemove: {},
-          ProjectType: '1A',
           forceRegenerate: false,
+          ProjectType: '1A',
         },
         '1B': {
           organization: {
@@ -560,8 +560,8 @@ describe('treasury report', () => {
           outputTemplateId: mockReportingPeriod.outputTemplateId,
           uploadsToAdd: {},
           uploadsToRemove: {},
-          ProjectType: '1B',
           forceRegenerate: false,
+          ProjectType: '1B',
         },
         '1C': {
           organization: {
@@ -577,8 +577,8 @@ describe('treasury report', () => {
           outputTemplateId: mockReportingPeriod.outputTemplateId,
           uploadsToAdd: {},
           uploadsToRemove: {},
-          ProjectType: '1C',
           forceRegenerate: false,
+          ProjectType: '1C',
         },
       }
       const subrecipientPayload: SubrecipientLambdaPayload = {
