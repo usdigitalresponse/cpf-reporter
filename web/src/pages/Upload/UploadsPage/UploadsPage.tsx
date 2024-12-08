@@ -12,6 +12,11 @@ const SEND_TREASURY_REPORT = gql`
     sendTreasuryReport
   }
 `
+const GENERATE_TREASURY_REPORT = gql`
+  mutation generateTreasuryReport($regenerate: Boolean!) {
+    generateTreasuryReport(regenerate: $regenerate)
+  }
+`
 
 const UploadsPage = () => {
   const { hasRole } = useAuth()
@@ -23,9 +28,21 @@ const UploadsPage = () => {
       toast.error('Error sending Treasury Report by email: ' + error.message)
     },
   })
+  const [generateTreasuryReport] = useMutation(GENERATE_TREASURY_REPORT, {
+    onCompleted: () => {
+      toast.success('Treasury Report has been generated')
+    },
+    onError: (error) => {
+      toast.error('Error genearting Treasury Report: ' + error.message)
+    },
+  })
 
   const handleSendTreasuryReportByEmail = () => {
     sendTreasuryReport()
+  }
+
+  const handleGenerateTreasuryReport = (regenerate) => {
+    generateTreasuryReport({ variables: { regenerate } })
   }
 
   return (
@@ -49,6 +66,26 @@ const UploadsPage = () => {
         >
           Upload Workbook
         </Button>
+        {(hasRole(ROLES.USDR_ADMIN) || hasRole(ROLES.ORGANIZATION_ADMIN)) && (
+          <Button
+            size="sm"
+            variant=""
+            className="btn-outline-primary"
+            onClick={() => handleGenerateTreasuryReport(false)}
+          >
+            Generate and Send Treasury Report
+          </Button>
+        )}
+        {(hasRole(ROLES.USDR_ADMIN) || hasRole(ROLES.ORGANIZATION_ADMIN)) && (
+          <Button
+            size="sm"
+            variant=""
+            className="btn-outline-primary"
+            onClick={() => handleGenerateTreasuryReport(true)}
+          >
+            Force Regenerate and Send Treasury Report
+          </Button>
+        )}
         {/* TODO: Remove USDR_ADMIN check when ready || 2024-05-13 Milestone */}
         {(hasRole(ROLES.USDR_ADMIN) || hasRole(ROLES.ORGANIZATION_ADMIN)) && (
           <Button
