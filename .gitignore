@@ -146,6 +146,7 @@ terraform/.terraform
 .tool-versions
 
 localstack/volume/
+volume/
 
 # Python virtual environments
 .venv/
@@ -165,3 +166,6 @@ python/dist/
 # Generated Type files
 web/types/graphql.d.ts
 api/types/graphql.d.ts
+
+# Generated zips for local testing
+scripts/local_treasury_file_email/*.zip

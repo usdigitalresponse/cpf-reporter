@@ -13,8 +13,8 @@ As found in `lambda_function-email-presigned-url`, defined in `treasury_generati
 awslocal lambda create-function \
     --function-name treasury-file-email \
     --runtime python3.12 \
-    --zip-file fileb://localTestLambda.zip \
-    --handler localTestzipLambda.handler \
+    --zip-file fileb://sendTreasuryReportLambda.zip \
+    --handler generate_presigned_url_and_send_email.handle \
     --role arn:aws:iam::000000000000:role/lambda-role
 ```
 
