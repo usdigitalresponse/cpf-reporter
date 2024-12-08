@@ -196,9 +196,7 @@ function getSQSClient() {
   let sqs: SQSClient
   if (process.env.LOCALSTACK_HOSTNAME) {
     console.log('------------ USING LOCALSTACK FOR SQS ------------')
-    const endpoint = `http://${process.env.LOCALSTACK_HOSTNAME}:${
-      process.env.EDGE_PORT || 4566
-    }`
+    const endpoint = `http://sqs.us-west-2.localhost.localstack.cloud:4566/000000000000/treasury-email-queue`
     sqs = new SQSClient({ endpoint, region: process.env.AWS_DEFAULT_REGION })
   } else {
     sqs = new SQSClient()

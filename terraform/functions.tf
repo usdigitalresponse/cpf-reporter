@@ -385,6 +385,7 @@ module "lambda_function-graphql" {
     PASSAGE_API_KEY_SECRET_ARN         = data.aws_ssm_parameter.passage_api_key_secret_arn.value
     AUTH_PROVIDER                      = "passage"
     TREASURY_STEP_FUNCTION_ARN         = module.treasury_generation_step_function.state_machine_arn
+    TREASURY_EMAIL_SQS_URL             = aws_sqs_queue.email_queue.id
     PASSAGE_APP_ID                     = var.passage_app_id
   })
 

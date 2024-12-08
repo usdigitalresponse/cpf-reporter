@@ -6,7 +6,6 @@ import type {
   MutationResolvers,
   UploadRelationResolvers,
 } from 'types/graphql'
-import { v4 as uuidv4 } from 'uuid'
 
 import { RedwoodError } from '@redwoodjs/api'
 
@@ -16,7 +15,7 @@ import {
   s3UploadFilePutSignedUrl,
   getSignedUrl,
   getS3UploadFileKey,
-  startStepFunctionExecution,
+  sendSqsMessage,
 } from 'src/lib/aws'
 import { ROLES } from 'src/lib/constants'
 import { db } from 'src/lib/db'
@@ -212,7 +211,7 @@ export type SubrecipientLambdaPayload = Record<
   InfoForSubrecipient
 >
 export type CreateArchiveLambdaPayload = Record<'zip', InfoForArchive>
-export type EmailLambdaPayload = Record<'email', InfoForEmail>
+export type EmailLambdaPayload = InfoForEmail
 
 export const getUploadsByExpenditureCategory = async (
   organization: Organization,
@@ -348,18 +347,16 @@ export const getEmailLambdaPayload = async (
   user: CurrentUser
 ): Promise<EmailLambdaPayload> => {
   return {
-    email: {
-      organization: {
-        id: organization.id,
-        preferences: {
-          current_reporting_period_id:
-            organization.preferences['current_reporting_period_id'],
-        },
+    organization: {
+      id: organization.id,
+      preferences: {
+        current_reporting_period_id:
+          organization.preferences['current_reporting_period_id'],
       },
-      user: {
-        email: user.email,
-        id: user.id,
-      },
+    },
+    user: {
+      email: user.email,
+      id: user.id,
     },
   }
 }
@@ -370,41 +367,12 @@ export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
       const organization = await db.organization.findFirst({
         where: { id: context.currentUser.agency.organizationId },
       })
-      const reportingPeriod = await db.reportingPeriod.findFirst({
-        where: { id: organization.preferences['current_reporting_period_id'] },
-      })
-      const projectLambdaPayload: ProjectLambdaPayload =
-        await getUploadsByExpenditureCategory(organization, reportingPeriod)
-      const subrecipientLambdaPayload: SubrecipientLambdaPayload =
-        await getSubrecipientLambdaPayload(
-          organization,
-          context.currentUser,
-          reportingPeriod
-        )
-      const createArchiveLambdaPayload: CreateArchiveLambdaPayload =
-        await getCreateArchiveLambdaPayload(organization)
-
       const emailLambdaPayload: EmailLambdaPayload =
         await getEmailLambdaPayload(organization, context.currentUser)
 
-      const input = {
-        '1A': {},
-        '1B': {},
-        '1C': {},
-        Subrecipient: {},
-        zip: {},
-        email: {},
-        ...projectLambdaPayload,
-        ...subrecipientLambdaPayload,
-        ...createArchiveLambdaPayload,
-        ...emailLambdaPayload,
-      }
+      const input = emailLambdaPayload
 
-      await startStepFunctionExecution(
-        process.env.TREASURY_STEP_FUNCTION_ARN,
-        `Force-kick-off-${uuidv4()}`,
-        JSON.stringify(input)
-      )
+      await sendSqsMessage(process.env.TREASURY_EMAIL_SQS_URL, input)
       return true
     } catch (error) {
       logger.error(error, 'Error sending Treasury Report')
