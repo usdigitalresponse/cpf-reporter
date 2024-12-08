@@ -302,7 +302,6 @@ def delete_output_file(
         error = e.response.get("Error") or {}
         if error.get("Code") == "404":
             logger.exception("Expected to find an existing treasury output report")
-            raise
 
 
 def download_output_file(
