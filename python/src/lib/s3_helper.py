@@ -39,7 +39,7 @@ def delete_file_from_s3(client: S3Client, bucket: str, key: str) -> None:
     """
     logger = get_logger()
 
-    logger = logger.bind(upload={"s3": {"bucket": bucket, "key": key}})
+    logger = logger.bind(delete={"s3": {"bucket": bucket, "key": key}})
     try:
         client.delete_object(
             Bucket=bucket,
@@ -70,7 +70,7 @@ def upload_generated_file_to_s3(
     """
     logger = get_logger()
 
-    logger = logger.bind(delete={"s3": {"bucket": bucket, "key": key}})
+    logger = logger.bind(upload={"s3": {"bucket": bucket, "key": key}})
     try:
         file.seek(0)
         client.put_object(
