@@ -389,17 +389,15 @@ describe('treasury report', () => {
       const mockUser = scenario.user.one
 
       const emailPayload: EmailLambdaPayload = {
-        email: {
-          organization: {
-            id: mockOrganization.id,
-            preferences: {
-              current_reporting_period_id: mockReportingPeriod.id,
-            },
+        organization: {
+          id: mockOrganization.id,
+          preferences: {
+            current_reporting_period_id: mockReportingPeriod.id,
           },
-          user: {
-            email: mockUser.email,
-            id: mockUser.id,
-          },
+        },
+        user: {
+          email: mockUser.email,
+          id: mockUser.id,
         },
       }
 

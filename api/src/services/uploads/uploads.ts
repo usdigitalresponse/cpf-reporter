@@ -211,7 +211,7 @@ export type SubrecipientLambdaPayload = Record<
   InfoForSubrecipient
 >
 export type CreateArchiveLambdaPayload = Record<'zip', InfoForArchive>
-export type EmailLambdaPayload = Record<'email', InfoForEmail>
+export type EmailLambdaPayload = InfoForEmail
 
 export const getUploadsByExpenditureCategory = async (
   organization: Organization,
@@ -347,18 +347,16 @@ export const getEmailLambdaPayload = async (
   user: CurrentUser
 ): Promise<EmailLambdaPayload> => {
   return {
-    email: {
-      organization: {
-        id: organization.id,
-        preferences: {
-          current_reporting_period_id:
-            organization.preferences['current_reporting_period_id'],
-        },
+    organization: {
+      id: organization.id,
+      preferences: {
+        current_reporting_period_id:
+          organization.preferences['current_reporting_period_id'],
       },
-      user: {
-        email: user.email,
-        id: user.id,
-      },
+    },
+    user: {
+      email: user.email,
+      id: user.id,
     },
   }
 }

@@ -42,19 +42,22 @@ def handle(event: Dict[str, Any], context: Context) -> dict[str, Any]:
             with a `Records` field
         context: Lambda context
     """
-    structlog.contextvars.bind_contextvars(lambda_event={"step_function": event})
     logger = get_logger()
-    logger.info("received new invocation event from step function")
+    logger.info("received a new inovcation event...")
 
     try:
         # Lambda payload
         payload = SendTreasuryEmailLambdaPayload.model_validate(event)
+        structlog.contextvars.bind_contextvars(lambda_event={"step_function": event})
+        logger.info("parsed event from step function")
     except Exception:
         try:
             # SQS event
             payload = SendTreasuryEmailLambdaPayload.model_validate(
                 json.loads(event["Records"][0]["body"])
             )
+            structlog.contextvars.bind_contextvars(lambda_event={"event_source": event})
+            logger.info("parsed event from SQS")
         except Exception:
             logger.exception("Exception parsing Send Treasury Email event payload")
             return {"statusCode": 400, "body": "Bad Request"}

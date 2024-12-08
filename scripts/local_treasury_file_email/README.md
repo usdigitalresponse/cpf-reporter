@@ -17,13 +17,18 @@ awslocal lambda create-function \
     --handler generate_presigned_url_and_send_email.handle \
     --role arn:aws:iam::000000000000:role/lambda-role
 ```
+    1. If you need to update the lambda function after the fact...
+    ```
+    awslocal lambda update-function-code \
+      --function-name treasury-file-email \
+      --zip-file fileb://sendTreasuryReportLambda.zip
+    ```
 
 3. update the environment variables
 ```
 awslocal lambda update-function-configuration \
   --function-name treasury-file-email \
-  ----environment Variables={"AWS_REGION":"us-west-2","AWS_ACCESS_KEY_ID":"test","AWS_SECRET_ACCESS_KEY":"test"}
-
+  --environment "{\"Variables\": {\"AWS_REGION\":\"us-west-2\",\"AWS_ACCESS_KEY_ID\":\"test\",\"AWS_SECRET_ACCESS_KEY\":\"test\"}}"
 ```
 
 4. Create the event source mapping
@@ -38,7 +43,7 @@ awslocal lambda create-event-source-mapping \
 
 6. Check the logs
 ```
-awslocal --region us-west-2 logs describe-log-streams --log-group-name "/aws/lambda/localstack-lambda-url-example" --order-by "LastEventTime" --descending
+LOG_STREAM_NAME=$(awslocal --region us-west-2 logs describe-log-streams --log-group-name "/aws/lambda/treasury-file-email" --order-by "LastEventTime" --descending | jq -r '.logStreams | first | .logStreamName')
 
-awslocal logs get-log-events --log-group-name "/aws/lambda/localstack-lambda-url-example" --log-stream-name "2024/08/27/[\$LATEST]013b13b62b4ff8ec0b6699a92682bf33"
+awslocal logs get-log-events --log-group-name "/aws/lambda/treasury-file-email" --log-stream-name "$LOG_STREAM_NAME"
 ```
