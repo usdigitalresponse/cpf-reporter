@@ -43,6 +43,7 @@ export const schema = gql`
     updateUpload(id: Int!, input: UpdateUploadInput!): Upload! @requireAuth
     deleteUpload(id: Int!): Upload! @requireAuth
     downloadUploadFile(id: Int!): String! @requireAuth
+    generateTreasuryReport(regenerate: Boolean!): Boolean! @requireAuth
     sendTreasuryReport: Boolean! @requireAuth
   }
 `

@@ -186,6 +186,7 @@ type UploadInfoForProject = {
   ProjectType: string
   uploadsToAdd: Partial<Record<AgencyId, UploadPayload>>
   uploadsToRemove: Partial<Record<AgencyId, UploadPayload>>
+  forceRegenerate: boolean
 }
 type InfoForSubrecipient = {
   organization: OrganizationObj
@@ -216,7 +217,8 @@ export type EmailLambdaPayload = Record<'email', InfoForEmail>
 
 export const getUploadsByExpenditureCategory = async (
   organization: Organization,
-  reportingPeriod: ReportingPeriod
+  reportingPeriod: ReportingPeriod,
+  regenerate: boolean = false
 ): Promise<ProjectLambdaPayload> => {
   const validUploadsInPeriod: UploadsWithValidationsAndExpenditureCategory[] =
     await getValidUploadsInCurrentPeriod(organization, reportingPeriod)
@@ -236,6 +238,7 @@ export const getUploadsByExpenditureCategory = async (
     outputTemplateId: reportingPeriod.outputTemplateId,
     uploadsToAdd: {},
     uploadsToRemove: {},
+    forceRegenerate: regenerate,
   }
 
   const uploadsByEC: ProjectLambdaPayload = {
@@ -363,6 +366,58 @@ export const getEmailLambdaPayload = async (
     },
   }
 }
+
+export const generateTreasuryReport: MutationResolvers['generateTreasuryReport'] =
+  async ({ regenerate }) => {
+    try {
+      const organization = await db.organization.findFirst({
+        where: { id: context.currentUser.agency.organizationId },
+      })
+      const reportingPeriod = await db.reportingPeriod.findFirst({
+        where: { id: organization.preferences['current_reporting_period_id'] },
+      })
+      const projectLambdaPayload: ProjectLambdaPayload =
+        await getUploadsByExpenditureCategory(
+          organization,
+          reportingPeriod,
+          regenerate
+        )
+      const subrecipientLambdaPayload: SubrecipientLambdaPayload =
+        await getSubrecipientLambdaPayload(
+          organization,
+          context.currentUser,
+          reportingPeriod
+        )
+      const createArchiveLambdaPayload: CreateArchiveLambdaPayload =
+        await getCreateArchiveLambdaPayload(organization)
+
+      const emailLambdaPayload: EmailLambdaPayload =
+        await getEmailLambdaPayload(organization, context.currentUser)
+
+      const input = {
+        '1A': {},
+        '1B': {},
+        '1C': {},
+        Subrecipient: {},
+        zip: {},
+        email: {},
+        ...projectLambdaPayload,
+        ...subrecipientLambdaPayload,
+        ...createArchiveLambdaPayload,
+        ...emailLambdaPayload,
+      }
+
+      await startStepFunctionExecution(
+        process.env.TREASURY_STEP_FUNCTION_ARN,
+        `Force-kick-off-${uuidv4()}`,
+        JSON.stringify(input)
+      )
+      return true
+    } catch (error) {
+      logger.error(error, 'Error sending Treasury Report')
+      throw new RedwoodError(error.message)
+    }
+  }
 
 export const sendTreasuryReport: MutationResolvers['sendTreasuryReport'] =
   async () => {

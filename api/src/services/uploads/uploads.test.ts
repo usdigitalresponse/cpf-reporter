@@ -22,6 +22,7 @@ import {
   Upload as UploadRelationResolver,
   getUploadsByExpenditureCategory,
   getValidUploadsInCurrentPeriod,
+  generateTreasuryReport,
   sendTreasuryReport,
   SubrecipientLambdaPayload,
   ProjectLambdaPayload,
@@ -380,6 +381,137 @@ describe('treasury report', () => {
     jest.resetAllMocks()
     process.env.TREASURY_STEP_FUNCTION_ARN = 'test-arn'
   })
+  scenario(
+    'successfully force regenerate a treasury report',
+    async (scenario: StandardScenario) => {
+      mockCurrentUser(scenario.user.one)
+      const mockOrganization = scenario.organization.one
+      const mockReportingPeriod = scenario.reportingPeriod.one
+      const mockUpload = scenario.upload.two
+      const mockUser = scenario.user.one
+
+      const projectPayload: ProjectLambdaPayload = {
+        '1A': {
+          organization: {
+            id: mockOrganization.id,
+            preferences: {
+              current_reporting_period_id: mockReportingPeriod.id,
+            },
+          },
+          user: {
+            email: mockUser.email,
+            id: mockUser.id,
+          },
+          outputTemplateId: mockReportingPeriod.outputTemplateId,
+          uploadsToAdd: {
+            [mockUpload.agencyId]: {
+              objectKey: `uploads/${mockOrganization.id}/${mockUpload.agencyId}/${mockReportingPeriod.id}/${mockUpload.id}/${mockUpload.filename}`,
+              createdAt: mockUpload.createdAt,
+              filename: mockUpload.filename,
+            },
+          },
+          uploadsToRemove: {},
+          ProjectType: '1A',
+          forceRegenerate: true,
+        },
+        '1B': {
+          organization: {
+            id: mockOrganization.id,
+            preferences: {
+              current_reporting_period_id: mockReportingPeriod.id,
+            },
+          },
+          user: {
+            email: mockUser.email,
+            id: mockUser.id,
+          },
+          outputTemplateId: mockReportingPeriod.outputTemplateId,
+          uploadsToAdd: {},
+          uploadsToRemove: {},
+          ProjectType: '1B',
+          forceRegenerate: true,
+        },
+        '1C': {
+          organization: {
+            id: mockOrganization.id,
+            preferences: {
+              current_reporting_period_id: mockReportingPeriod.id,
+            },
+          },
+          user: {
+            email: mockUser.email,
+            id: mockUser.id,
+          },
+          outputTemplateId: mockReportingPeriod.outputTemplateId,
+          uploadsToAdd: {},
+          uploadsToRemove: {},
+          ProjectType: '1C',
+          forceRegenerate: true,
+        },
+      }
+      const subrecipientPayload: SubrecipientLambdaPayload = {
+        Subrecipient: {
+          organization: {
+            id: mockOrganization.id,
+            preferences: {
+              current_reporting_period_id: mockReportingPeriod.id,
+            },
+          },
+          user: {
+            email: mockUser.email,
+            id: mockUser.id,
+          },
+          outputTemplateId: mockReportingPeriod.outputTemplateId,
+        },
+      }
+
+      const zipPayload: CreateArchiveLambdaPayload = {
+        zip: {
+          organization: {
+            id: mockOrganization.id,
+            preferences: {
+              current_reporting_period_id: mockReportingPeriod.id,
+            },
+          },
+        },
+      }
+      const emailPayload: EmailLambdaPayload = {
+        email: {
+          organization: {
+            id: mockOrganization.id,
+            preferences: {
+              current_reporting_period_id: mockReportingPeriod.id,
+            },
+          },
+          user: {
+            email: mockUser.email,
+            id: mockUser.id,
+          },
+        },
+      }
+
+      const input = JSON.stringify({
+        '1A': {},
+        '1B': {},
+        '1C': {},
+        Subrecipient: {},
+        zip: {},
+        email: {},
+        ...projectPayload,
+        ...subrecipientPayload,
+        ...zipPayload,
+        ...emailPayload,
+      })
+      const result = await generateTreasuryReport({regenerate: true})
+
+      expect(result).toBe(true)
+      expect(startStepFunctionExecution).toHaveBeenCalledWith(
+        'test-arn',
+        `Force-kick-off-00000000-0000-0000-0000-000000000000`,
+        input
+      )
+    }
+  )
 
   scenario(
     'successfully sends a treasury report',
@@ -412,6 +544,7 @@ describe('treasury report', () => {
           },
           uploadsToRemove: {},
           ProjectType: '1A',
+          forceRegenerate: false,
         },
         '1B': {
           organization: {
@@ -428,6 +561,7 @@ describe('treasury report', () => {
           uploadsToAdd: {},
           uploadsToRemove: {},
           ProjectType: '1B',
+          forceRegenerate: false,
         },
         '1C': {
           organization: {
@@ -444,6 +578,7 @@ describe('treasury report', () => {
           uploadsToAdd: {},
           uploadsToRemove: {},
           ProjectType: '1C',
+          forceRegenerate: false,
         },
       }
       const subrecipientPayload: SubrecipientLambdaPayload = {
