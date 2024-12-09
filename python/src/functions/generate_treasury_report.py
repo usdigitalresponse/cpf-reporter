@@ -140,7 +140,7 @@ def process_event(
     # If we need to force-regenerate the treasury report, we delete the treasury
     # report from s3 so that it starts with the template file.
     if payload.forceRegenerate:
-        delete_output_file(
+        delete_output_files(
             s3_client=s3_client,
             organization=organization,
             project_use_code=project_use_code,
@@ -282,26 +282,57 @@ def process_event(
     return {"statusCode": 200, "body": "Success"}
 
 
-def delete_output_file(
+def _try_delete(
     s3_client: S3Client,
-    organization: OrganizationObj,
-    project_use_code: str,
+    bucket: str,
+    key: str,
     logger: structlog.stdlib.BoundLogger,
 ):
+    """Tries to delete files from s3.
+
+    No error is thrown if the file is not found."""
     try:
         delete_file_from_s3(
             client=s3_client,
-            bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
-            key=get_generated_output_file_key(
-                file_type=OutputFileType.XLSX,
-                project=project_use_code,
-                organization=organization,
-            ),
+            bucket=bucket,
+            key=key,
         )
     except ClientError as e:
         error = e.response.get("Error") or {}
         if error.get("Code") == "404":
             logger.exception("Expected to find an existing treasury output report")
+
+
+def delete_output_files(
+    s3_client: S3Client,
+    organization: OrganizationObj,
+    project_use_code: str,
+    logger: structlog.stdlib.BoundLogger,
+):
+    """Deletes the output files and the generated report."""
+    for output_file_type in [
+        OutputFileType.XLSX,
+        OutputFileType.CSV,
+        OutputFileType.JSON,
+    ]:
+        _try_delete(
+            s3_client=s3_client,
+            bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+            key=get_generated_output_file_key(
+                file_type=output_file_type,
+                project=project_use_code,
+                organization=organization,
+            ),
+            logger=logger,
+        )
+
+    report_key = f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip"
+    _try_delete(
+        s3_client=s3_client,
+        bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+        key=report_key,
+        logger=logger,
+    )
 
 
 def download_output_file(
