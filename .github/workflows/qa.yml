@@ -291,6 +291,9 @@ jobs:
   mypy:
     name: Type-check python
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: python
     steps:
       - uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
         with:
@@ -303,10 +306,12 @@ jobs:
           persist-credentials: 'false'
       - name: Install poetry
         run: pipx install poetry
-      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+      - uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5.0.0
         with:
           python-version-file: 'python/pyproject.toml'
           cache: poetry
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-ansi
       - name: Get Python changed files
         id: changed-py-files
         uses: tj-actions/changed-files@4edd678ac3f81e2dc578756871e4d00c19191daf # v45.0.4
@@ -318,9 +323,8 @@ jobs:
         if: steps.changed-py-files.outputs.any_changed == 'true'
         env:
           CHANGED_PY_FILES: ${{ steps.changed-py-files.outputs.all_changed_files }}
-        run: |
-          poetry install --no-interaction --no-ansi
-          poetry run mypy $CHANGED_PY_FILES --ignore-missing-imports
+        # Remove the python/ that is prepended
+        run: poetry run mypy ${CHANGED_PY_FILES//python\/} --ignore-missing-imports
 
   tflint:
     name: Lint terraform
