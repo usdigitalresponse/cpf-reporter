@@ -26,7 +26,7 @@ const UploadsList = ({
   ]
 
   return (
-    <TableBuilder
+    <TableBuilder<FindUploads['uploads'][number]>
       data={uploads}
       columns={columnDefs}
       filterableInputs={filterableInputs}
