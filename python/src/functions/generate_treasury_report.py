@@ -14,7 +14,11 @@ from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import BaseModel
 
 from src.lib.logging import get_logger, reset_contextvars
-from src.lib.s3_helper import download_s3_object, upload_generated_file_to_s3
+from src.lib.s3_helper import (
+    delete_file_from_s3,
+    download_s3_object,
+    upload_generated_file_to_s3,
+)
 from src.lib.treasury_generation_common import (
     OrganizationObj,
     OutputFileType,
@@ -54,6 +58,7 @@ class ProjectLambdaPayload(BaseModel):
     ProjectType: str
     uploadsToAdd: Dict[AgencyId, UploadObj]
     uploadsToRemove: Dict[AgencyId, UploadObj]
+    forceRegenerate: bool = False
 
 
 @reset_contextvars
@@ -131,6 +136,16 @@ def process_event(
     ProjectRowSchema = getSchemaByProject(VERSION, project_use_code)
 
     organization = payload.organization
+
+    # If we need to force-regenerate the treasury report, we delete the treasury
+    # report from s3 so that it starts with the template file.
+    if payload.forceRegenerate:
+        delete_output_files(
+            s3_client=s3_client,
+            organization=organization,
+            project_use_code=project_use_code,
+            logger=logger,
+        )
 
     # If the treasury report file exists, download it and store the data
     # If it doesn't exist, download the output template
@@ -265,6 +280,59 @@ def process_event(
                     file=binary_json_file,
                 )
     return {"statusCode": 200, "body": "Success"}
+
+
+def _try_delete(
+    s3_client: S3Client,
+    bucket: str,
+    key: str,
+    logger: structlog.stdlib.BoundLogger,
+):
+    """Tries to delete files from s3.
+
+    No error is thrown if the file is not found."""
+    try:
+        delete_file_from_s3(
+            client=s3_client,
+            bucket=bucket,
+            key=key,
+        )
+    except ClientError as e:
+        error = e.response.get("Error") or {}
+        if error.get("Code") == "404":
+            logger.exception("Expected to find an existing treasury output report")
+
+
+def delete_output_files(
+    s3_client: S3Client,
+    organization: OrganizationObj,
+    project_use_code: str,
+    logger: structlog.stdlib.BoundLogger,
+):
+    """Deletes the output files and the generated report."""
+    for output_file_type in [
+        OutputFileType.XLSX,
+        OutputFileType.CSV,
+        OutputFileType.JSON,
+    ]:
+        _try_delete(
+            s3_client=s3_client,
+            bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+            key=get_generated_output_file_key(
+                file_type=output_file_type,
+                project=project_use_code,
+                organization=organization,
+            ),
+            logger=logger,
+        )
+
+    report_key = f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip"
+    _try_delete(
+        s3_client=s3_client,
+        bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+        key=report_key,
+        logger=logger,
+    )
 
 
 def download_output_file(

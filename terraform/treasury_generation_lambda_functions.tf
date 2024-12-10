@@ -234,6 +234,20 @@ module "lambda_function-treasuryProjectFileGeneration" {
         "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.xlsx",
       ]
     }
+    AllowDeleteTreasuryReports = {
+      effect = "Allow"
+      actions = [
+        "s3:DeleteObject",
+      ]
+      resources = [
+        # These are completed XLSX version of the project (1A, 1B, or 1C) file that can be submitted to treasury.
+        # Path: /treasuryreports/{organization_id}/{reporting_period_id}/{OUTPUT_TEMPLATE_FILENAME_BY_PROJECT[project]}.xlsx
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.xlsx",
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.csv",
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.json",
+        "${module.reporting_data_bucket.bucket_arn}/treasuryreports/*/*/*.zip",
+      ]
+    }
   }
 
   // Artifacts
