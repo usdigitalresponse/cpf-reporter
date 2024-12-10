@@ -3390,34 +3390,34 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@datadog/browser-core@npm:5.5.0":
-  version: 5.5.0
-  resolution: "@datadog/browser-core@npm:5.5.0"
-  checksum: beff1d0aeb75027f2382d8ef5abaf0320ebd6e6a92ae2c293483b4c00a47619f132d5c45009fadc2648a13c161aec6d269796ccf6b416e9066ce88746f7dab9a
+"@datadog/browser-core@npm:5.32.0":
+  version: 5.32.0
+  resolution: "@datadog/browser-core@npm:5.32.0"
+  checksum: 7f2d50455c4afa677a3089aee0997dae46a58533e9a77921a5364b2911532089600fb1dd7952e3e111637e9d87d0edf22a537c24eb4de987b3bdb5893def841e
   languageName: node
   linkType: hard
 
-"@datadog/browser-rum-core@npm:5.5.0":
-  version: 5.5.0
-  resolution: "@datadog/browser-rum-core@npm:5.5.0"
+"@datadog/browser-rum-core@npm:5.32.0":
+  version: 5.32.0
+  resolution: "@datadog/browser-rum-core@npm:5.32.0"
   dependencies:
-    "@datadog/browser-core": 5.5.0
-  checksum: 9eae269435bed9dfb2ad4b556bb2ebad0ee079c2c25866819655e67ba38f1984efb4855a83bcc79955611812ee445bccdf374bfd7e2cc4481a20a03f9b21867f
+    "@datadog/browser-core": 5.32.0
+  checksum: dcff9ddd15b74da4315719e12ba6ce0e4f3e61b5cf9741d5768023b8579e33b16d5fac00896bd3dc0ba9c5753d305691ef9f6e5a98d8ee85cca0136fe78d7a25
   languageName: node
   linkType: hard
 
 "@datadog/browser-rum@npm:^5.4.0":
-  version: 5.5.0
-  resolution: "@datadog/browser-rum@npm:5.5.0"
+  version: 5.32.0
+  resolution: "@datadog/browser-rum@npm:5.32.0"
   dependencies:
-    "@datadog/browser-core": 5.5.0
-    "@datadog/browser-rum-core": 5.5.0
+    "@datadog/browser-core": 5.32.0
+    "@datadog/browser-rum-core": 5.32.0
   peerDependencies:
-    "@datadog/browser-logs": 5.5.0
+    "@datadog/browser-logs": 5.32.0
   peerDependenciesMeta:
     "@datadog/browser-logs":
       optional: true
-  checksum: 5616fda121c9ccf13b2908a9ada9e3dc8913bb36afbacae73fe11ab9fb613cfffd4184302f3342a407c064c5a17623be6f3c62be054874ac35f96201a1a26c8c
+  checksum: b0d3e651004e17992b28affc1a3464d39f5fe7d1f57e73db2f2112b5f92e6b259eb6bd07173e30cfd02983658f3b74c9d2279333ce6b8d51e0a8168e9ab6ff4c
   languageName: node
   linkType: hard
 
