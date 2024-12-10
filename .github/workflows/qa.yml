@@ -116,7 +116,7 @@ jobs:
           CI: 1
       - name: Generate coverage markdown report
         id: coverage-markdown
-        uses: fingerprintjs/action-coverage-report-md@b7fcda0d2891d215c6808d32ca249e43f55abe3f # v1.0.6
+        uses: fingerprintjs/action-coverage-report-md@72dfb7de7581612640a8e599e918b2eda98f9bba # v2.0.1
         with:
           textReportPath: 'coverage/coverage.txt'
           srcBasePath: 'api/src'
@@ -170,7 +170,7 @@ jobs:
           CI: 1
       - name: Generate coverage markdown report
         id: coverage-markdown
-        uses: fingerprintjs/action-coverage-report-md@b7fcda0d2891d215c6808d32ca249e43f55abe3f # v1.0.6
+        uses: fingerprintjs/action-coverage-report-md@72dfb7de7581612640a8e599e918b2eda98f9bba # v2.0.1
         with:
           textReportPath: 'coverage/coverage.txt'
           srcBasePath: 'web/src'
