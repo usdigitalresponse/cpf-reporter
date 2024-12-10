@@ -1,10 +1,11 @@
 import functools
 import logging
 import sys
+from typing import Any, Callable, Dict, List
 
 import structlog
 
-shared_processors = [
+shared_processors: List[Callable] = [
     structlog.contextvars.merge_contextvars,
     structlog.processors.add_log_level,
     structlog.processors.TimeStamper(fmt="iso", key="ts"),
@@ -17,7 +18,7 @@ shared_processors = [
     ),
 ]
 
-processors = shared_processors + []
+processors: List[Callable] = shared_processors + []
 if sys.stderr.isatty():
     processors += [
         structlog.dev.ConsoleRenderer(),
@@ -36,11 +37,11 @@ structlog.configure(
 )
 
 
-def get_logger(*args, **kwargs) -> structlog.stdlib.BoundLogger:
+def get_logger(*args: str, **kwargs: str) -> structlog.stdlib.BoundLogger:
     return structlog.get_logger(*args, **kwargs)
 
 
-def reset_contextvars(func):
+def reset_contextvars(func: Callable) -> Callable:
     """Decorator that resets context-local log values prior to each call to the
     decorated function.
 
@@ -51,7 +52,7 @@ def reset_contextvars(func):
     """
 
     @functools.wraps(func)
-    def inner(*args, **kwargs):
+    def inner(*args: List[Any], **kwargs: Dict[str, Any]) -> Any:
         structlog.contextvars.unbind_contextvars()
         return func(*args, **kwargs)
 

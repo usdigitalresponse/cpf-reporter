@@ -24,6 +24,7 @@ class UserObj(BaseModel):
     id: int
     email: str
 
+
 class OutputFileType(Enum):
     XLSX = "xlsx"
     CSV = "csv"
@@ -41,7 +42,7 @@ def get_output_template(
     output_template_id: int,
     project: str,
     destination: IO[bytes],
-):
+) -> None:
     """Downloads an empty output template from S3.
 
     Args:

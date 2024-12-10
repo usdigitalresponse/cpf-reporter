@@ -40,6 +40,7 @@ function TableBuilder<T extends object>({
   filterableInputs = [],
   globalFilter,
 }: TableBuilderProps<T>) {
+
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [sorting, setSorting] = useState([])
 

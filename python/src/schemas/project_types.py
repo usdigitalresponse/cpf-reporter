@@ -15,7 +15,7 @@ class ProjectType(str, Enum):
             f"Project name '{project_name}' is not a recognized project type."
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.value
 
 

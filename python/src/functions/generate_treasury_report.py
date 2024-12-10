@@ -2,7 +2,7 @@ import json
 import os
 import tempfile
 from datetime import datetime
-from typing import IO, Dict, List, Set, Union
+from typing import IO, Any, Dict, List, Set, Type, Union
 
 import boto3
 import structlog
@@ -14,7 +14,11 @@ from openpyxl.worksheet.worksheet import Worksheet
 from pydantic import BaseModel
 
 from src.lib.logging import get_logger, reset_contextvars
-from src.lib.s3_helper import download_s3_object, upload_generated_file_to_s3
+from src.lib.s3_helper import (
+    delete_file_from_s3,
+    download_s3_object,
+    upload_generated_file_to_s3,
+)
 from src.lib.treasury_generation_common import (
     OrganizationObj,
     OutputFileType,
@@ -54,10 +58,11 @@ class ProjectLambdaPayload(BaseModel):
     ProjectType: str
     uploadsToAdd: Dict[AgencyId, UploadObj]
     uploadsToRemove: Dict[AgencyId, UploadObj]
+    forceRegenerate: bool = False
 
 
 @reset_contextvars
-def handle(event: ProjectLambdaPayload, context: Context):
+def handle(event: ProjectLambdaPayload, context: Context) -> Dict[str, Any]:
     """Lambda handler for generating Treasury Reports
 
     This function creates/outputs 3 files (all with the same name but different
@@ -94,7 +99,9 @@ def handle(event: ProjectLambdaPayload, context: Context):
     return {"statusCode": 200, "body": "Success"}
 
 
-def process_event(payload: ProjectLambdaPayload, logger: structlog.stdlib.BoundLogger):
+def process_event(
+    payload: ProjectLambdaPayload, logger: structlog.stdlib.BoundLogger
+) -> Dict[str, Any]:
     """
     This function is structured as followed:
     1) Load the metadata
@@ -129,6 +136,16 @@ def process_event(payload: ProjectLambdaPayload, logger: structlog.stdlib.BoundL
     ProjectRowSchema = getSchemaByProject(VERSION, project_use_code)
 
     organization = payload.organization
+
+    # If we need to force-regenerate the treasury report, we delete the treasury
+    # report from s3 so that it starts with the template file.
+    if payload.forceRegenerate:
+        delete_output_files(
+            s3_client=s3_client,
+            organization=organization,
+            project_use_code=project_use_code,
+            logger=logger,
+        )
 
     # If the treasury report file exists, download it and store the data
     # If it doesn't exist, download the output template
@@ -262,6 +279,60 @@ def process_event(payload: ProjectLambdaPayload, logger: structlog.stdlib.BoundL
                     ),
                     file=binary_json_file,
                 )
+    return {"statusCode": 200, "body": "Success"}
+
+
+def _try_delete(
+    s3_client: S3Client,
+    bucket: str,
+    key: str,
+    logger: structlog.stdlib.BoundLogger,
+):
+    """Tries to delete files from s3.
+
+    No error is thrown if the file is not found."""
+    try:
+        delete_file_from_s3(
+            client=s3_client,
+            bucket=bucket,
+            key=key,
+        )
+    except ClientError as e:
+        error = e.response.get("Error") or {}
+        if error.get("Code") == "404":
+            logger.exception("Expected to find an existing treasury output report")
+
+
+def delete_output_files(
+    s3_client: S3Client,
+    organization: OrganizationObj,
+    project_use_code: str,
+    logger: structlog.stdlib.BoundLogger,
+):
+    """Deletes the output files and the generated report."""
+    for output_file_type in [
+        OutputFileType.XLSX,
+        OutputFileType.CSV,
+        OutputFileType.JSON,
+    ]:
+        _try_delete(
+            s3_client=s3_client,
+            bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+            key=get_generated_output_file_key(
+                file_type=output_file_type,
+                project=project_use_code,
+                organization=organization,
+            ),
+            logger=logger,
+        )
+
+    report_key = f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip"
+    _try_delete(
+        s3_client=s3_client,
+        bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+        key=report_key,
+        logger=logger,
+    )
 
 
 def download_output_file(
@@ -310,7 +381,7 @@ def download_output_file(
 
 
 def get_existing_output_metadata(
-    s3_client,
+    s3_client: S3Client,
     organization: OrganizationObj,
     project_use_code: str,
     logger: structlog.stdlib.BoundLogger,
@@ -330,29 +401,29 @@ def get_existing_output_metadata(
                 ),
                 existing_file_binary,
             )
+            if existing_file_binary:
+                existing_file_binary.close()
+                with open(existing_file_binary.name, mode="rt") as existing_file_json:
+                    existing_project_agency_id_to_row_number = json.load(
+                        existing_file_json
+                    )
         except ClientError as e:
             error = e.response.get("Error") or {}
             if error.get("Code") == "404":
                 logger.info(
                     "There is no existing metadata file for this treasury report"
                 )
-                existing_file_binary = None
             else:
                 raise
-
-        if existing_file_binary:
-            existing_file_binary.close()
-            with open(existing_file_binary.name, mode="rt") as existing_file_json:
-                existing_project_agency_id_to_row_number = json.load(existing_file_json)
 
     return existing_project_agency_id_to_row_number
 
 
 def get_projects_to_remove(
     workbook: Workbook,
-    ProjectRowSchema: Union[Project1ARow, Project1BRow, Project1CRow],
+    ProjectRowSchema: Union[Type[Project1ARow], Type[Project1BRow], Type[Project1CRow]],
     agency_id: str,
-):
+) -> Set[str]:
     """
     Get the set of '{project_id}_{agency_id}' ids to remove from the
     existing output file.
@@ -360,7 +431,7 @@ def get_projects_to_remove(
     project_agency_ids_to_remove = set()
     # Get projects
     _, projects = validate_project_sheet(
-        workbook[PROJECT_SHEET], ProjectRowSchema, VERSION
+        workbook[PROJECT_SHEET], ProjectRowSchema, VERSION.value
     )
     # Store projects to remove
     for project in projects:
@@ -371,16 +442,16 @@ def get_projects_to_remove(
 
 
 def get_outdated_projects_to_remove(
-    s3_client,
+    s3_client: S3Client,
     uploads_by_agency_id: Dict[AgencyId, UploadObj],
-    ProjectRowSchema: Union[Project1ARow, Project1BRow, Project1CRow],
+    ProjectRowSchema: Union[Type[Project1ARow], Type[Project1BRow], Type[Project1CRow]],
     logger: structlog.stdlib.BoundLogger,
-):
+) -> Set[str]:
     """
     Open the files in the outdated_file_info_list and get the projects to
     remove.
     """
-    project_agency_ids_to_remove = set()
+    project_agency_ids_to_remove: Set[str] = set()
     for agency_id, file_info in uploads_by_agency_id.items():
         with tempfile.NamedTemporaryFile() as file:
             # Download projects from S3
@@ -415,7 +486,7 @@ def update_project_agency_ids_to_row_map(
     project_agency_ids_to_remove: Set[str],
     highest_row_num: int,
     sheet: Worksheet,
-):
+) -> int:
     """
     Delete rows corresponding to project_agency_ids_to_remove in the existing
     output file. Also update project_agency_id_to_row_map with the new row
@@ -445,14 +516,14 @@ def insert_project_row(
     sheet: Worksheet,
     row_num: int,
     row: Union[Project1ARow, Project1BRow, Project1CRow],
-):
+) -> None:
     """
     Append project to the xlsx file
 
     sheet is Optional only for tests
     """
     row_schema = row.model_json_schema()["properties"]
-    row_dict = row.dict()
+    row_dict = row.model_dump()
     row_with_output_cols = {}
     for prop in row_dict.keys():
         prop_meta = row_schema.get(prop)
@@ -473,19 +544,19 @@ def combine_project_rows(
     output_sheet: Worksheet,
     project_use_code: str,
     highest_row_num: int,
-    ProjectRowSchema: Union[Project1ARow, Project1BRow, Project1CRow],
+    ProjectRowSchema: Union[Type[Project1ARow], Type[Project1BRow], Type[Project1CRow]],
     project_id_agency_id_to_upload_date: Dict[str, datetime],
     project_id_agency_id_to_row_num: Dict[str, int],
     created_at: datetime,
     agency_id: str,
-):
+) -> int:
     """
     Combine projects together and check for conflicts.
     If there is a conflict, choose the most recent project based on created_at time.
     """
     # Get projects
     result = validate_project_sheet(
-        project_workbook[PROJECT_SHEET], ProjectRowSchema, VERSION
+        project_workbook[PROJECT_SHEET], ProjectRowSchema, VERSION.value
     )
     projects: List[Union[Project1ARow, Project1BRow, Project1CRow]] = result[1]
     # Get project rows from workbook

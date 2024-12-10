@@ -2,9 +2,10 @@ import json
 import os
 import tempfile
 import zipfile
-from typing import Any
+from typing import Any, Optional
 
 import boto3
+import structlog
 from aws_lambda_typing.context import Context
 from mypy_boto3_s3.client import S3Client
 from pydantic import BaseModel
@@ -20,7 +21,7 @@ class CreateArchiveLambdaPayload(BaseModel):
 
 
 @reset_contextvars
-def handle(event: dict[str, Any], _context: Context):
+def handle(event: dict[str, Any], _context: Context) -> dict[str, Any]:
     """Lambda handler for creating an archive of CSV files in S3
 
     Args:
@@ -49,7 +50,10 @@ def handle(event: dict[str, Any], _context: Context):
         create_archive(organization_id, reporting_period_id, boto3.client("s3"), logger)
     except Exception:
         logger.exception("Exception creating archive")
-        return {"statusCode": 500, "body": "Internal Server Error - unable to create archive"}
+        return {
+            "statusCode": 500,
+            "body": "Internal Server Error - unable to create archive",
+        }
 
     return {
         "statusCode": 200,
@@ -61,8 +65,11 @@ def handle(event: dict[str, Any], _context: Context):
 
 
 def create_archive(
-    org_id: int, reporting_period_id: int, s3_client: S3Client, logger=None
-):
+    org_id: int,
+    reporting_period_id: int,
+    s3_client: S3Client,
+    logger: Optional[structlog.stdlib.BoundLogger] = None,
+) -> None:
     """Create a zip archive of CSV files in S3"""
 
     if logger is None:
@@ -88,8 +95,8 @@ def create_archive(
     with tempfile.NamedTemporaryFile() as file:
         with zipfile.ZipFile(file, "w") as zipf:
             for target_file in target_files:
-                obj = s3_client.get_object(Bucket=S3_BUCKET, Key=target_file)
-                zipf.writestr(target_file, obj["Body"].read())
+                target_obj = s3_client.get_object(Bucket=S3_BUCKET, Key=target_file)
+                zipf.writestr(target_file, target_obj["Body"].read())
 
             zipf.close()
             file.flush()

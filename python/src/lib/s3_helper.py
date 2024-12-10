@@ -8,7 +8,9 @@ from mypy_boto3_s3.client import S3Client
 from src.lib.logging import get_logger
 
 
-def download_s3_object(client: S3Client, bucket: str, key: str, destination: IO[bytes]):
+def download_s3_object(
+    client: S3Client, bucket: str, key: str, destination: IO[bytes]
+) -> None:
     """Downloads an S3 object to a local file.
 
     Args:
@@ -27,12 +29,37 @@ def download_s3_object(client: S3Client, bucket: str, key: str, destination: IO[
         raise
 
 
+def delete_file_from_s3(client: S3Client, bucket: str, key: str) -> None:
+    """Deletes file from S3.
+
+    Args:
+        client: Client facilitating delete from S3
+        bucket: bucket file should be deleted from
+        key: S3 key for file
+    """
+    logger = get_logger()
+
+    logger = logger.bind(delete={"s3": {"bucket": bucket, "key": key}})
+    try:
+        client.delete_object(
+            Bucket=bucket,
+            Key=unquote_plus(key),
+        )
+    except:
+        logger.exception(
+            f"failed to delete file from S3, bucket {bucket} and key {key}"
+        )
+        raise
+
+    logger.info("successfully deleted file from s3")
+
+
 def upload_generated_file_to_s3(
     client: S3Client,
     bucket: str,
     key: str,
-    file: Union[IO[bytes], tempfile._TemporaryFileWrapper],
-):
+    file: Union[IO[bytes], "tempfile._TemporaryFileWrapper[str]"],
+) -> None:
     """Persists file to S3.
 
     Args:
@@ -60,14 +87,15 @@ def upload_generated_file_to_s3(
 
 
 def get_presigned_url(
-        s3_client: S3Client,
-        bucket: str,
-        key: str,
-        expiration_time: int = 60 * 60,  #  1 hour
+    s3_client: S3Client,
+    bucket: str,
+    key: str,
+    expiration_time: int = 60 * 60,  #  1 hour
 ) -> Optional[str]:
     logger = get_logger()
     try:
-        response = s3_client.head_object(
+        # Check file exists
+        _resp = s3_client.head_object(
             Bucket=bucket,
             Key=key,
         )
@@ -75,17 +103,17 @@ def get_presigned_url(
         logger.exception(f"Unable to retrieve head object for key: {key}")
         return None
 
+    response = None
     try:
-        response =  s3_client.generate_presigned_url(
+        response = s3_client.generate_presigned_url(
             "get_object",
             Params={
                 "Bucket": bucket,
                 "Key": key,
             },
-            ExpiresIn=expiration_time
+            ExpiresIn=expiration_time,
         )
     except ClientError:
         logger.exception(f"Unable to retrieve presigned URL for key: {key}")
-        return None
-    
+
     return response

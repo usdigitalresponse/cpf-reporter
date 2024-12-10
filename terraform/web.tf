@@ -39,7 +39,7 @@ module "cloudfront_to_origin_bucket_access_policy" {
 
 module "cdn_origin_bucket" {
   source  = "cloudposse/s3-bucket/aws"
-  version = "4.0.1"
+  version = "4.9.0"
   context = module.s3_label.context
   name    = "origin"
 
@@ -68,7 +68,7 @@ module "cdn_origin_bucket" {
 
 module "cdn_logs_bucket" {
   source  = "cloudposse/s3-bucket/aws"
-  version = "4.0.1"
+  version = "4.9.0"
   context = module.s3_label.context
   name    = "cdn-logs"
 
@@ -204,7 +204,7 @@ resource "aws_s3_object" "origin_dist_artifact" {
 
 module "cdn" {
   source              = "terraform-aws-modules/cloudfront/aws"
-  version             = "3.2.1"
+  version             = "3.4.1"
   create_distribution = true
 
   depends_on = [
@@ -303,7 +303,7 @@ resource "aws_route53_record" "cdn_alias" {
 
 module "cloudfront_ssl_certificate" {
   source  = "cloudposse/acm-request-certificate/aws"
-  version = "0.17.0"
+  version = "0.18.0"
   context = module.this.context
   providers = {
     # CloudFront SSL certificates must be managed in us-east-1

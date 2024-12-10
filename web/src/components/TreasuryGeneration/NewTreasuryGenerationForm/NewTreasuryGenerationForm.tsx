@@ -14,7 +14,7 @@ interface NewOrganizationFormProps {
   loading: boolean
 }
 
-/* 
+/*
   This form collects any payload information to kick-off a lambda function to generate a treasury file.
 */
 const NewTreasuryGenerationForm = (props: NewOrganizationFormProps) => {

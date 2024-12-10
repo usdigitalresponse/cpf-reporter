@@ -4,7 +4,7 @@ locals {
 
 module "api_ssl_certificate" {
   source  = "cloudposse/acm-request-certificate/aws"
-  version = "0.17.0"
+  version = "0.18.0"
 
   domain_name                       = local.api_domain_name
   zone_id                           = data.aws_ssm_parameter.public_dns_zone_id.value

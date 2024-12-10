@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 from pydantic import (
     BaseModel,
@@ -11,27 +11,27 @@ from pydantic import (
     field_validator,
 )
 
-from src.schemas.project_types import NAME_BY_PROJECT
 from src.schemas.custom_types import (
     CustomDecimal_7Digits,
     CustomDecimal_12Digits,
     CustomDecimal_13Digits,
-    CustomInt_GE1,
     CustomInt_GE0_LELARGE,
     CustomInt_GE0_LELARGE2,
     CustomInt_GE0_LELARGE3,
     CustomInt_GE0_LELARGE4,
+    CustomInt_GE1,
     CustomStr_MIN1,
-    CustomStr_MIN1_MAX100,
+    CustomStr_MIN1_MAX5,
     CustomStr_MIN1_MAX10,
     CustomStr_MIN1_MAX20,
-    CustomStr_MIN12_MAX12,
-    CustomStr_MIN9_MAX9,
-    CustomStr_MIN1_MAX3000,
-    CustomStr_MIN1_MAX5,
     CustomStr_MIN1_MAX40,
     CustomStr_MIN1_MAX80,
+    CustomStr_MIN1_MAX100,
+    CustomStr_MIN1_MAX3000,
+    CustomStr_MIN9_MAX9,
+    CustomStr_MIN12_MAX12,
 )
+from src.schemas.project_types import NAME_BY_PROJECT, ProjectType
 
 
 class StateAbbreviation(str, Enum):
@@ -346,7 +346,7 @@ class BaseProjectRow(BaseModel):
         "Actual_operations_date__c",
     )
     @classmethod
-    def parse_mm_dd_yyyy_dates(cls, v):
+    def parse_mm_dd_yyyy_dates(cls, v: Union[str, datetime]) -> datetime:
         if isinstance(v, str):
             try:
                 return datetime.strptime(v, "%m/%d/%Y")
@@ -383,8 +383,10 @@ class BaseProjectRow(BaseModel):
         "Project_Status__c",
     )
     @classmethod
-    def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
-        if isinstance(v, str) and v.strip == "":
+    def validate_field(
+        cls, v: Any, info: ValidationInfo, **kwargs: dict[str, Any]
+    ) -> Any:
+        if isinstance(v, str) and v.strip() == "":
             raise ValueError(f"Value is required for {info.field_name}")
         return v
 
@@ -535,8 +537,10 @@ class Project1ARow(BaseProjectRow):
         "Affordable_Connectivity_Program_ACP__c",
     )
     @classmethod
-    def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
-        if isinstance(v, str) and v.strip == "":
+    def validate_field(
+        cls, v: Any, info: ValidationInfo, **kwargs: dict[str, Any]
+    ) -> Any:
+        if isinstance(v, str) and v.strip() == "":
             raise ValueError(f"Value is required for {info.field_name}")
         return v
 
@@ -605,8 +609,10 @@ class AddressFields(BaseModel):
         "Zip_Code_Planned__c",
     )
     @classmethod
-    def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
-        if isinstance(v, str) and v.strip == "":
+    def validate_field(
+        cls, v: Any, info: ValidationInfo, **kwargs: dict[str, Any]
+    ) -> Any:
+        if isinstance(v, str) and v.strip() == "":
             raise ValueError(f"Value is required for {info.field_name}")
         return v
 
@@ -757,8 +763,10 @@ class Project1BRow(BaseProjectRow, AddressFields):
         "Measurement_of_Effectiveness__c",
     )
     @classmethod
-    def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
-        if isinstance(v, str) and v.strip == "":
+    def validate_field(
+        cls, v: Any, info: ValidationInfo, **kwargs: dict[str, Any]
+    ) -> Any:
+        if isinstance(v, str) and v.strip() == "":
             raise ValueError(f"Value is required for {info.field_name}")
         return v
 
@@ -860,8 +868,10 @@ class Project1CRow(BaseProjectRow, AddressFields):
 
     @field_validator("Access_to_Public_Transit__c")
     @classmethod
-    def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
-        if isinstance(v, str) and v.strip == "":
+    def validate_field(
+        cls, v: Any, info: ValidationInfo, **kwargs: dict[str, Any]
+    ) -> Any:
+        if isinstance(v, str) and v.strip() == "":
             raise ValueError(f"Value is required for {info.field_name}")
         return v
 
@@ -939,8 +949,10 @@ class SubrecipientRow(BaseModel):
         "State_Abbreviated__c",
     )
     @classmethod
-    def validate_field(cls, v: Any, info: ValidationInfo, **kwargs):
-        if isinstance(v, str) and v.strip == "":
+    def validate_field(
+        cls, v: Any, info: ValidationInfo, **kwargs: dict[str, Any]
+    ) -> Any:
+        if isinstance(v, str) and v.strip() == "":
             raise ValueError(f"Value is required for {info.field_name}")
         return v
 
@@ -982,15 +994,19 @@ class CoverSheetRow(BaseModel):
 
     @field_validator("project_use_code")
     @classmethod
-    def validate_code(cls, v: Any, info: ValidationInfo, **kwargs):
+    def validate_code(
+        cls, v: Any, info: ValidationInfo, **kwargs: dict[str, Any]
+    ) -> Any:
         if v is None or v.strip() == "":
             raise ValueError("EC code must be set")
         return v
 
     @field_validator("project_use_name")
     @classmethod
-    def validate_code_name_pair(cls, v: Any, info: ValidationInfo, **kwargs):
-        project_use_code = info.data.get("project_use_code")
+    def validate_code_name_pair(
+        cls, v: Any, info: ValidationInfo, **kwargs: dict[str, Any]
+    ) -> Any:
+        project_use_code = ProjectType(info.data.get("project_use_code"))
         expected_name = NAME_BY_PROJECT.get(project_use_code)
 
         if not expected_name:

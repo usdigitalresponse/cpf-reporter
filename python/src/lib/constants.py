@@ -9,7 +9,7 @@ class OutputTemplateFilename(Enum):
     CPF1CMultiPurposeCommunityTemplate = "CPF1CMultiPurposeCommunityTemplate"
     CPFSubrecipientTemplate = "CPFSubrecipientTemplate"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.value
 
 
