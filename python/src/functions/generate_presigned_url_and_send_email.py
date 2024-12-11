@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from typing import Any, Optional, Tuple
 
 import boto3
@@ -9,16 +10,18 @@ from pydantic import BaseModel
 
 from src.lib.email import send_email
 from src.lib.logging import get_logger, reset_contextvars
-from src.lib.s3_helper import get_presigned_url
+from src.lib.s3_helper import get_last_modified_timestamp, get_presigned_url
 from src.lib.treasury_generation_common import OrganizationObj, UserObj
 
 treasury_email_html = """
 Your treasury report can be downloaded <a href={url}>here</a>.
+This treasury reports includes valid uploads as of {time}.
 """
 
 treasury_email_text = """
 Hello,
 Your treasury report can be downloaded here: {url}.
+This treasury reports includes valid uploads as of {time}.
 """
 
 
@@ -62,6 +65,7 @@ def handle(event: SendTreasuryEmailLambdaPayload, context: Context) -> dict[str,
 def generate_email(
     user: UserObj,
     logger: structlog.stdlib.BoundLogger,
+    timestamp: datetime,
     presigned_url: str = "",
 ) -> Tuple[Optional[str], Optional[str], Optional[str]]:
     try:
@@ -70,7 +74,10 @@ def generate_email(
                 g,
                 {
                     "body_title": "Hello,",
-                    "body_detail": treasury_email_html.format(url=presigned_url),
+                    "body_detail": treasury_email_html.format(
+                        url=presigned_url,
+                        time=timestamp.strftime("%d/%m/%Y %H:%M:%S"),
+                    ),
                 },
             )
             with open("src/static/email_templates/base.html") as f:
@@ -91,7 +98,10 @@ def generate_email(
                         "email_body": email_body,
                     },
                 )
-                email_text = treasury_email_text.format(url=presigned_url)
+                email_text = treasury_email_text.format(
+                    url=presigned_url,
+                    time=timestamp.strftime("%d/%m/%Y %H:%M:%S"),
+                )
                 subject = "USDR CPF Treasury Report"
                 return email_html, email_text, subject
     except Exception as e:
@@ -109,8 +119,9 @@ def process_event(
         treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip
     2) If it does not, raise an exception and quit
     3) Generate a pre-signed URL with an expiration date of 1 hour
-    4) Generate an email
-    5) Send email to the user
+    4) Get last modified date timestamp of archive
+    5) Generate an email
+    6) Send email to the user
     """
     s3_client = boto3.client("s3")
     user = payload.user
@@ -125,9 +136,16 @@ def process_event(
     if presigned_url is None:
         raise Exception("Failed to generate signed-URL or file not found")
 
+    timestamp = get_last_modified_timestamp(
+        s3_client=s3_client,
+        bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
+        key=f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip",
+    )
+
     email_html, email_text, subject = generate_email(
         user=user,
         presigned_url=presigned_url,
+        timestamp=timestamp,
         logger=logger,
     )
     if not email_html:
