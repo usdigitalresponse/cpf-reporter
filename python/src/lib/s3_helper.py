@@ -1,4 +1,5 @@
 import tempfile
+from datetime import datetime
 from typing import IO, Optional, Union
 from urllib.parse import unquote_plus
 
@@ -117,3 +118,17 @@ def get_presigned_url(
         logger.exception(f"Unable to retrieve presigned URL for key: {key}")
 
     return response
+
+
+def get_create_timestamp(s3_client: S3Client, bucket: str, key: str) -> datetime:
+    logger = get_logger()
+    try:
+        head = s3_client.head_object(
+            Bucket=bucket,
+            Key=unquote_plus(key),
+        )
+        timestamp = head.get("LastModified", datetime.now())
+    except Exception:
+        logger.exception(f"Unable to retrieve object for key: {key}")
+        return datetime.now()
+    return timestamp
