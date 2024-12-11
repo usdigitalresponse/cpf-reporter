@@ -1586,6 +1586,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@aws-sdk/middleware-sdk-s3@npm:3.709.0":
+  version: 3.709.0
+  resolution: "@aws-sdk/middleware-sdk-s3@npm:3.709.0"
+  dependencies:
+    "@aws-sdk/core": 3.709.0
+    "@aws-sdk/types": 3.709.0
+    "@aws-sdk/util-arn-parser": 3.693.0
+    "@smithy/core": ^2.5.5
+    "@smithy/node-config-provider": ^3.1.12
+    "@smithy/protocol-http": ^4.1.8
+    "@smithy/signature-v4": ^4.2.4
+    "@smithy/smithy-client": ^3.5.0
+    "@smithy/types": ^3.7.2
+    "@smithy/util-config-provider": ^3.0.0
+    "@smithy/util-middleware": ^3.0.11
+    "@smithy/util-stream": ^3.3.2
+    "@smithy/util-utf8": ^3.0.0
+    tslib: ^2.6.2
+  checksum: 752809cbfd96355270206cb392a925fb3baaf5c17eb003f394044725af26bce39e4c881ed4cb40fa77c5c0bfb8655cdfe2ecec92cd7fcb6c8772924268a35dfd
+  languageName: node
+  linkType: hard
+
 "@aws-sdk/middleware-sdk-sqs@npm:3.468.0":
   version: 3.468.0
   resolution: "@aws-sdk/middleware-sdk-sqs@npm:3.468.0"
@@ -1742,18 +1764,18 @@ __metadata:
   linkType: hard
 
 "@aws-sdk/s3-request-presigner@npm:^3.472.0":
-  version: 3.472.0
-  resolution: "@aws-sdk/s3-request-presigner@npm:3.472.0"
+  version: 3.709.0
+  resolution: "@aws-sdk/s3-request-presigner@npm:3.709.0"
   dependencies:
-    "@aws-sdk/signature-v4-multi-region": 3.470.0
-    "@aws-sdk/types": 3.468.0
-    "@aws-sdk/util-format-url": 3.468.0
-    "@smithy/middleware-endpoint": ^2.2.3
-    "@smithy/protocol-http": ^3.0.11
-    "@smithy/smithy-client": ^2.1.18
-    "@smithy/types": ^2.7.0
-    tslib: ^2.5.0
-  checksum: 395356e9677c414709ee650bcba0f0a871311a62ade4fbf58c753926ae3ae8a71eaeec8253f4a524723ce0edacb39b5df766756c1a6fa552b81ce0778020e950
+    "@aws-sdk/signature-v4-multi-region": 3.709.0
+    "@aws-sdk/types": 3.709.0
+    "@aws-sdk/util-format-url": 3.709.0
+    "@smithy/middleware-endpoint": ^3.2.5
+    "@smithy/protocol-http": ^4.1.8
+    "@smithy/smithy-client": ^3.5.0
+    "@smithy/types": ^3.7.2
+    tslib: ^2.6.2
+  checksum: adb2d9dde9ce32ccd1531a060a0732e9c4f67772f20aa8ee218d1bb459a5a250fd916f9799a5042ac8a7e9cfdc643239ea15fa1f1f1ed79857b1319bee9ee8b2
   languageName: node
   linkType: hard
 
@@ -1768,6 +1790,20 @@ __metadata:
     "@smithy/types": ^2.7.0
     tslib: ^2.5.0
   checksum: e9ddc65c8f0d104c11ed7f468e18cbc6411819202452e10e42834a4634e933f3e25fcac503d752a9e97dd82174fefff6a047221e385683a8674cac6fe6093779
+  languageName: node
+  linkType: hard
+
+"@aws-sdk/signature-v4-multi-region@npm:3.709.0":
+  version: 3.709.0
+  resolution: "@aws-sdk/signature-v4-multi-region@npm:3.709.0"
+  dependencies:
+    "@aws-sdk/middleware-sdk-s3": 3.709.0
+    "@aws-sdk/types": 3.709.0
+    "@smithy/protocol-http": ^4.1.8
+    "@smithy/signature-v4": ^4.2.4
+    "@smithy/types": ^3.7.2
+    tslib: ^2.6.2
+  checksum: 991360e71ec2f8520a009313ecd445c5f9d1ecb09feec59175bde69d8817046708b6552abc111da2d31a5ed6ff125944920b3a4b90077db43a98e3bfa6a8243b
   languageName: node
   linkType: hard
 
@@ -1885,6 +1921,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@aws-sdk/util-arn-parser@npm:3.693.0":
+  version: 3.693.0
+  resolution: "@aws-sdk/util-arn-parser@npm:3.693.0"
+  dependencies:
+    tslib: ^2.6.2
+  checksum: de35fab41f61a37a8af3e80b4cdb8d861603ae8f6a85b266d8ad4f9aca14e6cdb0d260c88a78ab692ea0778626afcd53bbfe95a45d4f9857ae8a13251e80f289
+  languageName: node
+  linkType: hard
+
 "@aws-sdk/util-endpoints@npm:3.470.0":
   version: 3.470.0
   resolution: "@aws-sdk/util-endpoints@npm:3.470.0"
@@ -1920,18 +1965,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/util-format-url@npm:3.468.0":
-  version: 3.468.0
-  resolution: "@aws-sdk/util-format-url@npm:3.468.0"
-  dependencies:
-    "@aws-sdk/types": 3.468.0
-    "@smithy/querystring-builder": ^2.0.15
-    "@smithy/types": ^2.7.0
-    tslib: ^2.5.0
-  checksum: b8b469eaa32c0d680de067690363a982d37968a6e547a6201439e53165af2972a891ab2aff336de360ab6ced8c2b4204c40116e5893370b84c2e8c929295bb66
-  languageName: node
-  linkType: hard
-
 "@aws-sdk/util-format-url@npm:3.696.0":
   version: 3.696.0
   resolution: "@aws-sdk/util-format-url@npm:3.696.0"
@@ -1941,6 +1974,18 @@ __metadata:
     "@smithy/types": ^3.7.1
     tslib: ^2.6.2
   checksum: 3f923e3f87a3d5e867a348589d6e539988a7edb18270a17ff7093ebb0d14ada46ffffca8252017c375ec39ed8c7551ff59fc8ecbab1ce0e0564b566cb6bf47e2
+  languageName: node
+  linkType: hard
+
+"@aws-sdk/util-format-url@npm:3.709.0":
+  version: 3.709.0
+  resolution: "@aws-sdk/util-format-url@npm:3.709.0"
+  dependencies:
+    "@aws-sdk/types": 3.709.0
+    "@smithy/querystring-builder": ^3.0.11
+    "@smithy/types": ^3.7.2
+    tslib: ^2.6.2
+  checksum: f58a58bb4ff1361a5abd6a10389b5973fe2fec8800df59d53f4301f576b7e30f6a00e8ddff757b16687a6f3f11e4415272f43e63a7171fb4e6e4d2909a9bed41
   languageName: node
   linkType: hard
 
