@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 from src.lib.email import send_email
 from src.lib.logging import get_logger, reset_contextvars
-from src.lib.s3_helper import get_create_timestamp, get_presigned_url
+from src.lib.s3_helper import get_last_modified_timestamp, get_presigned_url
 from src.lib.treasury_generation_common import OrganizationObj, UserObj
 
 treasury_email_html = """
@@ -119,8 +119,9 @@ def process_event(
         treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip
     2) If it does not, raise an exception and quit
     3) Generate a pre-signed URL with an expiration date of 1 hour
-    4) Generate an email
-    5) Send email to the user
+    4) Get last modified date timestamp of archive
+    5) Generate an email
+    6) Send email to the user
     """
     s3_client = boto3.client("s3")
     user = payload.user
@@ -135,7 +136,7 @@ def process_event(
     if presigned_url is None:
         raise Exception("Failed to generate signed-URL or file not found")
 
-    timestamp = get_create_timestamp(
+    timestamp = get_last_modified_timestamp(
         s3_client=s3_client,
         bucket=os.environ["REPORTING_DATA_BUCKET_NAME"],
         key=f"treasuryreports/{organization.id}/{organization.preferences.current_reporting_period_id}/report.zip",
