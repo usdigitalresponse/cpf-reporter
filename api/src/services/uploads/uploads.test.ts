@@ -1,5 +1,3 @@
-import { Upload } from '@prisma/client'
-
 import {
   deleteUploadFile,
   s3UploadFilePutSignedUrl,
@@ -105,7 +103,7 @@ describe('uploads', () => {
     'returns all uploads in their agency for organization staff',
     async (scenario: StandardScenario) => {
       mockCurrentUser(scenario.user.three)
-      const result: Upload[] = await uploads()
+      const result = await uploads()
 
       const uploadsBelongToOrg = await uploadsBelongToOrganization(
         result,
@@ -152,7 +150,7 @@ describe('uploads', () => {
   })
 
   scenario('updates an upload', async (scenario: StandardScenario) => {
-    const original = (await upload({ id: scenario.upload.one.id })) as Upload
+    const original = await upload({ id: scenario.upload.one.id })
     const result = await updateUpload({
       id: original.id,
       input: { filename: 'String2' },
@@ -169,55 +167,79 @@ describe('uploads', () => {
     expect(deleteUploadFile).not.toHaveBeenCalled()
   })
 
-  scenario(
-    'returns the latest validation for an upload when there are multiple validations',
-    async (scenario: StandardScenario) => {
-      const uploadIdOne = scenario.upload.one.id
-      const latestValidationOfScenarioOne =
-        await UploadRelationResolver.latestValidation(
+  describe('Uploads resolvers', () => {
+    scenario(
+      'latest validations: returns the latest validation for an upload when there are multiple validations',
+      async (scenario: StandardScenario) => {
+        const uploadIdOne = scenario.upload.one.id
+        const latestValidationOfScenarioOne =
+          await UploadRelationResolver.latestValidation(
+            {},
+            {
+              root: {
+                id: uploadIdOne,
+                agencyId: scenario.upload.one.agencyId,
+                createdAt: scenario.upload.one.createdAt,
+                filename: scenario.upload.one.filename,
+                reportingPeriodId: scenario.upload.one.reportingPeriodId,
+                updatedAt: scenario.upload.one.updatedAt,
+                uploadedById: scenario.upload.one.uploadedById,
+              },
+              context: undefined,
+              info: undefined,
+            }
+          )
+
+        const uploadIdTwo = scenario.upload.two.id
+        const latestValidationOfScenarioTwo =
+          await UploadRelationResolver.latestValidation(
+            {},
+            {
+              root: {
+                id: uploadIdTwo,
+                agencyId: scenario.upload.two.agencyId,
+                createdAt: scenario.upload.two.createdAt,
+                filename: scenario.upload.two.filename,
+                reportingPeriodId: scenario.upload.two.reportingPeriodId,
+                updatedAt: scenario.upload.two.updatedAt,
+                uploadedById: scenario.upload.two.uploadedById,
+              },
+              context: undefined,
+              info: undefined,
+            }
+          )
+
+        expect(latestValidationOfScenarioOne?.createdAt).toEqual(
+          new Date('2024-01-27T10:32:00.000Z')
+        )
+        expect(latestValidationOfScenarioTwo?.createdAt).toEqual(
+          new Date('2024-01-29T18:13:25.000Z')
+        )
+      }
+    )
+
+    scenario(
+      'uploads resolver: correctly returns series uploads',
+      async (scenario: StandardScenario) => {
+        const results = await UploadRelationResolver.seriesUploads(
           {},
           {
             root: {
-              id: uploadIdOne,
-              agencyId: scenario.upload.one.agencyId,
-              createdAt: scenario.upload.one.createdAt,
-              filename: scenario.upload.one.filename,
-              reportingPeriodId: scenario.upload.one.reportingPeriodId,
-              updatedAt: scenario.upload.one.updatedAt,
-              uploadedById: scenario.upload.one.uploadedById,
+              ...scenario.upload.one,
             },
             context: undefined,
             info: undefined,
           }
         )
 
-      const uploadIdTwo = scenario.upload.two.id
-      const latestValidationOfScenarioTwo =
-        await UploadRelationResolver.latestValidation(
-          {},
-          {
-            root: {
-              id: uploadIdTwo,
-              agencyId: scenario.upload.two.agencyId,
-              createdAt: scenario.upload.two.createdAt,
-              filename: scenario.upload.two.filename,
-              reportingPeriodId: scenario.upload.two.reportingPeriodId,
-              updatedAt: scenario.upload.two.updatedAt,
-              uploadedById: scenario.upload.two.uploadedById,
-            },
-            context: undefined,
-            info: undefined,
-          }
-        )
-
-      expect(latestValidationOfScenarioOne?.createdAt).toEqual(
-        new Date('2024-01-27T10:32:00.000Z')
-      )
-      expect(latestValidationOfScenarioTwo?.createdAt).toEqual(
-        new Date('2024-01-29T18:13:25.000Z')
-      )
-    }
-  )
+        expect(results).toHaveLength(2)
+        expect(results.map((seriesUpload) => seriesUpload.id)).toEqual([
+          scenario.upload.two.id,
+          scenario.upload.one.id,
+        ])
+      }
+    )
+  })
 })
 
 describe('downloads', () => {
@@ -335,7 +357,7 @@ describe('getValidUploadsInCurrentPeriod', () => {
 
       const uploads = await getValidUploadsInCurrentPeriod(
         scenario.organization.one,
-        upload.reportingPeriodId
+        scenario.reportingPeriod.one
       )
 
       expect(uploads.map((upload) => upload.id)).toContain(upload.id)
@@ -352,7 +374,7 @@ describe('getValidUploadsInCurrentPeriod', () => {
 
       const uploads = await getValidUploadsInCurrentPeriod(
         scenario.organization.two,
-        upload.reportingPeriodId
+        scenario.reportingPeriod.one
       )
 
       expect(uploads.map((upload) => upload.id)).toContain(upload.id)
@@ -368,7 +390,7 @@ describe('getValidUploadsInCurrentPeriod', () => {
 
       const uploads = await getValidUploadsInCurrentPeriod(
         scenario.organization.two,
-        upload.reportingPeriodId
+        scenario.reportingPeriod.one
       )
 
       expect(uploads.map((upload) => upload.id)).not.toContain(upload.id)

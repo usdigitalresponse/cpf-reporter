@@ -32,6 +32,17 @@ export const QUERY = gql`
           name
         }
       }
+      seriesUploads {
+        id
+        createdAt
+        latestValidation {
+          id
+          passed
+          isManual
+          results
+          createdAt
+        }
+      }
       createdAt
       updatedAt
     }
