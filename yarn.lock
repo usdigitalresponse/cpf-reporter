@@ -2427,7 +2427,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-string-parser@npm:^7.24.8":
+"@babel/helper-string-parser@npm:^7.25.9":
   version: 7.25.9
   resolution: "@babel/helper-string-parser@npm:7.25.9"
   checksum: 6435ee0849e101681c1849868278b5aee82686ba2c1e27280e5e8aca6233af6810d39f8e4e693d2f2a44a3728a6ccfd66f72d71826a94105b86b731697cdfa99
@@ -2441,7 +2441,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-validator-identifier@npm:^7.24.7":
+"@babel/helper-validator-identifier@npm:^7.25.9":
   version: 7.25.9
   resolution: "@babel/helper-validator-identifier@npm:7.25.9"
   checksum: 5b85918cb1a92a7f3f508ea02699e8d2422fe17ea8e82acd445006c0ef7520fbf48e3dbcdaf7b0a1d571fc3a2715a29719e5226636cb6042e15fe6ed2a590944
@@ -3769,14 +3769,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/types@npm:7.25.6":
-  version: 7.25.6
-  resolution: "@babel/types@npm:7.25.6"
+"@babel/types@npm:7.26.3":
+  version: 7.26.3
+  resolution: "@babel/types@npm:7.26.3"
   dependencies:
-    "@babel/helper-string-parser": ^7.24.8
-    "@babel/helper-validator-identifier": ^7.24.7
-    to-fast-properties: ^2.0.0
-  checksum: 9b2f84ff3f874ad05b0b9bf06862c56f478b65781801f82296b4cc01bee39e79c20a7c0a06959fed0ee582c8267e1cb21638318655c5e070b0287242a844d1c9
+    "@babel/helper-string-parser": ^7.25.9
+    "@babel/helper-validator-identifier": ^7.25.9
+  checksum: 195f428080dcaadbcecc9445df7f91063beeaa91b49ccd78f38a5af6b75a6a58391d0c6614edb1ea322e57889a1684a0aab8e667951f820196901dd341f931e9
   languageName: node
   linkType: hard
 
@@ -6327,7 +6326,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@netlify/serverless-functions-api@npm:^1.31.0":
+"@netlify/serverless-functions-api@npm:^1.31.1":
   version: 1.31.1
   resolution: "@netlify/serverless-functions-api@npm:1.31.1"
   dependencies:
@@ -6338,13 +6337,13 @@ __metadata:
   linkType: hard
 
 "@netlify/zip-it-and-ship-it@npm:^9.27.0":
-  version: 9.41.1
-  resolution: "@netlify/zip-it-and-ship-it@npm:9.41.1"
+  version: 9.42.0
+  resolution: "@netlify/zip-it-and-ship-it@npm:9.42.0"
   dependencies:
     "@babel/parser": ^7.22.5
-    "@babel/types": 7.25.6
+    "@babel/types": 7.26.3
     "@netlify/binary-info": ^1.0.0
-    "@netlify/serverless-functions-api": ^1.31.0
+    "@netlify/serverless-functions-api": ^1.31.1
     "@vercel/nft": ^0.27.1
     archiver: ^7.0.0
     common-path-prefix: ^3.0.0
@@ -6377,7 +6376,7 @@ __metadata:
     zod: ^3.23.8
   bin:
     zip-it-and-ship-it: bin.js
-  checksum: ffa5b73f9a0a8e215cc63e5f7ec1b6e9f57db1f0787dbb71374a71b1b023e056f4f37eb34d398c4ef9d46bff9d74ac8ddedb8127bbf1eaa5bfaf6589a9956ccd
+  checksum: d7954d9198ae1b503a8504cd2c1ff6981cb4c65083deb5750ff70269bd036856191e0dde7e7925524e0cbd766f90a969dba95277b619d17a828e57f1a668f937
   languageName: node
   linkType: hard
 
