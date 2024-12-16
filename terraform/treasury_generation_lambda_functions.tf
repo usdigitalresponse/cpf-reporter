@@ -1,7 +1,7 @@
 
 module "lambda_function-subrecipientTreasuryReportGen" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "6.5.0"
+  version = "7.17.0"
 
   // Metadata
   function_name = "${var.namespace}-subrecipientTreasuryReportGen"
@@ -116,7 +116,7 @@ module "lambda_function-subrecipientTreasuryReportGen" {
 
 module "lambda_function-treasuryProjectFileGeneration" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "6.5.0"
+  version = "7.17.0"
 
   // Metadata
   function_name = "${var.namespace}-treasuryProjectFileGeneration"
@@ -286,7 +286,7 @@ module "lambda_function-treasuryProjectFileGeneration" {
 
 module "lambda_function-cpfCreateArchive" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "6.5.0"
+  version = "7.17.0"
 
   // Metadata
   function_name = "${var.namespace}-cpfCreateArchive"
@@ -380,7 +380,7 @@ data "aws_ses_domain_identity" "notifications" {
 
 module "lambda_function-email-presigned-url" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "6.5.0"
+  version = "7.17.0"
 
   // Metadata
   function_name = "${var.namespace}-email-presigned-url"
