@@ -521,25 +521,25 @@ __metadata:
   linkType: hard
 
 "@aws-sdk/client-sqs@npm:^3.470.0":
-  version: 3.709.0
-  resolution: "@aws-sdk/client-sqs@npm:3.709.0"
+  version: 3.713.0
+  resolution: "@aws-sdk/client-sqs@npm:3.713.0"
   dependencies:
     "@aws-crypto/sha256-browser": 5.2.0
     "@aws-crypto/sha256-js": 5.2.0
-    "@aws-sdk/client-sso-oidc": 3.709.0
-    "@aws-sdk/client-sts": 3.709.0
-    "@aws-sdk/core": 3.709.0
-    "@aws-sdk/credential-provider-node": 3.709.0
-    "@aws-sdk/middleware-host-header": 3.709.0
-    "@aws-sdk/middleware-logger": 3.709.0
-    "@aws-sdk/middleware-recursion-detection": 3.709.0
-    "@aws-sdk/middleware-sdk-sqs": 3.709.0
-    "@aws-sdk/middleware-user-agent": 3.709.0
-    "@aws-sdk/region-config-resolver": 3.709.0
-    "@aws-sdk/types": 3.709.0
-    "@aws-sdk/util-endpoints": 3.709.0
-    "@aws-sdk/util-user-agent-browser": 3.709.0
-    "@aws-sdk/util-user-agent-node": 3.709.0
+    "@aws-sdk/client-sso-oidc": 3.713.0
+    "@aws-sdk/client-sts": 3.713.0
+    "@aws-sdk/core": 3.713.0
+    "@aws-sdk/credential-provider-node": 3.713.0
+    "@aws-sdk/middleware-host-header": 3.713.0
+    "@aws-sdk/middleware-logger": 3.713.0
+    "@aws-sdk/middleware-recursion-detection": 3.713.0
+    "@aws-sdk/middleware-sdk-sqs": 3.713.0
+    "@aws-sdk/middleware-user-agent": 3.713.0
+    "@aws-sdk/region-config-resolver": 3.713.0
+    "@aws-sdk/types": 3.713.0
+    "@aws-sdk/util-endpoints": 3.713.0
+    "@aws-sdk/util-user-agent-browser": 3.713.0
+    "@aws-sdk/util-user-agent-node": 3.713.0
     "@smithy/config-resolver": ^3.0.13
     "@smithy/core": ^2.5.5
     "@smithy/fetch-http-handler": ^4.1.2
@@ -567,7 +567,7 @@ __metadata:
     "@smithy/util-retry": ^3.0.11
     "@smithy/util-utf8": ^3.0.0
     tslib: ^2.6.2
-  checksum: 98025f672897fd8afc15afe832fa5399915a3a2ac3c8865bf28d45f77a8fb901da625029a359d0d628544d6dfdd952d4d86296baab8e4be211cd0cd056c9844e
+  checksum: dc8251027412586c9d4223870ef3dabfacca4421017ddafc8ca3686bf423e50cbac642d65a17bc3a8f6a02f4115ff7bf4121099dd517a8b2d9fa177c0f201411
   languageName: node
   linkType: hard
 
@@ -1811,17 +1811,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/middleware-sdk-sqs@npm:3.709.0":
-  version: 3.709.0
-  resolution: "@aws-sdk/middleware-sdk-sqs@npm:3.709.0"
+"@aws-sdk/middleware-sdk-sqs@npm:3.713.0":
+  version: 3.713.0
+  resolution: "@aws-sdk/middleware-sdk-sqs@npm:3.713.0"
   dependencies:
-    "@aws-sdk/types": 3.709.0
+    "@aws-sdk/types": 3.713.0
     "@smithy/smithy-client": ^3.5.0
     "@smithy/types": ^3.7.2
     "@smithy/util-hex-encoding": ^3.0.0
     "@smithy/util-utf8": ^3.0.0
     tslib: ^2.6.2
-  checksum: 8b0879935efc09f654f8f67b2b724fcc13e1b04f2701595196d842d9b43d992384c40b443d8cd71bb80195a962f2b869cec811eb3ab7021e2e7b6b602eb8b234
+  checksum: e1a3b9494b860a132d2f9244972a18ca3956018cf2737c15c977d1c2bdb0159faf770df336d325fd7e7a3e6350605d7c2a1c26cd6d5462c7699cc0c142b6b251
   languageName: node
   linkType: hard
 
