@@ -8,12 +8,12 @@ package-mode = false
 [tool.poetry.dependencies]
 python = "^3.12"
 openpyxl = "^3.1.2"
-pydantic = "^2.10.3"
+pydantic = "^2.10.4"
 aws-lambda-typing = "^2.19.0"
-boto3 = "^1.35.83"
+boto3 = "^1.35.84"
 structlog = "^24.1.0"
 chevron="^0.14.0"
-boto3-stubs = {extras = ["essential"], version = "^1.35.83"}
+boto3-stubs = {extras = ["essential"], version = "^1.35.84"}
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.30.0"
