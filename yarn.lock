@@ -3427,34 +3427,34 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@datadog/browser-core@npm:5.34.0":
-  version: 5.34.0
-  resolution: "@datadog/browser-core@npm:5.34.0"
-  checksum: 05a7989d4f19c3bbdaa96d30f33eeab3121ed07da43d473bccc47eca7c26daaad3cab17d7828d6811ed1b308c4c875e74cc77400201fdeac60f49e606427c7f0
+"@datadog/browser-core@npm:5.34.1":
+  version: 5.34.1
+  resolution: "@datadog/browser-core@npm:5.34.1"
+  checksum: 298c3c22bdf034c12a8976a68a2232c9a20102bb54a78e5d7e8c11e8cec689df9d94af98d6e8abd0f5bbf8e444560eca4a93bc0b2eac361f9db4e028ea71835f
   languageName: node
   linkType: hard
 
-"@datadog/browser-rum-core@npm:5.34.0":
-  version: 5.34.0
-  resolution: "@datadog/browser-rum-core@npm:5.34.0"
+"@datadog/browser-rum-core@npm:5.34.1":
+  version: 5.34.1
+  resolution: "@datadog/browser-rum-core@npm:5.34.1"
   dependencies:
-    "@datadog/browser-core": 5.34.0
-  checksum: 747baabec3e34596b62939ae59f03058a3a5d4b1e3c00e4186344ac3588568c6654d7dd979a1b78b3495afbca57d3bc10d1b3bf737eff3d65714f98b7e743358
+    "@datadog/browser-core": 5.34.1
+  checksum: e508f39b94671ce8478afd3fe89719105bcbc495ecba27181d46770f72ab7af7a8503c9ac4f91627a03e3a00d9f5c999c7acb4191b6b49f5e62f669a79ec2da1
   languageName: node
   linkType: hard
 
 "@datadog/browser-rum@npm:^5.4.0":
-  version: 5.34.0
-  resolution: "@datadog/browser-rum@npm:5.34.0"
+  version: 5.34.1
+  resolution: "@datadog/browser-rum@npm:5.34.1"
   dependencies:
-    "@datadog/browser-core": 5.34.0
-    "@datadog/browser-rum-core": 5.34.0
+    "@datadog/browser-core": 5.34.1
+    "@datadog/browser-rum-core": 5.34.1
   peerDependencies:
-    "@datadog/browser-logs": 5.34.0
+    "@datadog/browser-logs": 5.34.1
   peerDependenciesMeta:
     "@datadog/browser-logs":
       optional: true
-  checksum: aef17389d0492a66fa13b2d7364f63c05a5f687d9eb0c05cc7b7afec9c94e7e73de60c609297552bf31fe610951e71a49e49b526cde040c017d3d07111b9604b
+  checksum: 903eb204550e8cbf3b05331c87927400ab22880b4c3c469f226384af9f25c2e0d58043a18d28aa55e4d657e88af0e43d87d6b04583e3ee48f3a1e5a9d57a13ce
   languageName: node
   linkType: hard
 
