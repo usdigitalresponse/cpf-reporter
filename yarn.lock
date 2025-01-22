@@ -3494,13 +3494,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@datadog/native-appsec@npm:8.3.0":
-  version: 8.3.0
-  resolution: "@datadog/native-appsec@npm:8.3.0"
+"@datadog/native-appsec@npm:8.4.0":
+  version: 8.4.0
+  resolution: "@datadog/native-appsec@npm:8.4.0"
   dependencies:
     node-gyp: latest
     node-gyp-build: ^3.9.0
-  checksum: 3ae46741f7a2390c6658a956f8dfdd624834a26b3b134b23ca5e0dac872e138bb900b53325c87340039907000060defdff2f9e722eda4442d7e714185264eab4
+  checksum: 4b6387a293a0d2521df53eca0b5d4067ee7d493ef797d30c46489d9ed2c66c078d7b399bb5eea98accaba5e9c8456162ed46d6f61158a428027ea3e3a2b1a166
   languageName: node
   linkType: hard
 
@@ -15652,11 +15652,11 @@ __metadata:
   linkType: hard
 
 "dd-trace@npm:^4.20.0":
-  version: 4.54.0
-  resolution: "dd-trace@npm:4.54.0"
+  version: 4.55.0
+  resolution: "dd-trace@npm:4.55.0"
   dependencies:
     "@datadog/libdatadog": ^0.3.0
-    "@datadog/native-appsec": 8.3.0
+    "@datadog/native-appsec": 8.4.0
     "@datadog/native-iast-rewriter": 2.6.1
     "@datadog/native-iast-taint-tracking": 3.2.0
     "@datadog/native-metrics": ^3.1.0
@@ -15686,7 +15686,7 @@ __metadata:
     shell-quote: ^1.8.1
     source-map: ^0.7.4
     tlhunter-sorted-set: ^0.1.0
-  checksum: 2ef1ee2898967880f63c78303e7d234b840a5ade83d2cf037976a287d6f5f9aeea802cb32136e006dea3e7ebecd9ca8b66422a9a95640d14f4fa0af916644674
+  checksum: 170b82c99f8e1b294852e129d688abdd9111eecde98d9f4eca88bf76a3a827a84bf9e824c89c8640cb7b19a201c7d827bf0bca5523d438247999ecbda4a3b015
   languageName: node
   linkType: hard
 
