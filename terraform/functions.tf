@@ -239,7 +239,7 @@ resource "aws_s3_bucket_notification" "reporting_data" {
 
 module "lambda_function-graphql" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.20.0"
+  version = "7.20.1"
 
   // Metadata
   function_name = "${var.namespace}-graphql"
@@ -399,7 +399,7 @@ module "lambda_function-graphql" {
 
 module "lambda_function-processValidationJson" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.20.0"
+  version = "7.20.1"
 
   // Metadata
   function_name = "${var.namespace}-processValidationJson"
@@ -506,7 +506,7 @@ module "lambda_function-processValidationJson" {
 
 module "lambda_function-cpfValidation" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.20.0"
+  version = "7.20.1"
 
   // Metadata
   function_name = "${var.namespace}-cpfValidation"
