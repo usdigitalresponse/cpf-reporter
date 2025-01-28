@@ -102,7 +102,7 @@ module "lambda_security_group" {
 
 module "lambda_artifacts_bucket" {
   source  = "cloudposse/s3-bucket/aws"
-  version = "4.9.0"
+  version = "4.10.0"
   context = module.s3_label.context
   name    = "lambda_artifacts"
 
@@ -136,7 +136,7 @@ module "lambda_artifacts_bucket" {
 
 module "reporting_data_bucket" {
   source  = "cloudposse/s3-bucket/aws"
-  version = "4.9.0"
+  version = "4.10.0"
   context = module.s3_label.context
   name    = "reporting_data"
 
