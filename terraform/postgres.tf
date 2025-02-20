@@ -41,7 +41,7 @@ resource "aws_ssm_parameter" "postgres_master_password" {
 module "postgres" {
   create  = true
   source  = "terraform-aws-modules/rds-aurora/aws"
-  version = "9.11.0"
+  version = "9.12.0"
 
   name                       = "${var.namespace}-postgres"
   cluster_use_name_prefix    = true
