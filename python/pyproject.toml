@@ -10,7 +10,7 @@ python = "^3.12"
 openpyxl = "^3.1.2"
 pydantic = "^2.10.6"
 aws-lambda-typing = "^2.19.0"
-boto3 = "^1.36.8"
+boto3 = "^1.36.24"
 structlog = "^24.1.0"
 chevron="^0.14.0"
 boto3-stubs = {extras = ["essential"], version = "^1.36.8"}
